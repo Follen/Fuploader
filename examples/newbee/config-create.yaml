@@ -1,0 +1,18 @@
+schema: fupload.newbee.config-create.v1
+cloud_id: 456
+title: Example UI 配置
+content_format: 2
+content_origin: 1
+intro: 一套可直接使用的界面配置。
+content: |
+  ## 配置说明
+
+  cloud_id 必须来自 `fupload newbee backup list`，关联与角色候选来自 `backup get`。
+public: false
+picture_files:
+  - ./assets/config-cover.png
+linked_mods: []
+ignored_unknown_mods: []
+ignored_materials: []
+ignored_fonts: []
+role_id: ""

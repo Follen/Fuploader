@@ -1,0 +1,15 @@
+schema: fupload.newbee.plugin-create.v1
+name: ExampleAddon
+categories: [1]
+content_origin: 1
+content_format: 2
+intro: 一句话介绍插件解决的问题。
+description: |
+  ## ExampleAddon
+
+  这里填写完整插件说明。
+logo_file: ./assets/logo.png
+screenshot_files:
+  - ./assets/screenshot-1.png
+subscribe_plan_level: 0
+link_to_channel: false

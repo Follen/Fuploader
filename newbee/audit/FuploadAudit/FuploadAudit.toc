@@ -1,0 +1,7 @@
+## Interface: 120100
+## Title: Fupload API Audit
+## Notes: Minimal addon package for authorized NewBeeBox upload testing.
+## Author: Fupload Audit
+## Version: 2026.07.30-audit.1
+
+FuploadAudit.lua

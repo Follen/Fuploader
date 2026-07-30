@@ -1,0 +1,15 @@
+schema: fupload.newbee.wa.create.v1
+game_version_id: 1
+name: 示例 WA
+intro: 示例简介
+description: "<p>示例详情</p>"
+content_format: 2
+thumbnail: "media/example-cover.png"
+category_id_list: [88]
+content_origin: 1
+public: false
+string_mode: single
+wa_str: "!WA:2!replace-with-export"
+wa_str_titles: []
+wa_log: 首次发布
+attachments: []

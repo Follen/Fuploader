@@ -1,0 +1,26 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 19
+name: build-fupload-newbee-cli-skill
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: 09186be9a484e29f00992bda62813c474d22aa5966de59552bcc54939645ba1c
+spec_changes:
+  - capability: fupload-cli
+    operation: create
+    source: specs/fupload-cli/spec.md
+    base_hash: null
+  - capability: fupload-skill
+    operation: create
+    source: specs/fupload-skill/spec.md
+    base_hash: null
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/519c4b60308b74fd1cd85b7f8b8551c4c00a755242005f901aff2fdbcfde3422.json
+verification_evidence: runtime/evidence/verifications/0e10d936f98adf63e13a1274ad37c9a3bcac1e57bf49fcb7467ee51921fc74e2.json
+partial_allowance: runtime/evidence/allowances/1cd78cc0bc4fd19ea0eb7df23f34cb907de06e324e920352a198e8d5d1aabd93.json
+archived: true
+created_at: 2026-07-30
+run_id: f1b4e71e-0e69-4249-82b4-b2ed2cba2b5e

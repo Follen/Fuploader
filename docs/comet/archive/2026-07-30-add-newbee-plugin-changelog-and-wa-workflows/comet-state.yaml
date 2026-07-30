@@ -1,0 +1,26 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 5
+name: add-newbee-plugin-changelog-and-wa-workflows
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: 4f70ed29655657e6f0508aeabbda42b25664129302cd452bc320478b5618ef70
+spec_changes:
+  - capability: newbee-plugin-changelog
+    operation: create
+    source: specs/newbee-plugin-changelog/spec.md
+    base_hash: null
+  - capability: newbee-wa-workflows
+    operation: create
+    source: specs/newbee-wa-workflows/spec.md
+    base_hash: null
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/95ddb8c397b4ef2992d26711e2a7140cca308806edec762fbc289b0ae2667a9b.json
+verification_evidence: runtime/evidence/verifications/91e7a2c9f70488c1786d9bf85c1e3f7a916eeba06fd82e6f882ab878116298c5.json
+partial_allowance: runtime/evidence/allowances/33e8037fe36f365b7f17adc8ae17ea7e1fe1244329a0c37670edc8845ef456ed.json
+archived: true
+created_at: 2026-07-30
+run_id: e4259e40-02dd-4584-b3cd-a3f280881369

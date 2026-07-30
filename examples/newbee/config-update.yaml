@@ -1,0 +1,4 @@
+schema: fupload.newbee.config-update.v1
+id: 789
+title: Example UI 配置 2.0
+intro: 更新后的配置简介。本次更新会直接提交公开审核。
