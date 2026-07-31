@@ -1,0 +1,28 @@
+{
+  "schema": "fupload.v1.dd.wa.create",
+  "game_type": 6,
+  "scope": "private",
+  "name": "Fupload DD Verify W03",
+  "game_version": "5.5.4",
+  "brief_desc": "Private WA verification 3",
+  "display_imgs": [
+    "https://uires.w.163.com/img/img/aGDefCUMsmSawDjP7wbamkOYYGjOLgsh"
+  ],
+  "category_ids": [
+    "314"
+  ],
+  "content": "!WA:1!FuploadSessionVerify03",
+  "desc": "Fupload DD session verification WA 3.",
+  "update_desc": "Initial WA verification 3",
+  "version": "1",
+  "with_file": false,
+  "share_code_life_type": "seven_day",
+  "need_buy": false,
+  "jump_room": false,
+  "sync_room": false,
+  "creation_statement": "original",
+  "with_associate": false,
+  "associated_acts": [],
+  "need_anchor_vip": false,
+  "vip_levels": []
+}

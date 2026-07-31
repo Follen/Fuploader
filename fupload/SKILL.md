@@ -18,10 +18,10 @@ Map natural language consistently:
 
 - `create`: create the main record. If first content is a separate platform action, plan it as a following atomic step.
 - `update`: publish a plugin version, change selected configuration-backup content, or publish a WA/string version.
-- `edit`: change metadata, media, categories, commercial settings, associations, channels, or explicit public/review state.
+- `edit`: change fields allowed by the target platform's action allowlist. For DD plugins, this is existing-record commercial, association, room/channel, and creation-statement settings; first-publication metadata, categories, media, and version fields are create/update-only.
 - `delete`: delete one main record only. It never deletes an individual version, media object, or associated record.
 
-Never offer bulk delete, version-file delete, drafts, guides, messages, or GUI automation.
+Never offer bulk delete, version-file delete, drafts, guides, messages, or GUI control automation. The DD task-session command may close verified official GUI processes only after the consent flow below.
 
 ## Select the execution channel
 
@@ -72,11 +72,19 @@ For official NewBeeBox, use the documented `ncc wow addons list|info|categories|
 
 For third-party Python NewBeeBox, always read `newbee options content-origins`, `subscribe-plans`, and `time-ranges` when the corresponding field is present. Also read plugin categories/builds, WA categories, and attachment paths for those fields. Empty option output blocks the write. Plugin compatibility uses build strings from `game-versions.items[].versions`, never the parent branch `id`.
 
-For DD, always read game types/builds and the resource-specific category tree. A plugin primary category is a top-level item and secondary IDs are children of that item. Validate associations as `(act_type,sn)`. A room-only selection has `room_id` with empty `channel_id` and `channel_type`; a channel selection requires both channel fields.
+For DD, use the one active task session to read game types/builds and the resource-specific category tree. Resolve parent/child choices in dependency order, display only children returned for the selected parent, and invalidate all descendants when a parent changes. A plugin primary category is a top-level item and secondary IDs are children of that item. Validate associations as `(act_type,sn)`. A room-only selection has `room_id` with empty `channel_id` and `channel_type`; a channel selection requires both channel fields.
 
-For official NewBeeBox, use only `ncc whoami -o json` to verify authentication; do not inspect its credential files. For third-party Python NewBeeBox, run `newbee session doctor`; credentials must come from the Windows Known Folder auth-store and all authenticated requests must use fixed official HTTPS origins. For DD, run `dd session doctor`; discovery must accept only an Authenticode-valid executable from an allowed official NetEase publisher. Do not set endpoint, credential-directory, or DD executable-path environment overrides.
+For DD WA create, collect user choices before generating JSON, then let the Python CLI supply only the official create defaults for omitted form values: seven-day share and purchase lifetimes, `need_buy=false`, category `ui_original`, `Interface/Addons`, empty VIP levels, and version `0`. Submit category IDs as strings even when a discovery response represents them numerically. Do not carry these defaults into WA update/edit; omitted existing fields preserve their remote value.
 
-For a DD retail configuration, read `dd config backup-get` and present the safe edit-mode and cooldown selector metadata. Send only returned selectors in `retail_ui_config`; never request, display, or reconstruct raw retail import strings.
+For official NewBeeBox, use only `ncc whoami -o json` to verify authentication; do not inspect its credential files. For third-party Python NewBeeBox, run `newbee session doctor`; credentials must come from the Windows Known Folder auth-store and all authenticated requests must use fixed official HTTPS origins. For DD, run `dd session doctor`; discovery must accept only an Authenticode-valid executable from an allowed official NetEase publisher. Doctor is local-only and must not start a native login. Do not set endpoint, credential-directory, or DD executable-path environment overrides.
+
+## Own one DD task session
+
+Before any DD live GET or write, run `dd session doctor`. If it reports `gui_running=true`, tell the user that continuing will close the listed official DD GUI instances and ask for explicit consent. Without consent, do not run start, do not close a process, and do not issue a native login. After consent, run `dd session start --confirm-close-gui`; when no GUI is running, run `dd session start` without that flag.
+
+Keep the returned opaque `session_id` only in task memory and pass it as `--session <id>` to every DD GET, write, readback, status, and delete. Reuse this one session for the complete task, serialize all commands, stop on the first failure, and never start one session per item in a batch. In a `finally` path, always run `dd session stop --session <id>` and require `cleanup_complete=true`; the ten-minute idle timeout is only an abnormal-exit fallback.
+
+For every DD configuration, first list backups, select `backup_sn`, then run `dd config backup-get --sn <backup>`. Select a WTF account/server/role before presenting that account's known/unknown WA choices. For a retail configuration, present the safe edit-mode and cooldown selector metadata. Send only stable IDs and returned selectors; never request, display, store, or reconstruct raw backup objects or retail import strings.
 
 For a configuration, require a cloud backup already uploaded by the matching desktop client. If none exists, ask the user to upload one in the client and stop before writing.
 
@@ -84,7 +92,7 @@ For a configuration, require a cloud backup already uploaded by the matching des
 
 Expose every business field writable through the selected channel. Do not silently accept a webpage preselection or invent a business default. This includes applicable game type/build, categories, origin, format, visibility, review submission, payment, lifetime, price, room/channel, synchronization, membership, associations, backup content, WTF roles, incremental selections, retail UI data, WA material mode, and install path. When official `ncc` does not expose a webpage field or action, state that capability boundary; do not guess a hidden flag or silently switch to Python.
 
-Use existing remote values only for omitted fields in `edit` or `update`, where omission means preserve. Show candidates by human name plus ID/SN and relevant status. Ask only choices that cannot be determined from the user's explicit request, local artifacts, or remote reads.
+Use existing remote values only for omitted fields in `edit` or `update`, where omission means preserve. Show candidates by human name plus ID/SN and relevant status. Ask only choices that cannot be determined from the user's explicit request, local artifacts, or remote reads. For DD, do not draft the executable JSON incrementally: close the full dependency graph first, then generate one final JSON containing parent fields and stable child IDs/selectors. Python repeats the live GETs before upload or mutation and rejects missing or cross-parent selections; detail is authoritative when DD list and detail timestamps differ.
 
 ## Prepare and confirm
 
@@ -104,14 +112,14 @@ Before the first write, present one complete human-readable plan containing:
 
 Obtain one explicit confirmation for that exact plan. If the plan changes materially, confirm the changed plan once.
 
-For a Python delete, first run the resource `get` command, show the exact name and ID/SN, and obtain confirmation for that single record. Write a delete input containing only the schema, `id` or `sn`, and `confirm: "DELETE"`. Do not reuse confirmation for another record and do not retry an uncertain delete. Official `ncc` currently documents plugin, WA, and configuration main-record deletion as web-only; state that boundary and wait for an explicit third-party selection before offering the Python delete command.
+For a Python delete, first run the resource `get` command, show the exact name and ID/SN, and obtain confirmation for that single record. NewBeeBox delete input contains only the schema, `id`, and `confirm: "DELETE"`; DD delete input contains only the schema, `sn`, and `confirm_delete: true`. Do not reuse confirmation for another record and do not retry an uncertain delete. Official `ncc` currently documents plugin, WA, and configuration main-record deletion as web-only; state that boundary and wait for an explicit third-party selection before offering the Python delete command.
 
 ## Execute and verify
 
-Run writes serially. For official `ncc`, always request `-o json`, parse stdout as JSON, and treat stderr only as progress diagnostics. For Python, parse its stable JSON output. Never scrape human text. After each successful step, immediately run the corresponding info/get/list/versions/history command and compare the intended fields. Treat “submitted for review” and “under review” as distinct from “approved” or “publicly visible.”
+Run writes serially. For official `ncc`, always request `-o json`, parse stdout as JSON, and treat stderr only as progress diagnostics. For Python, parse its stable JSON output. Never scrape human text. After each successful step, immediately run the corresponding info/get/list/versions/history command and compare the intended fields in the same DD session when applicable. For DD plugin update, the matching author-list item's `latest_version` is the primary confirmation; `detail_v2` is supplementary, and an empty `/addon/addon_versions` response is diagnostic-only. Treat “submitted for review” and “under review” as distinct from “approved” or “publicly visible.”
 
 In the third-party Python NewBeeBox channel, public plugin publication is three atomic writes: create privately, upload and verify the first version, then edit to public with explicit review intent. Never send a public `share_state` during Python create. In the official channel, follow the installed `ncc docs` sequence for create, init, push, and visibility instead of applying Python wire rules.
 
-Stop on the first failure. Report completed steps, retained IDs/SNs or media references, the redacted failure, whether verification is required, and the smallest safe retry. Official exit codes are `0` success, `1` business error, `2` authentication failure, and `3` network error. Even when a network error is generally retryable, read back after an uncertain write before resending it. Never loop on `quota_exceeded`.
+Stop on the first failure. Report completed steps, retained IDs/SNs or media references, the redacted failure stage, whether verification is required, and the smallest safe retry. Explicit DD HTTP/business rejection has `verification_required=false`; interrupted PUT/mutation or failed readback after an accepted write has `verification_required=true`. Native DD failures may include a bounded message and native business code, but signed-URL credentials, signatures, and tokens remain redacted. Read back after an uncertain write before resending it. Official NewBeeBox exit codes are `0` success, `1` business error, `2` authentication failure, and `3` network error. Never loop on `quota_exceeded`.
 
 Never print or persist tokens, cookies, JWTs, signed URLs, DD `clientNo`, raw WA strings, or raw configuration backup contents.

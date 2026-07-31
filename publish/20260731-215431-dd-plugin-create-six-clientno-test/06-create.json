@@ -1,0 +1,31 @@
+{
+  "schema": "fupload.v1.dd.plugin.create",
+  "game_type": 10001,
+  "scope": "private",
+  "addon_type": 0,
+  "name": "Fupload DD ClientNo Create Test 06",
+  "description": "Private DD sidecar session contention test 06 of 06",
+  "logo": "https://uires.w.163.com/img/img/6SIHCOlxh1wfhidseZD0Ma1qufp1SZWT",
+  "detail_imgs": [
+    "https://uires.w.163.com/img/img/aGDefCUMsmSawDjP7wbamkOYYGjOLgsh"
+  ],
+  "primary_category_id": 1018,
+  "second_category_ids": [],
+  "html_desc": "<p>Private Fupload DD ClientNo and sidecar session contention test 06 of 06.</p>",
+  "share_code_life_type": "seven_day",
+  "need_buy": false,
+  "jump_room": false,
+  "sync_room": false,
+  "creation_statement": "original",
+  "with_associate": false,
+  "associated_acts": [],
+  "need_anchor_vip": false,
+  "vip_levels": [],
+  "game_versions": [
+    "11.2.7"
+  ],
+  "file": "D:\\备份\\xwechat_files\\SukiFollen_891f\\msg\\file\\2026-07\\OmniCC v11.2.8 Rurutia fix.zip",
+  "release_type": 1,
+  "version": "11.2.8-test-06",
+  "update_desc": "Initial private sidecar contention test 06 of 06"
+}

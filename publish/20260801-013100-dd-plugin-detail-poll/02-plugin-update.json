@@ -1,0 +1,11 @@
+{
+  "schema": "fupload.v1.dd.plugin.update",
+  "sn": "f09176b5a4f443328dc6b46a66e237a7",
+  "game_versions": [
+    "12.0.7"
+  ],
+  "file": "D:\\备份\\xwechat_files\\SukiFollen_891f\\msg\\file\\2026-07\\OmniCC v11.2.8 Rurutia fix.zip",
+  "release_type": 1,
+  "version": "2.0.0",
+  "update_desc": "Detail poll verification update"
+}

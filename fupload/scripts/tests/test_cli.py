@@ -41,7 +41,7 @@ class CLITests(unittest.TestCase):
 
     def test_every_cli_leaf_has_complete_help_and_dispatch(self) -> None:
         leaves = parser_leaves(build_parser())
-        self.assertEqual(len(leaves), 73)
+        self.assertEqual(len(leaves), 76)
         for path, parser in leaves:
             with self.subTest(path=" ".join(path)):
                 handler = parser.get_default("handler")
@@ -101,6 +101,20 @@ class CLITests(unittest.TestCase):
         self.assertIn("fixed official HTTPS origins", skill)
         self.assertIn("Authenticode-valid executable", skill)
         self.assertIn("Do not set endpoint, credential-directory", skill)
+
+    def test_skill_owns_one_confirmed_dd_task_session(self) -> None:
+        root = Path(__file__).resolve().parents[2]
+        skill = (root / "SKILL.md").read_text(encoding="utf-8")
+        workflow = (root / "references" / "workflow.md").read_text(encoding="utf-8")
+        dd_reference = (root / "references" / "dd.md").read_text(encoding="utf-8")
+        for text in (skill, workflow, dd_reference):
+            self.assertIn("dd session doctor", text)
+            self.assertIn("dd session start --confirm-close-gui", text)
+            self.assertIn("dd session stop --session <id>", text)
+            self.assertIn("finally", text)
+        self.assertIn("never start one session per item", skill)
+        self.assertIn("one final JSON", skill)
+        self.assertIn("backup_sn -> backup detail -> WTF account/server/role", workflow)
 
     def test_skill_prefers_official_newbee_cli_without_silent_fallback(self) -> None:
         root = Path(__file__).resolve().parents[2]

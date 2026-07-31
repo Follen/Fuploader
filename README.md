@@ -12,7 +12,7 @@ Fuploader 是一个面向 Agent 的《魔兽世界》作者发布 Skill。新手
 - 第三方 Python 的编辑和更新采用 `GET -> 动态选项查询 -> presence-aware patch -> 写入 -> 读回`；官方通道采用 `ncc` 文档规定的只读查询、写入和读回命令。
 - 第三方 Python 写入使用严格 JSON Schema：未知字段、重复键、`NaN` 和 `Infinity` 均会被拒绝；官方 `ncc` 使用参数和 `-o json` 结构化输出。
 - 新手盒子官方通道复用本机 `ncc login` 或预先注入的 `NCC_TOKEN`，第三方通道复用桌面客户端登录状态；不接收或输出 token、cookie、JWT、签名 URL、DD `clientNo`、原始 WA 字符串或原始配置内容。
-- DD 通过已安装官方客户端的无头运行环境完成原生登录、签名和 WA 解析。
+- DD 通过已安装官方客户端的无头运行环境完成原生登录、签名和 WA 解析；一次发布任务只建立一个串行会话，任务结束立即退出。
 
 ## 目录
 
@@ -78,12 +78,22 @@ python fupload\scripts\fupload.py newbee plugin create --help
 python fupload\scripts\fupload.py dd config update --help
 ```
 
-检查桌面登录状态：
+检查桌面登录与安装状态：
 
 ```powershell
 python fupload\scripts\fupload.py newbee session doctor
 python fupload\scripts\fupload.py dd session doctor
 ```
+
+DD doctor 不会登录。若输出 `gui_running=true`，需先取得用户同意，随后关闭已验证的官方 GUI 并建立一个任务会话：
+
+```powershell
+python fupload\scripts\fupload.py dd session start --confirm-close-gui
+python fupload\scripts\fupload.py dd options game-types --session <session-id>
+python fupload\scripts\fupload.py dd session stop --session <session-id>
+```
+
+GUI 未运行时，`session start` 不加 `--confirm-close-gui`。后续 DD 的动态查询、写入和读回都传同一个 `--session`，并在 `finally` 中 stop。
 
 读取当前游戏分支：
 
@@ -104,8 +114,8 @@ python fupload\scripts\fupload.py dd plugin update --input fupload\examples\dd-p
 ## 工作流约束
 
 1. 写入前先运行目标 leaf command 的 `--help`，以运行时 Schema 为准。
-2. 使用只读命令获取账号记录、分类、版本、备份、频道和关联候选，不猜测 ID。
-3. 配置分享必须选择对应桌面客户端已经上传的云端备份。
+2. 使用只读命令获取账号记录、分类、版本、备份、频道和关联候选，不猜测 ID；DD 的全部命令复用一个任务 session。
+3. DD 配置按 `backup_sn -> backup detail -> WTF 账号/服务器/角色 -> 该账号的 WA` 逐层选择，依赖闭合后只生成一次最终 JSON。
 4. 每次独立发布都在目标项目的 `publish/` 下创建新目录，不把 JSON 写入 Skill 目录，也不自动删除发布记录。
 5. 第三方 Python 写入先执行 `--dry-run`；官方 `ncc` 只对文档声明支持的叶子执行 dry-run，例如 `addons push --dry-run`。
 6. 得到明确确认后串行写入，每步成功后立即读回验证。

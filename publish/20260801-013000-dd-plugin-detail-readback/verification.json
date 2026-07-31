@@ -1,0 +1,50 @@
+{
+  "generated_at": "2026-08-01T01:25:04.1555112+08:00",
+  "records": [
+    {
+      "label": "plugin.create.1.0.0",
+      "exit_code": 0,
+      "success": true,
+      "operation": "plugin.create",
+      "reference": "6ebc9ea298ed41939bee1c08e9f659c1",
+      "error": null
+    },
+    {
+      "label": "plugin.update.2.0.0",
+      "exit_code": 2,
+      "success": false,
+      "operation": "plugin.update",
+      "reference": null,
+      "error": {
+        "details": {
+          "fields": [
+            "detail_url",
+            "release_type",
+            "update_desc",
+            "version"
+          ]
+        },
+        "endpoint": "/addon/detail_v2",
+        "kind": "verification_required",
+        "message": "write readback did not match field(s): detail_url, release_type, update_desc, version",
+        "stage": "readback",
+        "verification_required": true
+      }
+    },
+    {
+      "label": "plugin.delete",
+      "exit_code": 0,
+      "success": true,
+      "operation": "plugin.delete",
+      "reference": null,
+      "error": null
+    },
+    {
+      "label": "session.lifecycle",
+      "success": false,
+      "login_count": 1,
+      "running_before_stop": true,
+      "cleanup_complete": null
+    }
+  ]
+}

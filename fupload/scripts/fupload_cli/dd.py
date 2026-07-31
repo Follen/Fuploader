@@ -5,13 +5,11 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
-import mimetypes
 import os
 import queue
 import subprocess
 import threading
 import time
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 import urllib.parse
@@ -30,7 +28,13 @@ LIFE_TYPES = [
     {"name": "forever", "value": "forever"},
 ]
 
-
+_OMIT_FILE_NAME = object()
+_IMAGE_MIME = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+}
 def _running_dd_dirs() -> List[Path]:
     if os.name != "nt":
         return []
@@ -266,7 +270,11 @@ class Sidecar:
             raise
         if not ready.get("ready"):
             self.close()
-            raise FuploadError(str((ready.get("error") or {}).get("message") or "DD sidecar failed to start"), kind="authentication_error")
+            raise FuploadError(
+                str((ready.get("error") or {}).get("message") or "DD sidecar failed to start"),
+                kind="authentication_error",
+                stage="session",
+            )
         return self
 
     def _lock(self) -> None:
@@ -293,6 +301,7 @@ class Sidecar:
 
     def _next_result(
         self, *, timeout: float = 180, endpoint: Optional[str] = None,
+        stage: Optional[str] = None,
         verification_required: bool = False,
     ) -> Dict[str, Any]:
         try:
@@ -301,11 +310,18 @@ class Sidecar:
             raise FuploadError(
                 "DD sidecar response timed out",
                 kind="timeout",
+                stage=stage,
                 endpoint=endpoint,
                 verification_required=verification_required,
             ) from exc
         if isinstance(value, FuploadError):
-            raise value
+            raise FuploadError(
+                str(value),
+                kind=value.kind,
+                stage=stage or value.stage,
+                endpoint=endpoint or value.endpoint,
+                verification_required=verification_required or value.verification_required,
+            )
         if not isinstance(value, dict):
             raise FuploadError("DD sidecar returned an invalid result", kind="sidecar_error")
         return value
@@ -318,56 +334,105 @@ class Sidecar:
         self.process.stdin.flush()
         method = str(values.get("method") or "").upper()
         endpoint = str(values.get("path") or "") or None
-        uncertain = action == "upload" or (action == "request" and method == "POST")
-        response = self._next_result(endpoint=endpoint, verification_required=uncertain)
+        if action == "cc_get":
+            endpoint = urllib.parse.urlsplit(str(values.get("url") or "")).path or None
+        request_stage = str(values.get("request_stage") or "")
+        if action == "request" and request_stage == "dependency_get":
+            expected_stage, uncertain = "dependency_get", False
+        elif action == "request" and method == "POST":
+            expected_stage, uncertain = "mutation", True
+        elif action == "upload":
+            expected_stage, uncertain = "object_put", True
+        elif action == "parse_wa":
+            expected_stage, uncertain = "native_parser", False
+        else:
+            expected_stage, uncertain = "dependency_get", False
+        response = self._next_result(
+            endpoint=endpoint,
+            stage=expected_stage,
+            verification_required=uncertain,
+        )
         if response.get("id") != self.counter:
             raise FuploadError("DD sidecar response order was invalid", kind="sidecar_error")
         if not response.get("ok"):
-            message = str((response.get("error") or {}).get("message") or "DD operation failed")
-            timed_out = "timed out" in message.lower() or "timeout" in message.lower()
+            error = response.get("error") if isinstance(response.get("error"), dict) else {}
+            message = str(error.get("message") or "DD operation failed")
+            timed_out = "timed out" in message.casefold() or "timeout" in message.casefold()
+            stage = str(error.get("stage") or expected_stage)
+            if stage == "object_put":
+                endpoint = "object-store-put"
+            elif stage == "upload_authorize":
+                endpoint = "/file/upload"
             raise FuploadError(
                 message,
-                kind="timeout" if timed_out else "platform_error",
+                kind=str(error.get("kind") or ("timeout" if timed_out else "platform_error")),
+                stage=stage,
                 endpoint=endpoint,
-                verification_required=uncertain,
+                http_status=error.get("http_status"),
+                business_code=error.get("business_code"),
+                verification_required=bool(error.get("verification_required")) or (uncertain and timed_out),
             )
         return response.get("data")
 
     def get(self, path: str, params: Optional[Mapping[str, Any]] = None) -> Any:
         return self._business_response(
-            path, self.call("request", method="GET", path=path, payload=dict(params or {}))
+            path, self.call("request", method="GET", path=path, payload=dict(params or {})), "dependency_get"
         )
 
     def post(self, path: str, body: Mapping[str, Any]) -> Any:
         return self._business_response(
-            path, self.call("request", method="POST", path=path, payload=dict(body))
+            path, self.call("request", method="POST", path=path, payload=dict(body)), "mutation"
+        )
+
+    def post_read(self, path: str, body: Mapping[str, Any]) -> Any:
+        return self._business_response(
+            path,
+            self.call(
+                "request", method="POST", path=path, payload=dict(body),
+                request_stage="dependency_get",
+            ),
+            "dependency_get",
         )
 
     @staticmethod
-    def _business_response(path: str, payload: Any) -> Any:
+    def _business_response(path: str, payload: Any, stage: str = "mutation") -> Any:
         if isinstance(payload, dict) and "code" in payload and payload.get("code") != 0:
             raise FuploadError(
                 str(payload.get("msg") or payload.get("message") or "DD operation failed"),
+                kind="platform_error",
+                stage=stage,
                 endpoint=path,
                 business_code=payload.get("code"),
             )
         return payload
 
-    def upload(self, file: str, business: str, *, file_name: Optional[str] = None, media: bool = False, max_bytes: Optional[int] = None) -> str:
-        name = file_name or Path(file).name
+    def upload(
+        self,
+        file: str,
+        business: str,
+        *,
+        file_name: Any = _OMIT_FILE_NAME,
+        media: bool = False,
+        max_bytes: Optional[int] = None,
+    ) -> str:
+        suffix = Path(file).suffix.casefold()
         size = Path(file).stat().st_size
         if max_bytes is not None and size > max_bytes:
             raise ValidationError("file exceeds the platform limit", path="$.file")
-        mime = mimetypes.guess_type(name)[0] or "application/octet-stream"
-        if media and not mime.startswith("image/"):
-            raise ValidationError("media file must have an image MIME type", path="$.file")
-        if name.lower().endswith(".zip"):
+        if media:
+            mime = _IMAGE_MIME.get(suffix)
+            if not mime:
+                raise ValidationError("media file extension must be .png, .jpg, .jpeg, or .gif", path="$.file")
+        else:
+            if suffix != ".zip":
+                raise ValidationError("resource file extension must be .zip", path="$.file")
             mime = "application/x-zip-compressed"
         file_type = "a19-ui-media" if media else "a19-ui-res"
         upload_business = "img" if media else business
-        result = self.call("upload", file=file, meta={
-            "file_type": file_type, "file_name": name, "business_id": upload_business, "mime_type": mime,
-        })
+        meta = {"file_type": file_type, "business_id": upload_business, "mime_type": mime}
+        if file_name is not _OMIT_FILE_NAME:
+            meta["file_name"] = str(file_name)
+        result = self.call("upload", file=file, meta=meta)
         return str(result["d_url"])
 
     def cc_get(self, url: str) -> Any:
@@ -522,15 +587,40 @@ def _verify_fields(expected: Mapping[str, Any], actual: Mapping[str, Any], field
     if mismatches:
         raise FuploadError(
             "write readback did not match field(s): %s" % ", ".join(sorted(mismatches)),
-            kind="verification_required", endpoint=endpoint, verification_required=True,
+            kind="verification_required", stage="readback", endpoint=endpoint, verification_required=True,
             details={"fields": sorted(mismatches)},
         )
+
+
+def _readback(getter: Any, endpoint: str) -> Any:
+    try:
+        return getter()
+    except FuploadError as exc:
+        if exc.stage == "readback" and exc.verification_required:
+            raise
+        raise FuploadError(
+            str(exc),
+            kind=exc.kind,
+            stage="readback",
+            endpoint=exc.endpoint or endpoint,
+            http_status=exc.http_status,
+            business_code=exc.business_code,
+            verification_required=True,
+            details=exc.details,
+        ) from exc
+
+
+def _dependency_post(session: Any, path: str, body: Mapping[str, Any]) -> Any:
+    method = getattr(session, "post_read", None)
+    if callable(method):
+        return method(path, body)
+    return session.post(path, body)
 
 
 def author_listing(session: Sidecar, resource: str, keyword: str, game_type: Any) -> Any:
     common = {"game_type": game_type, "origin": "created", "page": 1, "size": 100}
     if resource == "plugin":
-        return session.post("/addon/addon_list", {
+        return _dependency_post(session, "/addon/addon_list", {
             **common, "category": 0,
             "name_or_author_name_or_share_code": keyword,
             "sort_type": 2,
@@ -551,7 +641,7 @@ def readable_author_list(
     common = {"game_type": game_type, "origin": "created", "page": page, "size": size}
     def load(search: str) -> Any:
         if resource == "plugin":
-            return session.post("/addon/addon_list", {
+            return _dependency_post(session, "/addon/addon_list", {
                 **common, "category": 0,
                 "name_or_author_name_or_share_code": search, "sort_type": 2,
             })
@@ -613,21 +703,6 @@ def author_item(session: Sidecar, resource: str, reference: str, name: str, game
     return {}
 
 
-def _timestamp(value: Any) -> Optional[float]:
-    if isinstance(value, (int, float)):
-        return float(value)
-    text = str(value or "").strip()
-    if not text:
-        return None
-    try:
-        return float(text)
-    except ValueError:
-        try:
-            return datetime.fromisoformat(text.replace("Z", "+00:00")).timestamp()
-        except ValueError:
-            return None
-
-
 def safe_game_types(payload: Any) -> Dict[str, Any]:
     result_items = []
     for item in items(payload):
@@ -635,7 +710,89 @@ def safe_game_types(payload: Any) -> Dict[str, Any]:
             "game_type": item.get("game_type"), "name": item.get("name"),
             "type": item.get("type"), "def_game_version": item.get("def_game_version"),
         })
-    return {"total": len(result_items), "items": result_items}
+    return {
+        "total": len(result_items),
+        "items": result_items,
+        "dependencies": [
+            {"parent": "game_type", "children": ["game_versions", "associated_acts", "category_ids"]},
+        ],
+    }
+
+
+def safe_game_versions(payload: Any, game_type: Any) -> Dict[str, Any]:
+    result_items = []
+    seen = set()
+    for item in _option_items(payload):
+        if isinstance(item, dict):
+            value = item.get("game_version") or item.get("version") or item.get("value") or item.get("id")
+            name = item.get("name") or item.get("label") or value
+        else:
+            value = item
+            name = item
+        if value in (None, "") or str(value) in seen:
+            continue
+        seen.add(str(value))
+        result_items.append({"value": value, "name": name, "game_type": game_type})
+    return {
+        "parent": {"game_type": game_type},
+        "total": len(result_items),
+        "items": result_items,
+    }
+
+
+def safe_plugin_categories(payload: Any) -> Dict[str, Any]:
+    result_items = []
+    for item in _option_items(payload):
+        if not isinstance(item, dict):
+            continue
+        primary = _category_id(item)
+        if primary is None:
+            continue
+        children = []
+        for child in item.get("children") or []:
+            if not isinstance(child, dict):
+                continue
+            child_id = _category_id(child)
+            if child_id is not None:
+                children.append({
+                    "id": child_id,
+                    "name": child.get("name") or child.get("label"),
+                    "primary_category_id": primary,
+                })
+        result_items.append({
+            "id": primary,
+            "name": item.get("name") or item.get("label"),
+            "children": children,
+        })
+    return {
+        "total": len(result_items),
+        "items": result_items,
+        "dependencies": [{"parent": "primary_category_id", "child": "second_category_ids"}],
+    }
+
+
+def safe_wa_categories(payload: Any, game_type: Any) -> Dict[str, Any]:
+    result_items = []
+
+    def visit(rows: Sequence[Any], parent: Optional[str] = None) -> None:
+        for item in rows:
+            if not isinstance(item, dict):
+                continue
+            value = _category_id(item)
+            if value is not None:
+                result_items.append({
+                    "id": value,
+                    "name": item.get("name") or item.get("label"),
+                    "parent_id": parent,
+                    "game_type": game_type,
+                })
+            for key in ("children", "items", "options"):
+                children = item.get(key)
+                if isinstance(children, list):
+                    visit(children, value or parent)
+
+    visit(_option_items(payload))
+    return {"parent": {"game_type": game_type}, "total": len(result_items), "items": result_items}
 
 
 def safe_channels(payload: Any) -> Dict[str, Any]:
@@ -673,7 +830,11 @@ def safe_channels(payload: Any) -> Dict[str, Any]:
         if key not in seen:
             seen.add(key)
             unique.append(item)
-    return {"total": len(unique), "items": unique}
+    return {
+        "total": len(unique),
+        "items": unique,
+        "dependencies": [{"parent": "room_id", "children": ["channel_id", "channel_type"]}],
+    }
 
 
 def version_greater(candidate: Any, current: Any) -> bool:
@@ -801,6 +962,10 @@ def safe_backup_detail(value: Any) -> Dict[str, Any]:
     retail = value.get("retail_ui_config")
     if isinstance(retail, dict):
         result_value["retail_ui_config"] = safe_retail_catalog(value)
+    result_value["dependencies"] = [
+        {"parent": "backup_sn", "children": ["wtf_role_ids", "content_groups", "retail_ui_config"]},
+        {"parent": "wtf_role_ids.account", "children": ["known_wa_ids", "unknown_wa_ids"]},
+    ]
     return result_value
 
 
@@ -948,7 +1113,7 @@ def resolve_retail_ui_config(
 def safe_associated_acts(session: Sidecar, game_type: Any) -> Dict[str, Any]:
     common = {"game_type": game_type, "origin": "created", "page": 1, "size": 100}
     sources = (
-        ("addon", session.post("/addon/addon_list", {**common, "category": 0, "name_or_author_name_or_share_code": "", "sort_type": 2})),
+        ("addon", _dependency_post(session, "/addon/addon_list", {**common, "category": 0, "name_or_author_name_or_share_code": "", "sort_type": 2})),
         ("share", session.get("/share/list", {**common, "search_text": "", "sort_type": "mtime"})),
         ("wa", session.get("/wa/list", {**common, "search_text": "", "category_id": "", "sort_type": "mtime"})),
     )
@@ -1021,7 +1186,7 @@ COMMERCIAL = (
 )
 
 
-def normalize_commercial(form: Dict[str, Any]) -> None:
+def normalize_commercial(form: Dict[str, Any], resource: Optional[str] = None) -> None:
     if not form.get("need_buy"):
         form["price_fen"] = 0
         form["buy_life_type"] = form.get("buy_life_type") or "seven_day"
@@ -1030,7 +1195,10 @@ def normalize_commercial(form: Dict[str, Any]) -> None:
         form["need_anchor_vip"] = False
         form["vip_levels"] = []
     elif form.get("scope") == "public":
-        form["share_code_life_type"] = "forever"
+        if resource in ("plugin", "wa"):
+            form["share_code_life_type"] = "forever"
+        elif resource == "config":
+            form.pop("share_code_life_type", None)
     if not form.get("jump_room"):
         form.update({"room_id": "", "channel_id": "", "channel_type": "", "sync_room": False})
     if not form.get("with_associate"):
@@ -1039,10 +1207,30 @@ def normalize_commercial(form: Dict[str, Any]) -> None:
         form["vip_levels"] = []
 
 
+def validate_locked_usage_mode(current: Mapping[str, Any], form: Mapping[str, Any], doc: Mapping[str, Any]) -> None:
+    if not current or not any(name in doc for name in ("need_buy", "need_anchor_vip")):
+        return
+    current_paid = bool(current.get("need_buy") or current.get("need_anchor_vip"))
+    requested_paid = bool(form.get("need_buy") or form.get("need_anchor_vip"))
+    if current_paid != requested_paid:
+        path = "$.need_buy" if "need_buy" in doc else "$.need_anchor_vip"
+        raise ValidationError("the outer free/paid usage mode is locked after creation", path=path)
+
+
 PLUGIN_FIELDS = (
     "game_type", "game_versions", "scope", "addon_type", "name", "description", "logo",
     "detail_imgs", "primary_category_id", "second_category_ids", "detail_url", "release_type",
     "version", "html_desc", "update_desc", *COMMERCIAL,
+)
+
+# DD's modify form is not a second create form.  The official edit page
+# rebuilds the payload from the existing commercial/association controls;
+# first-publication metadata and version fields belong to create/update.
+PLUGIN_EDIT_FIELDS = (
+    "scope", "share_code_life_type", "need_buy", "price_fen", "buy_life_type",
+    "jump_room", "room_id", "channel_id", "channel_type", "sync_room",
+    "creation_statement", "with_associate", "associated_acts", "need_anchor_vip",
+    "vip_levels",
 )
 
 
@@ -1057,7 +1245,7 @@ def plugin_form(value: Mapping[str, Any]) -> Dict[str, Any]:
         category_id for category_id in (form.get("second_category_ids") or [])
         if str(category_id) != "999"
     ]
-    normalize_commercial(form)
+    normalize_commercial(form, "plugin")
     return form
 
 
@@ -1082,9 +1270,12 @@ def selected_group(backup: Mapping[str, Any], current: Mapping[str, Any], name: 
         raise ValidationError("selection is absent from the chosen backup: %s" % missing, path="$.%s" % name)
     old_versions = dict(((current.get(name) or {}).get("inner_version") or {}))
     versions = {}
-    for value in selected:
-        old = int(old_versions.get(str(value), old_versions.get(value, 0)) or 0)
-        versions[str(value)] = old + 1 if value in updates and old else (old or 1)
+    update_keys = {str(value) for value in updates}
+    for item in available:
+        value = _key(item, key)
+        lookup = str(value)
+        old = int(old_versions.get(lookup, old_versions.get(value, 0)) or 0)
+        versions[lookup] = old + 1 if lookup in update_keys and old else (old or 1)
     return {"items": [copy.deepcopy(by_key[value]) for value in selected], "inner_version": versions}
 
 
@@ -1145,6 +1336,29 @@ def selected_wtf_account(value: Mapping[str, Any]) -> str:
     return selected[0] if len(selected) == 1 else ""
 
 
+def current_wtf_selectors(backup: Mapping[str, Any], current: Mapping[str, Any]) -> List[str]:
+    available = safe_backup_detail(backup).get("wtf_roles") or []
+    selected = []
+    accounts = ((current.get("wtf") or {}).get("accounts") or []) if isinstance(current.get("wtf"), dict) else []
+    for account in accounts:
+        if not isinstance(account, dict):
+            continue
+        for server in account.get("servers") or []:
+            if not isinstance(server, dict):
+                continue
+            for role in server.get("items") or []:
+                role_id = role.get("role_id") or role.get("id") or role.get("name") if isinstance(role, dict) else role
+                matches = [item for item in available if (
+                    str(item.get("account") or "") == str(account.get("name") or "")
+                    and str(item.get("server") or "") == str(server.get("name") or "")
+                    and str(item.get("role_id") or item.get("name") or "") == str(role_id or "")
+                )]
+                if len(matches) != 1:
+                    raise ValidationError("current WTF role is absent from the live backup", path="$.wtf_role_ids")
+                selected.append(str(matches[0]["selector"]))
+    return selected
+
+
 def selected_wa_group(
     backup: Mapping[str, Any], current: Mapping[str, Any], name: str,
     selected: Sequence[str], updates: Sequence[str], account: str,
@@ -1168,10 +1382,13 @@ def selected_wa_group(
         raise ValidationError("WA selection is unavailable for the selected WTF account", path="$.%s_ids" % name)
     old_versions = dict(((current.get(name) or {}).get("inner_version") or {}))
     versions: Dict[str, int] = {}
+    update_keys = {str(value) for value in updates}
+    for item in available:
+        uid = str(item.get("uid"))
+        old = int(old_versions.get(uid, 0) or 0)
+        versions[uid] = old + 1 if uid in update_keys and old else (old or 1)
     chosen = []
     for uid in selected:
-        old = int(old_versions.get(uid, 0) or 0)
-        versions[uid] = old + 1 if uid in updates and old else (old or 1)
         item = copy.deepcopy(by_uid[uid])
         if name == "unknown_wa":
             item["id"] = mapping[uid]
@@ -1188,8 +1405,14 @@ def config_form(current: Mapping[str, Any], backup: Mapping[str, Any], doc: Mapp
         if selected_name in doc:
             form[group] = selected_group(backup, current, group, key, doc[selected_name], doc.get(update_name, []))
         else:
-            form[group] = copy.deepcopy(current.get(group) or {"items": [], "inner_version": {}})
-    form["wtf"] = wtf_tree(backup, doc["wtf_role_ids"]) if "wtf_role_ids" in doc else copy.deepcopy(current.get("wtf") or {"accounts": []})
+            current_selected = [
+                _key(item, key) for item in ((current.get(group) or {}).get("items") or [])
+            ]
+            form[group] = selected_group(backup, current, group, key, current_selected, [])
+    if "wtf_role_ids" in doc:
+        form["wtf"] = wtf_tree(backup, doc["wtf_role_ids"])
+    else:
+        form["wtf"] = wtf_tree(backup, current_wtf_selectors(backup, current))
     account = selected_wtf_account(form)
     current_account = selected_wtf_account(current)
     account_changed = "wtf_role_ids" in doc and account != current_account
@@ -1203,9 +1426,13 @@ def config_form(current: Mapping[str, Any], backup: Mapping[str, Any], doc: Mapp
                 raise ValidationError("select one WTF role before selecting WA content", path="$.wtf_role_ids")
             form[group] = selected_wa_group(backup, current, group, selected, doc.get(update_name, []), account)
         elif account_changed:
-            form[group] = {"items": [], "inner_version": {}}
+            form[group] = selected_wa_group(backup, current, group, [], [], account)
         else:
-            form[group] = copy.deepcopy(current.get(group) or {"items": [], "inner_version": {}})
+            current_selected = [
+                str(item.get("uid")) for item in ((current.get(group) or {}).get("items") or [])
+                if isinstance(item, dict) and item.get("uid") is not None
+            ]
+            form[group] = selected_wa_group(backup, current, group, current_selected, [], account)
     if current.get("retail_ui_config") is not None:
         form["retail_ui_config"] = copy.deepcopy(current["retail_ui_config"])
     if (form.get("known_addon", {}).get("items") or form.get("unknown_addon", {}).get("items")) and not form.get("wtf", {}).get("accounts"):
@@ -1213,7 +1440,8 @@ def config_form(current: Mapping[str, Any], backup: Mapping[str, Any], doc: Mapp
     content_groups = ("known_addon", "unknown_addon", "wtf", "material", "font")
     if not any(form.get(name, {}).get("items") or form.get(name, {}).get("accounts") for name in content_groups):
         raise ValidationError("DD configuration content cannot contain only WA selections", path="$.known_addon_ids")
-    normalize_commercial(form)
+    validate_locked_usage_mode(current, form, doc)
+    normalize_commercial(form, "config")
     return form
 
 
@@ -1222,6 +1450,16 @@ WA_FIELDS = (
     "content", "desc", "update_desc", "version", "with_file", "file_path", "file_install_path",
     "parse_wa_uid", "parse_wa_id", *COMMERCIAL,
 )
+
+WA_CREATE_DEFAULTS = {
+    "share_code_life_type": "seven_day",
+    "need_buy": False,
+    "buy_life_type": "seven_day",
+    "category_ids": ["ui_original"],
+    "file_install_path": "Interface/Addons",
+    "vip_levels": [],
+    "version": "0",
+}
 
 
 class DD:
@@ -1232,28 +1470,34 @@ class DD:
         endpoint = {"plugin": "/addon/detail_v2", "config": "/share/detail", "wa": "/wa/detail"}[resource]
         for attempt in range(2):
             current = detail(session, resource, reference)
+            if current.get("is_owner") is False:
+                raise FuploadError(
+                    "DD target is not owned by the current author",
+                    kind="ownership_error", stage="dependency_get", endpoint=endpoint,
+                )
             game_type = current.get("game_type") or (current.get("game_types") or [None])[0]
             name = str(current.get("name") or current.get("title") or "")
             listing = author_item(session, resource, reference, name, game_type)
-            detail_time = _timestamp(current.get("mtime") or current.get("update_time"))
-            list_time = _timestamp(listing.get("mtime") or listing.get("update_time"))
-            if listing and detail_time is not None and list_time is not None and detail_time >= list_time:
+            # DD detail and author-list timestamps come from independent read
+            # models. Detail is authoritative for the form; list only
+            # cross-checks ownership when detail omits is_owner.
+            if current.get("is_owner") is True or listing:
                 return current
             if attempt == 0:
                 time.sleep(1)
         raise FuploadError(
-            "DD detail is stale relative to the author list; wait for read models to converge before writing",
-            kind="verification_required",
+            "DD target ownership could not be verified from detail or author list",
+            kind="ownership_error",
+            stage="dependency_get",
             endpoint=endpoint,
-            verification_required=True,
         )
 
     @staticmethod
-    def _archive(path: str, suffixes: Sequence[str], limit: int) -> None:
+    def _archive(path: str, suffixes: Sequence[str], limit: Optional[int] = None) -> None:
         source = Path(path)
         if source.suffix.lower() not in suffixes:
             raise ValidationError("file extension is not supported", path="$.file")
-        if source.stat().st_size > limit:
+        if limit is not None and source.stat().st_size > limit:
             raise ValidationError("file exceeds the platform limit", path="$.file")
 
     @staticmethod
@@ -1327,7 +1571,7 @@ class DD:
     def _associated_refs(session: Sidecar, game_type: Any) -> set[Tuple[str, str]]:
         common = {"game_type": game_type, "origin": "created", "page": 1, "size": 100}
         payloads = (
-            ("addon", session.post("/addon/addon_list", {**common, "category": 0, "name_or_author_name_or_share_code": "", "sort_type": 2})),
+            ("addon", _dependency_post(session, "/addon/addon_list", {**common, "category": 0, "name_or_author_name_or_share_code": "", "sort_type": 2})),
             ("share", session.get("/share/list", {**common, "search_text": "", "sort_type": "mtime"})),
             ("wa", session.get("/wa/list", {**common, "search_text": "", "category_id": "", "sort_type": "mtime"})),
         )
@@ -1339,16 +1583,22 @@ class DD:
                     references.add((kind, str(reference)))
         return references
 
-    def execute_write(self, resource: str, action: str, doc: Dict[str, Any]) -> Any:
-        with Sidecar() as session:
-            if action == "delete" and resource in ("plugin", "config", "wa"):
-                return self._delete(session, resource, doc)
-            if resource == "plugin":
-                return self._write_plugin(session, action, doc)
-            if resource == "config":
-                return self._write_config(session, action, doc)
-            if resource == "wa":
-                return self._write_wa(session, action, doc)
+    def execute_write(self, resource: str, action: str, doc: Dict[str, Any], session_id: Optional[str] = None) -> Any:
+        if not session_id:
+            raise FuploadError("DD live writes require --session from `dd session start`", kind="session_required", stage="session")
+        from .dd_broker import execute
+
+        return execute(session_id, "write", resource, action, doc)
+
+    def execute_write_on(self, session: Sidecar, resource: str, action: str, doc: Dict[str, Any]) -> Any:
+        if action == "delete" and resource in ("plugin", "config", "wa"):
+            return self._delete(session, resource, doc)
+        if resource == "plugin":
+            return self._write_plugin(session, action, doc)
+        if resource == "config":
+            return self._write_config(session, action, doc)
+        if resource == "wa":
+            return self._write_wa(session, action, doc)
         raise FuploadError("unsupported DD write operation", kind="unsupported_operation")
 
     def _delete(self, session: Sidecar, resource: str, doc: Mapping[str, Any]) -> Dict[str, Any]:
@@ -1361,18 +1611,23 @@ class DD:
             if isinstance(backup, dict):
                 game_type = backup.get("game_type")
         if not game_type:
-            raise FuploadError("DD target game type could not be resolved before delete", kind="verification_required", verification_required=True)
+            raise FuploadError(
+                "DD target game type could not be resolved before delete",
+                kind="dependency_error",
+                stage="dependency_get",
+            )
         response = session.post(endpoints[resource], {"sn": reference})
-        listing = author_listing(session, resource, "", game_type)
+        listing = _readback(lambda: author_listing(session, resource, "", game_type), endpoints[resource])
         if any(str(item.get("sn") or item.get("share_sn") or "") == reference for item in items(listing)):
             raise FuploadError(
                 "delete response succeeded but the target remains in the author list",
-                kind="verification_required", endpoint=endpoints[resource], verification_required=True,
+                kind="verification_required", stage="readback", endpoint=endpoints[resource], verification_required=True,
             )
         return {"result": response, "deleted": True, "sn": reference, "before": safe_detail(resource, before), "readback": {"present": False}}
 
     def _write_plugin(self, session: Sidecar, action: str, doc: Dict[str, Any]) -> Any:
         if action == "create":
+            current: Dict[str, Any] = {}
             form = {name: copy.deepcopy(doc.get(name)) for name in PLUGIN_FIELDS if name in doc}
         else:
             current = self._fresh_detail(session, "plugin", doc["sn"])
@@ -1383,23 +1638,28 @@ class DD:
             )
             if fallback:
                 merge_plugin_version_fields(form, fallback)
-            allowed = PLUGIN_FIELDS if action == "edit" else ("game_versions", "detail_url", "release_type", "version", "update_desc")
+            allowed = PLUGIN_EDIT_FIELDS if action == "edit" else ("game_versions", "detail_url", "release_type", "version", "update_desc")
+            current_version = str(form.get("version") or "").strip()
             apply_present(form, doc, allowed)
+            if "game_type" in doc and str(doc["game_type"]) != str(current.get("game_type") or (current.get("game_types") or [None])[0]):
+                raise ValidationError("game_type is locked after plugin creation", path="$.game_type")
             form["sn"] = doc["sn"]
-            if action == "update":
-                versions = items(session.get("/addon/addon_versions", {"sn": doc["sn"], "game_type": form.get("game_type"), "page": 1}))
-                for item in versions:
-                    if str(item.get("version") or item.get("current_version") or "").strip().lower() == str(form.get("version") or "").strip().lower():
-                        raise ValidationError("version already exists; overwrite is not allowed", path="$.version")
-        if doc.get("logo_file"):
-            form["logo"] = session.upload(doc["logo_file"], "addon", media=True, max_bytes=10 * 1024 * 1024)
-        if doc.get("detail_img_files"):
-            form["detail_imgs"] = list(form.get("detail_imgs") or []) + [session.upload(path, "addon", media=True, max_bytes=10 * 1024 * 1024) for path in doc["detail_img_files"]]
+            if action == "update" and current_version and str(form.get("version") or "").strip().casefold() == current_version.casefold():
+                raise ValidationError("version already exists; overwrite is not allowed", path="$.version")
         if doc.get("file"):
-            self._archive(doc["file"], (".zip", ".rar", ".7z"), 300 * 1024 * 1024)
-            form["detail_url"] = session.upload(doc["file"], "addon", file_name=Path(doc["file"]).name)
-        normalize_commercial(form)
+            self._archive(doc["file"], (".zip",))
+        validate_locked_usage_mode(current, form, doc)
+        normalize_commercial(form, "plugin")
         self._validate_options(session, "plugin", form)
+        if doc.get("logo_file"):
+            form["logo"] = session.upload(doc["logo_file"], "addon", file_name="", media=True, max_bytes=10 * 1024 * 1024)
+        if doc.get("detail_img_files"):
+            existing_images = list(form.get("detail_imgs") or [])
+            if len(existing_images) + len(doc["detail_img_files"]) > 8:
+                raise ValidationError("plugin detail images cannot exceed eight", path="$.detail_img_files")
+            form["detail_imgs"] = existing_images + [session.upload(path, "addon", file_name="", media=True, max_bytes=10 * 1024 * 1024) for path in doc["detail_img_files"]]
+        if doc.get("file"):
+            form["detail_url"] = session.upload(doc["file"], "addon", file_name="addon.zip")
         endpoint = "/addon/create" if action == "create" else "/addon/modify"
         response = session.post(endpoint, form)
         reference = str((result(response) or {}).get("sn") if isinstance(result(response), dict) else result(response) or form.get("sn") or "")
@@ -1408,9 +1668,11 @@ class DD:
         if action == "create" and not reference:
             raise FuploadError(
                 "plugin was submitted but its reference could not be resolved; read the author list before retrying",
-                kind="verification_required", verification_required=True,
+                kind="verification_required", stage="readback", verification_required=True,
             )
-        raw_readback = detail(session, "plugin", reference) if reference else {}
+        raw_readback = _readback(
+            lambda: detail(session, "plugin", reference), "/addon/detail_v2"
+        ) if reference else {}
         actual = plugin_form(raw_readback) if raw_readback else {}
         stable_fields = (
             "game_type", "scope", "addon_type", "name", "description", "logo", "detail_imgs",
@@ -1422,10 +1684,35 @@ class DD:
         if action != "update":
             _verify_fields(form, actual, stable_fields, "/addon/detail_v2")
         else:
-            version_payload = session.get("/addon/addon_versions", {"sn": reference, "game_type": form.get("game_type"), "page": 1})
-            matching = [item for item in items(version_payload) if str(item.get("version") or item.get("current_version") or "") == str(form.get("version") or "")]
-            if not matching:
-                raise FuploadError("submitted plugin version is not visible in readback", kind="verification_required", endpoint="/addon/addon_versions", verification_required=True)
+            # The official editor reads latest_version from detail_v2 after modify.
+            # addon_versions is declared by the web bundle but is not used there and
+            # can remain empty for private plugins, so it is not a write confirmation.
+            update_fields = ("game_versions", "detail_url", "release_type", "version", "update_desc")
+            detail_mismatches = [
+                name for name in update_fields
+                if name in form and (name not in actual or not _same_readback(form[name], actual[name]))
+            ]
+            author = author_item(session, "plugin", reference, str(form.get("name") or ""), form.get("game_type"))
+            author_actual = plugin_form(author) if author else {}
+            author_mismatches = [
+                name for name in update_fields
+                if name in form and (name not in author_actual or not _same_readback(form[name], author_actual[name]))
+            ]
+            if detail_mismatches and author_mismatches:
+                raise FuploadError(
+                    "submitted plugin version is not visible in official readback projections",
+                    kind="verification_required",
+                    stage="readback",
+                    endpoint="/addon/detail_v2",
+                    verification_required=True,
+                    details={
+                        "fields": sorted(set(detail_mismatches) | set(author_mismatches)),
+                        "projections": {
+                            "detail_v2": "mismatch",
+                            "author_list": "mismatch" if author else "missing",
+                        },
+                    },
+                )
         return {"result": response, "reference": reference, "readback": safe_detail("plugin", raw_readback) if reference else None}
 
     def _backup(self, session: Sidecar, backup_sn: str) -> Dict[str, Any]:
@@ -1467,13 +1754,16 @@ class DD:
             form["retail_ui_config"] = resolve_retail_ui_config(backup, retail_current, doc["retail_ui_config"])
         elif game_type != 10001:
             form.pop("retail_ui_config", None)
-        if doc.get("display_img_files"):
-            form["display_imgs"] = list(form.get("display_imgs") or []) + [session.upload(path, "share", media=True, max_bytes=10 * 1024 * 1024) for path in doc["display_img_files"]]
         if action != "create":
             form["share_sn"] = doc["share_sn"]
         validation_form = dict(form)
         validation_form["game_type"] = current.get("game_type") or backup.get("game_type")
         self._validate_options(session, "config", validation_form)
+        if doc.get("display_img_files"):
+            existing_images = list(form.get("display_imgs") or [])
+            if len(existing_images) + len(doc["display_img_files"]) > 8:
+                raise ValidationError("configuration display images cannot exceed eight", path="$.display_img_files")
+            form["display_imgs"] = existing_images + [session.upload(path, "share", media=True, max_bytes=10 * 1024 * 1024) for path in doc["display_img_files"]]
         endpoint = "/share/create" if action == "create" else "/share/modify"
         response = session.post(endpoint, form)
         reference = str((result(response) or {}).get("share_sn") if isinstance(result(response), dict) else result(response) or form.get("share_sn") or "")
@@ -1482,9 +1772,11 @@ class DD:
         if action == "create" and not reference:
             raise FuploadError(
                 "configuration was submitted but its reference could not be resolved; read the author list before retrying",
-                kind="verification_required", verification_required=True,
+                kind="verification_required", stage="readback", verification_required=True,
             )
-        raw_readback = detail(session, "config", reference) if reference else {}
+        raw_readback = _readback(
+            lambda: detail(session, "config", reference), "/share/detail"
+        ) if reference else {}
         stable_fields = (
             "backup_sn", "scope", "title", "brief_desc", "desc", "update_desc", "display_imgs",
             "share_code_life_type", "creation_statement", "need_buy", "price_fen", "buy_life_type",
@@ -1496,41 +1788,52 @@ class DD:
         return {"result": response, "reference": reference, "readback": safe_detail("config", raw_readback) if reference else None}
 
     def _write_wa(self, session: Sidecar, action: str, doc: Dict[str, Any]) -> Any:
-        previous_content = ""
         if action == "create":
-            form = {name: copy.deepcopy(doc.get(name)) for name in WA_FIELDS if name in doc}
+            current: Dict[str, Any] = {}
+            form = copy.deepcopy(WA_CREATE_DEFAULTS)
+            apply_present(form, doc, WA_FIELDS)
         else:
             current = self._fresh_detail(session, "wa", doc["sn"])
-            previous_content = str(current.get("content") or "")
             form = {name: copy.deepcopy(current.get(name)) for name in WA_FIELDS}
             allowed = WA_FIELDS if action == "edit" else ("content", "update_desc", "version", "with_file", "file_path", "file_install_path", "parse_wa_uid", "parse_wa_id")
             apply_present(form, doc, allowed)
+            if "game_type" in doc and str(doc["game_type"]) != str(current.get("game_type")):
+                raise ValidationError("game_type is locked after WA creation", path="$.game_type")
             form["sn"] = doc["sn"]
             if action == "update" and not version_greater(form.get("version"), current.get("version")):
                 raise ValidationError("version must be greater than the current version", path="$.version")
-        if doc.get("display_img_files"):
-            form["display_imgs"] = list(form.get("display_imgs") or []) + [session.upload(path, "wa", media=True, max_bytes=10 * 1024 * 1024) for path in doc["display_img_files"]]
         if doc.get("file"):
             self._archive(doc["file"], (".zip",), 50 * 1024 * 1024)
-            form["file_path"] = session.upload(doc["file"], "wa", file_name="wa_materials.zip")
             form["with_file"] = True
-        if not form.get("with_file"):
-            form["file_path"] = ""
-            form["file_install_path"] = ""
+        if form.get("with_file") and not (doc.get("file") or form.get("file_path")):
+            raise ValidationError("with_file=true requires an existing or new WA material ZIP", path="$.file")
+        if form.get("with_file") and not form.get("file_install_path"):
+            raise ValidationError("with_file=true requires file_install_path", path="$.file_install_path")
         content = str(form.get("content") or "")
         if not content.startswith("!WA:2!"):
             form["parse_wa_uid"] = ""
             form["parse_wa_id"] = ""
-        elif action == "create" or ("content" in doc and str(doc.get("content")) != previous_content):
+        else:
             parsed = session.call("parse_wa", content=content)
             if not isinstance(parsed, dict) or not parsed.get("parse_wa_uid") or not parsed.get("parse_wa_id"):
-                raise FuploadError("DD native WA parser did not return parse identifiers", kind="native_parser_error")
+                raise FuploadError(
+                    "DD native WA parser did not return parse identifiers",
+                    kind="native_parser_error",
+                    stage="native_parser",
+                )
             form["parse_wa_uid"] = parsed["parse_wa_uid"]
             form["parse_wa_id"] = parsed["parse_wa_id"]
-        elif not form.get("parse_wa_uid") or not form.get("parse_wa_id"):
-            raise ValidationError("WA2 content requires parse_wa_uid and parse_wa_id from the DD parser", path="$.parse_wa_uid")
-        normalize_commercial(form)
+        validate_locked_usage_mode(current, form, doc)
+        normalize_commercial(form, "wa")
+        form["category_ids"] = [str(category_id) for category_id in (form.get("category_ids") or [])]
         self._validate_options(session, "wa", form)
+        if doc.get("display_img_files"):
+            existing_images = list(form.get("display_imgs") or [])
+            if len(existing_images) + len(doc["display_img_files"]) > 8:
+                raise ValidationError("WA display images cannot exceed eight", path="$.display_img_files")
+            form["display_imgs"] = existing_images + [session.upload(path, "wa", media=True, max_bytes=10 * 1024 * 1024) for path in doc["display_img_files"]]
+        if doc.get("file"):
+            form["file_path"] = session.upload(doc["file"], "wa", file_name="wa_materials.zip", max_bytes=50 * 1024 * 1024)
         endpoint = "/wa/create" if action == "create" else "/wa/modify"
         response = session.post(endpoint, form)
         reference = str((result(response) or {}).get("sn") if isinstance(result(response), dict) else result(response) or form.get("sn") or "")
@@ -1539,9 +1842,11 @@ class DD:
         if action == "create" and not reference:
             raise FuploadError(
                 "WA was submitted but its reference could not be resolved; read the author list before retrying",
-                kind="verification_required", verification_required=True,
+                kind="verification_required", stage="readback", verification_required=True,
             )
-        raw_readback = detail(session, "wa", reference) if reference else {}
+        raw_readback = _readback(
+            lambda: detail(session, "wa", reference), "/wa/detail"
+        ) if reference else {}
         stable_fields = (
             "game_type", "scope", "name", "game_version", "brief_desc", "display_imgs", "category_ids",
             "content", "desc", "update_desc", "version", "with_file", "file_path", "file_install_path",
@@ -1553,40 +1858,52 @@ class DD:
         readback = safe_detail("wa", raw_readback) if reference else None
         return {"result": response, "reference": reference, "readback": readback}
 
-    def execute_read(self, resource: str, action: str, args: Any) -> Any:
-        if resource == "session" and action == "doctor":
-            with Sidecar() as session:
-                return {
-                    "authenticated": True,
-                    "dd_dir": str(session.dd_dir),
-                    "installation_source": "automatic-discovery",
-                    "signature": session.signature,
-                    "device_state": str(state_dir() / "sidecar-device.json"),
-                    "state_source": "windows-known-folder",
-                    "api_origin": "dd-native-client",
-                }
-        with Sidecar() as session:
-            if resource == "plugin":
-                if action == "list": return readable_author_list(session, "plugin", args.keyword, args.game_type, args.page, args.page_size)
-                if action == "get": return safe_detail("plugin", detail(session, "plugin", args.sn))
-                if action == "categories": return session.get("/addon/category", {})
-                if action == "game-versions": return session.get("/game_versions/list", {"game_type": args.game_type})
-                if action == "versions": return session.get("/addon/addon_versions", {"sn": args.sn, "game_type": args.game_type, "page": args.page})
-            if resource == "config":
-                if action == "list": return readable_author_list(session, "config", args.keyword, args.game_type, args.page, args.page_size)
-                if action == "get": return safe_detail("config", detail(session, "config", args.sn))
-                if action == "backups": return safe_backup_list(session.get("/backup/list", {}))
-                if action == "backup-get":
-                    payload = session.get("/backup/detail", {"sn": args.sn})
-                    return safe_backup_detail(result(payload))
-            if resource == "wa":
-                if action == "list": return readable_author_list(session, "wa", args.keyword, args.game_type, args.page, args.page_size)
-                if action == "get": return safe_detail("wa", detail(session, "wa", args.sn))
-                if action == "categories": return session.get("/wa/categories", {"game_type": args.game_type})
-            if resource == "options":
-                if action == "game-types": return safe_game_types(session.get("/game_type/list", {}))
-                if action == "channels": return safe_channels(session.cc_get("https://api.cc.163.com/v1/mixteammsgproxy/channelList?" + urllib.parse.urlencode({"source": "pluginPublish"})))
-                if action == "life-types": return {"total": len(LIFE_TYPES), "items": list(LIFE_TYPES), "source": "NetEase DD official client enum"}
-                if action == "vip-levels": return session.get("/anchor_vip/level/list", {"enrich_acts": "false"})
-                if action == "associated-acts": return safe_associated_acts(session, args.game_type)
+    def execute_read(self, resource: str, action: str, args: Any, session_id: Optional[str] = None) -> Any:
+        if resource == "session":
+            from . import dd_broker
+
+            if action == "doctor":
+                return dd_broker.doctor()
+            if action == "start":
+                return dd_broker.start(bool(getattr(args, "confirm_close_gui", False)))
+            if action == "status":
+                return dd_broker.status(session_id)
+            if action == "stop":
+                if not session_id:
+                    raise FuploadError("dd session stop requires --session", kind="session_required", stage="session")
+                return dd_broker.stop(session_id)
+        if not session_id:
+            raise FuploadError("DD live reads require --session from `dd session start`", kind="session_required", stage="session")
+        from .dd_broker import execute
+
+        payload = {
+            key: value for key, value in vars(args).items()
+            if key not in {"handler", "platform", "resource", "action", "input", "dry_run", "session"}
+        }
+        return execute(session_id, "read", resource, action, payload)
+
+    def execute_read_on(self, session: Sidecar, resource: str, action: str, args: Any) -> Any:
+        if resource == "plugin":
+            if action == "list": return readable_author_list(session, "plugin", args.keyword, args.game_type, args.page, args.page_size)
+            if action == "get": return safe_detail("plugin", detail(session, "plugin", args.sn))
+            if action == "categories": return safe_plugin_categories(session.get("/addon/category", {}))
+            if action == "game-versions": return safe_game_versions(session.get("/game_versions/list", {"game_type": args.game_type}), args.game_type)
+            if action == "versions": return session.get("/addon/addon_versions", {"sn": args.sn, "game_type": args.game_type, "page": args.page})
+        if resource == "config":
+            if action == "list": return readable_author_list(session, "config", args.keyword, args.game_type, args.page, args.page_size)
+            if action == "get": return safe_detail("config", detail(session, "config", args.sn))
+            if action == "backups": return safe_backup_list(session.get("/backup/list", {}))
+            if action == "backup-get":
+                payload = session.get("/backup/detail", {"sn": args.sn})
+                return safe_backup_detail(result(payload))
+        if resource == "wa":
+            if action == "list": return readable_author_list(session, "wa", args.keyword, args.game_type, args.page, args.page_size)
+            if action == "get": return safe_detail("wa", detail(session, "wa", args.sn))
+            if action == "categories": return safe_wa_categories(session.get("/wa/categories", {"game_type": args.game_type}), args.game_type)
+        if resource == "options":
+            if action == "game-types": return safe_game_types(session.get("/game_type/list", {}))
+            if action == "channels": return safe_channels(session.cc_get("https://api.cc.163.com/v1/mixteammsgproxy/channelList?" + urllib.parse.urlencode({"source": "pluginPublish"})))
+            if action == "life-types": return {"total": len(LIFE_TYPES), "items": list(LIFE_TYPES), "source": "NetEase DD official client enum"}
+            if action == "vip-levels": return session.get("/anchor_vip/level/list", {"enrich_acts": "false"})
+            if action == "associated-acts": return safe_associated_acts(session, args.game_type)
         raise FuploadError("unsupported DD read operation", kind="unsupported_operation")

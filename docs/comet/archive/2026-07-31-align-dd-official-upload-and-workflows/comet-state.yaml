@@ -1,0 +1,30 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 11
+name: align-dd-official-upload-and-workflows
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: 2995e9f196044074c3bad83af5dd020cb6d836b85e4a7bcbcc4d22267be5a704
+spec_changes:
+  - capability: dd-publishing
+    operation: replace
+    source: specs/dd-publishing/spec.md
+    base_hash: 84844fe07e675aa9e960fb0107a81537908e2c1d32c9c1414648f6ae27b259d6
+  - capability: fupload-cli
+    operation: replace
+    source: specs/fupload-cli/spec.md
+    base_hash: dc6c4191f443860668cfc21ec890657d021d3e7b0821086868bd84f076c58501
+  - capability: fupload-skill
+    operation: replace
+    source: specs/fupload-skill/spec.md
+    base_hash: ffce294891eeb1041f25b280f10c6678c11fe2b2e31d0b308d22b582149bc720
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/22a0f3dc2f4a88d2b91d3b6b02ad5e30dfaf1e796676f08b7cab300406027270.json
+verification_evidence: runtime/evidence/verifications/69e0ed3be9082ea33773afa41a68368c6cd5d5626aa2d822e51a9e2726baf72e.json
+partial_allowance: null
+archived: true
+created_at: 2026-07-31
+run_id: 751c6c5a-46ef-4be0-8ed2-53de78033bf2

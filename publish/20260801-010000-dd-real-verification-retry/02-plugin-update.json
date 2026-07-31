@@ -1,0 +1,11 @@
+{
+  "schema": "fupload.v1.dd.plugin.update",
+  "sn": "1a50c6c45a9d4f57a3c567f53a5951f6",
+  "game_versions": [
+    "12.0.7"
+  ],
+  "file": "D:\\备份\\xwechat_files\\SukiFollen_891f\\msg\\file\\2026-07\\OmniCC v11.2.8 Rurutia fix.zip",
+  "release_type": 1,
+  "version": "2.0.0",
+  "update_desc": "Session verification retry update"
+}

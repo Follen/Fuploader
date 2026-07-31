@@ -65,12 +65,16 @@ def _write_leaf(parent: argparse._SubParsersAction, platform: str, resource: str
     )
     leaf.add_argument("--input", required=True, metavar="PATH|-", help="Versioned JSON file, or - to read one JSON object from stdin.")
     leaf.add_argument("--dry-run", action="store_true", help="Validate schema and local files only; do not authenticate, upload, or write remotely.")
+    if platform == "dd":
+        leaf.add_argument("--session", help="Opaque task session ID returned by `dd session start`; required for a live DD operation.")
     leaf.set_defaults(handler="write", platform=platform, resource=resource, action=action)
 
 
 def _read_leaf(parent: argparse._SubParsersAction, name: str, summary: str, **defaults: Any) -> argparse.ArgumentParser:
     leaf = parent.add_parser(name, help=summary, description=summary + "\n\nThis is a read-only command and emits stable JSON.")
     leaf.set_defaults(handler="read", **defaults)
+    if defaults.get("platform") == "dd" and defaults.get("resource") != "session":
+        leaf.add_argument("--session", help="Opaque task session ID returned by `dd session start`; required for this live DD read.")
     return leaf
 
 
@@ -137,8 +141,14 @@ def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
 def _dd_tree(platforms: argparse._SubParsersAction) -> None:
     root = platforms.add_parser("dd", help="NetEase DD author operations", description="Use DD's official netease_dd.exe, credentials, native login, and NEP signer. No token input is accepted.")
     groups = root.add_subparsers(dest="resource_command", required=True)
-    session = groups.add_parser("session", help="Installation and session diagnostics").add_subparsers(dest="action_command", required=True)
-    _read_leaf(session, "doctor", "Discover DD, verify its official Authenticode publisher, and validate the Known Folder sidecar state path.", platform="dd", resource="session", action="doctor")
+    session = groups.add_parser("session", help="Installation and task-session lifecycle").add_subparsers(dest="action_command", required=True)
+    _read_leaf(session, "doctor", "Discover DD, verify its official Authenticode publisher, and diagnose GUI/broker state without logging in.", platform="dd", resource="session", action="doctor")
+    leaf = _read_leaf(session, "start", "Close confirmed official DD GUI instances, then start one task-scoped native login session.", platform="dd", resource="session", action="start")
+    leaf.add_argument("--confirm-close-gui", action="store_true", help="Required only when doctor reports a running official DD GUI; the Skill obtains user consent before using it.")
+    leaf = _read_leaf(session, "status", "Read the local task-broker status without creating a login.", platform="dd", resource="session", action="status")
+    leaf.add_argument("--session", help="Optional opaque session ID; omitted selects the single active local session.")
+    leaf = _read_leaf(session, "stop", "Log out and stop one DD task session.", platform="dd", resource="session", action="stop")
+    leaf.add_argument("--session", required=True, help="Opaque session ID returned by `dd session start`.")
     options = groups.add_parser("options", help="Read dynamic business choices before writing").add_subparsers(dest="option_action", required=True)
     for action, text in (("game-types", "List DD game types."), ("channels", "List selectable DD rooms/channels for room association."), ("life-types", "List share-code and purchase life types."), ("vip-levels", "List available anchor VIP levels."), ("associated-acts", "List current-author content eligible for association.")):
         leaf = _read_leaf(options, action, text, platform="dd", resource="options", action=action)
@@ -146,7 +156,7 @@ def _dd_tree(platforms: argparse._SubParsersAction) -> None:
             leaf.add_argument("--game-type", type=_positive, required=True)
 
     plugin = groups.add_parser("plugin", help="DD plugin create, version update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
-    for action, text in (("create", "Create a DD plugin with its first selected version."), ("update", "Publish a DD plugin version while preserving metadata."), ("edit", "Edit DD plugin metadata and commercial/association settings."), ("delete", "Delete one explicitly confirmed DD plugin record.")):
+    for action, text in (("create", "Create a DD plugin with its first selected version."), ("update", "Publish a DD plugin version while preserving first-publication metadata."), ("edit", "Edit DD plugin commercial, association, room/channel, and creation-statement settings."), ("delete", "Delete one explicitly confirmed DD plugin record.")):
         _write_leaf(plugin, "dd", "plugin", action, text)
     leaf = _read_leaf(plugin, "list", "List plugins owned by the current DD author account.", platform="dd", resource="plugin", action="list"); _list_flags(leaf, game_type=True)
     leaf = _read_leaf(plugin, "get", "Read one DD plugin detail by share SN.", platform="dd", resource="plugin", action="get"); leaf.add_argument("--sn", required=True)
@@ -228,11 +238,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 write_output(platform, operation, _dry_run_data(doc, schema.name), dry_run=True)
                 return 0
             provider = NewBee() if platform == "newbee" else DD()
-            data = provider.execute_write(resource, action, doc)
+            if platform == "dd":
+                data = provider.execute_write(resource, action, doc, getattr(args, "session", None))
+            else:
+                data = provider.execute_write(resource, action, doc)
             write_output(platform, operation, data)
             return 0
         provider = NewBee() if platform == "newbee" else DD()
-        data = provider.execute_read(resource, action, args)
+        if platform == "dd":
+            data = provider.execute_read(resource, action, args, getattr(args, "session", None))
+        else:
+            data = provider.execute_read(resource, action, args)
         write_output(platform, operation, data)
         return 0
     except (FuploadError, OSError, ValueError) as exc:

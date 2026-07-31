@@ -1,0 +1,46 @@
+{
+  "schema": "fupload.v1.dd.config.create",
+  "scope": "private",
+  "backup_sn": "a91f4603ff4849f5a700475283fde900",
+  "title": "Fupload DD Verify C01",
+  "brief_desc": "Private config verification 1",
+  "desc": "Fupload DD session verification configuration 1.",
+  "update_desc": "Initial config verification 1",
+  "display_imgs": [
+    "https://uires.w.163.com/img/img/aGDefCUMsmSawDjP7wbamkOYYGjOLgsh"
+  ],
+  "known_addon_ids": [
+    1172
+  ],
+  "known_addon_update_ids": [],
+  "unknown_addon_ids": [],
+  "unknown_addon_update_ids": [],
+  "wtf_role_ids": [
+    "wtf_3a0253f124b7d42b1a2b"
+  ],
+  "material_names": [],
+  "material_update_names": [],
+  "font_names": [],
+  "font_update_names": [],
+  "known_wa_ids": [],
+  "known_wa_update_ids": [],
+  "unknown_wa_ids": [],
+  "unknown_wa_update_ids": [],
+  "share_code_life_type": "seven_day",
+  "need_buy": false,
+  "jump_room": false,
+  "sync_room": false,
+  "creation_statement": "original",
+  "with_associate": false,
+  "associated_acts": [],
+  "need_anchor_vip": false,
+  "vip_levels": [],
+  "retail_ui_config": {
+    "edit_mode_selectors": [
+      "em_40a93bc504a36c95cf52"
+    ],
+    "default_edit_mode_selector": "em_40a93bc504a36c95cf52",
+    "cool_down_selectors": [],
+    "enable_dd_setup_wizard": false
+  }
+}

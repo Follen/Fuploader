@@ -1,78 +1,84 @@
 # NetEase DD field and workflow reference
 
-## Native session
+## Task session
 
-Use `dd session doctor`, then a read command. Fupload checks a running `netease_dd.exe`, Windows uninstall records, bounded DD user-config JSON, and standard installation roots. It validates each candidate's structure, Authenticode chain, and official NetEase publisher, selects the highest trusted installed version, and runs that version's `netease_dd.exe` with DD-native login and signing modules. `FUPLOAD_DD_EXPECTED_VERSION` may pin an exact version for troubleshooting but cannot bypass signature validation. Do not request a token, credential database, or `clientNo`.
+Run `dd session doctor` first. Doctor only discovers the installation, verifies the Authenticode publisher, reports official DD processes and reads local broker state; it does not login. When `gui_running=true`, explain that the official DD GUI must close and obtain explicit user consent. Only then run `dd session start --confirm-close-gui`. When `gui_running=false`, run `dd session start` without the confirmation flag.
 
-The stable sidecar device state is in the Windows Known Folder Roaming AppData path `CCVoiceHub/Fupload/sidecar-device.json`. Environment variables cannot redirect it. Invalid state fails closed. One Fupload sidecar per Windows user may run while the normal DD GUI remains open.
+`start` closes only identity- and signature-verified official GUI processes, starts one task broker and returns an opaque `session_id`. Pass that value through `--session` to every DD read and write. All operations are serialized through one native login. Run `dd session status --session <id>` for a local status check and always run `dd session stop --session <id>` in `finally`; successful stop reports `cleanup_complete=true`. The ten-minute idle timeout is only a crash fallback.
 
-Before writes, query `dd options game-types`, `channels`, `life-types`, `vip-levels`, and `associated-acts`, plus resource categories/game versions/backups. `life-types` exposes the official client enum; the similarly named `/act/life_type_cfgs` endpoint is season availability data, not these form values. All page-selectable business values are user choices.
+Do not request or expose token, Cookie, JWT, credential database, signed URL, `clientNo`, raw WA content, or raw backup objects. The device state remains under Windows Known Folder Roaming AppData at `CCVoiceHub/Fupload/sidecar-device.json`.
 
-Before any non-create write, Fupload compares the target detail timestamp with the same SN in the author list. DD's read models can briefly disagree after a write; when detail is older, Fupload performs one additional read and then returns `verification_required` before POST if they still have not converged. Do not bypass this gate or immediately chain metadata edits after a pending update.
+## GET before one final JSON
 
-## Shared commercial fields
+DD GUI fields are not a flat form. Resolve these dependencies before generating the write JSON:
 
-All three resource create/edit schemas expose:
+- `game_type` -> `game_versions`, `associated_acts`, WA `category_ids`;
+- `primary_category_id` -> `second_category_ids`;
+- `scope` -> `share_code_life_type`, anchor-VIP availability, `sync_room`;
+- outer free/paid state -> `need_buy`, `need_anchor_vip` -> `price_fen`, `buy_life_type`, `vip_levels`;
+- `jump_room` -> `room_id` -> `channel_id` and `channel_type`;
+- `backup_sn` -> backup detail -> WTF account/server/role -> account-scoped `known_wa_ids` and `unknown_wa_ids`;
+- retail backup -> `retail_ui_config` selectors;
+- `with_file` -> WA `file` and `file_install_path`.
 
-| Field | Rule |
-| --- | --- |
-| `scope` | Required on create: `public` or `private`. |
-| `share_code_life_type` | Private/free lifetime choice; required when `scope=private`; public is forced by DD to `forever`. |
-| `need_buy` | Required create switch. When true, `price_fen` and `buy_life_type` are required. |
-| `price_fen` | Price in fen: `0` or `10..20000`. UI yuan must be converted explicitly. |
-| `jump_room` | Required create switch. When true, `room_id` is required. |
-| `room_id`, `channel_id`, `channel_type` | Live room/channel selection; channel ID and type move together. |
-| `sync_room` | Allowed only for public, room-linked content; otherwise false. |
-| `creation_statement` | `original`, `chinesize`, `renovate`, or `second`. |
-| `with_associate` | Required create switch; true requires non-empty `associated_acts`. |
-| `associated_acts` | Complete array of `{sn,act_type}`. |
-| `need_anchor_vip` | Required create switch; true requires `vip_levels`; private forces false. |
-| `vip_levels` | Complete selected membership levels. |
+Choose a parent, GET and display only that parent's child choices, then continue. Changing a parent invalidates all descendants. Generate one final JSON only after the graph closes. Store parent fields and stable IDs/opaque selectors, never copied backend objects or display names.
 
-Edit omission preserves current values. Explicit false clears dependent room, association, synchronization, or VIP fields.
-Explicit `need_buy=false` clears `price_fen` and retains or fills the frontend's `seven_day` `buy_life_type`; the value is checked against `dd options life-types`. `need_buy=true` requires `price_fen` in `10..20000` and a `buy_life_type`. `jump_room=true` requires `room_id`; `channel_id` and `channel_type` must both be empty for room-only association or both be nonempty for a channel. This is an option-source read, not channel message access.
+The Python provider repeats every live GET in the same session before any upload or mutation. A missing, duplicate, or cross-parent selection fails at its exact JSON path with `verification_required=false`. DD detail is authoritative for an existing object's form and ownership; author-list timestamps are not comparable freshness gates.
+
+## Shared fields
+
+All three create/edit form models use `scope`, `share_code_life_type`, `need_buy`, `price_fen`, `buy_life_type`, `jump_room`, `room_id`, `channel_id`, `channel_type`, `sync_room`, `creation_statement`, `with_associate`, `associated_acts`, `need_anchor_vip`, and `vip_levels`.
+
+- `scope` is `public` or `private`. Private requires `share_code_life_type`, clears anchor VIP and room sync. Plugin/WA public force `share_code_life_type=forever`; config public omits it.
+- `need_buy=true` requires `price_fen` in `10..20000` fen and `buy_life_type`. False uses zero price.
+- The outer free/paid selector is locked after an SN exists. It is derived from `need_buy || need_anchor_vip` and is not a wire field. Existing paid content may still adjust payment methods and their price/lifetime/VIP children while remaining paid.
+- `jump_room=true` requires `room_id`. `channel_id` and `channel_type` are both empty for a room-only link or both present for one live child channel.
+- `with_associate=true` requires nonempty `associated_acts`; each item is exactly `{sn,act_type}` with `act_type` `addon`, `share`, or `wa`.
+- `need_anchor_vip=true` requires live `vip_levels` and public scope.
+- `creation_statement` is `original`, `chinesize`, `renovate`, or `second`.
+
+Omission on edit preserves the remote value. Explicit false applies the official dependent-field normalization.
 
 ## Plugin
 
-`plugin create` fields include required `game_type`, `scope`, `addon_type` (`0|1`), `name`, `description`, `primary_category_id`, `game_versions`, `release_type` (`1|2|3`), `version`, nonempty `html_desc`, nonempty `update_desc`, `creation_statement`, and shared switches. One of `logo` or `logo_file`, one of `detail_imgs` or `detail_img_files`, and one of `detail_url` or `file` is required. Combined existing/local detail images are limited to 8. The primary category must be a live top-level item; every `second_category_ids` value must be a child of that selected primary.
+`plugin create` fields: `game_type`, `scope`, `addon_type`, `name`, `description`, `logo`/`logo_file`, `detail_imgs`/`detail_img_files`, `primary_category_id`, `second_category_ids`, `html_desc`, `game_versions`, `detail_url`/`file`, `release_type`, `version`, `update_desc`, and all shared fields. Name, description, and version are at most 80 characters; update description is at most 1000; detail images are at most 8.
 
-`plugin update` requires `sn`, `game_versions`, `version`, `update_desc`; it may replace `detail_url` through `file` and select `release_type`. It first GETs detail and versions, then calls `/addon/modify` with the complete plugin form.
+`game_type` and the outer free/paid state are create-only. `plugin update` requires `sn`, `game_versions`, `version`, and `update_desc`; optional `file`, `detail_url`, and `release_type` publish a new version. `plugin edit` requires `sn` and only accepts the official existing-record commercial and association controls (`scope`, payment/lifetime/VIP fields, room/channel linkage, `creation_statement`, and associated content). First-publication metadata (`addon_type`, `name`, `description`, logo, detail images, categories, and `html_desc`) and version fields are not edit fields; in particular, sending `description` to `/addon/modify` can be accepted while leaving the remote value unchanged, so the CLI rejects it instead of reporting a false success.
 
-`plugin edit` requires `sn`; all metadata and shared commercial fields are optional/presence-aware. It does not accept version fields. Read choices with `plugin categories`, `plugin game-versions`, and `plugin versions`.
+After `plugin update`, confirm the submitted version fields from the matching item in the author plugin list, whose `latest_version` is the official update projection. `detail_v2` is a supplementary projection and may remain on the prior version. `/addon/addon_versions` is diagnostic-only: DD can return an empty history for a successfully updated private plugin, so an empty history never triggers an automatic replay or a failed update by itself.
+
+Read `plugin categories`, choose `primary_category_id`, then choose only returned `second_category_ids`. Read `plugin game-versions --game-type <id>` and use its stable values. The package accepts `.zip` only. Authorization always uses `file_type=a19-ui-res`, `business_id=addon`, fixed `file_name=addon.zip`, and `mime_type=application/x-zip-compressed`. Plugin image authorization uses `a19-ui-media/img` with an explicit empty wire file name.
 
 ## Configuration share
 
-`config create` requires `scope`, `backup_sn`, `title`, `brief_desc`, `desc`, `creation_statement`, shared switches, and explicit full-selection arrays: `known_addon_ids`, `unknown_addon_ids`, `wtf_role_ids`, `material_names`, `font_names`, `known_wa_ids`, `unknown_wa_ids`. One of `display_imgs` or `display_img_files` is required and their combined count is at most 8. `update_desc` is optional because the production page does not require it. `wtf_role_ids` accepts at most one opaque `wtf_roles[].selector` from `backup-get`, so duplicate character names on different accounts/servers stay distinct. Legacy role IDs/names are accepted only when unique. `known_wa_ids` and `unknown_wa_ids` use the safe `uid` references returned by `backup-get` and must be available in that selected account's `accounts` list. Changing the WTF account clears omitted WA groups, and unknown WA objects receive the account-specific internal `id` automatically.
+`config create` fields: `backup_sn`, `scope`, `title`, `brief_desc`, `desc`, `update_desc`, `display_imgs`/`display_img_files`, `known_addon_ids`, `unknown_addon_ids`, `wtf_role_ids`, `material_names`, `font_names`, `known_wa_ids`, `unknown_wa_ids`, optional `retail_ui_config`, all incremental arrays, and shared fields. The incremental arrays are `known_addon_update_ids`, `unknown_addon_update_ids`, `material_update_names`, `font_update_names`, `known_wa_update_ids`, and `unknown_wa_update_ids`.
 
-The content schema also exposes per-group incremental arrays: `known_addon_update_ids`, `unknown_addon_update_ids`, `material_update_names`, `font_update_names`, `known_wa_update_ids`, and `unknown_wa_update_ids`.
+Title is at most 40 characters, brief description 50, update description 1000, and display images 8. `wtf_role_ids` contains at most one opaque selector returned by `config backup-get`.
 
-For a retail (`game_type=10001`) backup, `config backup-get` exposes a safe `retail_ui_config` catalog. Each edit-mode or cooldown entry has an opaque selector and non-sensitive display metadata; raw `import_string` values are never output. The write input accepts only:
+Run `config backups`, select `backup_sn`, then run `config backup-get --sn <backup>`. Choose content references only from that response. After choosing one WTF role, filter known/unknown WA by the selected role's account. Switching backup requires complete reselection. Switching the WTF account clears both WA groups. Unknown WA internal IDs are restored by Python from `extra.wa_account_info[account]`; they never appear in input JSON.
 
-- `edit_mode_selectors`: zero to five selectors;
-- `default_edit_mode_selector`: required when at least one edit mode is selected and must name one selected item;
-- `cool_down_selectors`: at most one selector for each `spec_tag`;
-- `enable_dd_setup_wizard`: explicit boolean.
+Every wire content group is rebuilt from the latest backup. Each `inner_version` map covers every source item; a new entry is 1, an existing value is preserved, and only explicitly listed existing update entries increment.
 
-Selectors are bound to one backup and are resolved internally to the complete raw objects immediately before the write. Cross-backup selectors, raw `edit_mode`/`cool_down` objects, duplicate selectors, more than five edit modes, and two cooldown choices for one `spec_tag` are rejected. A new or changed retail backup requires an explicit `retail_ui_config`; `null` explicitly clears it. On an unchanged retail backup, omission preserves the current value and a partial selector object changes only the named section. Non-retail backups reject a non-null retail selection.
+For retail, `retail_ui_config` accepts `edit_mode_selectors`, `default_edit_mode_selector`, `cool_down_selectors`, and `enable_dd_setup_wizard`. Up to five edit modes are allowed and one selected mode is default. Only one cooldown per `spec_tag` is allowed. Selectors are bound to one backup; raw `import_string` and raw edit/cooldown objects are read-only and never emitted.
 
-`config update` requires `share_sn`, `backup_sn`, and `update_desc`. If the backup changes, provide all full-selection arrays for the new backup. For the same backup, omitted groups preserve existing selections. Incremental arrays bump only existing `inner_version` keys.
-
-`config edit` requires `share_sn` and exposes only title/brief/description/images plus shared commercial fields. It cannot change backup content.
-
-The builder reads `/share/detail`, `/backup/list`, and `/backup/detail`; reconstructs `known_addon`, `unknown_addon`, `wtf`, `material`, `font`, `known_wa`, `unknown_wa`, and selector-resolved `retail_ui_config`; then uses `/share/create|modify`. Post-write verification checks metadata, `update_desc`, every content group, inner versions, and retail UI state, including fields omitted by a metadata edit that must remain unchanged. Selecting any plugin requires at least one WTF role. WA-only content does not satisfy DD's non-empty content check.
+`config update` requires `share_sn`, `backup_sn`, and `update_desc`; it changes backup content and increments. `config edit` requires `share_sn` and changes metadata, images, and allowed shared fields only. Config images omit `file_name` from upload authorization.
 
 ## WA/string
 
-`wa create` requires `game_type`, `scope`, `name`, `game_version`, `brief_desc`, `category_ids`, `content`, `desc`, `update_desc`, `version`, `creation_statement`, `with_file`, and shared switches. One of `display_imgs` or `display_img_files` is required, with at most 8 combined images. `category_ids` contains at most 5 live values.
+`wa create` fields: `game_type`, `scope`, `name`, `game_version`, `brief_desc`, `display_imgs`/`display_img_files`, `category_ids`, `content`, `desc`, `update_desc`, `version`, `with_file`, optional local `file`, `file_install_path`, and all shared fields. Name is at most 40 characters, brief description 50, update description 1000, numeric version length 80, categories 5, and images 8.
 
-Material fields are `with_file`, `file_path`, `file`, and `file_install_path`; provide either the existing `file_path` reference or a local `file`. A local material ZIP uploads with DD business `wa` and server limit (observed page limit 50 MiB). When `with_file=false`, path/install fields are cleared.
+Read `wa categories --game-type <id>` and use only that game type's category IDs. `game_type` and outer free/paid mode are locked after creation. `wa update` requires `sn`, `content`, `update_desc`, `version`, and `with_file`; the numeric version must increase. `wa edit` requires `sn` and accepts metadata, categories, images, and allowed shared fields.
 
-WA2 strings beginning `!WA:2!` require `parse_wa_uid` and `parse_wa_id` obtained through DD-native parsing; non-WA2 input clears both. `file_install_path` choices are `Interface/Addons`, `Interface`, or game root, subject to live page options.
+The official create builder supplies defaults that are required even when the user did not make a business choice: `share_code_life_type="seven_day"`, `need_buy=false`, `buy_life_type="seven_day"`, `category_ids=["ui_original"]`, `file_install_path="Interface/Addons"`, `vip_levels=[]`, and `version="0"`. The CLI applies these only to create, then applies the user's explicit values and normalizes every submitted category ID to its string wire form. Update and edit preserve remote values for omitted fields rather than reapplying create defaults.
 
-`wa update` requires `sn`, `content`, `update_desc`, `version`, and `with_file`; optional material and parse fields update content without metadata changes. Version must be greater than the current version.
+Every submit whose content begins `!WA:2!` is reparsed by the DD-native bridge, including unchanged content on edit. Internal `parse_wa_uid` and `parse_wa_id` are read-only wire fields and are not accepted in JSON. Non-WA2 clears them.
 
-`wa edit` requires `sn` and exposes metadata, images, categories, and shared commercial fields only. All writes use resource-specific detail-to-form and allowlisted `/wa/create|modify` payloads.
+When `with_file=true`, create requires a local `.zip` `file` and nonempty `file_install_path`; update may preserve an existing material when `file` is omitted. Authorization uses `a19-ui-res/wa`, fixed `file_name=wa_materials.zip`, fixed ZIP MIME, and a 50 MiB local limit plus server `maxSize`. `with_file=false` follows the official builder and preserves existing internal `file_path` and install path rather than clearing them. WA images omit upload `file_name`.
 
 ## Delete
 
-`plugin delete`, `config delete`, and `wa delete` each accept one nonempty `sn` plus `confirm` set to literal `"DELETE"`. The confirmed official request bodies are `{"sn": ...}` for `/addon/delete`, `/share/delete`, and `/wa/delete`. The provider reads detail before the request and verifies the SN is absent from the author list afterward. Main-record delete does not expose version-file deletion.
+`plugin delete`, `config delete`, and `wa delete` each accept one nonempty `sn` and `confirm_delete`=true. Python GETs the target and ownership state before `/addon/delete`, `/share/delete`, or `/wa/delete`, then verifies absence through list/get readback. An uncertain delete is never automatically retried.
+
+## Errors and readback
+
+Stages are `session`, `dependency_get`, `upload_authorize`, `object_put`, `mutation`, `readback`, and `native_parser`. Explicit HTTP/business failures and all pre-mutation validation failures have `verification_required=false`. PUT/mutation connection uncertainty and accepted-write readback uncertainty have `verification_required=true`; GET first and do not replay the write. Native failures retain a bounded exception message and the native `code`/`error_code` when present, with signed-URL query credentials, signatures, and tokens redacted before they leave the sidecar.

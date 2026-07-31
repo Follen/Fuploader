@@ -9,6 +9,7 @@ import os
 import re
 import sys
 import time
+import urllib.error
 import urllib.request
 
 
@@ -19,11 +20,56 @@ USER_AGENT = (
     "(KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 app/df_client dfVersion/%s"
     % os.path.basename(DD_DIR.rstrip("\\/"))
 )
+_SENSITIVE_ERROR_VALUE = re.compile(r"(?i)((?:x-amz-(?:credential|signature|security-token)|token|jwt|authorization|cookie)=)[^&\s]+")
+
+
+def safe_exception_message(exc):
+    return _SENSITIVE_ERROR_VALUE.sub(r"\1[REDACTED]", str(exc).strip())
 
 
 def output(payload):
     print("FUPLOAD_RESULT " + json.dumps(payload, ensure_ascii=False, sort_keys=True))
     sys.stdout.flush()
+
+
+class SidecarFailure(Exception):
+    def __init__(self, message, stage, http_status=None, business_code=None, verification_required=False):
+        Exception.__init__(self, message)
+        self.stage = stage
+        self.http_status = http_status
+        self.business_code = business_code
+        self.verification_required = verification_required
+
+    def as_dict(self):
+        result = {
+            "kind": "platform_error",
+            "stage": self.stage,
+            "message": self.args[0],
+            "verification_required": bool(self.verification_required),
+        }
+        if self.http_status is not None:
+            result["http_status"] = self.http_status
+        if self.business_code is not None:
+            result["business_code"] = self.business_code
+        return result
+
+
+def failure_from_exception(exc, stage):
+    if isinstance(exc, SidecarFailure):
+        return exc
+    if isinstance(exc, urllib.error.HTTPError):
+        return SidecarFailure("DD %s request returned HTTP %d" % (stage, exc.code), stage, http_status=exc.code)
+    uncertain = stage in ("object_put", "mutation")
+    message = safe_exception_message(exc)
+    business_code = getattr(exc, "code", None) or getattr(exc, "error_code", None)
+    if not message:
+        message = type(exc).__name__
+    return SidecarFailure(
+        "DD %s request failed (%s): %s" % (stage, type(exc).__name__, message[:400]),
+        stage,
+        business_code=business_code,
+        verification_required=uncertain,
+    )
 
 
 def bootstrap():
@@ -161,47 +207,106 @@ def parse_native_wa(session, content):
 def run_command(session, command):
     client = session[-1]
     action = command.get("action")
-    if action == "request":
-        method = command.get("method", "GET").upper()
-        path = command["path"]
-        params = command.get("payload") or {}
-        return client.get(path, params) if method == "GET" else client.post(path, params)
-    if action == "upload":
-        path = command["file"]
-        meta = command["meta"]
-        auth = client.get("/file/upload", meta)
-        info = api_result(auth)
-        if not isinstance(info, dict) or not info.get("url") or not info.get("d_url"):
-            raise RuntimeError("DD upload authorization did not return url and d_url")
-        size = os.path.getsize(path)
-        maximum = int(info.get("maxSize") or 0)
-        if maximum and size > maximum:
-            raise RuntimeError("file exceeds DD server size limit")
-        with open(path, "rb") as handle:
+    try:
+        if action == "request":
+            method = command.get("method", "GET").upper()
+            path = command["path"]
+            params = command.get("payload") or {}
+            return client.get(path, params) if method == "GET" else client.post(path, params)
+        if action == "upload":
+            path = command["file"]
+            meta = command["meta"]
+            try:
+                auth = client.get("/file/upload", meta)
+            except Exception as exc:
+                raise failure_from_exception(exc, "upload_authorize")
+            if isinstance(auth, dict) and auth.get("code") not in (None, 0):
+                raise SidecarFailure(
+                    "DD upload authorization was rejected",
+                    "upload_authorize",
+                    business_code=auth.get("code"),
+                )
+            info = api_result(auth)
+            if not isinstance(info, dict) or not info.get("url") or not info.get("d_url"):
+                raise SidecarFailure("DD upload authorization did not return a usable upload target", "upload_authorize")
+            size = os.path.getsize(path)
+            maximum = int(info.get("maxSize") or 0)
+            if maximum and size > maximum:
+                raise SidecarFailure("file exceeds DD server size limit", "upload_authorize")
+            try:
+                with open(path, "rb") as handle:
+                    request = urllib.request.Request(
+                        info["url"], data=handle.read(), method="PUT",
+                        headers={"Content-Type": meta["mime_type"], "X-Amz-Acl": "public-read"},
+                    )
+                with urllib.request.urlopen(request, timeout=180) as response:
+                    if response.status != 200:
+                        raise SidecarFailure("DD object upload returned HTTP %d" % response.status, "object_put", http_status=response.status)
+            except Exception as exc:
+                raise failure_from_exception(exc, "object_put")
+            return {"d_url": info["d_url"], "size": size}
+        if action == "cc_get":
+            jwt_value = session[3].getJwt()
+            url = command["url"]
             request = urllib.request.Request(
-                info["url"], data=handle.read(), method="PUT",
-                headers={"Content-Type": meta["mime_type"], "X-Amz-Acl": "public-read"},
+                url,
+                headers={
+                    "Authentication": jwt_value,
+                    "Authorization": jwt_value,
+                    "User-Agent": USER_AGENT,
+                },
             )
-        with urllib.request.urlopen(request, timeout=180) as response:
-            if response.status != 200:
-                raise RuntimeError("DD object upload returned HTTP %d" % response.status)
-        return {"d_url": info["d_url"], "size": size}
-    if action == "cc_get":
-        jwt_value = session[3].getJwt()
-        url = command["url"]
-        request = urllib.request.Request(
-            url,
-            headers={
-                "Authentication": jwt_value,
-                "Authorization": jwt_value,
-                "User-Agent": USER_AGENT,
-            },
-        )
-        with urllib.request.urlopen(request, timeout=30) as response:
-            return json.loads(response.read().decode("utf-8"))
-    if action == "parse_wa":
-        return parse_native_wa(session, command["content"])
-    raise RuntimeError("unsupported sidecar action")
+            with urllib.request.urlopen(request, timeout=30) as response:
+                return json.loads(response.read().decode("utf-8"))
+        if action == "parse_wa":
+            return parse_native_wa(session, command["content"])
+        raise SidecarFailure("unsupported sidecar action", "session")
+    except Exception as exc:
+        if action == "request":
+            stage = command.get("request_stage")
+            if stage not in ("dependency_get", "mutation"):
+                stage = "dependency_get" if command.get("method", "GET").upper() == "GET" else "mutation"
+        elif action == "cc_get":
+            stage = "dependency_get"
+        elif action == "parse_wa":
+            stage = "native_parser"
+        else:
+            stage = "session"
+        raise failure_from_exception(exc, stage)
+
+
+def close_session(session):
+    if not session:
+        return
+    qt, container, _flow, _jwt_helper, client = session
+    try:
+        message_center = container.get_instance("MessageCenter")
+        message_center.logout()
+        try:
+            from components.net_server.messagecenter import State
+
+            def stopped():
+                state = message_center.state
+                checker = getattr(state, "isStopped", None)
+                if callable(checker):
+                    return bool(checker())
+                checker = getattr(State, "isStopped", None)
+                return bool(checker(state)) if callable(checker) else False
+
+            wait_until(qt, stopped, 5)
+        except Exception:
+            pass
+    except Exception:
+        pass
+    try:
+        client._token = ""
+        client.close()
+    except Exception:
+        pass
+    try:
+        container.shutdown()
+    finally:
+        qt.shutdown()
 
 
 def main():
@@ -224,20 +329,16 @@ def main():
                 result = run_command(session, command)
                 output({"id": command.get("id"), "ok": True, "data": result})
             except Exception as exc:
+                error = exc.as_dict() if isinstance(exc, SidecarFailure) else failure_from_exception(exc, "session").as_dict()
                 output({"id": command.get("id") if isinstance(command, dict) else None, "ok": False,
-                        "error": {"type": type(exc).__name__, "message": str(exc)[:400]}})
+                        "error": error})
         return 0
     except Exception as exc:
         output({"ready": False, "error": {"type": type(exc).__name__, "message": str(exc)[:400]}})
         return 1
     finally:
         machine_data.clientNo = original
-        if session:
-            client = session[-1]
-            client._token = ""
-            client.close()
-            session[1].shutdown()
-            session[0].shutdown()
+        close_session(session)
 
 
 if __name__ == "__main__":

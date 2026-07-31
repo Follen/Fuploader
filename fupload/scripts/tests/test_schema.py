@@ -70,9 +70,14 @@ class SchemaTests(unittest.TestCase):
         for platform, identifier in (("newbee", {"id": 1}), ("dd", {"sn": "one"})):
             for resource in ("plugin", "config", "wa"):
                 schema = get_schema(platform, resource, "delete")
-                value = {"schema": schema.name, **identifier, "confirm": "DELETE"}
-                self.assertEqual(schema.validate(value)["confirm"], "DELETE")
-                value["confirm"] = "yes"
+                if platform == "dd":
+                    value = {"schema": schema.name, **identifier, "confirm_delete": True}
+                    self.assertTrue(schema.validate(value)["confirm_delete"])
+                    value["confirm_delete"] = False
+                else:
+                    value = {"schema": schema.name, **identifier, "confirm": "DELETE"}
+                    self.assertEqual(schema.validate(value)["confirm"], "DELETE")
+                    value["confirm"] = "yes"
                 with self.assertRaises(ValidationError):
                     schema.validate(value)
 
@@ -93,6 +98,12 @@ class SchemaTests(unittest.TestCase):
         for field, invalid in (("addon_type", 2), ("creation_statement", "translated")):
             with self.subTest(field=field), self.assertRaises(ValidationError):
                 plugin.validate({**base, field: invalid})
+        with self.assertRaisesRegex(ValidationError, "unknown field"):
+            plugin.validate({**base, "description": "create-only"})
+        self.assertEqual(
+            plugin.validate({**base, "scope": "private", "creation_statement": "original"})["scope"],
+            "private",
+        )
         config = get_schema("dd", "config", "edit")
         with self.assertRaisesRegex(ValidationError, "0 or between"):
             config.validate({"schema": config.name, "share_sn": "config", "price_fen": 9})

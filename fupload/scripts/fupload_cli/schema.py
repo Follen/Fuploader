@@ -136,9 +136,9 @@ class Schema:
             if value.get("scope") == "private" and not value.get("share_code_life_type"):
                 raise ValidationError("share_code_life_type is required when scope=private", path="$.share_code_life_type")
         if value.get("with_file") is True:
-            if not value.get("file_path") and not value.get("file"):
-                raise ValidationError("file_path or file is required when with_file=true", path="$.file_path")
-            if "file_install_path" not in value:
+            if self.name == "fupload.v1.dd.wa.create" and not value.get("file"):
+                raise ValidationError("file is required when with_file=true on create", path="$.file")
+            if self.name == "fupload.v1.dd.wa.create" and not value.get("file_install_path"):
                 raise ValidationError("required when with_file=true", path="$.file_install_path")
         if value.get("string_mode") == "collection":
             if not value.get("wa_str_titles"):
@@ -361,6 +361,10 @@ DD_PLUGIN_META = {
     "html_desc": f("string", nonempty=True),
     **DD_COMMERCIAL,
 }
+DD_PLUGIN_EDIT_META = {
+    name: DD_COMMERCIAL[name]
+    for name in DD_COMMERCIAL
+}
 DD_PLUGIN_VERSION = {
     "game_versions": f("array", nonempty=True), "detail_url": f("string"),
     "file": f("string", local_file=True), "release_type": f("integer", choices=(1, 2, 3)),
@@ -398,8 +402,8 @@ DD_WA_META = {
 DD_WA_CONTENT = {
     "content": f("string", nonempty=True), "update_desc": f("string", nonempty=True, max_length=1000),
     "version": f("string", nonempty=True, max_length=80), "with_file": f("boolean"),
-    "file_path": f("string"), "file": f("string", local_file=True),
-    "file_install_path": f("string", choices=("", "Interface", "Interface/Addons")), "parse_wa_uid": f("string"), "parse_wa_id": f("string"),
+    "file": f("string", local_file=True),
+    "file_install_path": f("string", choices=("", "Interface", "Interface/Addons")),
 }
 
 
@@ -456,7 +460,7 @@ register("dd", "plugin", "create", required(
      "with_associate", "need_anchor_vip"),
 ))
 register("dd", "plugin", "update", with_id(required(DD_PLUGIN_VERSION, ("game_versions", "version", "update_desc")), "sn"))
-register("dd", "plugin", "edit", with_id(DD_PLUGIN_META, "sn"))
+register("dd", "plugin", "edit", with_id(DD_PLUGIN_EDIT_META, "sn"))
 register("dd", "config", "create", required(
     {**DD_CONFIG_META, **DD_CONFIG_CONTENT},
     ("scope", "backup_sn", "title", "brief_desc", "desc",
@@ -475,7 +479,10 @@ register("dd", "wa", "create", required(
 register("dd", "wa", "update", with_id(required(DD_WA_CONTENT, ("content", "update_desc", "version", "with_file")), "sn"))
 register("dd", "wa", "edit", with_id(DD_WA_META, "sn"))
 for _resource in ("plugin", "config", "wa"):
-    register("dd", _resource, "delete", required({"sn": f("string", nonempty=True), "confirm": f("string", choices=("DELETE",))}, ("sn", "confirm")))
+    register("dd", _resource, "delete", required({
+        "sn": f("string", nonempty=True),
+        "confirm_delete": f("boolean", choices=(True,)),
+    }, ("sn", "confirm_delete")))
 
 
 def get_schema(platform: str, resource: str, action: str) -> Schema:

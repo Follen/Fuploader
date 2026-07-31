@@ -1,0 +1,38 @@
+{
+  "schema": "fupload.v1.dd.config.create",
+  "scope": "private",
+  "backup_sn": "bc83bc604578416883ed68ed023672b6",
+  "title": "Fupload DD Verify C04",
+  "brief_desc": "Private config verification 4",
+  "desc": "Fupload DD session verification configuration 4.",
+  "update_desc": "Initial config verification 4",
+  "display_imgs": [
+    "https://uires.w.163.com/img/img/aGDefCUMsmSawDjP7wbamkOYYGjOLgsh"
+  ],
+  "known_addon_ids": [
+    16542
+  ],
+  "known_addon_update_ids": [],
+  "unknown_addon_ids": [],
+  "unknown_addon_update_ids": [],
+  "wtf_role_ids": [
+    "wtf_d8f296198c6f755ec3ed"
+  ],
+  "material_names": [],
+  "material_update_names": [],
+  "font_names": [],
+  "font_update_names": [],
+  "known_wa_ids": [],
+  "known_wa_update_ids": [],
+  "unknown_wa_ids": [],
+  "unknown_wa_update_ids": [],
+  "share_code_life_type": "seven_day",
+  "need_buy": false,
+  "jump_room": false,
+  "sync_room": false,
+  "creation_statement": "original",
+  "with_associate": false,
+  "associated_acts": [],
+  "need_anchor_vip": false,
+  "vip_levels": []
+}

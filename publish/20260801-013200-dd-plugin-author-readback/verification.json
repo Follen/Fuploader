@@ -1,0 +1,39 @@
+{
+  "generated_at": "2026-08-01T01:29:33.1484243+08:00",
+  "records": [
+    {
+      "label": "plugin.create.1.0.0",
+      "exit_code": 0,
+      "success": true,
+      "reference": "e7acca927c754634b556128679fcce85",
+      "error": null
+    },
+    {
+      "label": "plugin.update.2.0.0",
+      "exit_code": 0,
+      "success": true,
+      "reference": "e7acca927c754634b556128679fcce85",
+      "error": null
+    },
+    {
+      "label": "plugin.author-list.after-update",
+      "exit_code": 0,
+      "success": true,
+      "version": "2.0.0",
+      "error": null
+    },
+    {
+      "label": "plugin.delete",
+      "exit_code": 0,
+      "success": true,
+      "reference": "",
+      "error": null
+    },
+    {
+      "label": "session.lifecycle",
+      "login_count": 1,
+      "stop_success": true,
+      "cleanup_complete": true
+    }
+  ]
+}

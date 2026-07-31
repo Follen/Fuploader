@@ -1,0 +1,39 @@
+{
+  "generated_at": "2026-08-01T01:40:58.0648662+08:00",
+  "records": [
+    {
+      "label": "wa.create.fixed",
+      "exit_code": 0,
+      "success": true,
+      "reference": "0fbe534267e44389bbf2987895e38ada",
+      "error": null
+    },
+    {
+      "label": "wa.update.fixed",
+      "exit_code": 0,
+      "success": true,
+      "reference": "0fbe534267e44389bbf2987895e38ada",
+      "error": null
+    },
+    {
+      "label": "wa.edit.fixed",
+      "exit_code": 0,
+      "success": true,
+      "reference": "0fbe534267e44389bbf2987895e38ada",
+      "error": null
+    },
+    {
+      "label": "wa.delete.fixed",
+      "exit_code": 0,
+      "success": true,
+      "reference": "",
+      "error": null
+    },
+    {
+      "label": "session.lifecycle.fixed",
+      "login_count": 1,
+      "stop_success": true,
+      "cleanup_complete": true
+    }
+  ]
+}

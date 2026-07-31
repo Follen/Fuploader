@@ -1,5 +1,5 @@
 {
   "schema": "fupload.v1.dd.plugin.delete",
   "sn": "PLUGIN_SN",
-  "confirm": "DELETE"
+  "confirm_delete": true
 }

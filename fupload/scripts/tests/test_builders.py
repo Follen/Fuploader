@@ -10,7 +10,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from fupload_cli.dd import DD, LIFE_TYPES, Sidecar, _option_values, _verify_fields, config_form, created_reference, discover_dd, merge_plugin_version_fields, normalize_commercial, plugin_form, readable_author_list, resolve_retail_ui_config, safe_backup_detail, safe_channels, safe_detail, selected_group
+from fupload_cli.dd import DD, LIFE_TYPES, Sidecar, _option_values, _verify_fields, config_form, created_reference, discover_dd, merge_plugin_version_fields, normalize_commercial, plugin_form, readable_author_list, resolve_retail_ui_config, safe_backup_detail, safe_channels, safe_detail, selected_group, validate_locked_usage_mode
 from fupload_cli.errors import FuploadError, ValidationError, redact
 from fupload_cli.newbee import NewBee, _redact_wa, _require_readback
 
@@ -370,6 +370,58 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(form["version"], "1.0.1")
         self.assertEqual(form["update_desc"], "pending update")
 
+    def test_dd_plugin_update_confirms_detail_latest_version_without_history(self) -> None:
+        before = {
+            "sn": "plugin-sn", "game_type": 10001, "name": "Plugin",
+            "scope": "public", "need_buy": False, "need_anchor_vip": False,
+            "jump_room": False, "with_associate": False,
+            "latest_version": {
+                "game_versions": ["12.1.0"], "file_path": "old-archive",
+                "release_type": 1, "version": "1.0.0",
+            },
+            "update_desc": "old update",
+        }
+        after = {
+            **before,
+            "latest_version": {
+                "game_versions": ["12.1.0"], "file_path": "new-archive",
+                "release_type": 2, "version": "1.0.1",
+            },
+            "update_desc": "new update",
+        }
+        session = mock.MagicMock()
+        session.post.return_value = {"code": 0, "result": {"sn": "plugin-sn"}}
+        with mock.patch.object(DD, "_fresh_detail", return_value=before), mock.patch(
+            "fupload_cli.dd.author_item", side_effect=[{}, after]
+        ), mock.patch.object(DD, "_validate_options"), mock.patch(
+            "fupload_cli.dd.detail", return_value=before
+        ):
+            result = DD()._write_plugin(session, "update", {
+                "sn": "plugin-sn", "game_versions": ["12.1.0"],
+                "detail_url": "new-archive", "release_type": 2,
+                "version": "1.0.1", "update_desc": "new update",
+            })
+        self.assertEqual(result["reference"], "plugin-sn")
+        self.assertFalse(any(call.args[0] == "/addon/addon_versions" for call in session.get.call_args_list))
+
+    def test_dd_wa_create_uses_official_form_defaults_and_string_categories(self) -> None:
+        session = mock.MagicMock()
+        session.post.return_value = {"code": 0, "result": {"sn": "wa-sn"}}
+        with mock.patch.object(DD, "_validate_options"), mock.patch(
+            "fupload_cli.dd.detail", return_value={}
+        ), mock.patch("fupload_cli.dd._verify_fields"):
+            DD()._write_wa(session, "create", {
+                "game_type": 10001, "scope": "private", "name": "WA", "game_version": "12.0.7",
+                "brief_desc": "Brief", "display_imgs": ["image"], "category_ids": [58],
+                "content": "plain string", "desc": "Description", "update_desc": "Initial",
+                "version": "1", "with_file": False, "need_buy": False, "jump_room": False,
+                "creation_statement": "original", "with_associate": False, "need_anchor_vip": False,
+            })
+        submitted = session.post.call_args.args[1]
+        self.assertEqual(submitted["category_ids"], ["58"])
+        self.assertEqual(submitted["buy_life_type"], "seven_day")
+        self.assertEqual(submitted["file_install_path"], "Interface/Addons")
+
     def test_dd_retail_backup_exposes_only_safe_selectors(self) -> None:
         safe = safe_backup_detail(self.retail_backup())
         encoded = repr(safe)
@@ -416,8 +468,8 @@ class BuilderTests(unittest.TestCase):
             "unknown_wa_ids": ["unknown-uid"],
         })
         changed = config_form(current, self.wa_backup(), {"wtf_role_ids": ["role-b"]})
-        self.assertEqual(changed["known_wa"], {"items": [], "inner_version": {}})
-        self.assertEqual(changed["unknown_wa"], {"items": [], "inner_version": {}})
+        self.assertEqual(changed["known_wa"], {"items": [], "inner_version": {"known-uid": 1}})
+        self.assertEqual(changed["unknown_wa"], {"items": [], "inner_version": {"unknown-uid": 1}})
 
     def test_dd_wa_selection_requires_wtf_role(self) -> None:
         with self.assertRaisesRegex(ValidationError, "select one WTF role"):
@@ -650,6 +702,63 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(form["associated_acts"], [])
         self.assertEqual(form["room_id"], "")
 
+    def test_dd_public_lifetime_and_locked_outer_usage_mode_match_resource_contract(self) -> None:
+        config = {"scope": "public", "share_code_life_type": "seven_day"}
+        normalize_commercial(config, "config")
+        self.assertNotIn("share_code_life_type", config)
+        plugin = {"scope": "public", "share_code_life_type": "seven_day"}
+        normalize_commercial(plugin, "plugin")
+        self.assertEqual(plugin["share_code_life_type"], "forever")
+
+        with self.assertRaisesRegex(ValidationError, "outer free/paid"):
+            validate_locked_usage_mode(
+                {"need_buy": True, "need_anchor_vip": False},
+                {"need_buy": False, "need_anchor_vip": False},
+                {"need_buy": False},
+            )
+        validate_locked_usage_mode(
+            {"need_buy": True, "need_anchor_vip": False},
+            {"need_buy": False, "need_anchor_vip": True},
+            {"need_buy": False, "need_anchor_vip": True},
+        )
+
+    def test_dd_wa_edit_reparses_unchanged_wa2_and_preserves_material_paths(self) -> None:
+        current = {
+            "sn": "wa-sn",
+            "game_type": 10001,
+            "scope": "public",
+            "name": "WA",
+            "game_version": "12.1.0",
+            "brief_desc": "Before",
+            "display_imgs": [],
+            "category_ids": ["210"],
+            "content": "!WA:2!same",
+            "desc": "Description",
+            "update_desc": "Update",
+            "version": "2",
+            "with_file": True,
+            "file_path": "https://cdn.example/wa.zip",
+            "file_install_path": "Interface/Addons",
+            "need_buy": False,
+            "need_anchor_vip": False,
+            "jump_room": False,
+            "with_associate": False,
+        }
+        session = mock.MagicMock()
+        session.call.return_value = {"parse_wa_uid": "uid", "parse_wa_id": "id"}
+        session.post.return_value = {"code": 0, "result": {"sn": "wa-sn"}}
+        with mock.patch.object(DD, "_fresh_detail", return_value=current), mock.patch.object(
+            DD, "_validate_options"
+        ), mock.patch("fupload_cli.dd.detail", return_value=current), mock.patch(
+            "fupload_cli.dd._verify_fields"
+        ):
+            DD()._write_wa(session, "edit", {"sn": "wa-sn", "brief_desc": "After", "with_file": False})
+        session.call.assert_called_once_with("parse_wa", content="!WA:2!same")
+        submitted = session.post.call_args.args[1]
+        self.assertFalse(submitted["with_file"])
+        self.assertEqual(submitted["file_path"], "https://cdn.example/wa.zip")
+        self.assertEqual(submitted["file_install_path"], "Interface/Addons")
+
     def test_dd_post_timeout_preserves_endpoint_and_uncertain_write(self) -> None:
         sidecar = Sidecar.__new__(Sidecar)
         sidecar.counter = 0
@@ -665,21 +774,20 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(raised.exception.endpoint, "/share/create")
         self.assertTrue(raised.exception.verification_required)
 
-    def test_dd_stale_detail_is_blocked_before_write(self) -> None:
+    def test_dd_detail_timestamp_skew_does_not_block_owner_write(self) -> None:
         stale = {"sn": "one", "title": "Old", "game_type": 10001, "mtime": "2026-07-31T10:00:00"}
         newer = {"share_sn": "one", "title": "New", "game_type": 10001, "mtime": "2026-07-31T10:01:00"}
         with mock.patch("fupload_cli.dd.detail", return_value=stale), mock.patch(
             "fupload_cli.dd.author_item", return_value=newer
-        ), mock.patch("fupload_cli.dd.time.sleep"):
-            with self.assertRaisesRegex(FuploadError, "detail is stale"):
-                DD._fresh_detail(mock.MagicMock(), "config", "one")
+        ):
+            self.assertEqual(DD._fresh_detail(mock.MagicMock(), "config", "one")["title"], "Old")
 
-    def test_dd_detail_may_converge_on_second_read(self) -> None:
+    def test_dd_detail_retries_when_ownership_is_unavailable(self) -> None:
         stale = {"sn": "one", "title": "Old", "game_type": 10001, "mtime": "2026-07-31T10:00:00"}
         fresh = {"sn": "one", "title": "New", "game_type": 10001, "mtime": "2026-07-31T10:01:00"}
         listing = {"share_sn": "one", "title": "New", "game_type": 10001, "mtime": "2026-07-31T10:01:00"}
         with mock.patch("fupload_cli.dd.detail", side_effect=[stale, fresh]), mock.patch(
-            "fupload_cli.dd.author_item", return_value=listing
+            "fupload_cli.dd.author_item", side_effect=[{}, listing]
         ), mock.patch("fupload_cli.dd.time.sleep"):
             self.assertEqual(DD._fresh_detail(mock.MagicMock(), "config", "one")["title"], "New")
 

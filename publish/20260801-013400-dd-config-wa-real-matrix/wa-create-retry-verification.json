@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-08-01T01:38:38.4525661+08:00",
+  "records": [
+    {
+      "label": "wa.create.retry",
+      "exit_code": 2,
+      "success": false,
+      "reference": null,
+      "error": {
+        "endpoint": "/wa/create",
+        "kind": "platform_error",
+        "message": "DD mutation request failed (UiApiError): 请求失败 HTTP 422: UNPROCESSABLE ENTITY",
+        "stage": "mutation",
+        "verification_required": true
+      }
+    },
+    {
+      "label": "session.lifecycle.retry",
+      "login_count": 1,
+      "stop_success": true,
+      "cleanup_complete": true
+    }
+  ]
+}

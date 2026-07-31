@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-08-01T01:35:47.6453440+08:00",
+  "records": [
+    {
+      "label": "config.create",
+      "exit_code": 0,
+      "success": true,
+      "reference": "33ed4b3dc14d45cfbe48c2ab9943f72e",
+      "error": null
+    },
+    {
+      "label": "config.update",
+      "exit_code": 0,
+      "success": true,
+      "reference": "33ed4b3dc14d45cfbe48c2ab9943f72e",
+      "error": null
+    },
+    {
+      "label": "config.edit",
+      "exit_code": 0,
+      "success": true,
+      "reference": "33ed4b3dc14d45cfbe48c2ab9943f72e",
+      "error": null
+    },
+    {
+      "label": "wa.create",
+      "exit_code": 2,
+      "success": false,
+      "reference": null,
+      "error": {
+        "endpoint": "/wa/create",
+        "kind": "platform_error",
+        "message": "DD mutation request failed (UiApiError)",
+        "stage": "mutation",
+        "verification_required": true
+      }
+    },
+    {
+      "label": "config.delete",
+      "exit_code": 0,
+      "success": true,
+      "reference": "",
+      "error": null
+    },
+    {
+      "label": "session.lifecycle",
+      "login_count": 1,
+      "stop_success": true,
+      "cleanup_complete": true
+    }
+  ]
+}

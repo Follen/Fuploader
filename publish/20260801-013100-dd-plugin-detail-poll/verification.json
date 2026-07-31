@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-08-01T01:27:15.5974952+08:00",
+  "records": [
+    {
+      "label": "plugin.create.1.0.0",
+      "exit_code": 0,
+      "success": true,
+      "reference": "f09176b5a4f443328dc6b46a66e237a7",
+      "error": null
+    },
+    {
+      "label": "plugin.update.2.0.0",
+      "exit_code": 2,
+      "success": false,
+      "reference": null,
+      "error": {
+        "details": {
+          "fields": [
+            "detail_url",
+            "release_type",
+            "update_desc",
+            "version"
+          ]
+        },
+        "endpoint": "/addon/detail_v2",
+        "kind": "verification_required",
+        "message": "write readback did not match field(s): detail_url, release_type, update_desc, version",
+        "stage": "readback",
+        "verification_required": true
+      }
+    },
+    {
+      "label": "plugin.get.after_0s",
+      "exit_code": 0,
+      "success": true,
+      "version": "",
+      "update_desc": "Initial detail poll verification",
+      "error": null
+    },
+    {
+      "label": "plugin.get.after_3s",
+      "exit_code": 0,
+      "success": true,
+      "version": "",
+      "update_desc": "Initial detail poll verification",
+      "error": null
+    },
+    {
+      "label": "plugin.get.after_10s",
+      "exit_code": 0,
+      "success": true,
+      "version": "",
+      "update_desc": "Initial detail poll verification",
+      "error": null
+    },
+    {
+      "label": "plugin.get.after_30s",
+      "exit_code": 0,
+      "success": true,
+      "version": "",
+      "update_desc": "Initial detail poll verification",
+      "error": null
+    },
+    {
+      "label": "plugin.delete",
+      "exit_code": 0,
+      "success": true,
+      "reference": "",
+      "error": null
+    },
+    {
+      "label": "session.lifecycle",
+      "status_success": true,
+      "login_count": 1,
+      "stop_success": true,
+      "cleanup_complete": true
+    }
+  ]
+}
