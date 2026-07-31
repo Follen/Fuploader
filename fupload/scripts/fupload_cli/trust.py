@@ -179,6 +179,7 @@ def verify_dd_executable(executable: Path) -> Dict[str, str]:
         raise FuploadError("DD executable signature validation requires Windows", kind="trust_boundary")
     script = (
         "Import-Module Microsoft.PowerShell.Security -ErrorAction Stop; "
+        "$OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false); "
         "$s=Get-AuthenticodeSignature -LiteralPath '%s'; "
         "[pscustomobject]@{Status=[string]$s.Status;Subject=[string]$s.SignerCertificate.Subject} "
         "| ConvertTo-Json -Compress"
@@ -189,7 +190,7 @@ def verify_dd_executable(executable: Path) -> Dict[str, str]:
         environment["PSModulePath"] = windows_root + "\\System32\\WindowsPowerShell\\v1.0\\Modules"
         completed = subprocess.run(
             [_powershell_path(), "-NoProfile", "-NonInteractive", "-Command", script],
-            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            capture_output=True, text=True, encoding="utf-8", errors="strict",
             timeout=20, check=False, env=environment,
         )
         if completed.returncode != 0:

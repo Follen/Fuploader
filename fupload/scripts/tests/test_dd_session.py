@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import importlib
+import io
+import json
 import os
+import queue
 import sys
 import tempfile
 import threading
@@ -20,6 +23,51 @@ import fupload_cli.dd_broker as dd_broker
 
 
 class DDSessionTests(unittest.TestCase):
+
+    def test_sidecar_requests_use_encoding_neutral_ascii_json(self) -> None:
+        sidecar = Sidecar.__new__(Sidecar)
+        sidecar.counter = 0
+        sidecar.process = mock.MagicMock()
+        sidecar.process.stdin = mock.MagicMock()
+        with mock.patch.object(sidecar, "_next_result", return_value={
+            "id": 1,
+            "ok": True,
+            "data": {"name": "中文公告"},
+        }):
+            result = sidecar.call(
+                "request", method="POST", path="/addon/modify",
+                payload={"name": "中文公告"},
+            )
+        wire = sidecar.process.stdin.write.call_args.args[0]
+        self.assertTrue(wire.isascii())
+        self.assertNotIn("中文公告", wire)
+        self.assertEqual(json.loads(wire)["payload"]["name"], "中文公告")
+        self.assertEqual(result["name"], "中文公告")
+
+    def test_native_sidecar_results_use_encoding_neutral_ascii_json(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        output = io.StringIO()
+        with mock.patch.object(module.sys, "stdout", output):
+            module.output({"ok": True, "data": {"name": "中文公告"}})
+        wire = output.getvalue()
+        self.assertTrue(wire.isascii())
+        self.assertNotIn("中文公告", wire)
+        payload = json.loads(wire.removeprefix("FUPLOAD_RESULT "))
+        self.assertEqual(payload["data"]["name"], "中文公告")
+
+    def test_sidecar_non_utf8_output_fails_without_replacement_text(self) -> None:
+        sidecar = Sidecar.__new__(Sidecar)
+        sidecar.responses = queue.Queue()
+        sidecar.process = mock.MagicMock()
+        sidecar.process.stdout = io.TextIOWrapper(io.BytesIO(bytes([0xff])), encoding="utf-8", errors="strict")
+        sidecar._read_results()
+        with self.assertRaises(FuploadError) as raised:
+            sidecar._next_result(timeout=0)
+        self.assertEqual(str(raised.exception), "DD sidecar returned non-UTF-8 output")
 
     def test_native_failure_keeps_message_and_business_code(self) -> None:
         class UiApiError(Exception):

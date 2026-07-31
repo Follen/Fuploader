@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from fupload_cli.cli import build_parser, main
+from fupload_cli.io import write_error, write_output
 from fupload_cli.schema import SCHEMAS
 
 
@@ -160,6 +161,23 @@ class CLITests(unittest.TestCase):
             self.assertEqual(payload["schema"], "fupload.output.v1")
             self.assertTrue(payload["success"])
             self.assertTrue(payload["dry_run"])
+
+    def test_final_json_output_is_ascii_and_round_trips_chinese(self) -> None:
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            write_output("dd", "plugin.get", {"name": "中文公告"})
+        wire = output.getvalue()
+        self.assertTrue(wire.isascii())
+        self.assertNotIn("中文公告", wire)
+        self.assertEqual(json.loads(wire)["data"]["name"], "中文公告")
+
+    def test_error_json_output_is_ascii_and_round_trips_chinese(self) -> None:
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            write_error("dd", "plugin.get", ValueError("中文错误"))
+        wire = output.getvalue()
+        self.assertTrue(wire.isascii())
+        self.assertEqual(json.loads(wire)["error"]["message"], "中文错误")
 
     def test_wrong_stage_field_is_rejected_before_network(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

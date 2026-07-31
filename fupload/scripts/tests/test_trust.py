@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import io
 import os
 import subprocess
 import sys
@@ -30,6 +31,27 @@ class TrustBoundaryTests(unittest.TestCase):
         with mock.patch("fupload_cli.transport.urllib.request.urlopen", return_value=response) as opened:
             self.assertEqual(json_request("https://example.test/read"), {"ok": True})
         opened.assert_called_once()
+
+    def test_http_error_keeps_valid_utf8_chinese_message(self) -> None:
+        error = urllib.error.HTTPError(
+            "https://example.test/write", 403, "Forbidden", {},
+            io.BytesIO(json.dumps({"message": "权限不足", "code": 4031}, ensure_ascii=False).encode("utf-8")),
+        )
+        with mock.patch("fupload_cli.transport.urllib.request.urlopen", side_effect=error):
+            with self.assertRaises(FuploadError) as raised:
+                json_request("https://example.test/write", method="POST")
+        self.assertEqual(str(raised.exception), "权限不足")
+        self.assertEqual(raised.exception.business_code, 4031)
+
+    def test_http_error_invalid_utf8_does_not_inject_replacement_text(self) -> None:
+        error = urllib.error.HTTPError(
+            "https://example.test/write", 403, "Forbidden", {},
+            io.BytesIO(b'{"message":"' + bytes([0xff]) + b'"}'),
+        )
+        with mock.patch("fupload_cli.transport.urllib.request.urlopen", side_effect=error):
+            with self.assertRaises(FuploadError) as raised:
+                json_request("https://example.test/write", method="POST")
+        self.assertEqual(str(raised.exception), "HTTP 403")
 
     def test_environment_overrides_do_not_change_newbee_targets(self) -> None:
         script = (
@@ -109,7 +131,8 @@ class TrustBoundaryTests(unittest.TestCase):
             "publisher": "NetEase (Hangzhou) Network Co., Ltd",
         })
         self.assertEqual(run.call_args.kwargs["encoding"], "utf-8")
-        self.assertEqual(run.call_args.kwargs["errors"], "replace")
+        self.assertEqual(run.call_args.kwargs["errors"], "strict")
+        self.assertIn("$OutputEncoding", run.call_args.args[0][-1])
 
     def test_dd_signature_none_stdout_fails_closed(self) -> None:
         completed = subprocess.CompletedProcess(args=[], returncode=1, stdout=None, stderr=None)

@@ -257,7 +257,7 @@ class Sidecar:
         environment["FUPLOAD_DD_DEVICE_STATE"] = str(state_dir() / "sidecar-device.json")
         self.process = subprocess.Popen(
             [str(executable), str(script)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL, text=True, encoding="utf-8", errors="replace",
+            stderr=subprocess.DEVNULL, text=True, encoding="utf-8", errors="strict",
             env=environment, cwd=str(self.dd_dir),
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
@@ -291,13 +291,17 @@ class Sidecar:
 
     def _read_results(self) -> None:
         assert self.process and self.process.stdout
-        for line in self.process.stdout:
-            if line.startswith("FUPLOAD_RESULT "):
-                try:
-                    self.responses.put(json.loads(line[len("FUPLOAD_RESULT "):]))
-                except ValueError:
-                    self.responses.put(FuploadError("DD sidecar returned invalid JSON", kind="sidecar_error"))
-        self.responses.put(FuploadError("DD sidecar exited without a result", kind="sidecar_error"))
+        try:
+            for line in self.process.stdout:
+                if line.startswith("FUPLOAD_RESULT "):
+                    try:
+                        self.responses.put(json.loads(line[len("FUPLOAD_RESULT "):]))
+                    except ValueError:
+                        self.responses.put(FuploadError("DD sidecar returned invalid JSON", kind="sidecar_error"))
+        except UnicodeDecodeError:
+            self.responses.put(FuploadError("DD sidecar returned non-UTF-8 output", kind="sidecar_error"))
+        else:
+            self.responses.put(FuploadError("DD sidecar exited without a result", kind="sidecar_error"))
 
     def _next_result(
         self, *, timeout: float = 180, endpoint: Optional[str] = None,
@@ -330,7 +334,7 @@ class Sidecar:
         assert self.process and self.process.stdin
         self.counter += 1
         request = {"id": self.counter, "action": action, **values}
-        self.process.stdin.write(json.dumps(request, ensure_ascii=False, separators=(",", ":")) + "\n")
+        self.process.stdin.write(json.dumps(request, ensure_ascii=True, separators=(",", ":")) + "\n")
         self.process.stdin.flush()
         method = str(values.get("method") or "").upper()
         endpoint = str(values.get("path") or "") or None

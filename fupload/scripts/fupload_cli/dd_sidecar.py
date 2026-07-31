@@ -28,7 +28,7 @@ def safe_exception_message(exc):
 
 
 def output(payload):
-    print("FUPLOAD_RESULT " + json.dumps(payload, ensure_ascii=False, sort_keys=True))
+    print("FUPLOAD_RESULT " + json.dumps(payload, ensure_ascii=True, sort_keys=True))
     sys.stdout.flush()
 
 

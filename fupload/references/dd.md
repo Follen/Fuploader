@@ -82,3 +82,5 @@ When `with_file=true`, create requires a local `.zip` `file` and nonempty `file_
 ## Errors and readback
 
 Stages are `session`, `dependency_get`, `upload_authorize`, `object_put`, `mutation`, `readback`, and `native_parser`. Explicit HTTP/business failures and all pre-mutation validation failures have `verification_required=false`. PUT/mutation connection uncertainty and accepted-write readback uncertainty have `verification_required=true`; GET first and do not replay the write. Native failures retain a bounded exception message and the native `code`/`error_code` when present, with signed-URL query credentials, signatures, and tokens redacted before they leave the sidecar.
+
+The parent process and native sidecar exchange ASCII-only JSONL, and Fuploader's final JSON output follows the same rule. Non-ASCII request, response, and output text is represented with JSON Unicode escapes so Chinese titles, descriptions, announcements, and URLs do not depend on either Windows process code page. JSON consumers recover original UTF-8 strings through normal parsing.

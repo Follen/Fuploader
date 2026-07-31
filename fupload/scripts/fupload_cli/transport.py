@@ -14,6 +14,18 @@ from .errors import FuploadError
 from .trust import official_opener, require_official_url
 
 
+def _http_error_details(raw: bytes, fallback: str) -> tuple[str, Any]:
+    """Extract a server error only from a conforming UTF-8 JSON object."""
+    try:
+        parsed = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return fallback, None
+    if not isinstance(parsed, dict):
+        return fallback, None
+    message = parsed.get("message") or parsed.get("msg") or fallback
+    return str(message), parsed.get("code")
+
+
 def json_request(
     url: str,
     *,
@@ -39,14 +51,7 @@ def json_request(
             status = response.status
     except urllib.error.HTTPError as exc:
         raw = exc.read()
-        message = "HTTP %d" % exc.code
-        code = None
-        try:
-            parsed = json.loads(raw.decode("utf-8", "replace"))
-            message = str(parsed.get("message") or parsed.get("msg") or message)
-            code = parsed.get("code")
-        except (ValueError, AttributeError):
-            pass
+        message, code = _http_error_details(raw, "HTTP %d" % exc.code)
         raise FuploadError(message, endpoint=url, http_status=exc.code, business_code=code) from exc
     except (OSError, urllib.error.URLError) as exc:
         raise FuploadError(
@@ -106,14 +111,7 @@ def multipart_request(
             status = response.status
     except urllib.error.HTTPError as exc:
         raw = exc.read()
-        message = "HTTP %d" % exc.code
-        code = None
-        try:
-            parsed = json.loads(raw.decode("utf-8", "replace"))
-            message = str(parsed.get("message") or parsed.get("msg") or message)
-            code = parsed.get("code")
-        except (ValueError, AttributeError):
-            pass
+        message, code = _http_error_details(raw, "HTTP %d" % exc.code)
         raise FuploadError(message, endpoint=url, http_status=exc.code, business_code=code) from exc
     except (OSError, urllib.error.URLError) as exc:
         raise FuploadError(

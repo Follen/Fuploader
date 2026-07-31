@@ -67,7 +67,8 @@ def write_output(platform: str, operation: str, data: Any, *, dry_run: bool = Fa
         "dry_run": bool(dry_run),
         "data": sanitize_output(data),
     }
-    print(json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False))
+    # Stable ASCII JSON avoids inheriting a Windows console code-page contract.
+    print(json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":"), allow_nan=False))
 
 
 def sanitize_output(value: Any) -> Any:
@@ -108,4 +109,4 @@ def write_error(platform: str, operation: str, error: BaseException) -> None:
         "success": False,
         "error": detail,
     }
-    print(json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False))
+    print(json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":"), allow_nan=False))
