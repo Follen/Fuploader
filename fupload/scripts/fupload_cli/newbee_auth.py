@@ -15,20 +15,21 @@ from typing import Dict, Tuple
 
 from .errors import FuploadError
 from .transport import json_request
+from .trust import NEWBEE_ORIGINS, official_opener, require_official_url, trusted_roaming_dir
 
 
-API_BASE = os.environ.get("FUPLOAD_NEWBEE_API_BASE", "https://api.newbeebox.com").rstrip("/")
-AUTH_BASE = os.environ.get("FUPLOAD_NEWBEE_AUTH_BASE", "https://api.next.newbeebox.com/auth").rstrip("/")
+API_BASE = NEWBEE_ORIGINS["creator"]
+AUTH_BASE = NEWBEE_ORIGINS["auth"] + "/auth"
+API_ORIGIN = "creator"
+AUTH_ORIGIN = "auth"
 
 
 def _auth_dir() -> Path:
-    configured = os.environ.get("FUPLOAD_NEWBEE_AUTH_DIR")
-    if configured:
-        return Path(configured)
-    appdata = os.environ.get("APPDATA")
-    if not appdata:
-        raise FuploadError("APPDATA is not set; NewBeeBox login state cannot be located", kind="authentication_error")
-    return Path(appdata) / "NewBeeBox" / "auth-store"
+    return auth_store_dir()
+
+
+def auth_store_dir() -> Path:
+    return trusted_roaming_dir("NewBeeBox", "auth-store")
 
 
 def _read(name: str, optional: bool = False) -> str:
@@ -77,14 +78,16 @@ def _refresh(access: str, refresh: str, proof: str) -> Tuple[str, str, str]:
     if proof:
         form["device_proof"] = proof
     request = urllib.request.Request(
-        AUTH_BASE + "/connect/token",
+        require_official_url(AUTH_BASE + "/connect/token", AUTH_ORIGIN, path_prefix="/auth/"),
         data=urllib.parse.urlencode(form).encode(),
         method="POST",
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     try:
-        with urllib.request.urlopen(request, timeout=60) as response:
+        with official_opener(NEWBEE_ORIGINS[AUTH_ORIGIN]).open(request, timeout=60) as response:
             payload = json.loads(response.read().decode("utf-8"))
+    except FuploadError:
+        raise
     except Exception as exc:
         raise FuploadError("cannot refresh NewBeeBox desktop session", kind="authentication_error") from exc
     access = str(payload.get("access_token") or "")
@@ -103,7 +106,7 @@ def creator_headers() -> Dict[str, str]:
     if not _jwt_fresh(access):
         access, refresh, proof = _refresh(access, refresh, proof)
     handoff = json_request(
-        API_BASE + "/v3/user/auth2web", method="POST",
+        API_BASE + "/v3/user/auth2web", method="POST", trusted_service=API_ORIGIN,
         headers={"Authorization": "Bearer " + access, "boxversion": "1.1.17", "Accept-Language": "zh-CN"},
         body={},
     )
@@ -111,7 +114,7 @@ def creator_headers() -> Dict[str, str]:
         raise FuploadError("NewBeeBox Creator handoff failed", kind="authentication_error")
     web_code = str((handoff.get("data") or {}).get("code") or "")
     exchange = json_request(
-        API_BASE + "/v3/user/exchange_web_code", method="POST",
+        API_BASE + "/v3/user/exchange_web_code", method="POST", trusted_service=API_ORIGIN,
         headers={"appId": "6", "Accept-Language": "zh-CN"}, body={"code": web_code},
     )
     data = exchange.get("data") or {}
@@ -122,7 +125,10 @@ def creator_headers() -> Dict[str, str]:
     headers = {"appId": "6", "token": author, "Accept-Language": "zh-CN"}
     if initial:
         headers["Authorization"] = "Bearer " + initial
-    resource = json_request(API_BASE + "/v3/user/refresh_web_resource_token", method="POST", headers=headers, body={})
+    resource = json_request(
+        API_BASE + "/v3/user/refresh_web_resource_token", method="POST", headers=headers,
+        body={}, trusted_service=API_ORIGIN,
+    )
     token = str((resource.get("data") or {}).get("resource_token") or "")
     if resource.get("code") != 1 or not token:
         raise FuploadError("NewBeeBox Creator resource token refresh failed", kind="authentication_error")

@@ -95,6 +95,13 @@ class CLITests(unittest.TestCase):
             self.assertIn("target project", text)
         self.assertIn("Keep the directory after execution", skill)
 
+    def test_skill_requires_trusted_authentication_sources(self) -> None:
+        root = Path(__file__).resolve().parents[2]
+        skill = (root / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("fixed official HTTPS origins", skill)
+        self.assertIn("Authenticode-valid executable", skill)
+        self.assertIn("Do not set endpoint, credential-directory", skill)
+
     def test_dry_run_emits_stable_json(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "input.json"

@@ -461,6 +461,9 @@ class BuilderTests(unittest.TestCase):
                 (candidate / "ccvoicehub.res").write_bytes(b"resource")
             with mock.patch("fupload_cli.dd._discovery_roots", return_value=[root]), mock.patch(
                 "fupload_cli.dd.EXPECTED_DD_VERSION", "any"
+            ), mock.patch(
+                "fupload_cli.dd.verify_dd_executable",
+                return_value={"status": "Valid", "publisher": "NetEase (Hangzhou) Network Co., Ltd"},
             ):
                 self.assertEqual(discover_dd(), (root / "100129").resolve())
 
@@ -474,6 +477,9 @@ class BuilderTests(unittest.TestCase):
                 (candidate / "ccvoicehub.res").write_bytes(b"resource")
             with mock.patch("fupload_cli.dd._discovery_roots", return_value=[root]), mock.patch(
                 "fupload_cli.dd.EXPECTED_DD_VERSION", "100128"
+            ), mock.patch(
+                "fupload_cli.dd.verify_dd_executable",
+                return_value={"status": "Valid", "publisher": "NetEase (Hangzhou) Network Co., Ltd"},
             ):
                 self.assertEqual(discover_dd(), (root / "100128").resolve())
 

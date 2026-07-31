@@ -1,0 +1,34 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 5
+name: harden-auth-trust-boundaries
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: 6a7c313d5c886430fb9135546ed12c38c238c8afd253c446a5b6676a4face5d5
+spec_changes:
+  - capability: dd-publishing
+    operation: replace
+    source: specs/dd-publishing/spec.md
+    base_hash: 3e2ad0747ae0f25a3784414ac2032577aeee93d11df8fc94d9f7cfda439cf53d
+  - capability: fupload-cli
+    operation: replace
+    source: specs/fupload-cli/spec.md
+    base_hash: 1e514733bf3df14180e51d86a35c43b6042543cdf892b9856a2154d477170b69
+  - capability: fupload-skill
+    operation: replace
+    source: specs/fupload-skill/spec.md
+    base_hash: 0d03b17a965b633c28b3fe9c36dccf7a834290464e9577d8b6f24bef05006ea2
+  - capability: newbee-publishing
+    operation: replace
+    source: specs/newbee-publishing/spec.md
+    base_hash: 70883599969117023d61a448f8dc33e0218553a63cf9e9e6cab642c3ab0919cb
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/66581562d748f4f7c7cc3d3f283601d40418af76cd5811947762adc90347a2f8.json
+verification_evidence: runtime/evidence/verifications/834a9e9c90161e2a2edc5893d58fdbe2acc13ef4a02e8456354d5112d4ce0fa1.json
+partial_allowance: null
+archived: true
+created_at: 2026-07-31
+run_id: 819d0b4e-fb98-4fc4-94e3-d929e3307a12

@@ -2,9 +2,9 @@
 
 ## Native session
 
-Use `dd session doctor`, then a read command. Fupload checks `FUPLOAD_DD_DIR`, a running `netease_dd.exe`, Windows uninstall records, bounded DD user-config JSON, and standard installation roots. It validates each candidate, selects the highest installed version, and runs that version's `netease_dd.exe` with DD-native login and signing modules. `FUPLOAD_DD_EXPECTED_VERSION` may pin an exact version for troubleshooting. Do not request a token, credential database, or `clientNo`.
+Use `dd session doctor`, then a read command. Fupload checks a running `netease_dd.exe`, Windows uninstall records, bounded DD user-config JSON, and standard installation roots. It validates each candidate's structure, Authenticode chain, and official NetEase publisher, selects the highest trusted installed version, and runs that version's `netease_dd.exe` with DD-native login and signing modules. `FUPLOAD_DD_EXPECTED_VERSION` may pin an exact version for troubleshooting but cannot bypass signature validation. Do not request a token, credential database, or `clientNo`.
 
-The stable sidecar device state is `%APPDATA%/CCVoiceHub/Fupload/sidecar-device.json`. Invalid state fails closed. One Fupload sidecar per Windows user may run while the normal DD GUI remains open.
+The stable sidecar device state is in the Windows Known Folder Roaming AppData path `CCVoiceHub/Fupload/sidecar-device.json`. Environment variables cannot redirect it. Invalid state fails closed. One Fupload sidecar per Windows user may run while the normal DD GUI remains open.
 
 Before writes, query `dd options game-types`, `channels`, `life-types`, `vip-levels`, and `associated-acts`, plus resource categories/game versions/backups. `life-types` exposes the official client enum; the similarly named `/act/life_type_cfgs` endpoint is season availability data, not these form values. All page-selectable business values are user choices.
 

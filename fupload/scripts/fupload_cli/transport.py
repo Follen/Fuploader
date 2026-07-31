@@ -11,6 +11,7 @@ import urllib.request
 from typing import Any, Dict, Mapping, Optional
 
 from .errors import FuploadError
+from .trust import official_opener, require_official_url
 
 
 def json_request(
@@ -20,6 +21,7 @@ def json_request(
     headers: Optional[Mapping[str, str]] = None,
     body: Any = None,
     timeout: int = 60,
+    trusted_service: Optional[str] = None,
 ) -> Any:
     data = None
     request_headers = dict(headers or {})
@@ -28,7 +30,11 @@ def json_request(
         request_headers.setdefault("Content-Type", "application/json")
     request = urllib.request.Request(url, data=data, method=method, headers=request_headers)
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+        response_context = (
+            official_opener(require_official_url(url, trusted_service)).open(request, timeout=timeout)
+            if trusted_service else urllib.request.urlopen(request, timeout=timeout)
+        )
+        with response_context as response:
             raw = response.read()
             status = response.status
     except urllib.error.HTTPError as exc:
@@ -66,6 +72,7 @@ def multipart_request(
     fields: Optional[Mapping[str, str]] = None,
     headers: Optional[Mapping[str, str]] = None,
     timeout: int = 600,
+    trusted_service: Optional[str] = None,
 ) -> Any:
     boundary = "----fupload-%s" % secrets.token_hex(16)
     chunks = []
@@ -90,7 +97,11 @@ def multipart_request(
     request_headers["Content-Type"] = "multipart/form-data; boundary=%s" % boundary
     request = urllib.request.Request(url, data=body, method="POST", headers=request_headers)
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+        response_context = (
+            official_opener(require_official_url(url, trusted_service)).open(request, timeout=timeout)
+            if trusted_service else urllib.request.urlopen(request, timeout=timeout)
+        )
+        with response_context as response:
             raw = response.read()
             status = response.status
     except urllib.error.HTTPError as exc:

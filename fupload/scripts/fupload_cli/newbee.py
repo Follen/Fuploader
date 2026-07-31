@@ -15,12 +15,16 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 from .errors import FuploadError, ValidationError
 from .transport import json_request, multipart_request
-from .newbee_auth import API_BASE, creator_headers
+from .newbee_auth import API_BASE, API_ORIGIN, auth_store_dir, creator_headers
+from .trust import NEWBEE_ORIGINS
 
 
-METADATA_URL = os.environ.get("FUPLOAD_NEWBEE_METADATA_URL", "https://cdn2.newbeebox.com/modconfig.json")
-UPLOAD_SERVER = os.environ.get("FUPLOAD_NEWBEE_UPLOAD_SERVER", "https://api.next.newbeebox.com/uploadserver").rstrip("/")
-NEXT_API_BASE = os.environ.get("FUPLOAD_NEWBEE_NEXT_API_BASE", "https://api.next.newbeebox.com").rstrip("/")
+METADATA_URL = NEWBEE_ORIGINS["metadata"] + "/modconfig.json"
+UPLOAD_SERVER = NEWBEE_ORIGINS["upload"] + "/uploadserver"
+NEXT_API_BASE = NEWBEE_ORIGINS["next"]
+NEXT_ORIGIN = "next"
+METADATA_ORIGIN = "metadata"
+UPLOAD_ORIGIN = "upload"
 
 
 def _first_object(value: Any) -> Dict[str, Any]:
@@ -184,7 +188,10 @@ class NewBee:
         return self._headers
 
     def post(self, endpoint: str, body: Mapping[str, Any]) -> Any:
-        envelope = json_request(self.base + endpoint, method="POST", headers=self.headers, body=body)
+        envelope = json_request(
+            self.base + endpoint, method="POST", headers=self.headers, body=body,
+            trusted_service=API_ORIGIN,
+        )
         if not isinstance(envelope, dict) or envelope.get("code") != 1:
             raise FuploadError(
                 str((envelope or {}).get("message") or "NewBeeBox request failed"),
@@ -194,7 +201,10 @@ class NewBee:
         return envelope.get("data")
 
     def post_next(self, endpoint: str, body: Mapping[str, Any]) -> Any:
-        envelope = json_request(NEXT_API_BASE + endpoint, method="POST", headers=self.headers, body=body)
+        envelope = json_request(
+            NEXT_API_BASE + endpoint, method="POST", headers=self.headers, body=body,
+            trusted_service=NEXT_ORIGIN,
+        )
         if not isinstance(envelope, dict) or envelope.get("code") != 1:
             raise FuploadError(
                 str((envelope or {}).get("message") or "NewBeeBox next request failed"),
@@ -204,7 +214,10 @@ class NewBee:
         return envelope.get("data")
 
     def upload(self, endpoint: str, path: str, fields: Optional[Mapping[str, str]] = None) -> Any:
-        envelope = multipart_request(self.base + endpoint, path, headers=self.headers, fields=fields)
+        envelope = multipart_request(
+            self.base + endpoint, path, headers=self.headers, fields=fields,
+            trusted_service=API_ORIGIN,
+        )
         if not isinstance(envelope, dict) or envelope.get("code") != 1:
             raise FuploadError(
                 str((envelope or {}).get("message") or "NewBeeBox upload failed"),
@@ -214,7 +227,7 @@ class NewBee:
         return envelope.get("data")
 
     def metadata(self) -> Dict[str, Any]:
-        value = json_request(METADATA_URL)
+        value = json_request(METADATA_URL, trusted_service=METADATA_ORIGIN)
         if not isinstance(value, dict):
             raise FuploadError("NewBeeBox metadata had an unexpected shape", endpoint=METADATA_URL)
         return value
@@ -453,6 +466,7 @@ class NewBee:
         name = Path(path).name
         prepare = json_request(
             UPLOAD_SERVER + "/upload/v3/prepare", method="POST",
+            trusted_service=UPLOAD_ORIGIN,
             body={
                 "code": upload_code, "indexType": 2, "fileName": name,
                 "files": [{"fullHash": upload_code, "totalSize": len(data), "chunks": [{"hash": upload_code, "size": len(data)}]}],
@@ -467,8 +481,9 @@ class NewBee:
             if not item.get("url") or not item.get("callback"):
                 raise FuploadError("attachment upload preparation omitted object credentials", endpoint="/upload/v3/prepare")
             parsed = urllib.parse.urlsplit(item["url"])
-            connection_type = http.client.HTTPSConnection if parsed.scheme == "https" else http.client.HTTPConnection
-            connection = connection_type(parsed.hostname, parsed.port, timeout=600)
+            if parsed.scheme.casefold() != "https" or not parsed.hostname or parsed.username or parsed.password or parsed.fragment:
+                raise FuploadError("attachment object URL was not HTTPS", kind="trust_boundary")
+            connection = http.client.HTTPSConnection(parsed.hostname, parsed.port, timeout=600)
             try:
                 target = parsed.path + (("?" + parsed.query) if parsed.query else "")
                 connection.request(
@@ -487,7 +502,10 @@ class NewBee:
             finally:
                 connection.close()
         index_code = str(prepared.get("id") or "")
-        index = json_request(UPLOAD_SERVER + "/upload/v3/index/get", method="POST", body={"code": index_code})
+        index = json_request(
+            UPLOAD_SERVER + "/upload/v3/index/get", method="POST", body={"code": index_code},
+            trusted_service=UPLOAD_ORIGIN,
+        )
         index_data = (index or {}).get("data") or {}
         if (index or {}).get("code") != 1 or not index_data.get("code"):
             raise FuploadError("attachment upload index could not be read back", endpoint="/upload/v3/index/get")
@@ -896,7 +914,14 @@ class NewBee:
     def execute_read(self, resource: str, action: str, args: Any) -> Any:
         if resource == "session" and action == "doctor":
             self.headers
-            return {"authenticated": True, "source": "NewBeeBox desktop auth-store"}
+            return {
+                "authenticated": True,
+                "source": "NewBeeBox desktop auth-store",
+                "auth_store": str(auth_store_dir()),
+                "auth_store_source": "windows-known-folder",
+                "api_origins": dict(NEWBEE_ORIGINS),
+                "trusted": True,
+            }
         if resource == "plugin":
             if action == "list": return self.list_plugins(args.keyword, args.page, args.page_size)
             if action == "get": return self.get_plugin(args.id)

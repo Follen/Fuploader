@@ -37,7 +37,7 @@ fupload/
 - 已安装并登录新手盒子桌面客户端（使用新手盒子时）
 - 已安装并登录网易 DD 官方客户端（使用 DD 时）
 
-新手盒子认证读取 `%APPDATA%/NewBeeBox/auth-store`。DD 会自动查找安装目录，并把稳定的 sidecar 设备状态保存在 `%APPDATA%/CCVoiceHub/Fupload/sidecar-device.json`。
+新手盒子认证目录由 Windows Known Folder API 定位到用户 Roaming AppData 下的 `NewBeeBox/auth-store`。NewBee API、认证、元数据和上传 origin 固定为官方 HTTPS 地址，环境变量不能重定向凭据或文件。DD 会自动查找安装目录，验证 `netease_dd.exe` 的 Authenticode 官方发布者后再启动，并把稳定的 sidecar 设备状态保存在 Roaming AppData 下的 `CCVoiceHub/Fupload/sidecar-device.json`。
 
 ## 作为 Skill 使用
 

@@ -45,6 +45,8 @@ Inspect the user-provided project or current workspace for `.toc`, README, chang
 
 Use read-only CLI commands to discover the current account's records, target detail, versions, backups, categories, game branches/builds, installation paths, life types, VIP levels, channels, and association candidates. Never ask the user to copy an ID that the CLI can query.
 
+Run the platform session doctor before authenticated reads. NewBee credentials must come from the Windows Known Folder auth-store and all authenticated requests must use the CLI's fixed official HTTPS origins. DD discovery must accept only an Authenticode-valid executable from an allowed official NetEase publisher. Do not set endpoint, credential-directory, or DD executable-path environment overrides.
+
 For a DD retail configuration, read `dd config backup-get` and present the safe edit-mode and cooldown selector metadata. Send only returned selectors in `retail_ui_config`; never request, display, or reconstruct raw retail import strings.
 
 For a configuration, require a cloud backup already uploaded by the matching desktop client. If none exists, ask the user to upload one in the client and stop before writing.

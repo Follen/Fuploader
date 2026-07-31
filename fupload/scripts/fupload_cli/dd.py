@@ -16,6 +16,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 import urllib.parse
 
 from .errors import FuploadError, ValidationError
+from .trust import trusted_local_dir, trusted_roaming_dir, verify_dd_executable
 
 
 EXPECTED_DD_VERSION = os.environ.get("FUPLOAD_DD_EXPECTED_VERSION", "any")
@@ -139,9 +140,12 @@ def _registry_dd_dirs() -> List[Path]:
 
 def _user_config_dd_dirs() -> List[Path]:
     paths: List[Path] = []
-    roots = [Path(value) / "CCVoiceHub" for value in (
-        os.environ.get("APPDATA", ""), os.environ.get("LOCALAPPDATA", ""),
-    ) if value]
+    roots: List[Path] = []
+    for resolver in (trusted_roaming_dir, trusted_local_dir):
+        try:
+            roots.append(resolver("CCVoiceHub"))
+        except FuploadError:
+            continue
     for root in roots:
         for name in ("appconfig.json", "localGameConfig.json"):
             source = root / name
@@ -168,14 +172,14 @@ def _user_config_dd_dirs() -> List[Path]:
 
 def _discovery_roots() -> List[Path]:
     roots: List[Path] = []
-    configured = os.environ.get("FUPLOAD_DD_DIR") or os.environ.get("NETEASE_DD_DIR")
-    if configured:
-        roots.append(Path(configured))
     roots.extend(_running_dd_dirs())
     roots.extend(_registry_dd_dirs())
     roots.extend(_user_config_dd_dirs())
+    try:
+        roots.append(trusted_local_dir("NetEaseDD"))
+    except FuploadError:
+        pass
     roots.extend((
-        Path(os.environ.get("LOCALAPPDATA", "")) / "NetEaseDD",
         Path(os.environ.get("PROGRAMFILES", "")) / "NetEaseDD",
         Path(os.environ.get("PROGRAMFILES(X86)", "")) / "NetEaseDD",
         Path("C:/NetEase/NetEaseDD"), Path("D:/Software/NetEaseDD"), Path("D:/NetEaseDD"),
@@ -183,7 +187,7 @@ def _discovery_roots() -> List[Path]:
     return roots
 
 
-def discover_dd() -> Path:
+def discover_dd_info() -> Tuple[Path, Dict[str, str]]:
     candidates: List[Path] = []
     for root in _discovery_roots():
         if str(root) in (".", "") or not root.exists():
@@ -194,7 +198,7 @@ def discover_dd() -> Path:
         except OSError:
             pass
     seen = set()
-    valid = []
+    valid: List[Tuple[Path, Dict[str, str]]] = []
     for candidate in candidates:
         try:
             resolved = candidate.resolve()
@@ -207,27 +211,32 @@ def discover_dd() -> Path:
         if (resolved / "netease_dd.exe").is_file() and (resolved / "ccvoicehub.res").exists() and (resolved / "ccsub64").is_dir():
             if EXPECTED_DD_VERSION and EXPECTED_DD_VERSION != "any" and version != EXPECTED_DD_VERSION:
                 continue
-            valid.append(resolved)
+            try:
+                signature = verify_dd_executable(resolved / "netease_dd.exe")
+            except FuploadError:
+                continue
+            valid.append((resolved, signature))
     if not valid:
         raise FuploadError(
-            "cannot locate a valid NetEase DD installation; set FUPLOAD_DD_DIR to the version directory containing netease_dd.exe",
+            "cannot locate a valid, officially signed NetEase DD installation",
             kind="installation_not_found",
         )
-    return sorted(valid, key=lambda p: p.name)[-1]
+    return sorted(valid, key=lambda item: item[0].name)[-1]
+
+
+def discover_dd() -> Path:
+    return discover_dd_info()[0]
 
 
 def state_dir() -> Path:
-    appdata = os.environ.get("APPDATA")
-    if not appdata:
-        raise FuploadError("APPDATA is not set; DD sidecar state cannot be located")
-    result = Path(appdata) / "CCVoiceHub" / "Fupload"
+    result = trusted_roaming_dir("CCVoiceHub", "Fupload")
     result.mkdir(parents=True, exist_ok=True)
     return result
 
 
 class Sidecar:
     def __init__(self) -> None:
-        self.dd_dir = discover_dd()
+        self.dd_dir, self.signature = discover_dd_info()
         self.process: Optional[subprocess.Popen[str]] = None
         self.counter = 0
         self.lock_handle = None
@@ -1321,8 +1330,16 @@ class DD:
 
     def execute_read(self, resource: str, action: str, args: Any) -> Any:
         if resource == "session" and action == "doctor":
-            with Sidecar():
-                return {"authenticated": True, "dd_dir": str(discover_dd()), "device_state": str(state_dir() / "sidecar-device.json")}
+            with Sidecar() as session:
+                return {
+                    "authenticated": True,
+                    "dd_dir": str(session.dd_dir),
+                    "installation_source": "automatic-discovery",
+                    "signature": session.signature,
+                    "device_state": str(state_dir() / "sidecar-device.json"),
+                    "state_source": "windows-known-folder",
+                    "api_origin": "dd-native-client",
+                }
         with Sidecar() as session:
             if resource == "plugin":
                 if action == "list": return readable_author_list(session, "plugin", args.keyword, args.game_type, args.page, args.page_size)

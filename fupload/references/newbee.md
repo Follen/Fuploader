@@ -2,7 +2,7 @@
 
 ## Session and dynamic reads
 
-Use `newbee session doctor`. Authentication is taken from `%APPDATA%/NewBeeBox/auth-store`. Never request a token.
+Use `newbee session doctor`. Authentication is taken from the Windows Known Folder Roaming AppData path `NewBeeBox/auth-store`. Creator, auth, metadata, next-API, and upload origins are fixed official HTTPS values; environment variables cannot replace them or the credential directory. Never request a token.
 
 - Plugin choices: `plugin categories`, `plugin game-versions`.
 - Plugin state: `plugin list|get|versions`, `plugin changelog list|get`.

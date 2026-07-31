@@ -79,7 +79,7 @@ def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
     groups = root.add_subparsers(dest="resource_command", required=True)
 
     session = groups.add_parser("session", help="Authentication diagnostics").add_subparsers(dest="action_command", required=True)
-    _read_leaf(session, "doctor", "Verify the existing NewBeeBox desktop login and Creator token exchange.", platform="newbee", resource="session", action="doctor")
+    _read_leaf(session, "doctor", "Verify Windows Known Folder credentials, fixed official origins, and the Creator token exchange.", platform="newbee", resource="session", action="doctor")
 
     plugin = groups.add_parser("plugin", help="Plugin create, version update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
     for action, text in (("create", "Create a private or explicitly reviewed plugin record."), ("update", "Upload one immutable plugin version."), ("edit", "Edit plugin metadata or explicit public/review state.")):
@@ -131,7 +131,7 @@ def _dd_tree(platforms: argparse._SubParsersAction) -> None:
     root = platforms.add_parser("dd", help="NetEase DD author operations", description="Use DD's official netease_dd.exe, credentials, native login, and NEP signer. No token input is accepted.")
     groups = root.add_subparsers(dest="resource_command", required=True)
     session = groups.add_parser("session", help="Installation and session diagnostics").add_subparsers(dest="action_command", required=True)
-    _read_leaf(session, "doctor", "Discover and validate the DD installation and sidecar state path.", platform="dd", resource="session", action="doctor")
+    _read_leaf(session, "doctor", "Discover DD, verify its official Authenticode publisher, and validate the Known Folder sidecar state path.", platform="dd", resource="session", action="doctor")
     options = groups.add_parser("options", help="Read dynamic business choices before writing").add_subparsers(dest="option_action", required=True)
     for action, text in (("game-types", "List DD game types."), ("channels", "List selectable DD rooms/channels for room association."), ("life-types", "List share-code and purchase life types."), ("vip-levels", "List available anchor VIP levels."), ("associated-acts", "List current-author content eligible for association.")):
         leaf = _read_leaf(options, action, text, platform="dd", resource="options", action=action)
