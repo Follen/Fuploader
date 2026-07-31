@@ -57,7 +57,7 @@ Use existing remote values only for omitted fields in `edit` or `update`, where 
 
 ## Prepare and confirm
 
-Create a temporary versioned JSON document outside the Skill folder. Use JSON, not YAML. Run the intended command with `--dry-run`; remember that dry-run validates only schema and local files.
+Create a durable release directory under the target project's root, never under or beside the installed Skill. Use `publish/<YYYYMMDD-HHmmss>-<platform>-<resource>-<action>/`; if that name already exists, append `-2`, `-3`, and so on instead of reusing it. Put every versioned JSON input for one publishing plan in that directory, ordered as `01-<action>.json`, `02-<action>.json`, and so on. A retry or readback for the same plan reuses its directory; a new independent publishing plan gets a new directory. Use JSON, not YAML. Keep the directory after execution as the project's publishing record, and do not change the target project's ignore rules unless the user asks. Run each intended command with `--dry-run`; remember that dry-run validates only schema and local files.
 
 Before the first write, present one complete human-readable plan containing:
 

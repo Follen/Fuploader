@@ -82,6 +82,19 @@ class CLITests(unittest.TestCase):
         self.assertIn("Do not trigger from ordinary mentions", skill)
         self.assertIn("使用 $fupload", agent)
 
+    def test_skill_keeps_versioned_inputs_in_project_publish_directory(self) -> None:
+        root = Path(__file__).resolve().parents[2]
+        skill = (root / "SKILL.md").read_text(encoding="utf-8")
+        workflow = (root / "references" / "workflow.md").read_text(encoding="utf-8")
+        for text in (skill, workflow):
+            self.assertIn(
+                "publish/<YYYYMMDD-HHmmss>-<platform>-<resource>-<action>/",
+                text,
+            )
+            self.assertIn("01-<action>.json", text)
+            self.assertIn("target project", text)
+        self.assertIn("Keep the directory after execution", skill)
+
     def test_dry_run_emits_stable_json(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "input.json"

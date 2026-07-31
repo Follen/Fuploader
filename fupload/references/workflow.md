@@ -16,6 +16,12 @@ Output is one JSON object with `schema=fupload.output.v1`, `platform`, `operatio
 - Local file alternatives do not require the corresponding already-uploaded URL.
 - Frontend defaults are not CLI defaults.
 
+## Project publishing records
+
+Before a write plan, create a new directory in the target project at `publish/<YYYYMMDD-HHmmss>-<platform>-<resource>-<action>/`. This path is relative to the project being published, not the Fuploader Skill installation. Resolve collisions by appending `-2`, `-3`, and so on.
+
+Store the plan's atomic write inputs in execution order as `01-<action>.json`, `02-<action>.json`, and so on. Material changes to the not-yet-executed plan update those files in the same directory. Retries and readback verification also refer to that directory; a separate publishing plan creates a new one. Keep the files after completion and do not add or change project ignore rules without an explicit user request.
+
 ## Mandatory read-modify-write sequence
 
 For partial edit/update, the provider performs: target GET, dynamic-option GETs, conversion to a resource-specific form, presence-aware patch, conditional normalization, allowlisted payload build, upload/write, and readback. A failed prerequisite stops the operation.
