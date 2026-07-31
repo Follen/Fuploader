@@ -1,0 +1,37 @@
+{
+  "schema": "fupload.verification.v1",
+  "date": "2026-08-01",
+  "platform": "newbee",
+  "channel": "third-party-python",
+  "records": {
+    "plugin": {"id": 24466, "build": "12.1.0", "created": true, "updated": true, "edited": true, "deleted": true},
+    "config": {"id": 58838, "created": true, "updated": true, "edited": true, "deleted": true},
+    "wa": {"id": 9691, "created": true, "updated": true, "edited": true, "deleted": true, "version_after_update": "1.0.1"}
+  },
+  "commands": [
+    {"command": "newbee plugin create", "exit": 0, "readback": "private record; screenshot, metadata, empty co-author/reference lists matched"},
+    {"command": "newbee plugin update", "exit": 0, "readback": "version 1.0.0-web-align bound to build 12.1.0"},
+    {"command": "newbee plugin edit", "exit": 0, "readback": "intro changed; private link_to_channel read back false"},
+    {"command": "newbee config create", "exit": 0, "readback": "private record; price=0 projected with time_range empty; empty relations matched"},
+    {"command": "newbee config update", "exit": 0, "readback": "selected backup content preserved"},
+    {"command": "newbee config edit", "exit": 0, "readback": "intro changed; private link_to_channel false and time_range empty"},
+    {"command": "newbee wa create", "exit": 0, "readback": "private record; time_range projected empty; empty relations matched"},
+    {"command": "newbee wa update", "exit": 0, "readback": "web next version 1.0.1 present; raw string remained redacted"},
+    {"command": "newbee wa edit", "exit": 0, "readback": "intro changed; private link_to_channel false and time_range empty"},
+    {"command": "newbee plugin delete", "exit": 0, "readback": "ID 24466 absent from author list"},
+    {"command": "newbee config delete", "exit": 0, "readback": "ID 58838 absent from author list"},
+    {"command": "newbee wa delete", "exit": 0, "readback": "ID 9691 absent from author list"}
+  ],
+  "initial_plugin_create": {
+    "exit": 2,
+    "endpoint": "/creator/wow/mod/create",
+    "business_code": -4,
+    "message": "screenshot required",
+    "resolution": "schema now requires screenshots or screenshot_files before network"
+  },
+  "rollback": {
+    "command": "newbee <plugin|config|wa> delete --input <ignored verification delete input>",
+    "verified": true,
+    "result": "only the three recorded temporary IDs were deleted"
+  }
+}

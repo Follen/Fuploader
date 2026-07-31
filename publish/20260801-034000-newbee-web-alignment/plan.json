@@ -1,0 +1,12 @@
+{
+  "schema": "fupload.publish-plan.v1",
+  "platform": "newbee",
+  "channel": "third-party-python",
+  "baseline": "Creator Center webpage request and readback behavior",
+  "scope": ["plugin", "config", "wa"],
+  "visibility": "private temporary records",
+  "excluded_build": "Exploration Season",
+  "relationship_verification": "explicit empty co_authors and references arrays",
+  "commercial_verification": "private link_to_channel=false and price=0 clears time_range",
+  "sensitive_inputs": "raw WA string and cloud-backup detail remained only in ignored analyze/ inputs"
+}

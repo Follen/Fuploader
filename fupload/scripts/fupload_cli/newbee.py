@@ -27,6 +27,14 @@ METADATA_ORIGIN = "metadata"
 UPLOAD_ORIGIN = "upload"
 
 
+# Creator Center uses different numeric namespaces for each main record type.
+RELATION_TYPES = {
+    "plugin": {"co_authors": 1, "references": 1},
+    "config": {"co_authors": 4, "references": 3},
+    "wa": {"co_authors": 3, "references": 2},
+}
+
+
 def _first_object(value: Any) -> Dict[str, Any]:
     if isinstance(value, dict):
         return value
@@ -231,6 +239,7 @@ def _wa_summary(item: Mapping[str, Any]) -> Dict[str, Any]:
         "content_origin": _pick(item, "t_content_origin", "content_origin"),
         "subscribe_plan_level": _pick(item, "t_subscribe_plan_level", "subscribe_plan_level"),
         "price": _pick(item, "price", "t_price"),
+        "time_range": _pick(item, "t_time_range", "time_range", default=""),
         "link_to_channel": bool(_pick(item, "t_link_to_channel", "link_to_channel", default=False)),
         "updated_at": _pick(item, "t_update_time", "updated_at"),
     }
@@ -535,6 +544,85 @@ class NewBee:
             if str(doc["time_range"]) not in allowed:
                 raise ValidationError("time_range is unavailable", path="$.time_range")
 
+    def _validate_changed_business_options(self, form: Mapping[str, Any], doc: Mapping[str, Any]) -> None:
+        fields = ("content_origin", "subscribe_plan_level", "time_range")
+        self._validate_business_options({name: form[name] for name in fields if name in doc})
+
+    @staticmethod
+    def _normalize_commercial(form: Dict[str, Any], public: bool) -> None:
+        """Apply the Creator Center's submitted, not intermediate, payment state."""
+        subscription = int(form.get("subscribe_plan_level") or 0)
+        if subscription < 0:
+            raise ValidationError("subscribe_plan_level must not be negative", path="$.subscribe_plan_level")
+        form["subscribe_plan_level"] = subscription
+        if "price" in form:
+            price = int(form.get("price") or 0)
+            if price < 0:
+                raise ValidationError("price must not be negative", path="$.price")
+            form["price"] = price
+            # A one-time duration has no wire meaning without a one-time price.
+            if price == 0:
+                form["time_range"] = ""
+        if not public:
+            form["link_to_channel"] = False
+
+    @staticmethod
+    def _relation_rows(value: Any, name: str) -> Optional[List[Dict[str, Any]]]:
+        if isinstance(value, list):
+            return [item for item in value if isinstance(item, dict)]
+        if not isinstance(value, dict):
+            return None
+        for key in (name, "list", "items", "data"):
+            candidate = value.get(key)
+            if isinstance(candidate, list):
+                return [item for item in candidate if isinstance(item, dict)]
+        return None
+
+    @staticmethod
+    def _require_relation_readback(name: str, expected: Sequence[Mapping[str, Any]], actual: Any, endpoint: str) -> None:
+        rows = NewBee._relation_rows(actual, name)
+        if rows is None:
+            raise FuploadError(
+                "relationship write succeeded but its readback had an unexpected shape",
+                kind="verification_required", endpoint=endpoint, verification_required=True,
+            )
+        if name == "co_authors":
+            wanted = {(int(item["user_id"]), float(item["share_percent"])) for item in expected}
+            observed = {
+                (int(_pick(item, "user_id", "t_user_id", "id", default=0) or 0),
+                 float(_pick(item, "share_percent", "t_share_percent", "ratio", default=-1) or -1))
+                for item in rows
+            }
+        else:
+            wanted = {(int(item["type"]), int(item["id"])) for item in expected}
+            observed = {
+                (int(_pick(item, "type", "content_type", "t_type", default=0) or 0),
+                 int(_pick(item, "id", "content_id", "t_id", default=0) or 0))
+                for item in rows
+            }
+        if wanted != observed:
+            raise FuploadError(
+                "relationship write readback did not match the complete replacement",
+                kind="verification_required", endpoint=endpoint, verification_required=True,
+            )
+
+    def _replace_relationships(self, resource: str, ident: int, doc: Mapping[str, Any]) -> Dict[str, Any]:
+        types = RELATION_TYPES[resource]
+        result: Dict[str, Any] = {}
+        if "co_authors" in doc:
+            body = {"content_type": types["co_authors"], "content_id": ident, "co_authors": doc["co_authors"]}
+            mutation = self.post("/creator/co_author/set", body)
+            readback = self.post("/creator/co_author/list", {"content_type": types["co_authors"], "content_id": ident})
+            self._require_relation_readback("co_authors", doc["co_authors"], readback, "/creator/co_author/list")
+            result["co_authors"] = {"result": mutation, "readback": readback}
+        if "references" in doc:
+            body = {"source_type": types["references"], "source_id": ident, "references": doc["references"]}
+            mutation = self.post("/creator/content_reference/set", body)
+            readback = self.post("/creator/content_reference/list", {"content_type": types["references"], "content_id": ident})
+            self._require_relation_readback("references", doc["references"], readback, "/creator/content_reference/list")
+            result["references"] = {"result": mutation, "readback": readback}
+        return result
+
     @staticmethod
     def _wa_category_values(payload: Any) -> set[int]:
         values: set[int] = set()
@@ -679,6 +767,7 @@ class NewBee:
             "subscribe_plan_level": doc.get("subscribe_plan_level", 0),
             "link_to_channel": False,
         }
+        self._normalize_commercial(payload, False)
         result = self.post("/creator/wow/mod/create", payload)
         ident = self._created_id(result, doc["name"])
         if ident <= 0:
@@ -698,11 +787,12 @@ class NewBee:
             "screenshots": screenshots, "public": False,
             "subscribe_plan_level": doc.get("subscribe_plan_level", 0), "link_to_channel": False,
         }, readback, "/creator/wow/mod/publish_detail")
+        relationships = self._replace_relationships("plugin", ident, doc)
         return {
             "result": result, "id": ident,
             "review_intent": bool(doc.get("public") and doc.get("submit_for_review")),
             "public_after_first_version": bool(doc.get("public")),
-            "readback": readback,
+            "readback": readback, "relationships": relationships,
         }
 
     def _plugin_form(self, ident: int, detail: Dict[str, Any]) -> Dict[str, Any]:
@@ -738,16 +828,20 @@ class NewBee:
             form["share_state"] = 1 if doc["public"] else 0
         if "mod_categories" in doc:
             self._validate_ids(form["mod_categories"], [x["id"] for x in self.categories()["items"]], "$.mod_categories")
-        self._validate_business_options(doc)
+        self._normalize_commercial(form, form["share_state"] == 1)
+        self._validate_changed_business_options(form, doc)
         result = self.post("/creator/wow/mod/edit", form)
         readback = self.get_plugin(ident)
         mapping = {"mod_categories": "category_ids"}
-        expected = {mapping.get(name, name): value for name, value in doc.items() if name in {
+        expected = {mapping.get(name, name): form[name] for name in doc if name != "public" and name in {
             "name", "mod_categories", "content_origin", "content_format", "intro", "description",
             "logo", "screenshots", "subscribe_plan_level", "link_to_channel", "public",
         }}
+        if "public" in doc:
+            expected["public"] = form["share_state"] == 1
         _require_readback(expected, readback, "/creator/wow/mod/publish_detail")
-        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback}
+        relationships = self._replace_relationships("plugin", ident, doc)
+        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback, "relationships": relationships}
 
     def update_plugin(self, doc: Dict[str, Any]) -> Any:
         ident = int(doc["mod_id"])
@@ -847,7 +941,6 @@ class NewBee:
         }
 
     def create_config(self, doc: Dict[str, Any]) -> Any:
-        self._validate_business_options(doc)
         backup = self.get_backup(int(doc["cloud_id"]))
         self._validate_backup_selection(backup, doc)
         pictures = self._resolve_media("/creator/wow/share_config/upload", doc.get("picture_urls", []), doc.get("picture_files", []))
@@ -863,6 +956,8 @@ class NewBee:
             "ignored_unknown_mods": doc["ignored_unknown_mods"], "ignored_materials": doc["ignored_materials"],
             "ignored_fronts": doc["ignored_fronts"], "roleid": doc["roleid"],
         }
+        self._normalize_commercial(payload, bool(doc["public"]))
+        self._validate_business_options(payload)
         result = self.post("/creator/wow/share_config/release", payload)
         ident = self._created_id(result, doc["title"], doc["cloud_id"])
         if ident <= 0:
@@ -872,21 +967,21 @@ class NewBee:
         if ident <= 0:
             raise FuploadError("configuration was submitted but its ID could not be resolved; read the author list before retrying", kind="verification_required", verification_required=True)
         readback = self.get_config(ident)
-        expected = {name: doc[name] for name in (
-            "title", "content", "content_format", "intro", "content_origin", "public",
-            "subscribe_plan_level", "price", "time_range", "linked_mods", "ignored_unknown_mods",
-            "ignored_materials", "ignored_fronts", "roleid",
-        ) if name in doc}
+        expected = {name: payload[name] for name in (
+            "title", "content", "content_format", "intro", "content_origin", "subscribe_plan_level", "price", "time_range",
+            "linked_mods", "ignored_unknown_mods", "ignored_materials", "ignored_fronts", "roleid",
+        )}
+        expected["public"] = bool(payload["sharing"])
         expected["picture_urls"] = pictures
-        expected["link_to_channel"] = bool(doc.get("link_to_channel", False)) if doc["public"] else False
+        expected["link_to_channel"] = payload["link_to_channel"]
         _require_readback(expected, readback, "/creator/wow/share_config/details_aps")
-        return {"result": result, "id": ident, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback}
+        relationships = self._replace_relationships("config", ident, doc)
+        return {"result": result, "id": ident, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback, "relationships": relationships}
 
     def update_config(self, doc: Dict[str, Any], metadata_only: bool) -> Any:
         ident = int(doc["id"])
         form = self._config_form(ident, self.get_config_raw(ident))
         if metadata_only:
-            self._validate_business_options(doc)
             mapping = {
                 "title": "title", "content": "content", "content_format": "content_format", "intro": "intro",
                 "picture_urls": "pic_url", "content_origin": "content_origin", "link_to_channel": "link_to_channel",
@@ -910,15 +1005,26 @@ class NewBee:
             backup = self.get_backup(int(form["cloud_id"]))
             selection = {name: form[name] for name in ("linked_mods", "ignored_unknown_mods", "ignored_materials", "ignored_fronts", "roleid")}
             self._validate_backup_selection(backup, selection)
+        self._normalize_commercial(form, bool(form["sharing"]))
+        self._validate_changed_business_options(form, doc)
         result = self.post("/creator/wow/share_config/update", form)
         readback = self.get_config(ident)
-        expected = {name: value for name, value in doc.items() if name in {
+        expected = {}
+        mapping = {"picture_urls": "pic_url", "public": "sharing"}
+        for name in {
             "cloud_id", "title", "content", "content_format", "intro", "picture_urls", "content_origin",
-            "public", "link_to_channel", "subscribe_plan_level", "price", "time_range", "linked_mods",
+            "link_to_channel", "subscribe_plan_level", "price", "time_range", "linked_mods",
             "ignored_unknown_mods", "ignored_materials", "ignored_fronts", "roleid",
-        }}
+        }:
+            if name in doc:
+                expected[name] = form[mapping.get(name, name)]
+        if "public" in doc:
+            expected["public"] = bool(form["sharing"])
+        if doc.get("picture_files"):
+            expected["picture_urls"] = form["pic_url"]
         _require_readback(expected, readback, "/creator/wow/share_config/details_aps")
-        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback}
+        relationships = self._replace_relationships("config", ident, doc)
+        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback, "relationships": relationships}
 
     def _wa_form(self, ident: int, detail: Dict[str, Any]) -> Dict[str, Any]:
         return {
@@ -944,7 +1050,6 @@ class NewBee:
     def create_wa(self, doc: Dict[str, Any]) -> Any:
         self._validate_ids([doc["game_version_id"]], [x["id"] for x in self.game_versions()["items"]], "$.game_version_id")
         self._validate_wa_categories(int(doc["game_version_id"]), doc["category_id_list"])
-        self._validate_business_options(doc)
         self._validate_attachments(doc.get("attachments", []))
         thumbnail = doc.get("thumbnail", "")
         if doc.get("thumbnail_file"):
@@ -964,6 +1069,8 @@ class NewBee:
             "wa_str_titles": doc.get("wa_str_titles", []), "wa_log": doc["wa_log"],
             "string_mode": doc["string_mode"],
         }
+        self._normalize_commercial(payload, bool(doc["public"]))
+        self._validate_business_options(payload)
         result = self.post("/creator/wow/wa/publish", payload)
         ident = self._created_id(result, doc["name"])
         if ident <= 0:
@@ -975,13 +1082,15 @@ class NewBee:
         readback = self.get_wa(ident)
         expected = {name: doc[name] for name in (
             "game_version_id", "name", "intro", "description", "content_format", "content_origin",
-            "subscribe_plan_level", "price", "link_to_channel", "attachments",
-        ) if name in doc}
+            "subscribe_plan_level", "price", "time_range", "link_to_channel", "attachments",
+        ) if name in payload}
+        expected = {name: payload[name] for name in expected}
         expected.update({"thumbnail": thumbnail, "images": images, "public": doc["public"], "categories": [{"id": value, "name": None} for value in doc["category_id_list"]]})
         actual_for_compare = dict(readback)
         actual_for_compare["categories"] = [{"id": item.get("id"), "name": None} for item in readback.get("categories", [])]
         _require_readback(expected, actual_for_compare, "/creator/wow/wa/detail_aps")
-        return {"result": result, "id": ident, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback}
+        relationships = self._replace_relationships("wa", ident, doc)
+        return {"result": result, "id": ident, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback, "relationships": relationships}
 
     def edit_wa(self, doc: Dict[str, Any]) -> Any:
         ident = int(doc["id"])
@@ -1004,22 +1113,26 @@ class NewBee:
             form["share_state"] = 1 if doc["public"] else 2
         self._validate_ids([form["game_version_id"]], [x["id"] for x in self.game_versions()["items"]], "$.game_version_id")
         self._validate_wa_categories(int(form["game_version_id"]), form["category_id_list"])
-        self._validate_business_options(doc)
+        self._normalize_commercial(form, form["share_state"] == 1)
+        self._validate_changed_business_options(form, doc)
         self._validate_attachments(form.get("attachments", []))
         result = self.post("/creator/wow/wa/update", form)
         readback = self.get_wa(ident)
         mapping = {"category_id_list": "categories"}
-        expected = {mapping.get(name, name): value for name, value in doc.items() if name in {
+        expected = {mapping.get(name, name): form[mapping.get(name, name)] for name in doc if name in {
             "game_version_id", "name", "intro", "description", "content_format", "thumbnail", "images",
-            "category_id_list", "content_origin", "subscribe_plan_level", "price", "public",
+            "category_id_list", "content_origin", "subscribe_plan_level", "price", "time_range",
             "link_to_channel", "attachments",
         }}
+        if "public" in doc:
+            expected["public"] = form["share_state"] == 1
         if "categories" in expected:
             expected["categories"] = [{"id": value, "name": None} for value in expected["categories"]]
         actual_for_compare = dict(readback)
         actual_for_compare["categories"] = [{"id": item.get("id"), "name": None} for item in readback.get("categories", [])]
         _require_readback(expected, actual_for_compare, "/creator/wow/wa/detail_aps")
-        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback}
+        relationships = self._replace_relationships("wa", ident, doc)
+        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback, "relationships": relationships}
 
     def update_wa(self, doc: Dict[str, Any]) -> Any:
         ident = int(doc["id"])
@@ -1106,15 +1219,16 @@ class NewBee:
             if doc.get("wa_id"):
                 readback = self.post("/creator/wow/wa_log/list", {"wa_id": doc["wa_id"], "pagenum": 1, "pagesize": 20})
             return {"result": result, "readback": readback}
-        if (resource, action) == ("wa-co-author", "set"):
-            total = sum(float(x.get("share_percent", 0)) for x in doc["co_authors"])
-            if total > 1.000001:
-                raise ValidationError("co-author share_percent total may not exceed 1", path="$.co_authors")
-            result = self.post("/creator/co_author/set", {"content_type": 3, "content_id": doc["content_id"], "co_authors": doc["co_authors"]})
-            return {"result": result, "readback": self.post("/creator/co_author/list", {"content_type": 3, "content_id": doc["content_id"]})}
-        if (resource, action) == ("wa-reference", "set"):
-            result = self.post("/creator/content_reference/set", {"source_type": 2, "source_id": doc["source_id"], "references": doc["references"]})
-            return {"result": result, "readback": self.post("/creator/content_reference/list", {"content_type": 2, "content_id": doc["source_id"]})}
+        if action == "set" and resource.endswith("-co-author"):
+            base = resource[:-len("-co-author")]
+            if base in RELATION_TYPES:
+                relationships = self._replace_relationships(base, int(doc["content_id"]), {"co_authors": doc["co_authors"]})
+                return relationships["co_authors"]
+        if action == "set" and resource.endswith("-reference"):
+            base = resource[:-len("-reference")]
+            if base in RELATION_TYPES:
+                relationships = self._replace_relationships(base, int(doc["source_id"]), {"references": doc["references"]})
+                return relationships["references"]
         if (resource, action) == ("wa-share-code", "set"):
             result = self.post_next("/bannerserver/ShareCode/Set", {"gameId": 1, "moduleId": doc["module_id"], "moduleType": 3})
             return {"result": result, "readback": self.get_wa(int(doc["module_id"]))}
@@ -1169,6 +1283,12 @@ class NewBee:
                 "api_origins": dict(NEWBEE_ORIGINS),
                 "trusted": True,
             }
+        if resource in RELATION_TYPES:
+            types = RELATION_TYPES[resource]
+            if action == "co-author-search": return self.post("/creator/co_author/search_user", {"keyword": args.keyword})
+            if action == "co-author-list": return self.post("/creator/co_author/list", {"content_type": types["co_authors"], "content_id": args.id})
+            if action == "reference-search": return self.post("/creator/content_reference/search", {"keyword": args.keyword, "limit": 20, "target_types": [types["references"]]})
+            if action == "reference-list": return self.post("/creator/content_reference/list", {"content_type": types["references"], "content_id": args.id})
         if resource == "plugin":
             if action == "list": return self.list_plugins(args.keyword, args.page, args.page_size)
             if action == "get": return self.get_plugin(args.id)
@@ -1189,10 +1309,6 @@ class NewBee:
             if action == "attachment-paths": return self.attachment_paths()
             if action == "changelog-latest": return self.latest_wa(args.id)
             if action == "changelog-list": return _redact_wa(self.post("/creator/wow/wa_log/list", {"wa_id": args.id, "pagenum": args.page, "pagesize": args.page_size}))
-            if action == "co-author-search": return self.post("/creator/co_author/search_user", {"keyword": args.keyword})
-            if action == "co-author-list": return self.post("/creator/co_author/list", {"content_type": 3, "content_id": args.id})
-            if action == "reference-search": return self.post("/creator/content_reference/search", {"keyword": args.keyword, "limit": 20, "target_types": [2]})
-            if action == "reference-list": return self.post("/creator/content_reference/list", {"content_type": 2, "content_id": args.id})
         if resource == "options":
             if action == "content-origins": return self.content_origins()
             if action == "subscribe-plans": return self.subscribe_plans()

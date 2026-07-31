@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from fupload_cli.dd import DD, LIFE_TYPES, Sidecar, _option_values, _verify_fields, config_form, created_reference, discover_dd, merge_plugin_version_fields, normalize_commercial, plugin_form, readable_author_list, resolve_retail_ui_config, safe_backup_detail, safe_channels, safe_detail, selected_group, validate_locked_usage_mode
 from fupload_cli.errors import FuploadError, ValidationError, redact
-from fupload_cli.newbee import NewBee, _redact_wa, _require_readback
+from fupload_cli.newbee import NewBee, RELATION_TYPES, _redact_wa, _require_readback, _wa_summary
 
 
 class FakeNewBee(NewBee):
@@ -200,6 +200,47 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(body["share_state"], 0)
         self.assertEqual(body["name"], "Before")
         self.assertEqual(body["intro"], "After")
+
+    def test_newbee_commercial_normalization_clears_disabled_children_and_private_channel(self) -> None:
+        form = {
+            "subscribe_plan_level": 0, "price": 0, "time_range": "seven_day",
+            "link_to_channel": True,
+        }
+        NewBee._normalize_commercial(form, False)
+        self.assertEqual(form["subscribe_plan_level"], 0)
+        self.assertEqual(form["price"], 0)
+        self.assertEqual(form["time_range"], "")
+        self.assertFalse(form["link_to_channel"])
+
+    def test_newbee_relationship_replacements_use_web_resource_namespaces_and_readback(self) -> None:
+        class RelationNewBee(NewBee):
+            def __init__(self):
+                self.calls = []
+
+            def post(self, endpoint, body):
+                self.calls.append((endpoint, dict(body)))
+                if endpoint == "/creator/co_author/list":
+                    return {"list": [{"user_id": 9, "share_percent": 0.25}]}
+                if endpoint == "/creator/content_reference/list":
+                    return {"list": [{"type": 7, "id": 8}]}
+                return {}
+
+        for resource, types in RELATION_TYPES.items():
+            with self.subTest(resource=resource):
+                provider = RelationNewBee()
+                relationships = provider._replace_relationships(resource, 42, {
+                    "co_authors": [{"user_id": 9, "share_percent": 0.25}],
+                    "references": [{"type": 7, "id": 8}],
+                })
+                self.assertEqual(list(relationships), ["co_authors", "references"])
+                self.assertEqual(provider.calls[0], ("/creator/co_author/set", {
+                    "content_type": types["co_authors"], "content_id": 42,
+                    "co_authors": [{"user_id": 9, "share_percent": 0.25}],
+                }))
+                self.assertEqual(provider.calls[2], ("/creator/content_reference/set", {
+                    "source_type": types["references"], "source_id": 42,
+                    "references": [{"type": 7, "id": 8}],
+                }))
 
     def test_newbee_config_create_falls_back_to_unfiltered_author_list(self) -> None:
         provider = DelayedConfigIndexNewBee()
@@ -656,6 +697,9 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(redacted["items"][0]["version"], 2)
         self.assertEqual(redacted["items"][0]["wa_str_summary"]["length"], 6)
         self.assertEqual(redacted["total"], 1)
+
+    def test_newbee_wa_readback_projects_one_time_duration(self) -> None:
+        self.assertEqual(_wa_summary({"t_time_range": "seven_day"})["time_range"], "seven_day")
 
     def test_newbee_attachment_parser_ignores_unrelated_nested_values(self) -> None:
         provider = NewBee()

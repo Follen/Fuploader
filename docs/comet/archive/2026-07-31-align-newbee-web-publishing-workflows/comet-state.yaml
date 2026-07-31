@@ -1,0 +1,30 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 6
+name: align-newbee-web-publishing-workflows
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: 3622acede5de930f63978118b5c5e9ac25f8ef7a466a38a2959989cfb15bd926
+spec_changes:
+  - capability: fupload-cli
+    operation: replace
+    source: specs/fupload-cli/spec.md
+    base_hash: 4dcaf198b9ed888eff14baeba1c853a837b01556ad513116c0ab4b08c73fe354
+  - capability: fupload-skill
+    operation: replace
+    source: specs/fupload-skill/spec.md
+    base_hash: 21096040a51dec5a505605e25802666f98ac893a8c49488429ee8a004d98345e
+  - capability: newbee-publishing
+    operation: replace
+    source: specs/newbee-publishing/spec.md
+    base_hash: 3aa89898d317507a0c5860529cd8f9bb01a6a84d6aa67b5af94c0166fc6cbe46
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/61537865aed28e17aba11c85d634c4ec444865f8b9e0d57a4367ccb5a1a148b4.json
+verification_evidence: runtime/evidence/verifications/0e9bea855551704cfd2aa12aa218fdd99d881acd6bccbe0183e09a468dec35e4.json
+partial_allowance: null
+archived: true
+created_at: 2026-07-31
+run_id: 4673bdec-ae75-4746-9fc1-6a7ef48ecb06

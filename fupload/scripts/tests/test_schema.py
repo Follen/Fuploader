@@ -30,6 +30,22 @@ class SchemaTests(unittest.TestCase):
         self.assertNotIn("link_to_channel", omitted)
         self.assertIs(explicit["link_to_channel"], False)
 
+    def test_newbee_main_records_accept_complete_relationship_replacements(self) -> None:
+        for resource, action, identifier in (("plugin", "edit", "id"), ("config", "edit", "id"), ("wa", "edit", "id")):
+            with self.subTest(resource=resource):
+                schema = get_schema("newbee", resource, action)
+                value = schema.validate({
+                    "schema": schema.name, identifier: 1,
+                    "co_authors": [{"user_id": 2, "share_percent": 0.5}],
+                    "references": [{"type": 3, "id": 4}],
+                })
+                self.assertEqual(value["references"][0]["id"], 4)
+                with self.assertRaisesRegex(ValidationError, "positive integer"):
+                    schema.validate({
+                        "schema": schema.name, identifier: 1,
+                        "references": [{"type": 3, "id": 0}],
+                    })
+
     def test_public_requires_explicit_review_intent(self) -> None:
         schema = get_schema("newbee", "plugin", "edit")
         with self.assertRaisesRegex(ValidationError, "submit_for_review"):
@@ -44,13 +60,24 @@ class SchemaTests(unittest.TestCase):
         schema = get_schema("newbee", "plugin", "create")
         with tempfile.TemporaryDirectory() as directory:
             logo = Path(directory) / "logo.png"
+            screenshot = Path(directory) / "screenshot.png"
             logo.write_bytes(b"png")
+            screenshot.write_bytes(b"png")
             value = {
                 "schema": schema.name, "name": "Demo", "mod_categories": [1],
                 "content_origin": 1, "content_format": 2, "intro": "i", "description": "d",
-                "logo_file": str(logo), "public": False,
+                "logo_file": str(logo), "screenshot_files": [str(screenshot)], "public": False,
             }
             self.assertEqual(schema.validate(value)["logo_file"], str(logo))
+
+    def test_newbee_plugin_create_requires_a_screenshot(self) -> None:
+        schema = get_schema("newbee", "plugin", "create")
+        with self.assertRaisesRegex(ValidationError, "screenshots"):
+            schema.validate({
+                "schema": schema.name, "name": "Demo", "mod_categories": [1],
+                "content_origin": 1, "content_format": 2, "intro": "i", "description": "d",
+                "logo": "image", "public": False,
+            })
 
     def test_newbee_plugin_update_uses_build_strings(self) -> None:
         schema = get_schema("newbee", "plugin", "update")

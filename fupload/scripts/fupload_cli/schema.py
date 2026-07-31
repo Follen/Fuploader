@@ -146,6 +146,8 @@ class Schema:
         one_of = []
         if self.name == "fupload.v1.newbee.plugin.create":
             one_of.append(("logo", "logo_file"))
+            if not value.get("screenshots") and not value.get("screenshot_files"):
+                raise ValidationError("screenshots or screenshot_files must contain at least one image", path="$.screenshots")
         if self.name == "fupload.v1.newbee.config.create":
             one_of.append(("picture_urls", "picture_files"))
         if self.name == "fupload.v1.newbee.wa.create":
@@ -217,6 +219,12 @@ class Schema:
                     total += float(share)
                 if total > 1.000001:
                     raise ValidationError("co_authors share_percent total may not exceed 1", path="$.co_authors")
+            if "references" in value:
+                for index, item in enumerate(value["references"]):
+                    for name in ("type", "id"):
+                        candidate = item[name]
+                        if isinstance(candidate, bool) or not isinstance(candidate, int) or candidate <= 0:
+                            raise ValidationError("%s must be a positive integer" % name, path="$.references[%d].%s" % (index, name))
             for name in ("mod_categories", "category_id_list"):
                 if name in value and any(isinstance(item, bool) or not isinstance(item, int) or item <= 0 for item in value[name]):
                     raise ValidationError("array must contain positive integer IDs", path="$.%s" % name)
@@ -310,8 +318,10 @@ NB_PLUGIN_META = {
     "screenshot_files": f("array"),
     "public": f("boolean"),
     "submit_for_review": f("boolean"),
-    "subscribe_plan_level": f("integer"),
+    "subscribe_plan_level": f("integer", minimum=0),
     "link_to_channel": f("boolean"),
+    "co_authors": f("array"),
+    "references": f("array"),
 }
 
 NB_CONFIG_META = {
@@ -320,8 +330,9 @@ NB_CONFIG_META = {
     "picture_urls": f("array"), "picture_files": f("array"),
     "content_origin": f("integer"), "public": f("boolean"),
     "submit_for_review": f("boolean"), "link_to_channel": f("boolean"),
-    "subscribe_plan_level": f("integer"), "price": f("integer"),
+    "subscribe_plan_level": f("integer", minimum=0), "price": f("integer", minimum=0),
     "time_range": f("string"),
+    "co_authors": f("array"), "references": f("array"),
 }
 NB_CONFIG_BACKUP = {
     "cloud_id": f("integer"), "linked_mods": f("array"),
@@ -335,9 +346,10 @@ NB_WA_META = {
     "thumbnail": f("string"), "thumbnail_file": f("string", local_file=True),
     "images": f("array"), "image_files": f("array"),
     "category_id_list": f("array", nonempty=True, max_items=5), "content_origin": f("integer"),
-    "subscribe_plan_level": f("integer"), "price": f("integer"), "time_range": f("string"),
+    "subscribe_plan_level": f("integer", minimum=0), "price": f("integer", minimum=0), "time_range": f("string"),
     "public": f("boolean"), "submit_for_review": f("boolean"),
     "link_to_channel": f("boolean"), "attachments": f("array"),
+    "co_authors": f("array"), "references": f("array"),
 }
 
 DD_COMMERCIAL = {
@@ -446,8 +458,9 @@ register("newbee", "wa", "update", required({"id": f("integer"), "version": f("s
 register("newbee", "wa", "edit", with_id(NB_WA_META))
 register("newbee", "wa-media", "upload", required({"file": f("string", local_file=True), "kind": f("string", choices=("image", "attachment")), "install_type": f("integer"), "install_path": f("string")}, ("file", "kind")))
 register("newbee", "wa-changelog", "edit", required({"id": f("integer"), "wa_id": f("integer"), "wa_log": f("string", nullable=True)}, ("id", "wa_log")))
-register("newbee", "wa-co-author", "set", required({"content_id": f("integer"), "co_authors": f("array")}, ("content_id", "co_authors")))
-register("newbee", "wa-reference", "set", required({"source_id": f("integer"), "references": f("array")}, ("source_id", "references")))
+for _resource in ("plugin", "config", "wa"):
+    register("newbee", _resource + "-co-author", "set", required({"content_id": f("integer"), "co_authors": f("array")}, ("content_id", "co_authors")))
+    register("newbee", _resource + "-reference", "set", required({"source_id": f("integer"), "references": f("array")}, ("source_id", "references")))
 register("newbee", "wa-share-code", "set", required({"module_id": f("integer")}, ("module_id",)))
 for _resource in ("plugin", "config", "wa"):
     register("newbee", _resource, "delete", required({"id": f("integer"), "confirm": f("string", choices=("DELETE",))}, ("id", "confirm")))

@@ -78,6 +78,17 @@ def _read_leaf(parent: argparse._SubParsersAction, name: str, summary: str, **de
     return leaf
 
 
+def _newbee_relationship_tree(parent: argparse.ArgumentParser, resource: str, label: str) -> None:
+    authors = parent.add_parser("co-author", help="Search, list, or replace %s co-authors" % label).add_subparsers(dest="author_action", required=True)
+    leaf = _read_leaf(authors, "search", "Search current co-author candidates.", platform="newbee", resource=resource, action="co-author-search"); leaf.add_argument("--keyword", required=True)
+    leaf = _read_leaf(authors, "list", "List current co-authors for one %s." % label, platform="newbee", resource=resource, action="co-author-list"); leaf.add_argument("--id", type=_positive, required=True)
+    _write_leaf(authors, "newbee", resource + "-co-author", "set", "Replace the complete %s co-author list; an empty array clears it." % label)
+    references = parent.add_parser("reference", help="Search, list, or replace %s content references" % label).add_subparsers(dest="reference_action", required=True)
+    leaf = _read_leaf(references, "search", "Search content that can be referenced by this %s." % label, platform="newbee", resource=resource, action="reference-search"); leaf.add_argument("--keyword", required=True)
+    leaf = _read_leaf(references, "list", "List current references for one %s." % label, platform="newbee", resource=resource, action="reference-list"); leaf.add_argument("--id", type=_positive, required=True)
+    _write_leaf(references, "newbee", resource + "-reference", "set", "Replace the complete %s reference list; an empty array clears it." % label)
+
+
 def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
     root = platforms.add_parser("newbee", help="NewBeeBox Creator operations", description="Reuse the signed-in NewBeeBox desktop auth-store; no token input is accepted.")
     groups = root.add_subparsers(dest="resource_command", required=True)
@@ -104,6 +115,7 @@ def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
     leaf = _read_leaf(changelog, "list", "List version log records for one plugin.", platform="newbee", resource="plugin", action="changelog-list"); leaf.add_argument("--id", type=_positive, required=True); _page_flags(leaf)
     leaf = _read_leaf(changelog, "get", "Read one plugin version log by file ID.", platform="newbee", resource="plugin", action="changelog-get"); leaf.add_argument("--id", type=_positive, required=True)
     _write_leaf(changelog, "newbee", "plugin-changelog", "edit", "Edit or explicitly clear one existing plugin version log.")
+    _newbee_relationship_tree(plugin, "plugin", "plugin")
 
     config = groups.add_parser("config", help="Configuration share create, backup update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
     for action, text in (("create", "Create a configuration share from an existing desktop cloud backup."), ("update", "Replace cloud-backup content selections without changing metadata."), ("edit", "Edit configuration metadata, business settings, channel, or review state."), ("delete", "Delete one explicitly confirmed configuration record.")):
@@ -112,6 +124,7 @@ def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
     leaf = _read_leaf(config, "get", "Read a safe configuration-share detail without raw backup paths.", platform="newbee", resource="config", action="get"); leaf.add_argument("--id", type=_positive, required=True)
     _read_leaf(config, "backups", "List cloud backups already uploaded by the NewBeeBox desktop client.", platform="newbee", resource="config", action="backups")
     leaf = _read_leaf(config, "backup-get", "Read selectable plugins, ignored items, fonts, materials, and roles from one cloud backup.", platform="newbee", resource="config", action="backup-get"); leaf.add_argument("--id", type=_positive, required=True, help="Cloud backup ID.")
+    _newbee_relationship_tree(config, "config", "configuration share")
 
     wa = groups.add_parser("wa", help="WA/string create, version update, metadata edit, and attached operations").add_subparsers(dest="action_command", required=True)
     for action, text in (("create", "Create a WA/string record and first string version."), ("update", "Publish one new immutable WA/string version."), ("edit", "Edit WA metadata, media, categories, attachments, business settings, or review state."), ("delete", "Delete one explicitly confirmed WA/string record.")):
@@ -126,14 +139,7 @@ def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
     leaf = _read_leaf(logs, "latest", "Read the latest WA version summary.", platform="newbee", resource="wa", action="changelog-latest"); leaf.add_argument("--id", type=_positive, required=True)
     leaf = _read_leaf(logs, "list", "List WA version log records.", platform="newbee", resource="wa", action="changelog-list"); leaf.add_argument("--id", type=_positive, required=True); _page_flags(leaf)
     _write_leaf(logs, "newbee", "wa-changelog", "edit", "Edit or explicitly clear one WA version log.")
-    authors = wa.add_parser("co-author", help="Search, list, or replace WA co-authors").add_subparsers(dest="author_action", required=True)
-    leaf = _read_leaf(authors, "search", "Search current co-author candidates.", platform="newbee", resource="wa", action="co-author-search"); leaf.add_argument("--keyword", required=True)
-    leaf = _read_leaf(authors, "list", "List current co-authors for one WA.", platform="newbee", resource="wa", action="co-author-list"); leaf.add_argument("--id", type=_positive, required=True)
-    _write_leaf(authors, "newbee", "wa-co-author", "set", "Replace the complete WA co-author list; an empty array clears it.")
-    references = wa.add_parser("reference", help="Search, list, or replace WA content references").add_subparsers(dest="reference_action", required=True)
-    leaf = _read_leaf(references, "search", "Search content that can be referenced by a WA.", platform="newbee", resource="wa", action="reference-search"); leaf.add_argument("--keyword", required=True)
-    leaf = _read_leaf(references, "list", "List current references for one WA.", platform="newbee", resource="wa", action="reference-list"); leaf.add_argument("--id", type=_positive, required=True)
-    _write_leaf(references, "newbee", "wa-reference", "set", "Replace the complete WA reference list; an empty array clears it.")
+    _newbee_relationship_tree(wa, "wa", "WA")
     share_code = wa.add_parser("share-code", help="Set or refresh the NewBeeBox WA share code").add_subparsers(dest="share_code_action", required=True)
     _write_leaf(share_code, "newbee", "wa-share-code", "set", "Set or refresh the share code for one WA module.")
 

@@ -41,7 +41,7 @@ class CLITests(unittest.TestCase):
 
     def test_every_cli_leaf_has_complete_help_and_dispatch(self) -> None:
         leaves = parser_leaves(build_parser())
-        self.assertEqual(len(leaves), 76)
+        self.assertEqual(len(leaves), 88)
         for path, parser in leaves:
             with self.subTest(path=" ".join(path)):
                 handler = parser.get_default("handler")

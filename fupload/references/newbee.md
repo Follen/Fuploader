@@ -14,7 +14,7 @@ Use `newbee session doctor`. Authentication is taken from the Windows Known Fold
 - Configuration choices: `config backups`, then `config backup-get --id <cloud_id>`.
 - Configuration state: `config list|get`.
 - WA choices: `wa categories --game-version-id`, `wa attachment-paths`.
-- WA state: `wa list|get`, `wa changelog latest|list`, `wa co-author search|list`, `wa reference search|list`.
+- Relationship state: each `plugin`, `config`, and `wa` group exposes `co-author search|list` and `reference search|list`.
 
 Game-version parent IDs distinguish retail, classic, Titan Reforged, and later branches. Always show the live list. Plugin update uses the nested build strings, while WA uses its live numeric game-version ID. Season of Discovery is excluded from live mutation tests.
 
@@ -30,10 +30,10 @@ Game-version parent IDs distinguish retail, classic, Titan Reforged, and later b
 | `content_format` | Required description format. |
 | `intro`, `description` | Required short and full descriptions. |
 | `logo` or `logo_file` | One required; remote reference or local upload. |
-| `screenshots`, `screenshot_files` | Optional existing references and local additions. |
+| `screenshots`, `screenshot_files` | At least one existing reference or local upload is required by the webpage. |
 | `public` | Required visibility choice; new records may remain private. |
 | `submit_for_review` | Required as `true` when `public=true`. |
-| `subscribe_plan_level`, `link_to_channel` | Optional plan/channel choices. |
+| `subscribe_plan_level`, `link_to_channel`, `co_authors`, `references` | Optional plan/channel choices and complete relation replacements. |
 
 `plugin update` publishes one immutable version. Required: `mod_id`, `version`, `game_version_list`, `file`. `game_version_list` contains the live build strings such as `"3.80.2"`, not the parent branch IDs returned as `game_versions[*].id`. Optional: `changelog`, `link_to_channel`. Packages are `.zip`, `.rar`, or `.7z`, at most 300 MB. Existing versions are rejected before upload, and the post-upload readback must confirm both the new file and at least one game-version binding.
 
@@ -53,19 +53,19 @@ Wire endpoints: `/creator/wow/mod/create|edit`, `/creator/wow/mod_file/upload_mo
 | Metadata | Required `title`, `content`, `content_format`, `content_origin`; optional `intro`. |
 | Media | At least one of `picture_urls` or `picture_files`. |
 | Visibility | Required `public`; `submit_for_review=true` when public. |
-| Commercial/channel | Optional `subscribe_plan_level`, `price`, `time_range`, `link_to_channel`. |
+| Commercial/channel | Optional `subscribe_plan_level`, `price` (fen), `time_range`, `link_to_channel`, `co_authors`, `references`. |
 
 Each `linked_mods` object supports `mod_id`, `mod_name`, `mod_file_id`, `mod_version`, `display_name`, and `update_type`. Choose these from `backup-get`; do not guess missing file/version values.
 
 `config update` requires `id` and only changes backup content: `cloud_id`, `linked_mods`, the three ignored arrays, and `roleid`. When `cloud_id` is present, all other backup selections are required and must come from that backup.
 
-`config edit` requires `id` and only changes metadata/media/visibility/commercial/channel fields. It cannot change `cloud_id`. Both update and edit GET the current detail and call `/creator/wow/share_config/update` with a complete allowlisted payload. Visibility wire values are `sharing=0/1`.
+`config edit` requires `id` and only changes metadata/media/visibility/commercial/channel fields. It cannot change `cloud_id`. Both update and edit GET the current detail and call `/creator/wow/share_config/update` with a complete allowlisted payload. Visibility wire values are `sharing=0/1`. A private record always sends `link_to_channel=false`; `price=0` clears `time_range` before submission.
 
 ## WA/string
 
-`wa create` metadata fields: required `game_version_id`, `name`, nonempty `description`, `content_format`, `category_id_list`, `content_origin`, `public`; optional `intro`, `images`, `image_files`, `subscribe_plan_level`, `price`, `time_range`, `link_to_channel`, `attachments`. `category_id_list` contains at most 5 live IDs. One of `thumbnail` or `thumbnail_file` is required. `submit_for_review=true` is required when public.
+`wa create` metadata fields: required `game_version_id`, `name`, nonempty `description`, `content_format`, `category_id_list`, `content_origin`, `public`; optional `intro`, `images`, `image_files`, `subscribe_plan_level`, `price` (fen), `time_range`, `link_to_channel`, `attachments`, `co_authors`, `references`. `category_id_list` contains at most 5 live IDs. One of `thumbnail` or `thumbnail_file` is required. `submit_for_review=true` is required when public. A private record always sends `link_to_channel=false`; `price=0` clears `time_range` before submission.
 
-First-version fields are required `wa_str`, `wa_log`, and `string_mode` (`single` or `collection`); `wa_str_titles` is required for collection mode and must follow string order.
+First-version fields are required `wa_str`, `wa_log`, and `string_mode` (`single` or `collection`); `wa_str_titles` is required for collection mode and must follow string order. `wa changelog edit` accepts the log `id`, `wa_log`, and optional `wa_id` for immediate list readback. `wa share-code set` accepts a `module_id` and reads the resulting WA record.
 
 Each attachment object has exactly `name`, `install_type`, `install_path`, `value`, `is_compressed`, and optional `timestamp`. Select install values from `attachment-paths`. `value` is the uploaded attachment index code. `wa media upload` accepts `file`, `kind`, `install_type`, and `install_path`; with `kind=attachment` it follows the production uploadserver v3 prepare, object PUT with callback, and index readback chain, then returns an `attachment` object. Include install values if you want that object to be directly pasteable into `attachments[]`. Use `kind=image` for Creator image media.
 
@@ -73,7 +73,7 @@ Each attachment object has exactly `name`, `install_type`, `install_path`, `valu
 
 `wa edit` requires `id`; all metadata fields above are optional/presence-aware and it never includes string-version fields. Visibility wire values are private `share_state=2`, public/review `share_state=1`.
 
-Attached actions are independent: `wa media upload`, `wa changelog edit`, `wa co-author set`, `wa reference set`, and `wa share-code set`. WA changelog edit requires log `id` and `wa_log`; optional `wa_id` enables immediate list readback after the edit. Co-author replacement requires `content_id` and `co_authors`; each item is `{user_id,share_percent}` and the total is at most `1`. Reference replacement requires `source_id` and `references`; each item is `{type,id}`. Share-code refresh requires `module_id`. Empty arrays explicitly clear the respective complete relationship.
+Relationship replacement is available both in the main create/edit JSON and as `plugin|config|wa co-author set` or `plugin|config|wa reference set`. Co-author replacement requires `content_id` and `co_authors`; each item is `{user_id,share_percent}` and the total is at most `1`. Reference replacement requires `source_id` and `references`; each item is `{type,id}`. Empty arrays explicitly clear the respective complete relationship. The webpage namespaces are plugin co-author/reference `1/1`, configuration `4/3`, and WA `3/2`. The provider performs the main write first, then replaces each present relation and verifies the matching list endpoint before reporting success. WA-specific attached actions remain `wa media upload`, `wa changelog edit`, and `wa share-code set`.
 
 ## Delete
 
