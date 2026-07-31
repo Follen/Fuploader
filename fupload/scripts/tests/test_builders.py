@@ -411,6 +411,18 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(form["version"], "1.0.1")
         self.assertEqual(form["update_desc"], "pending update")
 
+    def test_dd_plugin_form_does_not_invent_null_fields_for_legacy_records(self) -> None:
+        form = plugin_form({
+            "game_types": [10001],
+            "name": "Legacy",
+            "scope": "private",
+            "latest_version": {"version": "1.3.5", "game_versions": ["12.0.7"]},
+        })
+        self.assertNotIn("description", form)
+        self.assertNotIn("logo", form)
+        self.assertNotIn("html_desc", form)
+        self.assertEqual(form["version"], "1.3.5")
+
     def test_dd_plugin_update_confirms_detail_latest_version_without_history(self) -> None:
         before = {
             "sn": "plugin-sn", "game_type": 10001, "name": "Plugin",

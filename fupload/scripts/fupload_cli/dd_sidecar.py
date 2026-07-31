@@ -21,10 +21,80 @@ USER_AGENT = (
     % os.path.basename(DD_DIR.rstrip("\\/"))
 )
 _SENSITIVE_ERROR_VALUE = re.compile(r"(?i)((?:x-amz-(?:credential|signature|security-token)|token|jwt|authorization|cookie)=)[^&\s]+")
+_SENSITIVE_JSON_VALUE = re.compile(r'''(?i)((?:["']?(?:token|jwt|authorization|cookie)["']?)\s*:\s*["']?)[^"',}\s]+''')
+_BEARER_VALUE = re.compile(r"(?i)Bearer\s+[A-Za-z0-9._~+/=-]+")
+_HTTP_STATUS = re.compile(r"\bHTTP\s+(\d{3})\b", re.IGNORECASE)
+_SENSITIVE_KEYS = {
+    "token", "access_token", "refresh_token", "resource_token", "jwt", "jwttoken",
+    "cookie", "set-cookie", "authorization", "authentication", "credential",
+    "clientno", "client_no", "device_proof", "signed_url", "upload_url",
+    "presigneduri", "presigned_uri", "signature",
+}
 
 
 def safe_exception_message(exc):
-    return _SENSITIVE_ERROR_VALUE.sub(r"\1[REDACTED]", str(exc).strip())
+    value = _SENSITIVE_ERROR_VALUE.sub(r"\1[REDACTED]", str(exc).strip())
+    value = _SENSITIVE_JSON_VALUE.sub(r"\1[REDACTED]", value)
+    return _BEARER_VALUE.sub("Bearer [REDACTED]", value)
+
+
+def _sanitize_log_value(value, key=None, depth=0):
+    if depth > 12:
+        return "[MAX_DEPTH]"
+    normalized_key = str(key or "").replace("-", "_").lower()
+    if normalized_key in _SENSITIVE_KEYS or any(
+        marker in normalized_key for marker in ("token", "cookie", "credential", "signature")
+    ):
+        return "[REDACTED]"
+    if isinstance(value, dict):
+        return {
+            str(child_key): _sanitize_log_value(child_value, child_key, depth + 1)
+            for child_key, child_value in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        return [_sanitize_log_value(item, None, depth + 1) for item in value]
+    if isinstance(value, str):
+        return safe_exception_message(value)
+    if value is None or isinstance(value, (bool, int, float)):
+        return value
+    return safe_exception_message(str(value))
+
+
+def _response_log_content(probe, payload=None):
+    if payload is not None:
+        return {"response_json": _sanitize_log_value(payload)}
+    if not isinstance(probe, dict) or not probe.get("body"):
+        return {}
+    body = str(probe["body"])
+    try:
+        parsed = json.loads(body)
+    except (TypeError, ValueError):
+        return {"response_body": safe_exception_message(body)}
+    return {"response_json": _sanitize_log_value(parsed)}
+
+
+def write_error_log(failure, command, probe=None, payload=None):
+    log_dir = os.path.join(DD_DIR, "Fupload", "logs")
+    os.makedirs(log_dir, exist_ok=True)
+    path = os.path.join(log_dir, "dd-errors-%s.jsonl" % time.strftime("%Y%m%d"))
+    request = command.get("payload") if isinstance(command, dict) else None
+    record = {
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+        "action": command.get("action") if isinstance(command, dict) else None,
+        "method": command.get("method") if isinstance(command, dict) else None,
+        "endpoint": command.get("path") if isinstance(command, dict) else None,
+        "stage": failure.stage,
+        "message": safe_exception_message(failure),
+        "http_status": failure.http_status,
+        "business_code": failure.business_code,
+        "verification_required": bool(failure.verification_required),
+        "request_fields": sorted(str(key) for key in request) if isinstance(request, dict) else [],
+        "validation": _sanitize_log_value(failure.details),
+    }
+    record.update(_response_log_content(probe, payload))
+    with open(path, "a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, ensure_ascii=True, sort_keys=True, separators=(",", ":")) + "\n")
+    return os.path.abspath(path)
 
 
 def output(payload):
@@ -33,12 +103,13 @@ def output(payload):
 
 
 class SidecarFailure(Exception):
-    def __init__(self, message, stage, http_status=None, business_code=None, verification_required=False):
+    def __init__(self, message, stage, http_status=None, business_code=None, verification_required=False, details=None):
         Exception.__init__(self, message)
         self.stage = stage
         self.http_status = http_status
         self.business_code = business_code
         self.verification_required = verification_required
+        self.details = details or {}
 
     def as_dict(self):
         result = {
@@ -51,24 +122,109 @@ class SidecarFailure(Exception):
             result["http_status"] = self.http_status
         if self.business_code is not None:
             result["business_code"] = self.business_code
+        if self.details:
+            result["details"] = self.details
         return result
 
 
-def failure_from_exception(exc, stage):
+def _validation_details(probe):
+    if not isinstance(probe, dict):
+        return {}
+    body = probe.get("body")
+    if not body:
+        return {}
+    try:
+        parsed = json.loads(body)
+    except (TypeError, ValueError):
+        return {"server_message": safe_exception_message(str(body))[:400]}
+    if not isinstance(parsed, dict):
+        return {"server_response": safe_exception_message(str(parsed))[:400]}
+    result = {}
+    for key in ("code", "msg", "message", "error", "field", "fields", "type"):
+        if key in parsed and parsed[key] not in (None, ""):
+            result["server_" + key] = safe_exception_message(str(parsed[key]))[:400]
+    detail = parsed.get("detail")
+    if isinstance(detail, list):
+        items = []
+        for item in detail[:20]:
+            if not isinstance(item, dict):
+                continue
+            entry = {}
+            for key in ("loc", "msg", "type"):
+                if key in item:
+                    entry[key] = safe_exception_message(str(item[key]))[:200]
+            if entry:
+                items.append(entry)
+        if items:
+            result["server_detail"] = items
+    elif detail not in (None, ""):
+        result["server_detail"] = safe_exception_message(str(detail))[:400]
+    return result
+
+
+def install_response_probe(client):
+    """Keep a bounded, secret-free summary of rejected native API responses."""
+    session = getattr(client, "_session", None)
+    for method_name in ("get", "post"):
+        original = getattr(session, method_name, None)
+        if not callable(original):
+            continue
+
+        def wrapped_factory(original_method):
+            def wrapped(*args, **kwargs):
+                client._fupload_last_response_error = None
+                response = original_method(*args, **kwargs)
+                try:
+                    status = int(getattr(response, "status_code", 0) or 0)
+                except (TypeError, ValueError):
+                    status = 0
+                if status >= 400:
+                    try:
+                        body = str(getattr(response, "text", "") or "")
+                    except Exception:
+                        body = ""
+                    client._fupload_last_response_error = {
+                        "status": status,
+                        "body": body[:1048576],
+                    }
+                return response
+            return wrapped
+
+        try:
+            setattr(session, method_name, wrapped_factory(original))
+        except (AttributeError, TypeError):
+            continue
+
+
+def failure_from_exception(exc, stage, response=None):
     if isinstance(exc, SidecarFailure):
         return exc
     if isinstance(exc, urllib.error.HTTPError):
-        return SidecarFailure("DD %s request returned HTTP %d" % (stage, exc.code), stage, http_status=exc.code)
+        return SidecarFailure(
+            "DD %s request returned HTTP %d" % (stage, exc.code), stage,
+            http_status=exc.code, verification_required=stage in ("object_put", "mutation") and exc.code >= 500,
+        )
     uncertain = stage in ("object_put", "mutation")
     message = safe_exception_message(exc)
+    probe = response if isinstance(response, dict) else {}
+    status = probe.get("status")
+    match = _HTTP_STATUS.search(message)
+    if status is None and match:
+        status = int(match.group(1))
+    try:
+        status = int(status) if status is not None else None
+    except (TypeError, ValueError):
+        status = None
     business_code = getattr(exc, "code", None) or getattr(exc, "error_code", None)
     if not message:
         message = type(exc).__name__
     return SidecarFailure(
         "DD %s request failed (%s): %s" % (stage, type(exc).__name__, message[:400]),
         stage,
+        http_status=status,
         business_code=business_code,
-        verification_required=uncertain,
+        verification_required=uncertain and not (status is not None and 400 <= status < 500),
+        details=_validation_details(probe),
     )
 
 
@@ -167,6 +323,7 @@ def open_session(timeout=45):
     client._session.headers["User-Agent"] = USER_AGENT
     if not client.login():
         raise RuntimeError("DD author API login failed")
+    install_response_probe(client)
     return qt, container, flow, jwt_helper, client
 
 
@@ -206,21 +363,33 @@ def parse_native_wa(session, content):
 
 def run_command(session, command):
     client = session[-1]
+    client._fupload_last_response_error = None
     action = command.get("action")
+    rejected_payload = None
     try:
         if action == "request":
             method = command.get("method", "GET").upper()
             path = command["path"]
             params = command.get("payload") or {}
-            return client.get(path, params) if method == "GET" else client.post(path, params)
+            response_payload = client.get(path, params) if method == "GET" else client.post(path, params)
+            if isinstance(response_payload, dict) and response_payload.get("code") not in (None, 0):
+                rejected_payload = response_payload
+                raise SidecarFailure(
+                    str(response_payload.get("msg") or response_payload.get("message") or "DD operation failed"),
+                    command.get("request_stage") or ("dependency_get" if method == "GET" else "mutation"),
+                    business_code=response_payload.get("code"),
+                    details=_validation_details({"body": json.dumps(response_payload, ensure_ascii=False)}),
+                )
+            return response_payload
         if action == "upload":
             path = command["file"]
             meta = command["meta"]
             try:
                 auth = client.get("/file/upload", meta)
             except Exception as exc:
-                raise failure_from_exception(exc, "upload_authorize")
+                raise failure_from_exception(exc, "upload_authorize", getattr(client, "_fupload_last_response_error", None))
             if isinstance(auth, dict) and auth.get("code") not in (None, 0):
+                rejected_payload = auth
                 raise SidecarFailure(
                     "DD upload authorization was rejected",
                     "upload_authorize",
@@ -272,7 +441,17 @@ def run_command(session, command):
             stage = "native_parser"
         else:
             stage = "session"
-        raise failure_from_exception(exc, stage)
+        failure = failure_from_exception(exc, stage, getattr(client, "_fupload_last_response_error", None))
+        try:
+            log_path = write_error_log(
+                failure, command,
+                getattr(client, "_fupload_last_response_error", None),
+                rejected_payload,
+            )
+            failure.details["log_path"] = log_path
+        except Exception as log_exc:
+            failure.details["log_write_error"] = type(log_exc).__name__
+        raise failure
 
 
 def close_session(session):

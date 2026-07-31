@@ -18,7 +18,7 @@ Run `python <skill-root>/scripts/fupload.py <platform> <resource> <action>`. Eve
 
 DD live commands additionally require one opaque `--session <id>`. Run local-only `dd session doctor` first. If it reports a running GUI, obtain explicit user consent before `dd session start --confirm-close-gui`; otherwise use `dd session start`. Reuse that session for all dependency GETs, serial writes, and readbacks, then always run `dd session stop --session <id>` in `finally`. A task must not start one native login per item.
 
-Output is one JSON object with `schema=fupload.output.v1`, `platform`, `operation`, `success`, and either `data` or `error`. Exit code `0` means success; `2` means validation, session, platform, or verification failure.
+Output is one JSON object with `schema=fupload.output.v1`, `platform`, `operation`, `success`, and either `data` or `error`. Exit code `0` means success; `2` means validation, session, platform, or verification failure. A DD native/API error may include `details.log_path` pointing to the matching sanitized JSONL record under `<DD version directory>/Fupload/logs/`; read only that record for response JSON/body, HTTP status, native business code, and field hints.
 
 ## Python input semantics
 

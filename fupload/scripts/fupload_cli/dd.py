@@ -375,6 +375,7 @@ class Sidecar:
                 http_status=error.get("http_status"),
                 business_code=error.get("business_code"),
                 verification_required=bool(error.get("verification_required")) or (uncertain and timed_out),
+                details=error.get("details") if isinstance(error.get("details"), dict) else None,
             )
         return response.get("data")
 
@@ -1240,7 +1241,9 @@ PLUGIN_EDIT_FIELDS = (
 
 def plugin_form(value: Mapping[str, Any]) -> Dict[str, Any]:
     latest = value.get("latest_version") if isinstance(value.get("latest_version"), dict) else {}
-    form = {name: copy.deepcopy(value.get(name)) for name in PLUGIN_FIELDS}
+    # Match the official web pick/JSON.stringify path: absent properties stay absent,
+    # rather than becoming JSON null on legacy records.
+    form = {name: copy.deepcopy(value[name]) for name in PLUGIN_FIELDS if name in value}
     for name in ("game_versions", "detail_url", "release_type", "version"):
         if latest.get({"detail_url": "file_path"}.get(name, name)) is not None:
             form[name] = copy.deepcopy(latest.get({"detail_url": "file_path"}.get(name, name)))
