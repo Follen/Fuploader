@@ -10,9 +10,9 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from fupload_cli.dd import DD, LIFE_TYPES, Sidecar, config_form, created_reference, discover_dd, merge_plugin_version_fields, normalize_commercial, plugin_form, readable_author_list, resolve_retail_ui_config, safe_backup_detail, safe_detail, selected_group
+from fupload_cli.dd import DD, LIFE_TYPES, Sidecar, _option_values, _verify_fields, config_form, created_reference, discover_dd, merge_plugin_version_fields, normalize_commercial, plugin_form, readable_author_list, resolve_retail_ui_config, safe_backup_detail, safe_channels, safe_detail, selected_group
 from fupload_cli.errors import FuploadError, ValidationError, redact
-from fupload_cli.newbee import NewBee
+from fupload_cli.newbee import NewBee, _redact_wa, _require_readback
 
 
 class FakeNewBee(NewBee):
@@ -105,6 +105,40 @@ class EmptyDDOptions:
         return {}
 
 
+class ValidDDOptions:
+    def get(self, endpoint, body):
+        values = {
+            "/game_type/list": [{"game_type": 10001}],
+            "/game_versions/list": [{"game_version": "12.1.0"}],
+            "/addon/category": [{"id": 1, "children": [{"id": 2}]}],
+            "/anchor_vip/level/list": [],
+            "/share/list": [],
+            "/wa/list": [],
+        }
+        return {"code": 0, "result": values.get(endpoint, [])}
+
+    def post(self, endpoint, body):
+        return {"code": 0, "result": []}
+
+    def cc_get(self, url):
+        return {"data": [{"teamId": "room", "channelList": []}]}
+
+
+class DeleteDDSession:
+    def __init__(self):
+        self.calls = []
+
+    def get(self, endpoint, body):
+        self.calls.append(("get", endpoint, dict(body)))
+        if endpoint == "/addon/detail_v2":
+            return {"code": 0, "result": {"sn": "plugin-sn", "name": "Plugin", "game_type": 10001}}
+        return {"code": 0, "result": []}
+
+    def post(self, endpoint, body):
+        self.calls.append(("post", endpoint, dict(body)))
+        return {"code": 0, "result": []}
+
+
 class BuilderTests(unittest.TestCase):
     @staticmethod
     def retail_backup():
@@ -159,7 +193,8 @@ class BuilderTests(unittest.TestCase):
 
     def test_newbee_plugin_edit_preserves_private_state(self) -> None:
         provider = FakeNewBee()
-        result = provider.edit_plugin({"id": 42, "intro": "After"})
+        with mock.patch("fupload_cli.newbee._require_readback"):
+            result = provider.edit_plugin({"id": 42, "intro": "After"})
         endpoint, body = provider.calls[-1]
         self.assertEqual(endpoint, "/creator/wow/mod/edit")
         self.assertEqual(body["share_state"], 0)
@@ -168,20 +203,21 @@ class BuilderTests(unittest.TestCase):
 
     def test_newbee_config_create_falls_back_to_unfiltered_author_list(self) -> None:
         provider = DelayedConfigIndexNewBee()
-        result = provider.create_config({
-            "cloud_id": 12,
-            "title": "Delayed",
-            "content": "Body",
-            "content_format": 2,
-            "content_origin": 1,
-            "public": False,
-            "linked_mods": [],
-            "ignored_unknown_mods": [],
-            "ignored_materials": [],
-            "ignored_fronts": [],
-            "roleid": "7",
-            "picture_urls": ["image"],
-        })
+        with mock.patch.object(provider, "_validate_business_options"), mock.patch("fupload_cli.newbee._require_readback"):
+            result = provider.create_config({
+                "cloud_id": 12,
+                "title": "Delayed",
+                "content": "Body",
+                "content_format": 2,
+                "content_origin": 1,
+                "public": False,
+                "linked_mods": [],
+                "ignored_unknown_mods": [],
+                "ignored_materials": [],
+                "ignored_fronts": [],
+                "roleid": "7",
+                "picture_urls": ["image"],
+            })
         self.assertEqual(result["id"], 91)
         self.assertEqual(provider.keywords, ["Delayed", ""])
 
@@ -387,6 +423,21 @@ class BuilderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValidationError, "select one WTF role"):
             config_form({}, self.wa_backup(), {"known_wa_ids": ["known-uid"]})
 
+    def test_dd_wtf_selectors_disambiguate_duplicate_role_names(self) -> None:
+        backup = {
+            "sn": "backup",
+            "wtf": {"accounts": [
+                {"name": "a", "servers": [{"name": "one", "items": ["Same"]}]},
+                {"name": "b", "servers": [{"name": "two", "items": ["Same"]}]},
+            ]},
+        }
+        safe = safe_backup_detail(backup)
+        self.assertEqual(len(safe["wtf_roles"]), 2)
+        with self.assertRaisesRegex(ValidationError, "ambiguous"):
+            config_form({}, backup, {"wtf_role_ids": ["Same"]})
+        selected = config_form({}, backup, {"wtf_role_ids": [safe["wtf_roles"][0]["selector"]]})
+        self.assertEqual(selected["wtf"]["accounts"][0]["name"], "a")
+
     def test_dd_retail_selectors_restore_complete_wire_objects(self) -> None:
         backup = self.retail_backup()
         safe = safe_backup_detail(backup)["retail_ui_config"]
@@ -509,19 +560,164 @@ class BuilderTests(unittest.TestCase):
             package = Path(directory) / "plugin.zip"
             package.write_bytes(b"zip")
             with mock.patch.object(provider, "get_plugin_raw", return_value=current), mock.patch.object(
-                provider, "plugin_versions", return_value={"list": []}
+                provider, "plugin_versions", side_effect=[
+                    {"list": []},
+                    {"list": [{"t_display_name": "2", "versions": ["3.80.2"]}]},
+                ]
             ), mock.patch.object(
-                provider, "game_versions", return_value={"items": [{"id": 2}]}
+                provider, "game_versions", return_value={"items": [{"id": 4, "versions": ["3.80.2"]}]}
             ), mock.patch.object(provider, "upload", return_value={}) as upload, mock.patch.object(
                 provider, "get_plugin", return_value={"id": 1}
             ):
                 provider.update_plugin({
                     "mod_id": 1,
                     "version": "2",
-                    "game_version_list": [2],
+                    "game_version_list": ["3.80.2"],
                     "file": str(package),
                 })
         self.assertEqual(upload.call_args.args[2]["link_to_channel"], "true")
+
+    def test_newbee_dynamic_options_fail_closed(self) -> None:
+        provider = NewBee()
+        with mock.patch.object(provider, "content_origins", return_value={"total": 0, "items": []}):
+            with self.assertRaisesRegex(FuploadError, "no selectable values"):
+                provider._validate_business_options({"content_origin": 1})
+
+    def test_newbee_readback_match_completes_without_error(self) -> None:
+        _require_readback(
+            {"name": "Test", "categories": [2, 1], "picture_urls": ["user_media/image.png"]},
+            {
+                "name": "Test",
+                "categories": [1, 2],
+                "picture_urls": ["https://cdn.example/user_media/image.png?resize=1"],
+            },
+            "/readback",
+        )
+
+    def test_newbee_config_readback_normalizes_role_id_to_string(self) -> None:
+        provider = NewBee()
+        with mock.patch.object(provider, "get_config_raw", return_value={"t_id": 7, "t_roleid": 135676488}):
+            self.assertEqual(provider.get_config(7)["roleid"], "135676488")
+
+    def test_newbee_wa_redaction_preserves_non_sensitive_values(self) -> None:
+        redacted = _redact_wa({"items": [{"wa_str": "secret", "version": 2}], "total": 1})
+        self.assertEqual(redacted["items"][0]["version"], 2)
+        self.assertEqual(redacted["items"][0]["wa_str_summary"]["length"], 6)
+        self.assertEqual(redacted["total"], 1)
+
+    def test_newbee_attachment_parser_ignores_unrelated_nested_values(self) -> None:
+        provider = NewBee()
+        with mock.patch.object(provider, "attachment_paths", return_value={"metadata": {"value": 7, "extract_base_dir": "Interface"}}):
+            with self.assertRaisesRegex(FuploadError, "attachment path response"):
+                provider._validate_attachments([{
+                    "name": "one.zip", "install_type": 7, "install_path": "Interface",
+                    "value": "code", "is_compressed": True,
+                }])
+
+    def test_dd_plugin_categories_enforce_parent_child_relationship(self) -> None:
+        form = {
+            "game_type": 10001, "game_versions": ["12.1.0"],
+            "primary_category_id": 1, "second_category_ids": [3],
+        }
+        with self.assertRaisesRegex(ValidationError, "must belong"):
+            DD()._validate_options(ValidDDOptions(), "plugin", form)
+        form["second_category_ids"] = [2]
+        DD()._validate_options(ValidDDOptions(), "plugin", form)
+
+    def test_dd_wa_category_parser_accepts_live_c_id_shape(self) -> None:
+        class WAOptions(ValidDDOptions):
+            def get(self, endpoint, body):
+                if endpoint == "/wa/categories":
+                    return {"code": 0, "result": [{"c_id": "210", "children": [{"c_id": "211"}]}]}
+                return super().get(endpoint, body)
+
+        DD()._validate_options(WAOptions(), "wa", {
+            "game_type": 10001, "game_version": "12.1.0", "category_ids": ["211"],
+        })
+
+    def test_dd_option_parser_accepts_internal_enum_lists(self) -> None:
+        self.assertIn("seven_day", _option_values(LIFE_TYPES, ("value",)))
+
+    def test_dd_plugin_readback_normalizes_disabled_commercial_fields(self) -> None:
+        form = plugin_form({
+            "scope": "private",
+            "need_buy": False,
+            "jump_room": False,
+            "with_associate": False,
+            "need_anchor_vip": False,
+        })
+        self.assertEqual(form["vip_levels"], [])
+        self.assertEqual(form["associated_acts"], [])
+        self.assertEqual(form["room_id"], "")
+
+    def test_dd_post_timeout_preserves_endpoint_and_uncertain_write(self) -> None:
+        sidecar = Sidecar.__new__(Sidecar)
+        sidecar.counter = 0
+        sidecar.process = mock.MagicMock()
+        sidecar.process.stdin = mock.MagicMock()
+        with mock.patch.object(sidecar, "_next_result", return_value={
+            "id": 1,
+            "ok": False,
+            "error": {"message": "The read operation timed out"},
+        }):
+            with self.assertRaises(FuploadError) as raised:
+                sidecar.call("request", method="POST", path="/share/create", payload={})
+        self.assertEqual(raised.exception.endpoint, "/share/create")
+        self.assertTrue(raised.exception.verification_required)
+
+    def test_dd_stale_detail_is_blocked_before_write(self) -> None:
+        stale = {"sn": "one", "title": "Old", "game_type": 10001, "mtime": "2026-07-31T10:00:00"}
+        newer = {"share_sn": "one", "title": "New", "game_type": 10001, "mtime": "2026-07-31T10:01:00"}
+        with mock.patch("fupload_cli.dd.detail", return_value=stale), mock.patch(
+            "fupload_cli.dd.author_item", return_value=newer
+        ), mock.patch("fupload_cli.dd.time.sleep"):
+            with self.assertRaisesRegex(FuploadError, "detail is stale"):
+                DD._fresh_detail(mock.MagicMock(), "config", "one")
+
+    def test_dd_detail_may_converge_on_second_read(self) -> None:
+        stale = {"sn": "one", "title": "Old", "game_type": 10001, "mtime": "2026-07-31T10:00:00"}
+        fresh = {"sn": "one", "title": "New", "game_type": 10001, "mtime": "2026-07-31T10:01:00"}
+        listing = {"share_sn": "one", "title": "New", "game_type": 10001, "mtime": "2026-07-31T10:01:00"}
+        with mock.patch("fupload_cli.dd.detail", side_effect=[stale, fresh]), mock.patch(
+            "fupload_cli.dd.author_item", return_value=listing
+        ), mock.patch("fupload_cli.dd.time.sleep"):
+            self.assertEqual(DD._fresh_detail(mock.MagicMock(), "config", "one")["title"], "New")
+
+    def test_dd_content_readback_allows_only_additional_read_only_fields(self) -> None:
+        expected = {"material": {"items": [{"name": "Icons"}], "inner_version": {"Icons": 2}}}
+        actual = {"material": {
+            "items": [{"name": "Icons", "desc": ""}],
+            "inner_version": {"Icons": 2},
+            "size": 20,
+        }}
+        _verify_fields(expected, actual, ("material",), "/share/detail")
+        actual["material"]["inner_version"]["Icons"] = 1
+        with self.assertRaisesRegex(FuploadError, "material"):
+            _verify_fields(expected, actual, ("material",), "/share/detail")
+
+    def test_dd_channel_parser_keeps_parent_room_on_nested_channels(self) -> None:
+        value = safe_channels({"data": [{
+            "teamId": "room", "teamName": "Room",
+            "channelList": [{"channelId": "channel", "channelType": "text", "channelName": "General"}],
+        }]})
+        tuples = {(item["room_id"], item["channel_id"], item["channel_type"]) for item in value["items"]}
+        self.assertIn(("room", "", ""), tuples)
+        self.assertIn(("room", "channel", "text"), tuples)
+
+    def test_newbee_delete_uses_one_id_and_verifies_author_list(self) -> None:
+        provider = NewBee()
+        with mock.patch.object(provider, "get_plugin", return_value={"id": 7, "name": "Plugin"}), mock.patch.object(
+            provider, "post", return_value={"removed": True}
+        ) as post, mock.patch.object(provider, "list_plugins", return_value={"total": 0, "items": []}):
+            result = provider.delete("plugin", {"id": 7, "confirm": "DELETE"})
+        post.assert_called_once_with("/creator/wow/mod/remove", {"id": 7})
+        self.assertTrue(result["deleted"])
+
+    def test_dd_delete_uses_confirmed_sn_body_and_post_readback(self) -> None:
+        session = DeleteDDSession()
+        result = DD()._delete(session, "plugin", {"sn": "plugin-sn", "confirm": "DELETE"})
+        self.assertIn(("post", "/addon/delete", {"sn": "plugin-sn"}), session.calls)
+        self.assertTrue(result["deleted"])
 
     def test_newbee_wa_update_preserves_omitted_channel_and_titles(self) -> None:
         provider = AtomicNewBee()

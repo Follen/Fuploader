@@ -1,0 +1,9 @@
+{
+  "schema": "fupload.v1.dd.wa.update",
+  "sn": "3e8381f195ba4ba5b1080075021965f4",
+  "content": "FUPLOAD-CONTRACT-TEST-DD-20260731-191228-UPDATED",
+  "update_desc": "Second private WA verification version",
+  "version": "2",
+  "with_file": false,
+  "file_install_path": ""
+}

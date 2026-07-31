@@ -1,0 +1,20 @@
+{
+  "schema": "fupload.v1.newbee.config.create",
+  "cloud_id": 3794428,
+  "title": "Fupload Config Test NB 20260731-191228",
+  "content": "Temporary private configuration contract verification.",
+  "content_format": 2,
+  "intro": "Create readback test",
+  "picture_urls": ["user_media/default/558213/9380791a67412ecb228f3789c2dbd878.png"],
+  "content_origin": 1,
+  "public": false,
+  "link_to_channel": false,
+  "subscribe_plan_level": 0,
+  "price": 0,
+  "time_range": "",
+  "linked_mods": [],
+  "ignored_unknown_mods": [],
+  "ignored_materials": [],
+  "ignored_fronts": [],
+  "roleid": "135676488"
+}

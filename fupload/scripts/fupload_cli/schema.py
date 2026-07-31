@@ -27,6 +27,9 @@ class Field:
     choices: Tuple[Any, ...] = ()
     nonempty: bool = False
     max_length: Optional[int] = None
+    max_items: Optional[int] = None
+    minimum: Optional[float] = None
+    maximum: Optional[float] = None
     local_file: bool = False
     description: str = ""
 
@@ -68,6 +71,15 @@ class Schema:
                     "must contain at most %d characters" % spec.max_length,
                     path="$.%s" % name,
                 )
+            if spec.max_items is not None and len(item) > spec.max_items:
+                raise ValidationError(
+                    "must contain at most %d items" % spec.max_items,
+                    path="$.%s" % name,
+                )
+            if spec.minimum is not None and item < spec.minimum:
+                raise ValidationError("must be at least %s" % spec.minimum, path="$.%s" % name)
+            if spec.maximum is not None and item > spec.maximum:
+                raise ValidationError("must be at most %s" % spec.maximum, path="$.%s" % name)
             if spec.choices and item not in spec.choices:
                 raise ValidationError(
                     "must be one of: %s" % ", ".join(map(str, spec.choices)),
@@ -100,9 +112,15 @@ class Schema:
             if int(value["price_fen"]) <= 0:
                 raise ValidationError("price_fen must be greater than zero when need_buy=true", path="$.price_fen")
         if value.get("jump_room") is True:
-            for name in ("room_id", "channel_id", "channel_type"):
-                if not value.get(name):
-                    raise ValidationError("%s is required when jump_room=true" % name, path="$.%s" % name)
+            if not value.get("room_id"):
+                raise ValidationError("room_id is required when jump_room=true", path="$.room_id")
+            has_channel_id = bool(value.get("channel_id"))
+            has_channel_type = bool(value.get("channel_type"))
+            if has_channel_id != has_channel_type:
+                raise ValidationError(
+                    "channel_id and channel_type must both be empty or both be nonempty",
+                    path="$.channel_id" if not has_channel_id else "$.channel_type",
+                )
         if value.get("sync_room") is True:
             if value.get("jump_room") is False:
                 raise ValidationError("sync_room=true requires jump_room=true", path="$.jump_room")
@@ -120,7 +138,7 @@ class Schema:
         if value.get("with_file") is True:
             if not value.get("file_path") and not value.get("file"):
                 raise ValidationError("file_path or file is required when with_file=true", path="$.file_path")
-            if not value.get("file_install_path"):
+            if "file_install_path" not in value:
                 raise ValidationError("required when with_file=true", path="$.file_install_path")
         if value.get("string_mode") == "collection":
             if not value.get("wa_str_titles"):
@@ -202,9 +220,9 @@ class Schema:
             for name in ("mod_categories", "category_id_list"):
                 if name in value and any(isinstance(item, bool) or not isinstance(item, int) or item <= 0 for item in value[name]):
                     raise ValidationError("array must contain positive integer IDs", path="$.%s" % name)
-            scalar_array("game_version_list", (int,), "array must contain positive integer IDs")
-            if "game_version_list" in value and any(item <= 0 for item in value["game_version_list"]):
-                raise ValidationError("array must contain positive integer IDs", path="$.game_version_list")
+            scalar_array("game_version_list", (str,), "array must contain nonempty game-version strings")
+            if "game_version_list" in value and any(not item.strip() for item in value["game_version_list"]):
+                raise ValidationError("array must contain nonempty game-version strings", path="$.game_version_list")
             for name in (
                 "screenshots", "picture_urls", "images", "screenshot_files", "picture_files",
                 "image_files", "ignored_unknown_mods", "ignored_materials", "ignored_fronts",
@@ -216,6 +234,12 @@ class Schema:
             for name in ("second_category_ids", "vip_levels"):
                 if name in value and any(isinstance(item, bool) or not isinstance(item, int) for item in value[name]):
                     raise ValidationError("array must contain integer IDs", path="$.%s" % name)
+            for name in ("game_type", "primary_category_id"):
+                if name in value and value[name] <= 0:
+                    raise ValidationError("must be greater than zero", path="$.%s" % name)
+            for existing, local in (("detail_imgs", "detail_img_files"), ("display_imgs", "display_img_files")):
+                if len(value.get(existing) or []) + len(value.get(local) or []) > 8:
+                    raise ValidationError("combined existing and local images may contain at most 8 items", path="$.%s" % local)
             for index, item in enumerate(value.get("associated_acts") or []):
                 if not isinstance(item.get("sn"), str) or not item["sn"]:
                     raise ValidationError("expected nonempty string", path="$.associated_acts[%d].sn" % index)
@@ -235,6 +259,10 @@ class Schema:
                 scalar_array(name, (str,), "array must contain nonempty strings")
             if len(value.get("wtf_role_ids") or []) > 1:
                 raise ValidationError("at most one WTF role may be selected", path="$.wtf_role_ids")
+            if "price_fen" in value:
+                price = value["price_fen"]
+                if price != 0 and not 10 <= price <= 20000:
+                    raise ValidationError("price_fen must be 0 or between 10 and 20000", path="$.price_fen")
             if self.name.startswith("fupload.v1.dd.wa") and "version" in value and not value["version"].isdigit():
                 raise ValidationError("version must contain digits only", path="$.version")
             if self.name.startswith("fupload.v1.dd.config") and value.get("retail_ui_config") is not None:
@@ -271,7 +299,7 @@ def f(type_name: str, **kwargs: Any) -> Field:
 
 NB_PLUGIN_META = {
     "name": f("string", nonempty=True),
-    "mod_categories": f("array", nonempty=True),
+    "mod_categories": f("array", nonempty=True, max_items=5),
     "content_origin": f("integer"),
     "content_format": f("integer"),
     "intro": f("string"),
@@ -306,7 +334,7 @@ NB_WA_META = {
     "intro": f("string"), "description": f("string", nonempty=True), "content_format": f("integer"),
     "thumbnail": f("string"), "thumbnail_file": f("string", local_file=True),
     "images": f("array"), "image_files": f("array"),
-    "category_id_list": f("array", nonempty=True), "content_origin": f("integer"),
+    "category_id_list": f("array", nonempty=True, max_items=5), "content_origin": f("integer"),
     "subscribe_plan_level": f("integer"), "price": f("integer"), "time_range": f("string"),
     "public": f("boolean"), "submit_for_review": f("boolean"),
     "link_to_channel": f("boolean"), "attachments": f("array"),
@@ -318,32 +346,32 @@ DD_COMMERCIAL = {
     "price_fen": f("integer"), "buy_life_type": f("string"),
     "jump_room": f("boolean"), "room_id": f("string"), "channel_id": f("string"),
     "channel_type": f("string"), "sync_room": f("boolean"),
-    "creation_statement": f("string"), "with_associate": f("boolean"),
+    "creation_statement": f("string", choices=("original", "chinesize", "renovate", "second")), "with_associate": f("boolean"),
     "associated_acts": f("array"), "need_anchor_vip": f("boolean"),
     "vip_levels": f("array"),
 }
 
 DD_PLUGIN_META = {
-    "game_type": f("integer"), "scope": DD_COMMERCIAL["scope"], "addon_type": f("integer"),
+    "game_type": f("integer"), "scope": DD_COMMERCIAL["scope"], "addon_type": f("integer", choices=(0, 1)),
     "name": f("string", nonempty=True, max_length=80),
     "description": f("string", nonempty=True, max_length=80),
     "logo": f("string"), "logo_file": f("string", local_file=True),
-    "detail_imgs": f("array"), "detail_img_files": f("array"),
+    "detail_imgs": f("array", max_items=8), "detail_img_files": f("array", max_items=8),
     "primary_category_id": f("integer"), "second_category_ids": f("array"),
-    "html_desc": f("string"),
+    "html_desc": f("string", nonempty=True),
     **DD_COMMERCIAL,
 }
 DD_PLUGIN_VERSION = {
     "game_versions": f("array", nonempty=True), "detail_url": f("string"),
-    "file": f("string", local_file=True), "release_type": f("integer"),
+    "file": f("string", local_file=True), "release_type": f("integer", choices=(1, 2, 3)),
     "version": f("string", nonempty=True, max_length=80),
-    "update_desc": f("string", max_length=1000),
+    "update_desc": f("string", nonempty=True, max_length=1000),
 }
 
 DD_CONFIG_META = {
     "scope": DD_COMMERCIAL["scope"], "title": f("string", nonempty=True, max_length=40),
     "brief_desc": f("string", nonempty=True, max_length=50), "desc": f("string", nonempty=True),
-    "display_imgs": f("array"), "display_img_files": f("array"),
+    "display_imgs": f("array", max_items=8), "display_img_files": f("array", max_items=8),
     **DD_COMMERCIAL,
 }
 DD_CONFIG_CONTENT = {
@@ -363,15 +391,15 @@ DD_CONFIG_CONTENT = {
 DD_WA_META = {
     "game_type": f("integer"), "scope": DD_COMMERCIAL["scope"],
     "name": f("string", nonempty=True, max_length=40), "game_version": f("string", nonempty=True),
-    "brief_desc": f("string", nonempty=True, max_length=50), "display_imgs": f("array"),
-    "display_img_files": f("array"), "category_ids": f("array", nonempty=True),
+    "brief_desc": f("string", nonempty=True, max_length=50), "display_imgs": f("array", max_items=8),
+    "display_img_files": f("array", max_items=8), "category_ids": f("array", nonempty=True, max_items=5),
     "desc": f("string", nonempty=True), **DD_COMMERCIAL,
 }
 DD_WA_CONTENT = {
     "content": f("string", nonempty=True), "update_desc": f("string", nonempty=True, max_length=1000),
     "version": f("string", nonempty=True, max_length=80), "with_file": f("boolean"),
     "file_path": f("string"), "file": f("string", local_file=True),
-    "file_install_path": f("string"), "parse_wa_uid": f("string"), "parse_wa_id": f("string"),
+    "file_install_path": f("string", choices=("", "Interface", "Interface/Addons")), "parse_wa_uid": f("string"), "parse_wa_id": f("string"),
 }
 
 
@@ -381,7 +409,8 @@ def required(fields: Mapping[str, Field], names: Iterable[str]) -> Dict[str, Fie
         old = result[name]
         result[name] = Field(
             old.type, required=True, nullable=old.nullable, choices=old.choices,
-            nonempty=old.nonempty, max_length=old.max_length,
+            nonempty=old.nonempty, max_length=old.max_length, max_items=old.max_items,
+            minimum=old.minimum, maximum=old.maximum,
             local_file=old.local_file, description=old.description,
         )
     return result
@@ -416,6 +445,8 @@ register("newbee", "wa-changelog", "edit", required({"id": f("integer"), "wa_id"
 register("newbee", "wa-co-author", "set", required({"content_id": f("integer"), "co_authors": f("array")}, ("content_id", "co_authors")))
 register("newbee", "wa-reference", "set", required({"source_id": f("integer"), "references": f("array")}, ("source_id", "references")))
 register("newbee", "wa-share-code", "set", required({"module_id": f("integer")}, ("module_id",)))
+for _resource in ("plugin", "config", "wa"):
+    register("newbee", _resource, "delete", required({"id": f("integer"), "confirm": f("string", choices=("DELETE",))}, ("id", "confirm")))
 
 register("dd", "plugin", "create", required(
     {**DD_PLUGIN_META, **DD_PLUGIN_VERSION},
@@ -443,6 +474,8 @@ register("dd", "wa", "create", required(
 ))
 register("dd", "wa", "update", with_id(required(DD_WA_CONTENT, ("content", "update_desc", "version", "with_file")), "sn"))
 register("dd", "wa", "edit", with_id(DD_WA_META, "sn"))
+for _resource in ("plugin", "config", "wa"):
+    register("dd", _resource, "delete", required({"sn": f("string", nonempty=True), "confirm": f("string", choices=("DELETE",))}, ("sn", "confirm")))
 
 
 def get_schema(platform: str, resource: str, action: str) -> Schema:
@@ -463,6 +496,8 @@ def schema_help(platform: str, resource: str, action: str) -> str:
             flags.append("choices=" + "|".join(map(str, spec.choices)))
         if spec.max_length is not None:
             flags.append("max-length=" + str(spec.max_length))
+        if spec.max_items is not None:
+            flags.append("max-items=" + str(spec.max_items))
         if spec.local_file:
             flags.append("local file")
         detail = ", ".join(flags)

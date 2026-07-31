@@ -1,0 +1,5 @@
+{
+  "schema": "fupload.v1.dd.config.delete",
+  "sn": "CONFIG_SN",
+  "confirm": "DELETE"
+}

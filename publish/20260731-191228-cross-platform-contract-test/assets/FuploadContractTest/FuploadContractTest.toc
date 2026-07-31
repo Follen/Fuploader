@@ -1,0 +1,6 @@
+## Interface: 120100
+## Title: Fupload Contract Test
+## Notes: Temporary private contract verification addon.
+## Version: 1.0.0
+
+FuploadContractTest.lua

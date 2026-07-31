@@ -102,12 +102,20 @@ class TrustBoundaryTests(unittest.TestCase):
             }),
             stderr="",
         )
-        with mock.patch("fupload_cli.trust.subprocess.run", return_value=completed):
+        with mock.patch("fupload_cli.trust.subprocess.run", return_value=completed) as run:
             result = verify_dd_executable(Path("C:/official/netease_dd.exe"))
         self.assertEqual(result, {
             "status": "Valid",
             "publisher": "NetEase (Hangzhou) Network Co., Ltd",
         })
+        self.assertEqual(run.call_args.kwargs["encoding"], "utf-8")
+        self.assertEqual(run.call_args.kwargs["errors"], "replace")
+
+    def test_dd_signature_none_stdout_fails_closed(self) -> None:
+        completed = subprocess.CompletedProcess(args=[], returncode=1, stdout=None, stderr=None)
+        with mock.patch("fupload_cli.trust.subprocess.run", return_value=completed):
+            with self.assertRaisesRegex(FuploadError, "Authenticode verification process"):
+                verify_dd_executable(Path("C:/official/netease_dd.exe"))
 
     def test_reparse_point_attribute_is_rejected(self) -> None:
         stat_result = mock.Mock(st_file_attributes=0x400)

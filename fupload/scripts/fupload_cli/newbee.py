@@ -119,6 +119,68 @@ def _redact_wa(value: Any) -> Any:
     return value
 
 
+def _option_rows(value: Any) -> List[Dict[str, Any]]:
+    """Read only documented top-level option containers."""
+    if isinstance(value, list):
+        return [item for item in value if isinstance(item, dict)]
+    if not isinstance(value, dict):
+        return []
+    for key in ("list", "items", "rows", "options"):
+        if isinstance(value.get(key), list):
+            return [item for item in value[key] if isinstance(item, dict)]
+    data = value.get("data")
+    if isinstance(data, list):
+        return [item for item in data if isinstance(item, dict)]
+    return []
+
+
+def _same_value(expected: Any, actual: Any) -> bool:
+    if isinstance(expected, bool):
+        return actual is expected
+    if isinstance(expected, (int, float)) and not isinstance(expected, bool):
+        try:
+            return float(actual) == float(expected)
+        except (TypeError, ValueError):
+            return False
+    if isinstance(expected, list):
+        if not isinstance(actual, list):
+            return False
+        unmatched = list(actual)
+        for wanted in expected:
+            match = next((index for index, candidate in enumerate(unmatched) if _same_value(wanted, candidate)), None)
+            if match is None:
+                return False
+            unmatched.pop(match)
+        return len(unmatched) == 0
+    if isinstance(expected, dict):
+        if not isinstance(actual, dict):
+            return False
+        for name, wanted in expected.items():
+            actual_name = "updateType" if name == "update_type" and "updateType" in actual else name
+            if actual_name not in actual or not _same_value(wanted, actual[actual_name]):
+                return False
+        return True
+    if isinstance(expected, str) and isinstance(actual, str):
+        if expected.startswith(("http://", "https://")) or actual.startswith(("http://", "https://")):
+            expected_path = urllib.parse.urlsplit(expected).path.lstrip("/")
+            actual_path = urllib.parse.urlsplit(actual).path.lstrip("/")
+            return bool(expected_path and expected_path == actual_path)
+    return actual == expected
+
+
+def _require_readback(expected: Mapping[str, Any], actual: Mapping[str, Any], endpoint: str) -> None:
+    mismatches = []
+    for name, wanted in expected.items():
+        if name not in actual or not _same_value(wanted, actual[name]):
+            mismatches.append(name)
+    if mismatches:
+        raise FuploadError(
+            "write readback did not match field(s): %s" % ", ".join(sorted(mismatches)),
+            kind="verification_required", endpoint=endpoint, verification_required=True,
+            details={"fields": sorted(mismatches)},
+        )
+
+
 def _paged_items(value: Any) -> Tuple[int, List[Dict[str, Any]], Dict[str, Any]]:
     obj = _first_object(value)
     raw_items = _list(_pick(obj, "list", "items", default=[]))
@@ -410,7 +472,7 @@ class NewBee:
             "ignored_unknown_mods": _list(_pick(detail, "t_ignored_unknown_mods", "ignored_unknown_mods", default=[])),
             "ignored_materials": _list(_pick(detail, "t_ignored_materials", "ignored_materials", default=[])),
             "ignored_fronts": _list(_pick(detail, "t_ignored_fronts", "ignored_fronts", default=[])),
-            "roleid": _pick(detail, "t_roleid", "roleid", "role_id", default=""),
+            "roleid": str(_pick(detail, "t_roleid", "roleid", "role_id", default="")),
         }
 
     def list_was(self, keyword: str, offset: int, size: int) -> Any:
@@ -439,6 +501,66 @@ class NewBee:
 
     def attachment_paths(self) -> Any:
         return self.post("/creator/wow/wa/attachment_install_path_list", {})
+
+    def content_origins(self) -> Dict[str, Any]:
+        rows = _option_rows(self.post("/v3/sys/content_origin_list", {}))
+        return {"total": len(rows), "items": [{"label": row.get("label"), "value": row.get("value")} for row in rows if row.get("value") is not None]}
+
+    def subscribe_plans(self) -> Dict[str, Any]:
+        rows = _option_rows(self.post("/creator/author_subscribe/plan_level_preset", {}))
+        return {"total": len(rows), "items": [{"label": row.get("label") or row.get("name"), "value": row.get("value")} for row in rows if row.get("value") is not None]}
+
+    def time_ranges(self) -> Dict[str, Any]:
+        rows = _option_rows(self.post_next("/cloudsaveserver/GameCloudSavePublish/GetTimeRangeList", {}))
+        return {"total": len(rows), "items": [{"label": row.get("label") or row.get("name"), "value": row.get("value")} for row in rows if row.get("value") is not None]}
+
+    @staticmethod
+    def _option_values(payload: Mapping[str, Any], path: str) -> set[str]:
+        values = {str(item["value"]) for item in payload.get("items", []) if isinstance(item, dict) and item.get("value") is not None}
+        if not values:
+            raise FuploadError("live option response contained no selectable values", kind="platform_data_error", details={"path": path})
+        return values
+
+    def _validate_business_options(self, doc: Mapping[str, Any]) -> None:
+        if "content_origin" in doc:
+            allowed = self._option_values(self.content_origins(), "$.content_origin")
+            if str(doc["content_origin"]) not in allowed:
+                raise ValidationError("content_origin is unavailable", path="$.content_origin")
+        if int(doc.get("subscribe_plan_level") or 0):
+            allowed = self._option_values(self.subscribe_plans(), "$.subscribe_plan_level")
+            if str(doc["subscribe_plan_level"]) not in allowed:
+                raise ValidationError("subscribe_plan_level is unavailable", path="$.subscribe_plan_level")
+        if doc.get("time_range"):
+            allowed = self._option_values(self.time_ranges(), "$.time_range")
+            if str(doc["time_range"]) not in allowed:
+                raise ValidationError("time_range is unavailable", path="$.time_range")
+
+    @staticmethod
+    def _wa_category_values(payload: Any) -> set[int]:
+        values: set[int] = set()
+        rows = _option_rows(payload)
+        def visit(row: Mapping[str, Any]) -> None:
+            raw = _pick(row, "id", "t_id", "category_id", "value", default=None)
+            if raw is not None and not isinstance(raw, bool):
+                try:
+                    values.add(int(raw))
+                except (TypeError, ValueError):
+                    pass
+            for key in ("children", "items", "options"):
+                for child in _list(row.get(key)):
+                    if isinstance(child, dict):
+                        visit(child)
+        for row in rows:
+            visit(row)
+        return values
+
+    def _validate_wa_categories(self, game_version_id: int, selected: Sequence[int]) -> None:
+        values = self._wa_category_values(self.wa_categories(game_version_id))
+        if not values:
+            raise FuploadError("live WA category response contained no selectable values", kind="platform_data_error")
+        invalid = sorted(set(map(int, selected)) - values)
+        if invalid:
+            raise ValidationError("category_id_list contains an unavailable live category", path="$.category_id_list")
 
     @staticmethod
     def _media_url(value: Any) -> str:
@@ -528,9 +650,21 @@ class NewBee:
         if invalid:
             raise ValidationError("unknown or unavailable ID(s): %s" % invalid, path=path)
 
+    def _validate_game_versions(self, selected: Iterable[str], path: str) -> None:
+        available = {
+            str(version).strip()
+            for item in self.game_versions()["items"]
+            for version in _list(item.get("versions"))
+            if str(version).strip()
+        }
+        invalid = sorted({str(value).strip() for value in selected} - available)
+        if invalid:
+            raise ValidationError("unknown or unavailable game version(s): %s" % invalid, path=path)
+
     def create_plugin(self, doc: Dict[str, Any]) -> Any:
         self.post("/creator/wow/mod/permission_check", {})
         self._validate_ids(doc["mod_categories"], [x["id"] for x in self.categories()["items"]], "$.mod_categories")
+        self._validate_business_options(doc)
         logo = doc.get("logo", "")
         if doc.get("logo_file"):
             logo = self.upload_media("/creator/wow/mod/upload_media", doc["logo_file"])
@@ -541,9 +675,9 @@ class NewBee:
             "mod_categories": doc["mod_categories"], "content_origin": doc["content_origin"],
             "content_format": doc["content_format"], "name": doc["name"],
             "description": doc["description"], "intro": doc["intro"], "logo": logo,
-            "screenshots": screenshots, "share_state": 1 if doc["public"] else 0,
+            "screenshots": screenshots, "share_state": 0,
             "subscribe_plan_level": doc.get("subscribe_plan_level", 0),
-            "link_to_channel": bool(doc.get("link_to_channel", False)) if doc["public"] else False,
+            "link_to_channel": False,
         }
         result = self.post("/creator/wow/mod/create", payload)
         ident = self._created_id(result, doc["name"])
@@ -556,10 +690,19 @@ class NewBee:
                 "plugin was submitted but its ID could not be resolved; read the author list before retrying",
                 kind="verification_required", verification_required=True,
             )
+        readback = self.get_plugin(ident)
+        _require_readback({
+            "name": doc["name"], "category_ids": doc["mod_categories"],
+            "content_origin": doc["content_origin"], "content_format": doc["content_format"],
+            "intro": doc["intro"], "description": doc["description"], "logo": logo,
+            "screenshots": screenshots, "public": False,
+            "subscribe_plan_level": doc.get("subscribe_plan_level", 0), "link_to_channel": False,
+        }, readback, "/creator/wow/mod/publish_detail")
         return {
             "result": result, "id": ident,
             "review_intent": bool(doc.get("public") and doc.get("submit_for_review")),
-            "readback": self.get_plugin(ident),
+            "public_after_first_version": bool(doc.get("public")),
+            "readback": readback,
         }
 
     def _plugin_form(self, ident: int, detail: Dict[str, Any]) -> Dict[str, Any]:
@@ -595,8 +738,16 @@ class NewBee:
             form["share_state"] = 1 if doc["public"] else 0
         if "mod_categories" in doc:
             self._validate_ids(form["mod_categories"], [x["id"] for x in self.categories()["items"]], "$.mod_categories")
+        self._validate_business_options(doc)
         result = self.post("/creator/wow/mod/edit", form)
-        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": self.get_plugin(ident)}
+        readback = self.get_plugin(ident)
+        mapping = {"mod_categories": "category_ids"}
+        expected = {mapping.get(name, name): value for name, value in doc.items() if name in {
+            "name", "mod_categories", "content_origin", "content_format", "intro", "description",
+            "logo", "screenshots", "subscribe_plan_level", "link_to_channel", "public",
+        }}
+        _require_readback(expected, readback, "/creator/wow/mod/publish_detail")
+        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback}
 
     def update_plugin(self, doc: Dict[str, Any]) -> Any:
         ident = int(doc["mod_id"])
@@ -606,7 +757,7 @@ class NewBee:
             remote = str(_pick(item, "t_display_name", "display_name", "version", "t_version", default="")).strip()
             if remote.lower() == str(doc["version"]).strip().lower():
                 raise ValidationError("version already exists; overwrite is not allowed", path="$.version")
-        self._validate_ids(doc["game_version_list"], [x["id"] for x in self.game_versions()["items"]], "$.game_version_list")
+        self._validate_game_versions(doc["game_version_list"], "$.game_version_list")
         size = Path(doc["file"]).stat().st_size
         if size > 300 * 1024 * 1024 or Path(doc["file"]).suffix.lower() not in (".zip", ".rar", ".7z"):
             raise ValidationError("plugin package must be .zip/.rar/.7z and no larger than 300 MB", path="$.file")
@@ -622,9 +773,38 @@ class NewBee:
         if "changelog" in doc:
             fields["changelog"] = str(doc["changelog"])
         result = self.upload("/creator/wow/mod_file/upload_mod_file", doc["file"], fields)
+        readback = {"plugin": self.get_plugin(ident), "versions": self.plugin_versions(ident)}
+        version_items = _list(_first_object(readback["versions"]).get("list"))
+        uploaded = next(
+            (
+                item for item in version_items
+                if str(_pick(item, "t_display_name", "display_name", "version", "t_version", default="")).strip().lower()
+                == str(doc["version"]).strip().lower()
+            ),
+            None,
+        )
+        if uploaded is None:
+            raise FuploadError(
+                "upload returned success but the new plugin version was not present in readback",
+                endpoint="/creator/wow/mod_file/mod_file_list",
+            )
+        bound_versions = _list(_pick(uploaded, "versions", "game_version_list", "t_game_version_list", default=[]))
+        bound_values = {
+            str(_pick(item, "version", "build", "support_version", "value", default=""))
+            if isinstance(item, dict) else str(item)
+            for item in bound_versions
+        }
+        missing_bindings = sorted(set(map(str, doc["game_version_list"])) - bound_values)
+        if not bound_versions or missing_bindings:
+            raise FuploadError(
+                "upload returned success but requested game-version bindings were not recorded",
+                endpoint="/creator/wow/mod_file/mod_file_list",
+                kind="verification_required", verification_required=True,
+                details={"missing_builds": missing_bindings},
+            )
         return {
             "result": result, "sha256": hashlib.sha256(Path(doc["file"]).read_bytes()).hexdigest(),
-            "readback": {"plugin": self.get_plugin(ident), "versions": self.plugin_versions(ident)},
+            "readback": readback,
         }
 
     @staticmethod
@@ -667,6 +847,7 @@ class NewBee:
         }
 
     def create_config(self, doc: Dict[str, Any]) -> Any:
+        self._validate_business_options(doc)
         backup = self.get_backup(int(doc["cloud_id"]))
         self._validate_backup_selection(backup, doc)
         pictures = self._resolve_media("/creator/wow/share_config/upload", doc.get("picture_urls", []), doc.get("picture_files", []))
@@ -690,12 +871,22 @@ class NewBee:
             ident = self._created_id(self.list_configs("", 0, 100), doc["title"], doc["cloud_id"])
         if ident <= 0:
             raise FuploadError("configuration was submitted but its ID could not be resolved; read the author list before retrying", kind="verification_required", verification_required=True)
-        return {"result": result, "id": ident, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": self.get_config(ident)}
+        readback = self.get_config(ident)
+        expected = {name: doc[name] for name in (
+            "title", "content", "content_format", "intro", "content_origin", "public",
+            "subscribe_plan_level", "price", "time_range", "linked_mods", "ignored_unknown_mods",
+            "ignored_materials", "ignored_fronts", "roleid",
+        ) if name in doc}
+        expected["picture_urls"] = pictures
+        expected["link_to_channel"] = bool(doc.get("link_to_channel", False)) if doc["public"] else False
+        _require_readback(expected, readback, "/creator/wow/share_config/details_aps")
+        return {"result": result, "id": ident, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback}
 
     def update_config(self, doc: Dict[str, Any], metadata_only: bool) -> Any:
         ident = int(doc["id"])
         form = self._config_form(ident, self.get_config_raw(ident))
         if metadata_only:
+            self._validate_business_options(doc)
             mapping = {
                 "title": "title", "content": "content", "content_format": "content_format", "intro": "intro",
                 "picture_urls": "pic_url", "content_origin": "content_origin", "link_to_channel": "link_to_channel",
@@ -720,7 +911,14 @@ class NewBee:
             selection = {name: form[name] for name in ("linked_mods", "ignored_unknown_mods", "ignored_materials", "ignored_fronts", "roleid")}
             self._validate_backup_selection(backup, selection)
         result = self.post("/creator/wow/share_config/update", form)
-        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": self.get_config(ident)}
+        readback = self.get_config(ident)
+        expected = {name: value for name, value in doc.items() if name in {
+            "cloud_id", "title", "content", "content_format", "intro", "picture_urls", "content_origin",
+            "public", "link_to_channel", "subscribe_plan_level", "price", "time_range", "linked_mods",
+            "ignored_unknown_mods", "ignored_materials", "ignored_fronts", "roleid",
+        }}
+        _require_readback(expected, readback, "/creator/wow/share_config/details_aps")
+        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback}
 
     def _wa_form(self, ident: int, detail: Dict[str, Any]) -> Dict[str, Any]:
         return {
@@ -744,11 +942,9 @@ class NewBee:
         }
 
     def create_wa(self, doc: Dict[str, Any]) -> Any:
-        categories = self.wa_categories(int(doc["game_version_id"]))
-        available = set(_numeric_ids(categories))
-        selected = set(_numeric_ids(doc["category_id_list"]))
-        if available and not selected.issubset(available):
-            raise ValidationError("category_id_list contains an unavailable live category", path="$.category_id_list")
+        self._validate_ids([doc["game_version_id"]], [x["id"] for x in self.game_versions()["items"]], "$.game_version_id")
+        self._validate_wa_categories(int(doc["game_version_id"]), doc["category_id_list"])
+        self._validate_business_options(doc)
         self._validate_attachments(doc.get("attachments", []))
         thumbnail = doc.get("thumbnail", "")
         if doc.get("thumbnail_file"):
@@ -776,7 +972,16 @@ class NewBee:
             ident = self._created_id(self.list_was("", 0, 100), doc["name"])
         if ident <= 0:
             raise FuploadError("WA was submitted but its ID could not be resolved; read the author list before retrying", kind="verification_required", verification_required=True)
-        return {"result": result, "id": ident, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": self.get_wa(ident)}
+        readback = self.get_wa(ident)
+        expected = {name: doc[name] for name in (
+            "game_version_id", "name", "intro", "description", "content_format", "content_origin",
+            "subscribe_plan_level", "price", "link_to_channel", "attachments",
+        ) if name in doc}
+        expected.update({"thumbnail": thumbnail, "images": images, "public": doc["public"], "categories": [{"id": value, "name": None} for value in doc["category_id_list"]]})
+        actual_for_compare = dict(readback)
+        actual_for_compare["categories"] = [{"id": item.get("id"), "name": None} for item in readback.get("categories", [])]
+        _require_readback(expected, actual_for_compare, "/creator/wow/wa/detail_aps")
+        return {"result": result, "id": ident, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback}
 
     def edit_wa(self, doc: Dict[str, Any]) -> Any:
         ident = int(doc["id"])
@@ -797,14 +1002,24 @@ class NewBee:
             form["images"] = self._resolve_media("/creator/wow/wa/upload_media", form["images"], doc["image_files"])
         if "public" in doc:
             form["share_state"] = 1 if doc["public"] else 2
-        categories = self.wa_categories(int(form["game_version_id"]))
-        available = set(_numeric_ids(categories))
-        selected = set(_numeric_ids(form["category_id_list"]))
-        if available and not selected.issubset(available):
-            raise ValidationError("category_id_list contains an unavailable live category", path="$.category_id_list")
+        self._validate_ids([form["game_version_id"]], [x["id"] for x in self.game_versions()["items"]], "$.game_version_id")
+        self._validate_wa_categories(int(form["game_version_id"]), form["category_id_list"])
+        self._validate_business_options(doc)
         self._validate_attachments(form.get("attachments", []))
         result = self.post("/creator/wow/wa/update", form)
-        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": self.get_wa(ident)}
+        readback = self.get_wa(ident)
+        mapping = {"category_id_list": "categories"}
+        expected = {mapping.get(name, name): value for name, value in doc.items() if name in {
+            "game_version_id", "name", "intro", "description", "content_format", "thumbnail", "images",
+            "category_id_list", "content_origin", "subscribe_plan_level", "price", "public",
+            "link_to_channel", "attachments",
+        }}
+        if "categories" in expected:
+            expected["categories"] = [{"id": value, "name": None} for value in expected["categories"]]
+        actual_for_compare = dict(readback)
+        actual_for_compare["categories"] = [{"id": item.get("id"), "name": None} for item in readback.get("categories", [])]
+        _require_readback(expected, actual_for_compare, "/creator/wow/wa/detail_aps")
+        return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback}
 
     def update_wa(self, doc: Dict[str, Any]) -> Any:
         ident = int(doc["id"])
@@ -829,7 +1044,11 @@ class NewBee:
             ),
         }
         result = self.post("/creator/wow/wa/update_wa_str", payload)
-        return {"result": result, "version": version, "readback": self.latest_wa(ident)}
+        readback = self.latest_wa(ident)
+        actual_version = str(_pick(_first_object(readback), "version", "t_version", default=""))
+        if actual_version != version:
+            raise FuploadError("WA update version was not present in readback", kind="verification_required", verification_required=True, endpoint="/creator/wow/wa_log/latest_str_info")
+        return {"result": result, "version": version, "readback": readback}
 
     def latest_wa(self, ident: int) -> Any:
         return _redact_wa(self.post("/creator/wow/wa_log/latest_str_info", {"wa_id": ident}))
@@ -838,16 +1057,17 @@ class NewBee:
         allowed = {"name", "install_type", "install_path", "value", "is_compressed", "timestamp"}
         paths = self.attachment_paths()
         candidates = []
-        def walk(value: Any) -> None:
-            if isinstance(value, dict):
-                if "value" in value or "extract_base_dir" in value:
+        def walk_rows(rows: Sequence[Any]) -> None:
+            for value in rows:
+                if not isinstance(value, dict):
+                    continue
+                if "value" in value and ("extract_base_dir" in value or "install_path" in value):
                     candidates.append(value)
-                for child in value.values():
-                    walk(child)
-            elif isinstance(value, list):
-                for child in value:
-                    walk(child)
-        walk(paths)
+                for key in ("children", "items", "options"):
+                    walk_rows(_list(value.get(key)))
+        walk_rows(_option_rows(paths))
+        if attachments and not candidates:
+            raise FuploadError("live attachment path response contained no selectable values", kind="platform_data_error")
         for index, item in enumerate(attachments):
             path = "$.attachments[%d]" % index
             if not isinstance(item, dict):
@@ -866,6 +1086,8 @@ class NewBee:
                 raise ValidationError("install type/path is not in the current platform options", path=path + ".install_path")
 
     def execute_write(self, resource: str, action: str, doc: Dict[str, Any]) -> Any:
+        if action == "delete" and resource in ("plugin", "config", "wa"):
+            return self.delete(resource, doc)
         if (resource, action) == ("plugin", "create"): return self.create_plugin(doc)
         if (resource, action) == ("plugin", "update"): return self.update_plugin(doc)
         if (resource, action) == ("plugin", "edit"): return self.edit_plugin(doc)
@@ -911,6 +1133,31 @@ class NewBee:
             return {"url": self.upload_media("/creator/wow/wa/upload_media", doc["file"])}
         raise FuploadError("unsupported NewBeeBox write operation", kind="unsupported_operation")
 
+    def delete(self, resource: str, doc: Mapping[str, Any]) -> Dict[str, Any]:
+        ident = int(doc["id"])
+        getters = {"plugin": self.get_plugin, "config": self.get_config, "wa": self.get_wa}
+        listers = {
+            "plugin": lambda keyword: self.list_plugins(keyword, 1, 100),
+            "config": lambda keyword: self.list_configs(keyword, 0, 100),
+            "wa": lambda keyword: self.list_was(keyword, 0, 100),
+        }
+        endpoints = {
+            "plugin": "/creator/wow/mod/remove",
+            "config": "/creator/wow/share_config/delete",
+            "wa": "/creator/wow/wa/delete",
+        }
+        before = getters[resource](ident)
+        name = str(before.get("name") or before.get("title") or "")
+        response = self.post(endpoints[resource], {"id": ident})
+        listing = listers[resource](name)
+        _total, rows, _obj = _paged_items(listing)
+        if any(int(_pick(row, "id", "t_id", "mod_id", "wa_id", default=0) or 0) == ident for row in rows):
+            raise FuploadError(
+                "delete response succeeded but the target remains in the author list",
+                kind="verification_required", endpoint=endpoints[resource], verification_required=True,
+            )
+        return {"result": response, "deleted": True, "id": ident, "before": before, "readback": {"present": False}}
+
     def execute_read(self, resource: str, action: str, args: Any) -> Any:
         if resource == "session" and action == "doctor":
             self.headers
@@ -946,4 +1193,8 @@ class NewBee:
             if action == "co-author-list": return self.post("/creator/co_author/list", {"content_type": 3, "content_id": args.id})
             if action == "reference-search": return self.post("/creator/content_reference/search", {"keyword": args.keyword, "limit": 20, "target_types": [2]})
             if action == "reference-list": return self.post("/creator/content_reference/list", {"content_type": 2, "content_id": args.id})
+        if resource == "options":
+            if action == "content-origins": return self.content_origins()
+            if action == "subscribe-plans": return self.subscribe_plans()
+            if action == "time-ranges": return self.time_ranges()
         raise FuploadError("unsupported NewBeeBox read operation", kind="unsupported_operation")

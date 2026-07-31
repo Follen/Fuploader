@@ -1,0 +1,16 @@
+{
+  "schema": "fupload.v1.newbee.config.edit",
+  "id": 58806,
+  "title": "Fupload Config Test NB 20260731-191228 Edited",
+  "content": "Temporary private configuration after metadata edit verification.",
+  "content_format": 2,
+  "intro": "Metadata edit readback test",
+  "picture_urls": ["user_media/default/558213/9380791a67412ecb228f3789c2dbd878.png"],
+  "content_origin": 1,
+  "public": false,
+  "submit_for_review": false,
+  "link_to_channel": false,
+  "subscribe_plan_level": 0,
+  "price": 0,
+  "time_range": ""
+}

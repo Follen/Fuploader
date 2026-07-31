@@ -22,15 +22,16 @@ On Windows, prefer `py -3` only if `python` is unavailable. Do not use a binary,
 When the user has not already stated both dimensions, ask in one short message:
 
 1. Platform: NewBeeBox or DD.
-2. Resource and action: plugin/configuration/WA, then create/content update/metadata edit.
+2. Resource and action: plugin/configuration/WA, then create/content update/metadata edit/delete.
 
 Map natural language consistently:
 
 - `create`: create the main record. If first content is a separate platform action, plan it as a following atomic step.
 - `update`: publish a plugin version, change selected configuration-backup content, or publish a WA/string version.
 - `edit`: change metadata, media, categories, commercial settings, associations, channels, or explicit public/review state.
+- `delete`: delete one main record only. It never deletes an individual version, media object, or associated record.
 
-Never offer delete, drafts, guides, messages, or GUI automation.
+Never offer bulk delete, version-file delete, drafts, guides, messages, or GUI automation.
 
 ## Load only the needed contract
 
@@ -44,6 +45,10 @@ Never offer delete, drafts, guides, messages, or GUI automation.
 Inspect the user-provided project or current workspace for `.toc`, README, changelog, Git changes, archives, screenshots, logos, and WA material files. Do not modify or package the user's project until that is part of the agreed plan.
 
 Use read-only CLI commands to discover the current account's records, target detail, versions, backups, categories, game branches/builds, installation paths, life types, VIP levels, channels, and association candidates. Never ask the user to copy an ID that the CLI can query.
+
+For NewBeeBox, always read `newbee options content-origins`, `subscribe-plans`, and `time-ranges` when the corresponding field is present. Also read plugin categories/builds, WA categories, and attachment paths for those fields. Empty option output blocks the write. Plugin compatibility uses build strings from `game-versions.items[].versions`, never the parent branch `id`.
+
+For DD, always read game types/builds and the resource-specific category tree. A plugin primary category is a top-level item and secondary IDs are children of that item. Validate associations as `(act_type,sn)`. A room-only selection has `room_id` with empty `channel_id` and `channel_type`; a channel selection requires both channel fields.
 
 Run the platform session doctor before authenticated reads. NewBee credentials must come from the Windows Known Folder auth-store and all authenticated requests must use the CLI's fixed official HTTPS origins. DD discovery must accept only an Authenticode-valid executable from an allowed official NetEase publisher. Do not set endpoint, credential-directory, or DD executable-path environment overrides.
 
@@ -73,9 +78,13 @@ Before the first write, present one complete human-readable plan containing:
 
 Obtain one explicit confirmation for that exact plan. If the plan changes materially, confirm the changed plan once.
 
+For delete, first run the resource `get` command, show the exact name and ID/SN, and obtain confirmation for that single record. Write a delete input containing only the schema, `id` or `sn`, and `confirm: "DELETE"`. Do not reuse confirmation for another record and do not retry an uncertain delete.
+
 ## Execute and verify
 
 Run writes serially. Parse JSON output; never scrape human text. After each successful step, immediately run the corresponding get/list/version/history command and compare the intended fields. Treat “submitted for review” and “under review” as distinct from “approved” or “publicly visible.”
+
+NewBeeBox plugin publication is three atomic writes when public visibility is requested: create the record privately, upload and verify the first version, then edit to public with explicit review intent. Never send a public `share_state` during plugin create.
 
 Stop on the first failure. Report completed steps, retained IDs/SNs or media references, the redacted failure, whether verification is required, and the smallest safe retry. When a write result is uncertain, read back first and do not automatically resend.
 

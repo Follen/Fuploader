@@ -1,0 +1,9 @@
+{
+  "schema": "fupload.v1.newbee.plugin.update",
+  "mod_id": 24462,
+  "version": "1.0.0",
+  "game_version_list": ["12.1.0"],
+  "file": "D:\\Code\\Fuploader\\publish\\20260731-191228-cross-platform-contract-test\\assets\\FuploadContractTest.zip",
+  "changelog": "Initial private contract verification version",
+  "link_to_channel": false
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "fupload.v1.dd.wa.create",
+  "game_type": 10001,
+  "scope": "private",
+  "name": "Fupload WA Test DD 20260731-191228",
+  "game_version": "12.0.7",
+  "brief_desc": "Private WA contract test",
+  "display_imgs": ["https://uires.w.163.com/img/img/U2JyVpbkryjEylTG5GWknOYJsEpPFyRq"],
+  "category_ids": ["ui_original"],
+  "content": "FUPLOAD-CONTRACT-TEST-DD-20260731-191228",
+  "desc": "<p>Temporary private WA contract verification.</p>",
+  "update_desc": "Initial private verification version",
+  "version": "1",
+  "with_file": false,
+  "share_code_life_type": "seven_day",
+  "need_buy": false,
+  "jump_room": false,
+  "creation_statement": "original",
+  "with_associate": false,
+  "need_anchor_vip": false
+}

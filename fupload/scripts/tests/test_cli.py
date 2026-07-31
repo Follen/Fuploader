@@ -41,7 +41,7 @@ class CLITests(unittest.TestCase):
 
     def test_every_cli_leaf_has_complete_help_and_dispatch(self) -> None:
         leaves = parser_leaves(build_parser())
-        self.assertEqual(len(leaves), 64)
+        self.assertEqual(len(leaves), 73)
         for path, parser in leaves:
             with self.subTest(path=" ".join(path)):
                 handler = parser.get_default("handler")
@@ -167,6 +167,12 @@ class CLITests(unittest.TestCase):
             "dd-plugin-update.json": ("dd", "plugin", "update"),
             "dd-config-update.json": ("dd", "config", "update"),
             "dd-wa-edit.json": ("dd", "wa", "edit"),
+            "newbee-plugin-delete.json": ("newbee", "plugin", "delete"),
+            "newbee-config-delete.json": ("newbee", "config", "delete"),
+            "newbee-wa-delete.json": ("newbee", "wa", "delete"),
+            "dd-plugin-delete.json": ("dd", "plugin", "delete"),
+            "dd-config-delete.json": ("dd", "config", "delete"),
+            "dd-wa-delete.json": ("dd", "wa", "delete"),
         }
         with tempfile.TemporaryDirectory() as directory:
             local_file = Path(directory) / "local.zip"

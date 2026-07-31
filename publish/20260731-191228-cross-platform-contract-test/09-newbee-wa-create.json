@@ -1,0 +1,21 @@
+{
+  "schema": "fupload.v1.newbee.wa.create",
+  "game_version_id": 2,
+  "name": "Fupload WA Test NB 20260731-191228",
+  "intro": "Create readback test",
+  "description": "Temporary private WA contract verification.",
+  "content_format": 2,
+  "thumbnail": "wow_wa/20260730/dc33a46e3b92101515d13e163559437f.png",
+  "images": [],
+  "category_id_list": [87],
+  "content_origin": 1,
+  "subscribe_plan_level": 0,
+  "price": 0,
+  "time_range": "",
+  "public": false,
+  "link_to_channel": false,
+  "attachments": [],
+  "wa_str": "FUPLOAD-CONTRACT-TEST-NB-20260731-191228",
+  "wa_log": "Initial private verification version",
+  "string_mode": "single"
+}

@@ -28,7 +28,9 @@ For partial edit/update, the provider performs: target GET, dynamic-option GETs,
 
 ## Review and retries
 
-New records remain private unless the input explicitly selects public and review submission. Updates never change visibility implicitly. If output contains `verification_required`, query the target before any retry.
+NewBeeBox plugins are always created privately. If public review was selected, upload and verify the first version before the separate public edit. Other new records follow their platform visibility contract. Updates never change visibility implicitly. If output contains `verification_required`, query the target before any retry.
+
+Delete inputs require one `id` or `sn` and literal `confirm: "DELETE"`. The provider reads the exact target before deletion and verifies absence from the author list afterward. Never batch, retry an uncertain delete, or treat deletion of a main record as deletion of its versions or uploaded media.
 
 ## Local artifact checklist
 

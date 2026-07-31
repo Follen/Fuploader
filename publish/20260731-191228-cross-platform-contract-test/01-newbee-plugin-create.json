@@ -1,0 +1,14 @@
+{
+  "schema": "fupload.v1.newbee.plugin.create",
+  "name": "Fupload Contract Test NB 20260731-191228",
+  "mod_categories": [1017],
+  "content_origin": 1,
+  "content_format": 2,
+  "intro": "Private automated contract verification",
+  "description": "Temporary private record for create, update, edit, readback, and delete verification.",
+  "logo": "user_media/default/558213/de2effae5964f9280367c2e8b58364c1.png",
+  "screenshots": ["user_media/default/558213/9380791a67412ecb228f3789c2dbd878.png"],
+  "public": false,
+  "subscribe_plan_level": 0,
+  "link_to_channel": false
+}

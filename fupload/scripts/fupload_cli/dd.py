@@ -11,6 +11,7 @@ import queue
 import subprocess
 import threading
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 import urllib.parse
@@ -322,7 +323,14 @@ class Sidecar:
         if response.get("id") != self.counter:
             raise FuploadError("DD sidecar response order was invalid", kind="sidecar_error")
         if not response.get("ok"):
-            raise FuploadError(str((response.get("error") or {}).get("message") or "DD operation failed"), kind="platform_error")
+            message = str((response.get("error") or {}).get("message") or "DD operation failed")
+            timed_out = "timed out" in message.lower() or "timeout" in message.lower()
+            raise FuploadError(
+                message,
+                kind="timeout" if timed_out else "platform_error",
+                endpoint=endpoint,
+                verification_required=uncertain,
+            )
         return response.get("data")
 
     def get(self, path: str, params: Optional[Mapping[str, Any]] = None) -> Any:
@@ -403,38 +411,120 @@ def items(payload: Any) -> List[Dict[str, Any]]:
     return []
 
 
-def _records(payload: Any) -> List[Dict[str, Any]]:
-    records: List[Dict[str, Any]] = []
-
-    def walk(value: Any) -> None:
-        if isinstance(value, dict):
-            if any(key in value for key in ("id", "_id", "c_id", "sn", "value", "game_version", "game_version_id", "category_id")):
-                records.append(value)
-            for child in value.values():
-                if isinstance(child, (dict, list)):
-                    walk(child)
-        elif isinstance(value, list):
-            for child in value:
-                walk(child)
-
-    walk(payload)
-    return records
-
-
-def _record_values(payload: Any, keys: Sequence[str]) -> set[str]:
-    values: set[str] = set()
+def _option_items(payload: Any) -> List[Any]:
+    """Read only documented result-level option containers."""
+    if isinstance(payload, list):
+        return list(payload)
     raw = result(payload)
-    if isinstance(raw, list) and all(not isinstance(item, (dict, list)) for item in raw):
-        values.update(str(item) for item in raw if item is not None)
-    for record in _records(payload):
+    if isinstance(raw, list):
+        return list(raw)
+    if isinstance(raw, dict):
+        for key in ("data_list", "list", "rows", "items", "categories", "versions"):
+            if isinstance(raw.get(key), list):
+                return list(raw[key])
+    return []
+
+
+def _option_values(payload: Any, keys: Sequence[str]) -> set[str]:
+    values: set[str] = set()
+    for item in _option_items(payload):
+        if not isinstance(item, dict):
+            if item not in (None, ""):
+                values.add(str(item))
+            continue
         for key in keys:
-            if record.get(key) is not None:
-                values.add(str(record[key]))
-        if "c_id" in record:
-            values.add(str(record["c_id"]))
-        if "_id" in record:
-            values.add(str(record["_id"]))
+            if item.get(key) not in (None, ""):
+                values.add(str(item[key]))
     return values
+
+
+def _category_id(item: Mapping[str, Any]) -> Optional[str]:
+    for key in ("id", "c_id", "category_id", "value"):
+        if item.get(key) not in (None, ""):
+            return str(item[key])
+    return None
+
+
+def _addon_category_tree(payload: Any) -> Dict[str, set[str]]:
+    tree: Dict[str, set[str]] = {}
+    for item in _option_items(payload):
+        if not isinstance(item, dict):
+            continue
+        parent = _category_id(item)
+        if parent is None:
+            continue
+        children = set()
+        for child in item.get("children") or []:
+            if isinstance(child, dict):
+                child_id = _category_id(child)
+                if child_id is not None:
+                    children.add(child_id)
+        tree[parent] = children
+    return tree
+
+
+def _wa_category_values(payload: Any) -> set[str]:
+    values: set[str] = set()
+    def visit(rows: Sequence[Any]) -> None:
+        for item in rows:
+            if not isinstance(item, dict):
+                continue
+            ident = _category_id(item)
+            if ident is not None:
+                values.add(ident)
+            for key in ("children", "items", "options"):
+                child_rows = item.get(key)
+                if isinstance(child_rows, list):
+                    visit(child_rows)
+    visit(_option_items(payload))
+    return values
+
+
+def _normalized(value: Any) -> Any:
+    if isinstance(value, bool) or value is None:
+        return value
+    if isinstance(value, (int, float, str)):
+        return str(value)
+    if isinstance(value, list):
+        return sorted((_normalized(item) for item in value), key=repr)
+    if isinstance(value, dict):
+        return {key: _normalized(item) for key, item in sorted(value.items())}
+    return str(value)
+
+
+def _same_readback(expected: Any, actual: Any) -> bool:
+    if isinstance(expected, dict):
+        return isinstance(actual, dict) and all(
+            key in actual and _same_readback(value, actual[key])
+            for key, value in expected.items()
+        )
+    if isinstance(expected, list):
+        if not isinstance(actual, list):
+            return False
+        unmatched = list(actual)
+        for wanted in expected:
+            match = next(
+                (index for index, candidate in enumerate(unmatched) if _same_readback(wanted, candidate)),
+                None,
+            )
+            if match is None:
+                return False
+            unmatched.pop(match)
+        return not unmatched
+    return _normalized(expected) == _normalized(actual)
+
+
+def _verify_fields(expected: Mapping[str, Any], actual: Mapping[str, Any], fields: Sequence[str], endpoint: str) -> None:
+    mismatches = [
+        name for name in fields
+        if name in expected and (name not in actual or not _same_readback(expected[name], actual[name]))
+    ]
+    if mismatches:
+        raise FuploadError(
+            "write readback did not match field(s): %s" % ", ".join(sorted(mismatches)),
+            kind="verification_required", endpoint=endpoint, verification_required=True,
+            details={"fields": sorted(mismatches)},
+        )
 
 
 def author_listing(session: Sidecar, resource: str, keyword: str, game_type: Any) -> Any:
@@ -523,6 +613,21 @@ def author_item(session: Sidecar, resource: str, reference: str, name: str, game
     return {}
 
 
+def _timestamp(value: Any) -> Optional[float]:
+    if isinstance(value, (int, float)):
+        return float(value)
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        return float(text)
+    except ValueError:
+        try:
+            return datetime.fromisoformat(text.replace("Z", "+00:00")).timestamp()
+        except ValueError:
+            return None
+
+
 def safe_game_types(payload: Any) -> Dict[str, Any]:
     result_items = []
     for item in items(payload):
@@ -540,22 +645,26 @@ def safe_channels(payload: Any) -> Dict[str, Any]:
     else:
         raw_items = raw if isinstance(raw, list) else []
     result_items = []
-    def walk(value: Any) -> None:
-        if isinstance(value, dict):
-            if value.get("teamId") or value.get("channelId") or value.get("id"):
+    def walk(rows: Sequence[Any], inherited_room_id: str = "", inherited_room_name: Any = None) -> None:
+        for value in rows:
+            if not isinstance(value, dict):
+                continue
+            room_id = str(value.get("teamId") or value.get("team_id") or value.get("room_id") or inherited_room_id or "")
+            room_name = value.get("teamName") or value.get("team_name") or value.get("room_name") or inherited_room_name
+            channel_id = str(value.get("channelId") or value.get("channel_id") or "")
+            channel_type = str(value.get("channelType") or value.get("channel_type") or "")
+            if room_id and (value.get("teamId") or value.get("team_id") or value.get("room_id") or channel_id):
                 result_items.append({
-                    "room_id": str(value.get("teamId") or value.get("team_id") or value.get("room_id") or value.get("id") or ""),
-                    "room_name": value.get("teamName") or value.get("team_name") or value.get("room_name") or value.get("name"),
-                    "channel_id": str(value.get("channelId") or value.get("channel_id") or ""),
-                    "channel_name": value.get("channelName") or value.get("channel_name") or value.get("name"),
-                    "channel_type": str(value.get("channelType") or value.get("channel_type") or ""),
+                    "room_id": room_id,
+                    "room_name": room_name,
+                    "channel_id": channel_id,
+                    "channel_name": value.get("channelName") or value.get("channel_name") or (value.get("name") if channel_id else None),
+                    "channel_type": channel_type,
                 })
-            for child in value.values():
-                if isinstance(child, (list, dict)):
-                    walk(child)
-        elif isinstance(value, list):
-            for child in value:
-                walk(child)
+            for key in ("channelList", "channels", "children", "items"):
+                children = value.get(key)
+                if isinstance(children, list):
+                    walk(children, room_id, room_name)
     walk(raw_items)
     unique = []
     seen = set()
@@ -671,15 +780,23 @@ def safe_backup_detail(value: Any) -> Dict[str, Any]:
         result_value[name] = summaries
     wtf = value.get("wtf") or {}
     role_summary = []
+    backup_reference = str(value.get("sn") or value.get("backup_sn") or "")
     for account in (wtf.get("accounts") if isinstance(wtf, dict) else []) or []:
         if not isinstance(account, dict):
             continue
         for server in account.get("servers") or []:
             if isinstance(server, dict):
-                role_summary.append({
-                    "account": account.get("name"), "server": server.get("name"),
-                    "roles": [str(item) for item in server.get("items") or []],
-                })
+                for index, role in enumerate(server.get("items") or []):
+                    role_id = role.get("role_id") or role.get("id") or role.get("name") if isinstance(role, dict) else role
+                    selector_source = "%s\0%s\0%s\0%d\0%s" % (
+                        backup_reference, account.get("name"), server.get("name"), index, role_id,
+                    )
+                    role_summary.append({
+                        "selector": "wtf_" + hashlib.sha256(selector_source.encode("utf-8")).hexdigest()[:20],
+                        "account": account.get("name"), "server": server.get("name"),
+                        "name": role.get("name") if isinstance(role, dict) else str(role),
+                        "role_id": role_id if isinstance(role, dict) and (role.get("role_id") is not None or role.get("id") is not None) else None,
+                    })
     result_value["wtf_roles"] = role_summary
     retail = value.get("retail_ui_config")
     if isinstance(retail, dict):
@@ -940,6 +1057,7 @@ def plugin_form(value: Mapping[str, Any]) -> Dict[str, Any]:
         category_id for category_id in (form.get("second_category_ids") or [])
         if str(category_id) != "999"
     ]
+    normalize_commercial(form)
     return form
 
 
@@ -971,17 +1089,36 @@ def selected_group(backup: Mapping[str, Any], current: Mapping[str, Any], name: 
 
 
 def wtf_tree(backup: Mapping[str, Any], selected_roles: Sequence[str]) -> Dict[str, Any]:
-    wanted = set(map(str, selected_roles))
+    wanted = list(map(str, selected_roles))
     accounts = []
     raw = (backup.get("wtf") or {}).get("accounts") or backup.get("wtf_accounts") or []
+    candidates: List[Tuple[str, str, str, int, Any, str]] = []
+    backup_reference = str(backup.get("sn") or backup.get("backup_sn") or "")
+    for account in raw:
+        account_name = str(account.get("name") or "")
+        for server in account.get("servers", []):
+            server_name = str(server.get("name") or "")
+            for index, role in enumerate(server.get("items", [])):
+                role_id = role.get("role_id") or role.get("id") or role.get("name") if isinstance(role, dict) else role
+                selector_source = "%s\0%s\0%s\0%d\0%s" % (backup_reference, account_name, server_name, index, role_id)
+                selector = "wtf_" + hashlib.sha256(selector_source.encode("utf-8")).hexdigest()[:20]
+                candidates.append((account_name, server_name, str(role_id), index, role, selector))
+    selected_positions: set[Tuple[str, str, int]] = set()
+    for selected in wanted:
+        exact = [(account, server, index) for account, server, _role_id, index, _role, selector in candidates if selector == selected]
+        legacy = [(account, server, index) for account, server, role_id, index, _role, _selector in candidates if role_id == selected]
+        matches = exact or legacy
+        if len(matches) != 1:
+            message = "WTF role selector is absent" if not matches else "legacy WTF role value is ambiguous; use the backup selector"
+            raise ValidationError(message, path="$.wtf_role_ids")
+        selected_positions.add(matches[0])
     for account in raw:
         account_copy = {k: copy.deepcopy(v) for k, v in account.items() if k != "servers"}
         servers = []
         for server in account.get("servers", []):
             chosen = []
-            for role in server.get("items", []):
-                role_id = role.get("role_id") or role.get("id") if isinstance(role, dict) else role
-                if str(role_id) in wanted:
+            for index, role in enumerate(server.get("items", [])):
+                if (str(account.get("name") or ""), str(server.get("name") or ""), index) in selected_positions:
                     chosen.append(copy.deepcopy(role))
             if chosen:
                 server_copy = {k: copy.deepcopy(v) for k, v in server.items() if k != "items"}
@@ -990,12 +1127,6 @@ def wtf_tree(backup: Mapping[str, Any], selected_roles: Sequence[str]) -> Dict[s
         if servers:
             account_copy["servers"] = servers
             accounts.append(account_copy)
-    found = {
-        str(role.get("role_id") or role.get("id") if isinstance(role, dict) else role)
-        for account in accounts for server in account["servers"] for role in server["items"]
-    }
-    if found != wanted:
-        raise ValidationError("one or more WTF roles are absent from the chosen backup", path="$.wtf_role_ids")
     return {"accounts": accounts}
 
 
@@ -1097,6 +1228,27 @@ class DD:
     platform = "dd"
 
     @staticmethod
+    def _fresh_detail(session: Sidecar, resource: str, reference: str) -> Dict[str, Any]:
+        endpoint = {"plugin": "/addon/detail_v2", "config": "/share/detail", "wa": "/wa/detail"}[resource]
+        for attempt in range(2):
+            current = detail(session, resource, reference)
+            game_type = current.get("game_type") or (current.get("game_types") or [None])[0]
+            name = str(current.get("name") or current.get("title") or "")
+            listing = author_item(session, resource, reference, name, game_type)
+            detail_time = _timestamp(current.get("mtime") or current.get("update_time"))
+            list_time = _timestamp(listing.get("mtime") or listing.get("update_time"))
+            if listing and detail_time is not None and list_time is not None and detail_time >= list_time:
+                return current
+            if attempt == 0:
+                time.sleep(1)
+        raise FuploadError(
+            "DD detail is stale relative to the author list; wait for read models to converge before writing",
+            kind="verification_required",
+            endpoint=endpoint,
+            verification_required=True,
+        )
+
+    @staticmethod
     def _archive(path: str, suffixes: Sequence[str], limit: int) -> None:
         source = Path(path)
         if source.suffix.lower() not in suffixes:
@@ -1106,7 +1258,7 @@ class DD:
 
     @staticmethod
     def _validate_choices(payload: Any, selected: Sequence[Any], keys: Sequence[str], path: str) -> None:
-        available = _record_values(payload, keys)
+        available = _option_values(payload, keys)
         values = [value for value in selected if value not in (None, "")]
         if values and not available:
             raise FuploadError("live option response contained no selectable values", kind="platform_data_error")
@@ -1117,15 +1269,29 @@ class DD:
         game_type = form.get("game_type")
         if resource == "plugin":
             versions = session.get("/game_versions/list", {"game_type": game_type})
-            self._validate_choices(versions, form.get("game_versions") or [], ("id", "game_version", "game_version_id", "value"), "$.game_versions")
+            self._validate_choices(versions, form.get("game_versions") or [], ("game_version", "version", "value"), "$.game_versions")
             categories = session.get("/addon/category", {})
-            self._validate_choices(categories, [form.get("primary_category_id")], ("id", "category_id", "value"), "$.primary_category_id")
-            self._validate_choices(categories, form.get("second_category_ids") or [], ("id", "category_id", "value"), "$.second_category_ids")
+            tree = _addon_category_tree(categories)
+            if not tree:
+                raise FuploadError("live plugin category response contained no selectable values", kind="platform_data_error")
+            primary = str(form.get("primary_category_id") or "")
+            if primary not in tree:
+                raise ValidationError("primary_category_id must be a live top-level category", path="$.primary_category_id")
+            selected_children = {str(value) for value in form.get("second_category_ids") or []}
+            if selected_children - tree[primary]:
+                raise ValidationError("second_category_ids must belong to primary_category_id", path="$.second_category_ids")
+            if tree[primary] and not selected_children:
+                raise ValidationError("select at least one child category", path="$.second_category_ids")
         elif resource == "wa":
             versions = session.get("/game_versions/list", {"game_type": game_type})
-            self._validate_choices(versions, [form.get("game_version")], ("id", "game_version", "game_version_id", "value"), "$.game_version")
+            self._validate_choices(versions, [form.get("game_version")], ("game_version", "version", "value"), "$.game_version")
             categories = session.get("/wa/categories", {"game_type": game_type})
-            self._validate_choices(categories, [value for value in (form.get("category_ids") or []) if str(value) != "ui_original"], ("id", "category_id", "value"), "$.category_ids")
+            available_categories = _wa_category_values(categories)
+            selected_categories = {str(value) for value in (form.get("category_ids") or []) if str(value) != "ui_original"}
+            if selected_categories and not available_categories:
+                raise FuploadError("live WA category response contained no selectable values", kind="platform_data_error")
+            if selected_categories - available_categories:
+                raise ValidationError("category_ids contains an unavailable live option", path="$.category_ids")
 
         if form.get("buy_life_type"):
             self._validate_choices(LIFE_TYPES, [form.get("buy_life_type")], ("value",), "$.buy_life_type")
@@ -1150,28 +1316,33 @@ class DD:
             if not references:
                 raise FuploadError("live association response contained no selectable values", kind="platform_data_error")
             for item in form.get("associated_acts") or []:
-                reference = str(item.get("sn")) if isinstance(item, dict) else str(item)
+                reference = (str(item.get("act_type")), str(item.get("sn"))) if isinstance(item, dict) else ("", str(item))
                 if reference not in references:
                     raise ValidationError("associated_acts contains an unavailable author item", path="$.associated_acts")
 
+        game_types = session.get("/game_type/list", {})
+        self._validate_choices(game_types, [game_type], ("game_type",), "$.game_type")
+
     @staticmethod
-    def _associated_refs(session: Sidecar, game_type: Any) -> set[str]:
+    def _associated_refs(session: Sidecar, game_type: Any) -> set[Tuple[str, str]]:
         common = {"game_type": game_type, "origin": "created", "page": 1, "size": 100}
         payloads = (
-            session.post("/addon/addon_list", {**common, "category": 0, "name_or_author_name_or_share_code": "", "sort_type": 2}),
-            session.get("/share/list", {**common, "search_text": "", "sort_type": "mtime"}),
-            session.get("/wa/list", {**common, "search_text": "", "category_id": "", "sort_type": "mtime"}),
+            ("addon", session.post("/addon/addon_list", {**common, "category": 0, "name_or_author_name_or_share_code": "", "sort_type": 2})),
+            ("share", session.get("/share/list", {**common, "search_text": "", "sort_type": "mtime"})),
+            ("wa", session.get("/wa/list", {**common, "search_text": "", "category_id": "", "sort_type": "mtime"})),
         )
-        references: set[str] = set()
-        for payload in payloads:
+        references: set[Tuple[str, str]] = set()
+        for kind, payload in payloads:
             for item in items(payload):
                 reference = item.get("sn") or item.get("share_sn")
                 if reference:
-                    references.add(str(reference))
+                    references.add((kind, str(reference)))
         return references
 
     def execute_write(self, resource: str, action: str, doc: Dict[str, Any]) -> Any:
         with Sidecar() as session:
+            if action == "delete" and resource in ("plugin", "config", "wa"):
+                return self._delete(session, resource, doc)
             if resource == "plugin":
                 return self._write_plugin(session, action, doc)
             if resource == "config":
@@ -1180,11 +1351,31 @@ class DD:
                 return self._write_wa(session, action, doc)
         raise FuploadError("unsupported DD write operation", kind="unsupported_operation")
 
+    def _delete(self, session: Sidecar, resource: str, doc: Mapping[str, Any]) -> Dict[str, Any]:
+        reference = str(doc["sn"])
+        before = detail(session, resource, reference)
+        endpoints = {"plugin": "/addon/delete", "config": "/share/delete", "wa": "/wa/delete"}
+        game_type = before.get("game_type") or (before.get("game_types") or [None])[0]
+        if not game_type and resource == "config" and before.get("backup_sn"):
+            backup = result(session.get("/backup/detail", {"sn": before["backup_sn"]}))
+            if isinstance(backup, dict):
+                game_type = backup.get("game_type")
+        if not game_type:
+            raise FuploadError("DD target game type could not be resolved before delete", kind="verification_required", verification_required=True)
+        response = session.post(endpoints[resource], {"sn": reference})
+        listing = author_listing(session, resource, "", game_type)
+        if any(str(item.get("sn") or item.get("share_sn") or "") == reference for item in items(listing)):
+            raise FuploadError(
+                "delete response succeeded but the target remains in the author list",
+                kind="verification_required", endpoint=endpoints[resource], verification_required=True,
+            )
+        return {"result": response, "deleted": True, "sn": reference, "before": safe_detail(resource, before), "readback": {"present": False}}
+
     def _write_plugin(self, session: Sidecar, action: str, doc: Dict[str, Any]) -> Any:
         if action == "create":
             form = {name: copy.deepcopy(doc.get(name)) for name in PLUGIN_FIELDS if name in doc}
         else:
-            current = detail(session, "plugin", doc["sn"])
+            current = self._fresh_detail(session, "plugin", doc["sn"])
             form = plugin_form(current)
             fallback = author_item(
                 session, "plugin", str(doc["sn"]), str(current.get("name") or ""),
@@ -1219,7 +1410,23 @@ class DD:
                 "plugin was submitted but its reference could not be resolved; read the author list before retrying",
                 kind="verification_required", verification_required=True,
             )
-        return {"result": response, "reference": reference, "readback": safe_detail("plugin", detail(session, "plugin", reference)) if reference else None}
+        raw_readback = detail(session, "plugin", reference) if reference else {}
+        actual = plugin_form(raw_readback) if raw_readback else {}
+        stable_fields = (
+            "game_type", "scope", "addon_type", "name", "description", "logo", "detail_imgs",
+            "primary_category_id", "second_category_ids", "html_desc", "update_desc", "share_code_life_type",
+            "creation_statement", "need_buy",
+            "price_fen", "buy_life_type", "jump_room", "room_id", "channel_id", "channel_type",
+            "sync_room", "with_associate", "associated_acts", "need_anchor_vip", "vip_levels",
+        )
+        if action != "update":
+            _verify_fields(form, actual, stable_fields, "/addon/detail_v2")
+        else:
+            version_payload = session.get("/addon/addon_versions", {"sn": reference, "game_type": form.get("game_type"), "page": 1})
+            matching = [item for item in items(version_payload) if str(item.get("version") or item.get("current_version") or "") == str(form.get("version") or "")]
+            if not matching:
+                raise FuploadError("submitted plugin version is not visible in readback", kind="verification_required", endpoint="/addon/addon_versions", verification_required=True)
+        return {"result": response, "reference": reference, "readback": safe_detail("plugin", raw_readback) if reference else None}
 
     def _backup(self, session: Sidecar, backup_sn: str) -> Dict[str, Any]:
         listing = session.get("/backup/list", {})
@@ -1238,7 +1445,7 @@ class DD:
             backup_sn = doc["backup_sn"]
             backup_changed = True
         else:
-            current = detail(session, "config", doc["share_sn"])
+            current = self._fresh_detail(session, "config", doc["share_sn"])
             if not current.get("backup_sn"):
                 time.sleep(1)
                 current = detail(session, "config", doc["share_sn"])
@@ -1277,14 +1484,23 @@ class DD:
                 "configuration was submitted but its reference could not be resolved; read the author list before retrying",
                 kind="verification_required", verification_required=True,
             )
-        return {"result": response, "reference": reference, "readback": safe_detail("config", detail(session, "config", reference)) if reference else None}
+        raw_readback = detail(session, "config", reference) if reference else {}
+        stable_fields = (
+            "backup_sn", "scope", "title", "brief_desc", "desc", "update_desc", "display_imgs",
+            "share_code_life_type", "creation_statement", "need_buy", "price_fen", "buy_life_type",
+            "jump_room", "room_id", "channel_id", "channel_type", "sync_room", "with_associate",
+            "associated_acts", "need_anchor_vip", "vip_levels", "known_addon", "unknown_addon", "wtf",
+            "material", "font", "known_wa", "unknown_wa", "retail_ui_config",
+        )
+        _verify_fields(form, raw_readback, stable_fields, "/share/detail")
+        return {"result": response, "reference": reference, "readback": safe_detail("config", raw_readback) if reference else None}
 
     def _write_wa(self, session: Sidecar, action: str, doc: Dict[str, Any]) -> Any:
         previous_content = ""
         if action == "create":
             form = {name: copy.deepcopy(doc.get(name)) for name in WA_FIELDS if name in doc}
         else:
-            current = detail(session, "wa", doc["sn"])
+            current = self._fresh_detail(session, "wa", doc["sn"])
             previous_content = str(current.get("content") or "")
             form = {name: copy.deepcopy(current.get(name)) for name in WA_FIELDS}
             allowed = WA_FIELDS if action == "edit" else ("content", "update_desc", "version", "with_file", "file_path", "file_install_path", "parse_wa_uid", "parse_wa_id")
@@ -1325,7 +1541,16 @@ class DD:
                 "WA was submitted but its reference could not be resolved; read the author list before retrying",
                 kind="verification_required", verification_required=True,
             )
-        readback = safe_detail("wa", detail(session, "wa", reference)) if reference else None
+        raw_readback = detail(session, "wa", reference) if reference else {}
+        stable_fields = (
+            "game_type", "scope", "name", "game_version", "brief_desc", "display_imgs", "category_ids",
+            "content", "desc", "update_desc", "version", "with_file", "file_path", "file_install_path",
+            "parse_wa_uid", "parse_wa_id", "share_code_life_type", "creation_statement", "need_buy",
+            "price_fen", "buy_life_type", "jump_room", "room_id", "channel_id", "channel_type",
+            "sync_room", "with_associate", "associated_acts", "need_anchor_vip", "vip_levels",
+        )
+        _verify_fields(form, raw_readback, stable_fields, "/wa/detail")
+        readback = safe_detail("wa", raw_readback) if reference else None
         return {"result": response, "reference": reference, "readback": readback}
 
     def execute_read(self, resource: str, action: str, args: Any) -> Any:

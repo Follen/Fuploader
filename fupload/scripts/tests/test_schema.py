@@ -52,6 +52,54 @@ class SchemaTests(unittest.TestCase):
             }
             self.assertEqual(schema.validate(value)["logo_file"], str(logo))
 
+    def test_newbee_plugin_update_uses_build_strings(self) -> None:
+        schema = get_schema("newbee", "plugin", "update")
+        with tempfile.TemporaryDirectory() as directory:
+            package = Path(directory) / "package.zip"
+            package.write_bytes(b"zip")
+            value = {
+                "schema": schema.name, "mod_id": 1, "version": "2",
+                "game_version_list": ["3.80.2"], "file": str(package),
+            }
+            self.assertEqual(schema.validate(value)["game_version_list"], ["3.80.2"])
+            value["game_version_list"] = [4]
+            with self.assertRaisesRegex(ValidationError, "game-version strings"):
+                schema.validate(value)
+
+    def test_delete_requires_literal_confirmation(self) -> None:
+        for platform, identifier in (("newbee", {"id": 1}), ("dd", {"sn": "one"})):
+            for resource in ("plugin", "config", "wa"):
+                schema = get_schema(platform, resource, "delete")
+                value = {"schema": schema.name, **identifier, "confirm": "DELETE"}
+                self.assertEqual(schema.validate(value)["confirm"], "DELETE")
+                value["confirm"] = "yes"
+                with self.assertRaises(ValidationError):
+                    schema.validate(value)
+
+    def test_dd_room_only_channel_is_valid(self) -> None:
+        schema = get_schema("dd", "wa", "edit")
+        value = {
+            "schema": schema.name, "sn": "wa", "jump_room": True,
+            "room_id": "room", "channel_id": "", "channel_type": "",
+        }
+        self.assertEqual(schema.validate(value)["room_id"], "room")
+        value["channel_id"] = "channel"
+        with self.assertRaisesRegex(ValidationError, "both be empty or both be nonempty"):
+            schema.validate(value)
+
+    def test_dd_contract_enums_limits_and_counts(self) -> None:
+        plugin = get_schema("dd", "plugin", "edit")
+        base = {"schema": plugin.name, "sn": "plugin"}
+        for field, invalid in (("addon_type", 2), ("creation_statement", "translated")):
+            with self.subTest(field=field), self.assertRaises(ValidationError):
+                plugin.validate({**base, field: invalid})
+        config = get_schema("dd", "config", "edit")
+        with self.assertRaisesRegex(ValidationError, "0 or between"):
+            config.validate({"schema": config.name, "share_sn": "config", "price_fen": 9})
+        wa = get_schema("dd", "wa", "edit")
+        with self.assertRaisesRegex(ValidationError, "at most 5"):
+            wa.validate({"schema": wa.name, "sn": "wa", "category_ids": [1, 2, 3, 4, 5, 6]})
+
     def test_dd_commercial_conditionals(self) -> None:
         schema = get_schema("dd", "wa", "edit")
         with self.assertRaisesRegex(ValidationError, "room_id"):

@@ -1,0 +1,20 @@
+{
+  "schema": "fupload.v1.newbee.wa.edit",
+  "id": 9689,
+  "game_version_id": 2,
+  "name": "Fupload WA Test NB 20260731-191228 Edited",
+  "intro": "Metadata edit readback test",
+  "description": "Temporary private WA after metadata edit verification.",
+  "content_format": 2,
+  "thumbnail": "wow_wa/20260730/dc33a46e3b92101515d13e163559437f.png",
+  "images": [],
+  "category_id_list": [87],
+  "content_origin": 1,
+  "subscribe_plan_level": 0,
+  "price": 0,
+  "time_range": "",
+  "public": false,
+  "submit_for_review": false,
+  "link_to_channel": false,
+  "attachments": []
+}

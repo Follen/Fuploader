@@ -1,0 +1,23 @@
+{
+  "schema": "fupload.v1.dd.config.edit",
+  "share_sn": "dfd97b6f3cb74ade9a2c15810981a7fd",
+  "scope": "private",
+  "title": "Fupload Config Test DD 20260731 Edited",
+  "brief_desc": "Private config metadata edit test",
+  "desc": "<p>Temporary private configuration after metadata edit verification.</p>",
+  "display_imgs": ["https://uires.w.163.com/img/img/U2JyVpbkryjEylTG5GWknOYJsEpPFyRq"],
+  "share_code_life_type": "seven_day",
+  "need_buy": false,
+  "price_fen": 0,
+  "buy_life_type": "seven_day",
+  "jump_room": false,
+  "room_id": "",
+  "channel_id": "",
+  "channel_type": "",
+  "sync_room": false,
+  "creation_statement": "original",
+  "with_associate": false,
+  "associated_acts": [],
+  "need_anchor_vip": false,
+  "vip_levels": []
+}

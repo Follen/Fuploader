@@ -1,0 +1,23 @@
+{
+  "schema": "fupload.v1.dd.config.edit",
+  "share_sn": "96282722ebda4086805c886ccc563e18",
+  "scope": "private",
+  "title": "Fupload Config DD Retest Edited",
+  "brief_desc": "Freshness guard metadata edit passed",
+  "desc": "<p>Metadata edit after converged content update.</p>",
+  "display_imgs": ["https://uires.w.163.com/img/img/U2JyVpbkryjEylTG5GWknOYJsEpPFyRq"],
+  "share_code_life_type": "seven_day",
+  "need_buy": false,
+  "price_fen": 0,
+  "buy_life_type": "seven_day",
+  "jump_room": false,
+  "room_id": "",
+  "channel_id": "",
+  "channel_type": "",
+  "sync_room": false,
+  "creation_statement": "original",
+  "with_associate": false,
+  "associated_acts": [],
+  "need_anchor_vip": false,
+  "vip_levels": []
+}

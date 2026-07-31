@@ -1,0 +1,5 @@
+{
+  "schema": "fupload.v1.newbee.plugin.delete",
+  "id": 123,
+  "confirm": "DELETE"
+}

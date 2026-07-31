@@ -80,9 +80,16 @@ def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
 
     session = groups.add_parser("session", help="Authentication diagnostics").add_subparsers(dest="action_command", required=True)
     _read_leaf(session, "doctor", "Verify Windows Known Folder credentials, fixed official origins, and the Creator token exchange.", platform="newbee", resource="session", action="doctor")
+    options = groups.add_parser("options", help="Read dynamic business choices before writing").add_subparsers(dest="option_action", required=True)
+    for action, text in (
+        ("content-origins", "List current content-origin values."),
+        ("subscribe-plans", "List current author subscription plan levels."),
+        ("time-ranges", "List current one-time purchase durations."),
+    ):
+        _read_leaf(options, action, text, platform="newbee", resource="options", action=action)
 
     plugin = groups.add_parser("plugin", help="Plugin create, version update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
-    for action, text in (("create", "Create a private or explicitly reviewed plugin record."), ("update", "Upload one immutable plugin version."), ("edit", "Edit plugin metadata or explicit public/review state.")):
+    for action, text in (("create", "Create a private plugin record; public review is applied only after a version exists."), ("update", "Upload one immutable plugin version."), ("edit", "Edit plugin metadata or explicit public/review state."), ("delete", "Delete one explicitly confirmed plugin record.")):
         _write_leaf(plugin, "newbee", "plugin", action, text)
     leaf = _read_leaf(plugin, "list", "List plugins owned by the current author.", platform="newbee", resource="plugin", action="list"); _list_flags(leaf)
     leaf = _read_leaf(plugin, "get", "Read one plugin detail by numeric Creator ID.", platform="newbee", resource="plugin", action="get"); leaf.add_argument("--id", type=_positive, required=True)
@@ -95,7 +102,7 @@ def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
     _write_leaf(changelog, "newbee", "plugin-changelog", "edit", "Edit or explicitly clear one existing plugin version log.")
 
     config = groups.add_parser("config", help="Configuration share create, backup update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
-    for action, text in (("create", "Create a configuration share from an existing desktop cloud backup."), ("update", "Replace cloud-backup content selections without changing metadata."), ("edit", "Edit configuration metadata, business settings, channel, or review state.")):
+    for action, text in (("create", "Create a configuration share from an existing desktop cloud backup."), ("update", "Replace cloud-backup content selections without changing metadata."), ("edit", "Edit configuration metadata, business settings, channel, or review state."), ("delete", "Delete one explicitly confirmed configuration record.")):
         _write_leaf(config, "newbee", "config", action, text)
     leaf = _read_leaf(config, "list", "List configuration shares owned by the current author.", platform="newbee", resource="config", action="list"); _list_flags(leaf, offset=True)
     leaf = _read_leaf(config, "get", "Read a safe configuration-share detail without raw backup paths.", platform="newbee", resource="config", action="get"); leaf.add_argument("--id", type=_positive, required=True)
@@ -103,7 +110,7 @@ def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
     leaf = _read_leaf(config, "backup-get", "Read selectable plugins, ignored items, fonts, materials, and roles from one cloud backup.", platform="newbee", resource="config", action="backup-get"); leaf.add_argument("--id", type=_positive, required=True, help="Cloud backup ID.")
 
     wa = groups.add_parser("wa", help="WA/string create, version update, metadata edit, and attached operations").add_subparsers(dest="action_command", required=True)
-    for action, text in (("create", "Create a WA/string record and first string version."), ("update", "Publish one new immutable WA/string version."), ("edit", "Edit WA metadata, media, categories, attachments, business settings, or review state.")):
+    for action, text in (("create", "Create a WA/string record and first string version."), ("update", "Publish one new immutable WA/string version."), ("edit", "Edit WA metadata, media, categories, attachments, business settings, or review state."), ("delete", "Delete one explicitly confirmed WA/string record.")):
         _write_leaf(wa, "newbee", "wa", action, text)
     leaf = _read_leaf(wa, "list", "List WA/string records owned by the current author; raw strings are redacted.", platform="newbee", resource="wa", action="list"); _list_flags(leaf, offset=True)
     leaf = _read_leaf(wa, "get", "Read one WA metadata detail; raw strings are replaced with length and SHA-256.", platform="newbee", resource="wa", action="get"); leaf.add_argument("--id", type=_positive, required=True)
@@ -139,7 +146,7 @@ def _dd_tree(platforms: argparse._SubParsersAction) -> None:
             leaf.add_argument("--game-type", type=_positive, required=True)
 
     plugin = groups.add_parser("plugin", help="DD plugin create, version update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
-    for action, text in (("create", "Create a DD plugin with its first selected version."), ("update", "Publish a DD plugin version while preserving metadata."), ("edit", "Edit DD plugin metadata and commercial/association settings.")):
+    for action, text in (("create", "Create a DD plugin with its first selected version."), ("update", "Publish a DD plugin version while preserving metadata."), ("edit", "Edit DD plugin metadata and commercial/association settings."), ("delete", "Delete one explicitly confirmed DD plugin record.")):
         _write_leaf(plugin, "dd", "plugin", action, text)
     leaf = _read_leaf(plugin, "list", "List plugins owned by the current DD author account.", platform="dd", resource="plugin", action="list"); _list_flags(leaf, game_type=True)
     leaf = _read_leaf(plugin, "get", "Read one DD plugin detail by share SN.", platform="dd", resource="plugin", action="get"); leaf.add_argument("--sn", required=True)
@@ -148,7 +155,7 @@ def _dd_tree(platforms: argparse._SubParsersAction) -> None:
     leaf = _read_leaf(plugin, "versions", "List versions for one DD plugin.", platform="dd", resource="plugin", action="versions"); leaf.add_argument("--sn", required=True); leaf.add_argument("--game-type", type=_positive, required=True); leaf.add_argument("--page", type=_positive, default=1)
 
     config = groups.add_parser("config", help="DD configuration create, backup-content update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
-    for action, text in (("create", "Create a DD configuration share from an existing DD cloud backup."), ("update", "Update selected backup content and inner versions."), ("edit", "Edit DD configuration metadata and commercial/association settings.")):
+    for action, text in (("create", "Create a DD configuration share from an existing DD cloud backup."), ("update", "Update selected backup content and inner versions."), ("edit", "Edit DD configuration metadata and commercial/association settings."), ("delete", "Delete one explicitly confirmed DD configuration record.")):
         _write_leaf(config, "dd", "config", action, text)
     leaf = _read_leaf(config, "list", "List configuration shares owned by the current DD author.", platform="dd", resource="config", action="list"); _list_flags(leaf, game_type=True)
     leaf = _read_leaf(config, "get", "Read one DD configuration detail by share SN.", platform="dd", resource="config", action="get"); leaf.add_argument("--sn", required=True)
@@ -156,7 +163,7 @@ def _dd_tree(platforms: argparse._SubParsersAction) -> None:
     leaf = _read_leaf(config, "backup-get", "Read one DD backup's complete selectable content.", platform="dd", resource="config", action="backup-get"); leaf.add_argument("--sn", required=True)
 
     wa = groups.add_parser("wa", help="DD WA/string create, content update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
-    for action, text in (("create", "Create a DD WA/string record."), ("update", "Publish updated DD WA content/version/material while preserving metadata."), ("edit", "Edit DD WA metadata and commercial/association settings.")):
+    for action, text in (("create", "Create a DD WA/string record."), ("update", "Publish updated DD WA content/version/material while preserving metadata."), ("edit", "Edit DD WA metadata and commercial/association settings."), ("delete", "Delete one explicitly confirmed DD WA/string record.")):
         _write_leaf(wa, "dd", "wa", action, text)
     leaf = _read_leaf(wa, "list", "List WA/string records owned by the current DD author.", platform="dd", resource="wa", action="list"); _list_flags(leaf, game_type=True)
     leaf = _read_leaf(wa, "get", "Read one DD WA detail by share SN.", platform="dd", resource="wa", action="get"); leaf.add_argument("--sn", required=True)

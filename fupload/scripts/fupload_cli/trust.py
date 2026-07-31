@@ -189,9 +189,12 @@ def verify_dd_executable(executable: Path) -> Dict[str, str]:
         environment["PSModulePath"] = windows_root + "\\System32\\WindowsPowerShell\\v1.0\\Modules"
         completed = subprocess.run(
             [_powershell_path(), "-NoProfile", "-NonInteractive", "-Command", script],
-            capture_output=True, text=True, timeout=20, check=False, env=environment,
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=20, check=False, env=environment,
         )
-        payload = json.loads(completed.stdout.strip() or "{}")
+        if completed.returncode != 0:
+            raise FuploadError("DD Authenticode verification process failed", kind="trust_boundary")
+        payload = json.loads((completed.stdout or "").strip() or "{}")
     except (OSError, subprocess.SubprocessError, ValueError) as exc:
         raise FuploadError("DD Authenticode verification failed", kind="trust_boundary") from exc
     status = str(payload.get("Status") or "")
