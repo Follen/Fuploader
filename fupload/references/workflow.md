@@ -1,12 +1,24 @@
 # Workflow and CLI contract
 
+## Channel selection
+
+DD always uses the bundled Python CLI. NewBeeBox uses official `ncc` by default when installed unless the
+user explicitly requests Fupload's third-party Python management tool. If `ncc` is absent, ask before
+installing it. A missing or unsupported official capability does not silently select Python; the user must
+explicitly choose the third-party channel, after which remote state and the write plan are rebuilt.
+
 ## Command shape
+
+Official NewBeeBox runs the installed `ncc` command described by `ncc docs` and the exact leaf `--help`.
+Machine calls include `-o json`. Its exit codes are `0` success, `1` business error, `2` authentication
+failure, and `3` network error. Never pass a real credential through `--token`; reuse official local login or
+an `NCC_TOKEN` already injected into the Agent environment.
 
 Run `python <skill-root>/scripts/fupload.py <platform> <resource> <action>`. Every command supports `--help`; every write accepts only `--input <path|->`, with optional `--dry-run`.
 
 Output is one JSON object with `schema=fupload.output.v1`, `platform`, `operation`, `success`, and either `data` or `error`. Exit code `0` means success; `2` means validation, session, platform, or verification failure.
 
-## Input semantics
+## Python input semantics
 
 - Use the exact `schema` printed by leaf help.
 - Unknown fields are errors.
@@ -22,15 +34,29 @@ Before a write plan, create a new directory in the target project at `publish/<Y
 
 Store the plan's atomic write inputs in execution order as `01-<action>.json`, `02-<action>.json`, and so on. Material changes to the not-yet-executed plan update those files in the same directory. Retries and readback verification also refer to that directory; a separate publishing plan creates a new one. Keep the files after completion and do not add or change project ignore rules without an explicit user request.
 
+For Python these files are executable schema inputs. For official `ncc` they are redacted plan records with
+the channel, working directory, argument vector, non-secret business inputs, local file references, and
+expected readback. Do not store tokens, raw WA strings, raw configuration content, cookies, signed URLs, or
+other replayable authentication material. Use content file references instead. Only run `--dry-run` when the
+official leaf documents it; `ncc wow addons push --dry-run` is the primary supported preflight.
+
 ## Mandatory read-modify-write sequence
 
-For partial edit/update, the provider performs: target GET, dynamic-option GETs, conversion to a resource-specific form, presence-aware patch, conditional normalization, allowlisted payload build, upload/write, and readback. A failed prerequisite stops the operation.
+For Python partial edit/update, the provider performs: target GET, dynamic-option GETs, conversion to a resource-specific form, presence-aware patch, conditional normalization, allowlisted payload build, upload/write, and readback. A failed prerequisite stops the operation.
+
+For official `ncc`, run the documented info/list/categories/versions/cloudbackup reads needed by the leaf,
+apply only flags shown by the installed help, execute once, then read the target back with official commands.
+Do not infer hidden flags from the website or translate Python wire fields into undocumented `ncc` options.
 
 ## Review and retries
 
-NewBeeBox plugins are always created privately. If public review was selected, upload and verify the first version before the separate public edit. Other new records follow their platform visibility contract. Updates never change visibility implicitly. If output contains `verification_required`, query the target before any retry.
+In the Python NewBeeBox channel, plugins are always created privately. If public review was selected, upload and verify the first version before the separate public edit. Other new records follow their platform visibility contract. Updates never change visibility implicitly. If output contains `verification_required`, query the target before any retry.
 
-Delete inputs require one `id` or `sn` and literal `confirm: "DELETE"`. The provider reads the exact target before deletion and verifies absence from the author list afterward. Never batch, retry an uncertain delete, or treat deletion of a main record as deletion of its versions or uploaded media.
+In official `ncc`, follow the installed docs for create/init/push/edit ordering and review effects. On any
+network failure after a write starts, read back before retrying. Do not loop on `quota_exceeded` or treat a
+submitted/under-review result as public approval.
+
+Python delete inputs require one `id` or `sn` and literal `confirm: "DELETE"`. The provider reads the exact target before deletion and verifies absence from the author list afterward. Never batch, retry an uncertain delete, or treat deletion of a main record as deletion of its versions or uploaded media. Official `ncc` currently marks plugin, WA, and configuration main-record deletion as web-only; wait for an explicit third-party selection before using Python delete.
 
 ## Local artifact checklist
 

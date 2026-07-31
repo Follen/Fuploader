@@ -1,4 +1,8 @@
-# NewBeeBox field and workflow reference
+# NewBeeBox third-party Python field and workflow reference
+
+Load this reference only after the user explicitly selects Fupload's third-party Python management tool.
+When official `ncc` is installed and the user has not requested the third-party channel, use
+[newbee-official-cli.md](newbee-official-cli.md) and the installed `ncc docs`/leaf help instead.
 
 ## Session and dynamic reads
 

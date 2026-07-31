@@ -5,17 +5,7 @@ description: Explicit author-publishing workflow for World of Warcraft plugins, 
 
 # Fupload
 
-Act as the publishing operator. Use the bundled Python CLI only as an atomic read/write tool; keep investigation, choices, planning, confirmation, and recovery in the conversation.
-
-## Locate the CLI
-
-Resolve paths relative to this `SKILL.md`, never relative to the user's project:
-
-```text
-python <skill-root>/scripts/fupload.py --help
-```
-
-On Windows, prefer `py -3` only if `python` is unavailable. Do not use a binary, Go source, repository-relative fallback, browser automation, Computer Use, or direct handcrafted HTTP calls.
+Act as the publishing operator. For NewBeeBox, prefer the official `ncc` CLI whenever it is installed unless the user explicitly requests the third-party Python management tool. For DD, and for an explicitly selected third-party NewBeeBox workflow, use the bundled Python CLI. Keep investigation, choices, planning, confirmation, and recovery in the conversation.
 
 ## Establish intent
 
@@ -33,24 +23,58 @@ Map natural language consistently:
 
 Never offer bulk delete, version-file delete, drafts, guides, messages, or GUI automation.
 
+## Select the execution channel
+
+For DD, use the bundled Python CLI.
+
+For NewBeeBox, apply this order exactly:
+
+1. If the user explicitly requests the third-party Python management tool, use the bundled Python CLI even when `ncc` is installed.
+2. Otherwise detect `ncc` locally. On PowerShell use `Get-Command ncc -ErrorAction SilentlyContinue`; on POSIX shells use `command -v ncc`. Do not ask the user to report a fact the environment can show.
+3. If installed, select official `ncc` by default. Run `ncc -V`, `ncc --help`, `ncc docs`, and `ncc whoami -o json`. Treat the installed `ncc docs` and target leaf `--help` as the execution contract. From `whoami`, retain or report only the creator identity and module permissions needed for the task; redact token names, prefixes, timestamps, and other credential metadata.
+4. If not installed, ask whether the user wants the official CLI. If yes, check `node -v` is at least 18, help install Node.js when needed, then run `npm i -g @newbeebox/newbeebox-creator-center-cli@latest`. Verify `ncc -V` and `ncc --help`; installation success is not authentication success.
+5. After installation, direct the user to `https://creator.newbeebox.com/creator-center/cli-token` to create a token and have them run `ncc login` in their own terminal. Resume only after `ncc whoami -o json` verifies the expected creator identity. For automation, accept an `NCC_TOKEN` already present in the Agent process environment without printing it.
+6. If the user declines official installation, or official docs do not support the target action, explain the exact boundary. Use the Python channel only after the user explicitly chooses the third-party Python management tool.
+
+Never switch channels silently. Before changing channels, re-read remote state and present a new plan so the same create, version, or edit cannot be submitted twice.
+
+## Protect credentials
+
+Prefer an existing official `ncc login`, then a caller-provided `NCC_TOKEN`, then user-performed local login. Never ask the user to paste a token into the conversation. Never place a real token in `--token`, shell history, command output, JSON, `.env`, `publish/`, `analyze/`, tests, Skill files, references, or Git. Do not inspect or copy the official CLI credential store.
+
+If a token is pasted into the conversation, do not repeat or use it. Tell the user to revoke it from the official CLI token page and create a replacement through local login or pre-launch environment injection. Check only whether `NCC_TOKEN` is present, never its length, prefix, hash, or value.
+
+## Locate the bundled Python CLI
+
+Resolve paths relative to this `SKILL.md`, never relative to the user's project:
+
+```text
+python <skill-root>/scripts/fupload.py --help
+```
+
+On Windows, prefer `py -3` only if `python` is unavailable. Do not use a binary, Go source, repository-relative fallback, browser automation, Computer Use, or direct handcrafted HTTP calls. NewBeeBox's official `ncc` is not this bundled CLI and must not be wrapped as a Python `--input` command.
+
 ## Load only the needed contract
 
 - Read [references/workflow.md](references/workflow.md) for every write workflow.
-- Read [references/newbee.md](references/newbee.md) only for NewBeeBox.
+- For official NewBeeBox, read [references/newbee-official-cli.md](references/newbee-official-cli.md), then run the installed `ncc docs` and exact leaf `--help`. The bundled reference is a complete official snapshot, but runtime docs win when versions differ.
+- Read [references/newbee.md](references/newbee.md) only when the user explicitly selected the third-party Python NewBeeBox channel.
 - Read [references/dd.md](references/dd.md) only for DD.
-- Run the exact leaf command with `--help` before creating its input. Treat help as the executable schema contract.
+- For Python, run the exact leaf command with `--help` before creating its input. Treat help as the executable schema contract.
 
 ## Investigate
 
 Inspect the user-provided project or current workspace for `.toc`, README, changelog, Git changes, archives, screenshots, logos, and WA material files. Do not modify or package the user's project until that is part of the agreed plan.
 
-Use read-only CLI commands to discover the current account's records, target detail, versions, backups, categories, game branches/builds, installation paths, life types, VIP levels, channels, and association candidates. Never ask the user to copy an ID that the CLI can query.
+Use read-only commands from the selected channel to discover the current account's records, target detail, versions, backups, categories, game branches/builds, installation paths, life types, VIP levels, channels, and association candidates. Never ask the user to copy an ID that the selected CLI can query.
 
-For NewBeeBox, always read `newbee options content-origins`, `subscribe-plans`, and `time-ranges` when the corresponding field is present. Also read plugin categories/builds, WA categories, and attachment paths for those fields. Empty option output blocks the write. Plugin compatibility uses build strings from `game-versions.items[].versions`, never the parent branch `id`.
+For official NewBeeBox, use the documented `ncc wow addons list|info|categories|versions`, `wa list|info|categories`, `uipack list|info`, `cloudbackup list|info`, and related commands needed by the action. Use the exact options returned by the installed help. `addons push` compatibility uses explicit build strings or documented `auto`; never substitute a parent branch ID. An empty required option list blocks the write.
+
+For third-party Python NewBeeBox, always read `newbee options content-origins`, `subscribe-plans`, and `time-ranges` when the corresponding field is present. Also read plugin categories/builds, WA categories, and attachment paths for those fields. Empty option output blocks the write. Plugin compatibility uses build strings from `game-versions.items[].versions`, never the parent branch `id`.
 
 For DD, always read game types/builds and the resource-specific category tree. A plugin primary category is a top-level item and secondary IDs are children of that item. Validate associations as `(act_type,sn)`. A room-only selection has `room_id` with empty `channel_id` and `channel_type`; a channel selection requires both channel fields.
 
-Run the platform session doctor before authenticated reads. NewBee credentials must come from the Windows Known Folder auth-store and all authenticated requests must use the CLI's fixed official HTTPS origins. DD discovery must accept only an Authenticode-valid executable from an allowed official NetEase publisher. Do not set endpoint, credential-directory, or DD executable-path environment overrides.
+For official NewBeeBox, use only `ncc whoami -o json` to verify authentication; do not inspect its credential files. For third-party Python NewBeeBox, run `newbee session doctor`; credentials must come from the Windows Known Folder auth-store and all authenticated requests must use fixed official HTTPS origins. For DD, run `dd session doctor`; discovery must accept only an Authenticode-valid executable from an allowed official NetEase publisher. Do not set endpoint, credential-directory, or DD executable-path environment overrides.
 
 For a DD retail configuration, read `dd config backup-get` and present the safe edit-mode and cooldown selector metadata. Send only returned selectors in `retail_ui_config`; never request, display, or reconstruct raw retail import strings.
 
@@ -58,13 +82,15 @@ For a configuration, require a cloud backup already uploaded by the matching des
 
 ## Collect every business choice
 
-Expose every selectable page field to the user. Do not silently accept a webpage preselection or invent a business default. This includes game type/build, categories, origin, format, visibility, review submission, payment, lifetime, price, room/channel, synchronization, membership, associations, backup content, WTF roles, incremental selections, retail UI data, WA material mode, and install path.
+Expose every business field writable through the selected channel. Do not silently accept a webpage preselection or invent a business default. This includes applicable game type/build, categories, origin, format, visibility, review submission, payment, lifetime, price, room/channel, synchronization, membership, associations, backup content, WTF roles, incremental selections, retail UI data, WA material mode, and install path. When official `ncc` does not expose a webpage field or action, state that capability boundary; do not guess a hidden flag or silently switch to Python.
 
 Use existing remote values only for omitted fields in `edit` or `update`, where omission means preserve. Show candidates by human name plus ID/SN and relevant status. Ask only choices that cannot be determined from the user's explicit request, local artifacts, or remote reads.
 
 ## Prepare and confirm
 
-Create a durable release directory under the target project's root, never under or beside the installed Skill. Use `publish/<YYYYMMDD-HHmmss>-<platform>-<resource>-<action>/`; if that name already exists, append `-2`, `-3`, and so on instead of reusing it. Put every versioned JSON input for one publishing plan in that directory, ordered as `01-<action>.json`, `02-<action>.json`, and so on. A retry or readback for the same plan reuses its directory; a new independent publishing plan gets a new directory. Use JSON, not YAML. Keep the directory after execution as the project's publishing record, and do not change the target project's ignore rules unless the user asks. Run each intended command with `--dry-run`; remember that dry-run validates only schema and local files.
+Create a durable release directory under the target project's root, never under or beside the installed Skill. Use `publish/<YYYYMMDD-HHmmss>-<platform>-<resource>-<action>/`; if that name already exists, append `-2`, `-3`, and so on instead of reusing it. Put every atomic step in a versioned JSON file ordered as `01-<action>.json`, `02-<action>.json`, and so on. A retry or readback for the same plan reuses its directory; a new independent publishing plan gets a new directory. Use JSON, not YAML. Keep the directory after execution as the target project's publishing record, and do not change its ignore rules unless the user asks.
+
+For Python, these are executable `--input` documents using the leaf schema. For official `ncc`, these are redacted plan records containing the channel, working directory, argument vector, non-secret business inputs, local file references, and expected readback; `ncc` does not consume them. Never store a token, raw WA string, raw configuration content, or signed URL in a plan record. Use `@file` or local path references for content. Run `--dry-run` where the selected leaf documents it, especially `ncc wow addons push --dry-run`; do not invent dry-run support for other official commands.
 
 Before the first write, present one complete human-readable plan containing:
 
@@ -78,14 +104,14 @@ Before the first write, present one complete human-readable plan containing:
 
 Obtain one explicit confirmation for that exact plan. If the plan changes materially, confirm the changed plan once.
 
-For delete, first run the resource `get` command, show the exact name and ID/SN, and obtain confirmation for that single record. Write a delete input containing only the schema, `id` or `sn`, and `confirm: "DELETE"`. Do not reuse confirmation for another record and do not retry an uncertain delete.
+For a Python delete, first run the resource `get` command, show the exact name and ID/SN, and obtain confirmation for that single record. Write a delete input containing only the schema, `id` or `sn`, and `confirm: "DELETE"`. Do not reuse confirmation for another record and do not retry an uncertain delete. Official `ncc` currently documents plugin, WA, and configuration main-record deletion as web-only; state that boundary and wait for an explicit third-party selection before offering the Python delete command.
 
 ## Execute and verify
 
-Run writes serially. Parse JSON output; never scrape human text. After each successful step, immediately run the corresponding get/list/version/history command and compare the intended fields. Treat “submitted for review” and “under review” as distinct from “approved” or “publicly visible.”
+Run writes serially. For official `ncc`, always request `-o json`, parse stdout as JSON, and treat stderr only as progress diagnostics. For Python, parse its stable JSON output. Never scrape human text. After each successful step, immediately run the corresponding info/get/list/versions/history command and compare the intended fields. Treat “submitted for review” and “under review” as distinct from “approved” or “publicly visible.”
 
-NewBeeBox plugin publication is three atomic writes when public visibility is requested: create the record privately, upload and verify the first version, then edit to public with explicit review intent. Never send a public `share_state` during plugin create.
+In the third-party Python NewBeeBox channel, public plugin publication is three atomic writes: create privately, upload and verify the first version, then edit to public with explicit review intent. Never send a public `share_state` during Python create. In the official channel, follow the installed `ncc docs` sequence for create, init, push, and visibility instead of applying Python wire rules.
 
-Stop on the first failure. Report completed steps, retained IDs/SNs or media references, the redacted failure, whether verification is required, and the smallest safe retry. When a write result is uncertain, read back first and do not automatically resend.
+Stop on the first failure. Report completed steps, retained IDs/SNs or media references, the redacted failure, whether verification is required, and the smallest safe retry. Official exit codes are `0` success, `1` business error, `2` authentication failure, and `3` network error. Even when a network error is generally retryable, read back after an uncertain write before resending it. Never loop on `quota_exceeded`.
 
 Never print or persist tokens, cookies, JWTs, signed URLs, DD `clientNo`, raw WA strings, or raw configuration backup contents.

@@ -102,6 +102,36 @@ class CLITests(unittest.TestCase):
         self.assertIn("Authenticode-valid executable", skill)
         self.assertIn("Do not set endpoint, credential-directory", skill)
 
+    def test_skill_prefers_official_newbee_cli_without_silent_fallback(self) -> None:
+        root = Path(__file__).resolve().parents[2]
+        skill = (root / "SKILL.md").read_text(encoding="utf-8")
+        official = (root / "references" / "newbee-official-cli.md").read_text(encoding="utf-8")
+        self.assertIn("Get-Command ncc -ErrorAction SilentlyContinue", skill)
+        self.assertIn("If installed, select official `ncc` by default", skill)
+        self.assertIn("explicitly requests the third-party Python management tool", skill)
+        self.assertIn("Never switch channels silently", skill)
+        self.assertIn("npm i -g @newbeebox/newbeebox-creator-center-cli@latest", skill)
+        self.assertIn("ncc whoami -o json", skill)
+        self.assertIn("https://creator.newbeebox.com/md/cli-docs", official)
+        self.assertIn("## 命令参考", official)
+        self.assertIn("ncc wow addons push", official)
+        self.assertIn("ncc wow wa push", official)
+        self.assertIn("ncc wow uipack push", official)
+        self.assertIn("ncc community post", official)
+        self.assertIn("## ncc.json 配置说明", official)
+        self.assertIn("NCC_TOKEN", official)
+        self.assertIn("## 错误码参考", official)
+
+    def test_skill_keeps_newbee_token_out_of_agent_commands(self) -> None:
+        root = Path(__file__).resolve().parents[2]
+        skill = (root / "SKILL.md").read_text(encoding="utf-8")
+        workflow = (root / "references" / "workflow.md").read_text(encoding="utf-8")
+        for text in (skill, workflow):
+            self.assertIn("NCC_TOKEN", text)
+            self.assertIn("Never", text)
+        self.assertIn("Never place a real token in `--token`", skill)
+        self.assertIn("do not repeat or use it", skill)
+
     def test_dry_run_emits_stable_json(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "input.json"

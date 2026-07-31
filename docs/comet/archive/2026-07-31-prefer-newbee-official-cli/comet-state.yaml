@@ -1,0 +1,22 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 5
+name: prefer-newbee-official-cli
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: 89500076bd974d12ddf7119ac7c8aeb2de6a30bcd7ad49e227572c1735fc0b27
+spec_changes:
+  - capability: newbee-official-cli
+    operation: create
+    source: specs/newbee-official-cli/spec.md
+    base_hash: null
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/09704a58ae74b655033cf1f53c4c5854825ea208ebf2fd2cd43ffd2b5cf4e20d.json
+verification_evidence: runtime/evidence/verifications/daef5a983ca1bcce2b45405bb8d115387b52453ebdc7639002ac39bde6caea49.json
+partial_allowance: null
+archived: true
+created_at: 2026-07-31
+run_id: d1d37f67-a732-47e1-bd5d-b4e247d9b01f
