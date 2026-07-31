@@ -1,0 +1,10 @@
+{
+  "schema": "fupload.v1.newbee.config.update",
+  "id": 12345,
+  "cloud_id": 67890,
+  "linked_mods": [],
+  "ignored_unknown_mods": [],
+  "ignored_materials": [],
+  "ignored_fronts": [],
+  "roleid": "selected-role-id"
+}

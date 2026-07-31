@@ -1,0 +1,237 @@
+"""Argparse command tree for Fupload."""
+
+from __future__ import annotations
+
+import argparse
+import os
+import sys
+from pathlib import Path
+from typing import Any, Callable, Dict, Optional, Sequence, Tuple
+
+from . import __version__
+from .dd import DD
+from .errors import FuploadError, ValidationError
+from .io import read_json, write_error, write_output
+from .newbee import NewBee
+from .schema import get_schema, schema_help
+
+
+WRITE_HELP = """This command performs one remote business action from a versioned JSON document.
+
+It is non-interactive. Unknown fields and fields belonging to another action are rejected.
+On edit/update, an omitted field preserves the remote value; an explicit empty value clears it
+only when the field contract permits. The provider GETs current detail and dynamic options before
+building an allowlisted wire payload, then reads the result back after the write.
+
+Public/review changes are never implicit. Set public and submit_for_review explicitly where the
+schema exposes them. The calling Skill must show the complete plan and obtain confirmation first.
+"""
+
+
+def _parser(**kwargs: Any) -> argparse.ArgumentParser:
+    return argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        **kwargs,
+    )
+
+
+def _positive(value: str) -> int:
+    number = int(value)
+    if number <= 0:
+        raise argparse.ArgumentTypeError("must be greater than zero")
+    return number
+
+
+def _page_flags(parser: argparse.ArgumentParser, *, offset: bool = False) -> None:
+    if offset:
+        parser.add_argument("--offset", type=int, default=0, help="Zero-based result offset (technical default: 0).")
+    else:
+        parser.add_argument("--page", type=_positive, default=1, help="One-based page number (technical default: 1).")
+    parser.add_argument("--page-size", type=_positive, default=50, help="Page size, capped by the platform (technical default: 50).")
+
+
+def _list_flags(parser: argparse.ArgumentParser, *, offset: bool = False, game_type: bool = False) -> None:
+    parser.add_argument("--keyword", default="", help="Optional name/title filter; empty means all current-author records.")
+    _page_flags(parser, offset=offset)
+    if game_type:
+        parser.add_argument("--game-type", type=_positive, required=True, help="DD game type selected from `dd options game-types`.")
+
+
+def _write_leaf(parent: argparse._SubParsersAction, platform: str, resource: str, action: str, summary: str) -> None:
+    leaf = parent.add_parser(
+        action, help=summary, description=summary + "\n\n" + WRITE_HELP,
+        epilog=schema_help(platform, resource, action),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    leaf.add_argument("--input", required=True, metavar="PATH|-", help="Versioned JSON file, or - to read one JSON object from stdin.")
+    leaf.add_argument("--dry-run", action="store_true", help="Validate schema and local files only; do not authenticate, upload, or write remotely.")
+    leaf.set_defaults(handler="write", platform=platform, resource=resource, action=action)
+
+
+def _read_leaf(parent: argparse._SubParsersAction, name: str, summary: str, **defaults: Any) -> argparse.ArgumentParser:
+    leaf = parent.add_parser(name, help=summary, description=summary + "\n\nThis is a read-only command and emits stable JSON.")
+    leaf.set_defaults(handler="read", **defaults)
+    return leaf
+
+
+def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
+    root = platforms.add_parser("newbee", help="NewBeeBox Creator operations", description="Reuse the signed-in NewBeeBox desktop auth-store; no token input is accepted.")
+    groups = root.add_subparsers(dest="resource_command", required=True)
+
+    session = groups.add_parser("session", help="Authentication diagnostics").add_subparsers(dest="action_command", required=True)
+    _read_leaf(session, "doctor", "Verify the existing NewBeeBox desktop login and Creator token exchange.", platform="newbee", resource="session", action="doctor")
+
+    plugin = groups.add_parser("plugin", help="Plugin create, version update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
+    for action, text in (("create", "Create a private or explicitly reviewed plugin record."), ("update", "Upload one immutable plugin version."), ("edit", "Edit plugin metadata or explicit public/review state.")):
+        _write_leaf(plugin, "newbee", "plugin", action, text)
+    leaf = _read_leaf(plugin, "list", "List plugins owned by the current author.", platform="newbee", resource="plugin", action="list"); _list_flags(leaf)
+    leaf = _read_leaf(plugin, "get", "Read one plugin detail by numeric Creator ID.", platform="newbee", resource="plugin", action="get"); leaf.add_argument("--id", type=_positive, required=True)
+    _read_leaf(plugin, "categories", "List current plugin categories and IDs.", platform="newbee", resource="plugin", action="categories")
+    _read_leaf(plugin, "game-versions", "List current game branches/build IDs, including retail and classic variants.", platform="newbee", resource="plugin", action="game-versions")
+    leaf = _read_leaf(plugin, "versions", "List uploaded versions for one plugin.", platform="newbee", resource="plugin", action="versions"); leaf.add_argument("--id", type=_positive, required=True); _page_flags(leaf)
+    changelog = plugin.add_parser("changelog", help="Read or edit plugin version logs").add_subparsers(dest="changelog_action", required=True)
+    leaf = _read_leaf(changelog, "list", "List version log records for one plugin.", platform="newbee", resource="plugin", action="changelog-list"); leaf.add_argument("--id", type=_positive, required=True); _page_flags(leaf)
+    leaf = _read_leaf(changelog, "get", "Read one plugin version log by file ID.", platform="newbee", resource="plugin", action="changelog-get"); leaf.add_argument("--id", type=_positive, required=True)
+    _write_leaf(changelog, "newbee", "plugin-changelog", "edit", "Edit or explicitly clear one existing plugin version log.")
+
+    config = groups.add_parser("config", help="Configuration share create, backup update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
+    for action, text in (("create", "Create a configuration share from an existing desktop cloud backup."), ("update", "Replace cloud-backup content selections without changing metadata."), ("edit", "Edit configuration metadata, business settings, channel, or review state.")):
+        _write_leaf(config, "newbee", "config", action, text)
+    leaf = _read_leaf(config, "list", "List configuration shares owned by the current author.", platform="newbee", resource="config", action="list"); _list_flags(leaf, offset=True)
+    leaf = _read_leaf(config, "get", "Read a safe configuration-share detail without raw backup paths.", platform="newbee", resource="config", action="get"); leaf.add_argument("--id", type=_positive, required=True)
+    _read_leaf(config, "backups", "List cloud backups already uploaded by the NewBeeBox desktop client.", platform="newbee", resource="config", action="backups")
+    leaf = _read_leaf(config, "backup-get", "Read selectable plugins, ignored items, fonts, materials, and roles from one cloud backup.", platform="newbee", resource="config", action="backup-get"); leaf.add_argument("--id", type=_positive, required=True, help="Cloud backup ID.")
+
+    wa = groups.add_parser("wa", help="WA/string create, version update, metadata edit, and attached operations").add_subparsers(dest="action_command", required=True)
+    for action, text in (("create", "Create a WA/string record and first string version."), ("update", "Publish one new immutable WA/string version."), ("edit", "Edit WA metadata, media, categories, attachments, business settings, or review state.")):
+        _write_leaf(wa, "newbee", "wa", action, text)
+    leaf = _read_leaf(wa, "list", "List WA/string records owned by the current author; raw strings are redacted.", platform="newbee", resource="wa", action="list"); _list_flags(leaf, offset=True)
+    leaf = _read_leaf(wa, "get", "Read one WA metadata detail; raw strings are replaced with length and SHA-256.", platform="newbee", resource="wa", action="get"); leaf.add_argument("--id", type=_positive, required=True)
+    leaf = _read_leaf(wa, "categories", "List WA categories for a selected game version.", platform="newbee", resource="wa", action="categories"); leaf.add_argument("--game-version-id", type=_positive, required=True)
+    _read_leaf(wa, "attachment-paths", "List platform-provided attachment install types and paths.", platform="newbee", resource="wa", action="attachment-paths")
+    media = wa.add_parser("media", help="Upload one WA image or verified attachment material").add_subparsers(dest="media_action", required=True)
+    _write_leaf(media, "newbee", "wa-media", "upload", "Upload one WA media file and return its reusable platform reference.")
+    logs = wa.add_parser("changelog", help="Read or edit WA version logs").add_subparsers(dest="log_action", required=True)
+    leaf = _read_leaf(logs, "latest", "Read the latest WA version summary.", platform="newbee", resource="wa", action="changelog-latest"); leaf.add_argument("--id", type=_positive, required=True)
+    leaf = _read_leaf(logs, "list", "List WA version log records.", platform="newbee", resource="wa", action="changelog-list"); leaf.add_argument("--id", type=_positive, required=True); _page_flags(leaf)
+    _write_leaf(logs, "newbee", "wa-changelog", "edit", "Edit or explicitly clear one WA version log.")
+    authors = wa.add_parser("co-author", help="Search, list, or replace WA co-authors").add_subparsers(dest="author_action", required=True)
+    leaf = _read_leaf(authors, "search", "Search current co-author candidates.", platform="newbee", resource="wa", action="co-author-search"); leaf.add_argument("--keyword", required=True)
+    leaf = _read_leaf(authors, "list", "List current co-authors for one WA.", platform="newbee", resource="wa", action="co-author-list"); leaf.add_argument("--id", type=_positive, required=True)
+    _write_leaf(authors, "newbee", "wa-co-author", "set", "Replace the complete WA co-author list; an empty array clears it.")
+    references = wa.add_parser("reference", help="Search, list, or replace WA content references").add_subparsers(dest="reference_action", required=True)
+    leaf = _read_leaf(references, "search", "Search content that can be referenced by a WA.", platform="newbee", resource="wa", action="reference-search"); leaf.add_argument("--keyword", required=True)
+    leaf = _read_leaf(references, "list", "List current references for one WA.", platform="newbee", resource="wa", action="reference-list"); leaf.add_argument("--id", type=_positive, required=True)
+    _write_leaf(references, "newbee", "wa-reference", "set", "Replace the complete WA reference list; an empty array clears it.")
+    share_code = wa.add_parser("share-code", help="Set or refresh the NewBeeBox WA share code").add_subparsers(dest="share_code_action", required=True)
+    _write_leaf(share_code, "newbee", "wa-share-code", "set", "Set or refresh the share code for one WA module.")
+
+
+def _dd_tree(platforms: argparse._SubParsersAction) -> None:
+    root = platforms.add_parser("dd", help="NetEase DD author operations", description="Use DD's official netease_dd.exe, credentials, native login, and NEP signer. No token input is accepted.")
+    groups = root.add_subparsers(dest="resource_command", required=True)
+    session = groups.add_parser("session", help="Installation and session diagnostics").add_subparsers(dest="action_command", required=True)
+    _read_leaf(session, "doctor", "Discover and validate the DD installation and sidecar state path.", platform="dd", resource="session", action="doctor")
+    options = groups.add_parser("options", help="Read dynamic business choices before writing").add_subparsers(dest="option_action", required=True)
+    for action, text in (("game-types", "List DD game types."), ("channels", "List selectable DD rooms/channels for room association."), ("life-types", "List share-code and purchase life types."), ("vip-levels", "List available anchor VIP levels."), ("associated-acts", "List current-author content eligible for association.")):
+        leaf = _read_leaf(options, action, text, platform="dd", resource="options", action=action)
+        if action == "associated-acts":
+            leaf.add_argument("--game-type", type=_positive, required=True)
+
+    plugin = groups.add_parser("plugin", help="DD plugin create, version update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
+    for action, text in (("create", "Create a DD plugin with its first selected version."), ("update", "Publish a DD plugin version while preserving metadata."), ("edit", "Edit DD plugin metadata and commercial/association settings.")):
+        _write_leaf(plugin, "dd", "plugin", action, text)
+    leaf = _read_leaf(plugin, "list", "List plugins owned by the current DD author account.", platform="dd", resource="plugin", action="list"); _list_flags(leaf, game_type=True)
+    leaf = _read_leaf(plugin, "get", "Read one DD plugin detail by share SN.", platform="dd", resource="plugin", action="get"); leaf.add_argument("--sn", required=True)
+    _read_leaf(plugin, "categories", "List DD plugin category choices.", platform="dd", resource="plugin", action="categories")
+    leaf = _read_leaf(plugin, "game-versions", "List build choices for one DD game type.", platform="dd", resource="plugin", action="game-versions"); leaf.add_argument("--game-type", type=_positive, required=True)
+    leaf = _read_leaf(plugin, "versions", "List versions for one DD plugin.", platform="dd", resource="plugin", action="versions"); leaf.add_argument("--sn", required=True); leaf.add_argument("--game-type", type=_positive, required=True); leaf.add_argument("--page", type=_positive, default=1)
+
+    config = groups.add_parser("config", help="DD configuration create, backup-content update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
+    for action, text in (("create", "Create a DD configuration share from an existing DD cloud backup."), ("update", "Update selected backup content and inner versions."), ("edit", "Edit DD configuration metadata and commercial/association settings.")):
+        _write_leaf(config, "dd", "config", action, text)
+    leaf = _read_leaf(config, "list", "List configuration shares owned by the current DD author.", platform="dd", resource="config", action="list"); _list_flags(leaf, game_type=True)
+    leaf = _read_leaf(config, "get", "Read one DD configuration detail by share SN.", platform="dd", resource="config", action="get"); leaf.add_argument("--sn", required=True)
+    _read_leaf(config, "backups", "List DD cloud backups available to the current account.", platform="dd", resource="config", action="backups")
+    leaf = _read_leaf(config, "backup-get", "Read one DD backup's complete selectable content.", platform="dd", resource="config", action="backup-get"); leaf.add_argument("--sn", required=True)
+
+    wa = groups.add_parser("wa", help="DD WA/string create, content update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
+    for action, text in (("create", "Create a DD WA/string record."), ("update", "Publish updated DD WA content/version/material while preserving metadata."), ("edit", "Edit DD WA metadata and commercial/association settings.")):
+        _write_leaf(wa, "dd", "wa", action, text)
+    leaf = _read_leaf(wa, "list", "List WA/string records owned by the current DD author.", platform="dd", resource="wa", action="list"); _list_flags(leaf, game_type=True)
+    leaf = _read_leaf(wa, "get", "Read one DD WA detail by share SN.", platform="dd", resource="wa", action="get"); leaf.add_argument("--sn", required=True)
+    leaf = _read_leaf(wa, "categories", "List DD WA category choices for a game type.", platform="dd", resource="wa", action="categories"); leaf.add_argument("--game-type", type=_positive, required=True)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = _parser(
+        prog="fupload",
+        description="Atomic World of Warcraft author publishing CLI for NewBeeBox and NetEase DD.",
+        epilog="All output is JSON. Write commands require versioned JSON through --input and never prompt.",
+    )
+    parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
+    platforms = parser.add_subparsers(dest="platform_command", required=True)
+    _newbee_tree(platforms)
+    _dd_tree(platforms)
+    return parser
+
+
+def _validate_nested_files(doc: Dict[str, Any]) -> None:
+    for name in ("screenshot_files", "picture_files", "image_files", "detail_img_files", "display_img_files"):
+        if name not in doc:
+            continue
+        if not isinstance(doc[name], list):
+            raise ValidationError("expected array", path="$.%s" % name)
+        for index, value in enumerate(doc[name]):
+            if not isinstance(value, str) or not os.path.isfile(value):
+                raise ValidationError("file does not exist or is not a regular file", path="$.%s[%d]" % (name, index))
+
+
+def _dry_run_data(doc: Dict[str, Any], schema_name: str) -> Dict[str, Any]:
+    files = {}
+    for name, value in doc.items():
+        if name == "file" or name.endswith("_file"):
+            if isinstance(value, str) and value:
+                files[name] = {"name": Path(value).name, "size": Path(value).stat().st_size}
+        elif name.endswith("_files") and isinstance(value, list):
+            files[name] = [{"name": Path(path).name, "size": Path(path).stat().st_size} for path in value]
+    return {
+        "schema_valid": True,
+        "input_schema": schema_name,
+        "present_fields": sorted(set(doc) - {"schema"}),
+        "local_files": files,
+        "remote_validation_performed": False,
+        "note": "Remote IDs, permissions, current state, and dynamic choices are checked only during execution.",
+    }
+
+
+def main(argv: Optional[Sequence[str]] = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    platform = getattr(args, "platform", getattr(args, "platform_command", "unknown"))
+    resource = getattr(args, "resource", "unknown")
+    action = getattr(args, "action", "unknown")
+    operation = "%s.%s" % (resource, action)
+    try:
+        if args.handler == "write":
+            schema = get_schema(platform, resource, action)
+            doc = schema.validate(read_json(args.input))
+            _validate_nested_files(doc)
+            if args.dry_run:
+                write_output(platform, operation, _dry_run_data(doc, schema.name), dry_run=True)
+                return 0
+            provider = NewBee() if platform == "newbee" else DD()
+            data = provider.execute_write(resource, action, doc)
+            write_output(platform, operation, data)
+            return 0
+        provider = NewBee() if platform == "newbee" else DD()
+        data = provider.execute_read(resource, action, args)
+        write_output(platform, operation, data)
+        return 0
+    except (FuploadError, OSError, ValueError) as exc:
+        write_error(platform, operation, exc)
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

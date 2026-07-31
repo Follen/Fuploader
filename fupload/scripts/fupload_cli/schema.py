@@ -1,0 +1,477 @@
+"""Versioned write schemas with presence-aware validation."""
+
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass, field
+from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple
+
+from .errors import ValidationError
+
+
+JSON_TYPES = {
+    "string": (str,),
+    "integer": (int,),
+    "number": (int, float),
+    "boolean": (bool,),
+    "array": (list,),
+    "object": (dict,),
+}
+
+
+@dataclass(frozen=True)
+class Field:
+    type: str
+    required: bool = False
+    nullable: bool = False
+    choices: Tuple[Any, ...] = ()
+    nonempty: bool = False
+    max_length: Optional[int] = None
+    local_file: bool = False
+    description: str = ""
+
+
+@dataclass(frozen=True)
+class Schema:
+    name: str
+    fields: Mapping[str, Field]
+    conditionals: Tuple[str, ...] = field(default_factory=tuple)
+
+    def validate(self, value: Mapping[str, Any]) -> Dict[str, Any]:
+        if not isinstance(value, dict):
+            raise ValidationError("input document must be an object")
+        unknown = sorted(set(value) - set(self.fields) - {"schema"})
+        if unknown:
+            raise ValidationError("unknown field(s): %s" % ", ".join(unknown), path="$.%s" % unknown[0])
+        actual = value.get("schema")
+        if actual != self.name:
+            raise ValidationError("schema must be %s" % self.name, path="$.schema")
+        for name, spec in self.fields.items():
+            if spec.required and name not in value:
+                raise ValidationError("field is required", path="$.%s" % name)
+            if name not in value:
+                continue
+            item = value[name]
+            if item is None:
+                if not spec.nullable:
+                    raise ValidationError("null is not allowed", path="$.%s" % name)
+                continue
+            expected = JSON_TYPES[spec.type]
+            if spec.type in ("integer", "number") and isinstance(item, bool):
+                raise ValidationError("expected %s" % spec.type, path="$.%s" % name)
+            if not isinstance(item, expected):
+                raise ValidationError("expected %s" % spec.type, path="$.%s" % name)
+            if spec.nonempty and item in ("", []):
+                raise ValidationError("must not be empty", path="$.%s" % name)
+            if spec.max_length is not None and len(item) > spec.max_length:
+                raise ValidationError(
+                    "must contain at most %d characters" % spec.max_length,
+                    path="$.%s" % name,
+                )
+            if spec.choices and item not in spec.choices:
+                raise ValidationError(
+                    "must be one of: %s" % ", ".join(map(str, spec.choices)),
+                    path="$.%s" % name,
+                )
+            if spec.local_file and item and (not os.path.isfile(item)):
+                raise ValidationError("file does not exist or is not a regular file", path="$.%s" % name)
+        checked = dict(value)
+        self._validate_conditionals(checked)
+        return checked
+
+    def _validate_conditionals(self, value: Dict[str, Any]) -> None:
+        for name in ("id", "mod_id", "file_id", "content_id", "source_id", "module_id", "game_version_id"):
+            if name in value and isinstance(value[name], int) and value[name] <= 0:
+                raise ValidationError("must be greater than zero", path="$.%s" % name)
+        if value.get("public") is True and value.get("submit_for_review") is not True:
+            raise ValidationError(
+                "public=true requires submit_for_review=true",
+                path="$.submit_for_review",
+            )
+        if value.get("submit_for_review") is True and value.get("public") is not True:
+            raise ValidationError(
+                "submit_for_review=true requires public=true",
+                path="$.public",
+            )
+        if value.get("need_buy") is True:
+            for name in ("price_fen", "buy_life_type"):
+                if name not in value or value[name] in (None, ""):
+                    raise ValidationError("%s is required when need_buy=true" % name, path="$.%s" % name)
+            if int(value["price_fen"]) <= 0:
+                raise ValidationError("price_fen must be greater than zero when need_buy=true", path="$.price_fen")
+        if value.get("jump_room") is True:
+            for name in ("room_id", "channel_id", "channel_type"):
+                if not value.get(name):
+                    raise ValidationError("%s is required when jump_room=true" % name, path="$.%s" % name)
+        if value.get("sync_room") is True:
+            if value.get("jump_room") is False:
+                raise ValidationError("sync_room=true requires jump_room=true", path="$.jump_room")
+            if value.get("scope") == "private":
+                raise ValidationError("sync_room=true requires public scope", path="$.scope")
+        if value.get("with_associate") is True and not value.get("associated_acts"):
+            raise ValidationError("associated_acts must contain at least one item when with_associate=true", path="$.associated_acts")
+        if value.get("need_anchor_vip") is True and not value.get("vip_levels"):
+            raise ValidationError("vip_levels must contain at least one item when need_anchor_vip=true", path="$.vip_levels")
+        if value.get("need_anchor_vip") is True and value.get("scope") == "private":
+            raise ValidationError("need_anchor_vip=true requires public scope", path="$.scope")
+        if self.name.startswith("fupload.v1.dd.") and self.name.endswith(".create"):
+            if value.get("scope") == "private" and not value.get("share_code_life_type"):
+                raise ValidationError("share_code_life_type is required when scope=private", path="$.share_code_life_type")
+        if value.get("with_file") is True:
+            if not value.get("file_path") and not value.get("file"):
+                raise ValidationError("file_path or file is required when with_file=true", path="$.file_path")
+            if not value.get("file_install_path"):
+                raise ValidationError("required when with_file=true", path="$.file_install_path")
+        if value.get("string_mode") == "collection":
+            if not value.get("wa_str_titles"):
+                raise ValidationError("required for collection mode", path="$.wa_str_titles")
+        one_of = []
+        if self.name == "fupload.v1.newbee.plugin.create":
+            one_of.append(("logo", "logo_file"))
+        if self.name == "fupload.v1.newbee.config.create":
+            one_of.append(("picture_urls", "picture_files"))
+        if self.name == "fupload.v1.newbee.wa.create":
+            one_of.append(("thumbnail", "thumbnail_file"))
+        if self.name == "fupload.v1.dd.plugin.create":
+            one_of.extend((("logo", "logo_file"), ("detail_imgs", "detail_img_files"), ("detail_url", "file")))
+        if self.name == "fupload.v1.dd.config.create":
+            one_of.append(("display_imgs", "display_img_files"))
+        if self.name == "fupload.v1.dd.wa.create":
+            one_of.append(("display_imgs", "display_img_files"))
+        for choices in one_of:
+            if not any(value.get(name) for name in choices):
+                raise ValidationError("one of %s is required" % ", ".join(choices), path="$.%s" % choices[0])
+        if "cloud_id" in value and value.get("cloud_id") is not None and self.name == "fupload.v1.newbee.config.update":
+            required = ("linked_mods", "ignored_unknown_mods", "ignored_materials", "ignored_fronts", "roleid")
+            for name in required:
+                if name not in value:
+                    raise ValidationError("%s is required when cloud_id is changed" % name, path="$.%s" % name)
+        if self.name == "fupload.v1.dd.config.update" and "backup_sn" in value:
+            if not value.get("update_desc"):
+                raise ValidationError("update_desc is required for DD config update", path="$.update_desc")
+        self._validate_nested(value)
+
+    def _validate_nested(self, value: Mapping[str, Any]) -> None:
+        def scalar_array(name: str, expected: Tuple[type, ...], message: str) -> None:
+            if name not in value:
+                return
+            items = value[name]
+            if not isinstance(items, list):
+                raise ValidationError("expected array", path="$.%s" % name)
+            for index, item in enumerate(items):
+                if isinstance(item, bool) or not isinstance(item, expected) or (isinstance(item, str) and not item):
+                    raise ValidationError(message, path="$.%s[%d]" % (name, index))
+
+        def object_array(name: str, allowed: set[str], required_names: Tuple[str, ...] = ()) -> None:
+            if name not in value:
+                return
+            items = value[name]
+            if not isinstance(items, list):
+                raise ValidationError("expected array", path="$.%s" % name)
+            for index, item in enumerate(items):
+                path = "$.%s[%d]" % (name, index)
+                if not isinstance(item, dict):
+                    raise ValidationError("expected object", path=path)
+                unknown = sorted(set(item) - allowed)
+                if unknown:
+                    raise ValidationError("unknown field(s): %s" % ", ".join(unknown), path=path + "." + unknown[0])
+                for required_name in required_names:
+                    if required_name not in item:
+                        raise ValidationError("field is required", path=path + "." + required_name)
+
+        if self.name.startswith("fupload.v1.newbee"):
+            object_array(
+                "linked_mods",
+                {"mod_id", "mod_name", "mod_file_id", "mod_version", "display_name", "update_type", "updateType"},
+                ("mod_id",),
+            )
+            object_array("attachments", {"name", "install_type", "install_path", "value", "is_compressed", "timestamp"}, ("name", "install_type", "install_path", "value", "is_compressed"))
+            object_array("co_authors", {"user_id", "share_percent"}, ("user_id", "share_percent"))
+            object_array("references", {"type", "id"}, ("type", "id"))
+            if "co_authors" in value:
+                total = 0.0
+                for index, item in enumerate(value["co_authors"]):
+                    share = item["share_percent"]
+                    if isinstance(share, bool) or not isinstance(share, (int, float)) or share <= 0 or share > 1:
+                        raise ValidationError("share_percent must be in (0,1]", path="$.co_authors[%d].share_percent" % index)
+                    if isinstance(item["user_id"], bool) or not isinstance(item["user_id"], int) or item["user_id"] <= 0:
+                        raise ValidationError("user_id must be greater than zero", path="$.co_authors[%d].user_id" % index)
+                    total += float(share)
+                if total > 1.000001:
+                    raise ValidationError("co_authors share_percent total may not exceed 1", path="$.co_authors")
+            for name in ("mod_categories", "category_id_list"):
+                if name in value and any(isinstance(item, bool) or not isinstance(item, int) or item <= 0 for item in value[name]):
+                    raise ValidationError("array must contain positive integer IDs", path="$.%s" % name)
+            scalar_array("game_version_list", (int,), "array must contain positive integer IDs")
+            if "game_version_list" in value and any(item <= 0 for item in value["game_version_list"]):
+                raise ValidationError("array must contain positive integer IDs", path="$.game_version_list")
+            for name in (
+                "screenshots", "picture_urls", "images", "screenshot_files", "picture_files",
+                "image_files", "ignored_unknown_mods", "ignored_materials", "ignored_fronts",
+                "wa_str_titles",
+            ):
+                scalar_array(name, (str,), "array must contain nonempty strings")
+        if self.name.startswith("fupload.v1.dd"):
+            object_array("associated_acts", {"sn", "act_type"}, ("sn", "act_type"))
+            for name in ("second_category_ids", "vip_levels"):
+                if name in value and any(isinstance(item, bool) or not isinstance(item, int) for item in value[name]):
+                    raise ValidationError("array must contain integer IDs", path="$.%s" % name)
+            for index, item in enumerate(value.get("associated_acts") or []):
+                if not isinstance(item.get("sn"), str) or not item["sn"]:
+                    raise ValidationError("expected nonempty string", path="$.associated_acts[%d].sn" % index)
+                if item.get("act_type") not in ("addon", "share", "wa"):
+                    raise ValidationError("act_type must be addon, share, or wa", path="$.associated_acts[%d].act_type" % index)
+            scalar_array("game_versions", (str,), "array must contain nonempty version strings")
+            scalar_array("category_ids", (str, int), "array must contain nonempty category IDs")
+            for name in ("detail_imgs", "display_imgs", "detail_img_files", "display_img_files"):
+                scalar_array(name, (str,), "array must contain nonempty strings")
+            for name in ("known_addon_ids", "known_addon_update_ids"):
+                scalar_array(name, (int,), "array must contain integer addon IDs")
+            for name in (
+                "unknown_addon_ids", "unknown_addon_update_ids", "wtf_role_ids",
+                "material_names", "material_update_names", "font_names", "font_update_names",
+                "known_wa_ids", "known_wa_update_ids", "unknown_wa_ids", "unknown_wa_update_ids",
+            ):
+                scalar_array(name, (str,), "array must contain nonempty strings")
+            if len(value.get("wtf_role_ids") or []) > 1:
+                raise ValidationError("at most one WTF role may be selected", path="$.wtf_role_ids")
+            if self.name.startswith("fupload.v1.dd.wa") and "version" in value and not value["version"].isdigit():
+                raise ValidationError("version must contain digits only", path="$.version")
+            if self.name.startswith("fupload.v1.dd.config") and value.get("retail_ui_config") is not None:
+                retail = value["retail_ui_config"]
+                allowed = {
+                    "edit_mode_selectors", "default_edit_mode_selector",
+                    "cool_down_selectors", "enable_dd_setup_wizard",
+                }
+                unknown = sorted(set(retail) - allowed)
+                if unknown:
+                    raise ValidationError(
+                        "unknown field(s): %s" % ", ".join(unknown),
+                        path="$.retail_ui_config.%s" % unknown[0],
+                    )
+                for name in ("edit_mode_selectors", "cool_down_selectors"):
+                    if name not in retail:
+                        continue
+                    if not isinstance(retail[name], list):
+                        raise ValidationError("expected array", path="$.retail_ui_config.%s" % name)
+                    for index, item in enumerate(retail[name]):
+                        if not isinstance(item, str) or not item:
+                            raise ValidationError("array must contain nonempty selector strings", path="$.retail_ui_config.%s[%d]" % (name, index))
+                if "default_edit_mode_selector" in retail:
+                    selector = retail["default_edit_mode_selector"]
+                    if selector is not None and (not isinstance(selector, str) or not selector):
+                        raise ValidationError("expected nonempty string or null", path="$.retail_ui_config.default_edit_mode_selector")
+                if "enable_dd_setup_wizard" in retail and not isinstance(retail["enable_dd_setup_wizard"], bool):
+                    raise ValidationError("expected boolean", path="$.retail_ui_config.enable_dd_setup_wizard")
+
+
+def f(type_name: str, **kwargs: Any) -> Field:
+    return Field(type_name, **kwargs)
+
+
+NB_PLUGIN_META = {
+    "name": f("string", nonempty=True),
+    "mod_categories": f("array", nonempty=True),
+    "content_origin": f("integer"),
+    "content_format": f("integer"),
+    "intro": f("string"),
+    "description": f("string"),
+    "logo": f("string"),
+    "logo_file": f("string", local_file=True),
+    "screenshots": f("array"),
+    "screenshot_files": f("array"),
+    "public": f("boolean"),
+    "submit_for_review": f("boolean"),
+    "subscribe_plan_level": f("integer"),
+    "link_to_channel": f("boolean"),
+}
+
+NB_CONFIG_META = {
+    "title": f("string", nonempty=True), "content": f("string", nonempty=True),
+    "content_format": f("integer"), "intro": f("string"),
+    "picture_urls": f("array"), "picture_files": f("array"),
+    "content_origin": f("integer"), "public": f("boolean"),
+    "submit_for_review": f("boolean"), "link_to_channel": f("boolean"),
+    "subscribe_plan_level": f("integer"), "price": f("integer"),
+    "time_range": f("string"),
+}
+NB_CONFIG_BACKUP = {
+    "cloud_id": f("integer"), "linked_mods": f("array"),
+    "ignored_unknown_mods": f("array"), "ignored_materials": f("array"),
+    "ignored_fronts": f("array"), "roleid": f("string"),
+}
+
+NB_WA_META = {
+    "game_version_id": f("integer"), "name": f("string", nonempty=True),
+    "intro": f("string"), "description": f("string", nonempty=True), "content_format": f("integer"),
+    "thumbnail": f("string"), "thumbnail_file": f("string", local_file=True),
+    "images": f("array"), "image_files": f("array"),
+    "category_id_list": f("array", nonempty=True), "content_origin": f("integer"),
+    "subscribe_plan_level": f("integer"), "price": f("integer"), "time_range": f("string"),
+    "public": f("boolean"), "submit_for_review": f("boolean"),
+    "link_to_channel": f("boolean"), "attachments": f("array"),
+}
+
+DD_COMMERCIAL = {
+    "scope": f("string", choices=("public", "private")),
+    "share_code_life_type": f("string"), "need_buy": f("boolean"),
+    "price_fen": f("integer"), "buy_life_type": f("string"),
+    "jump_room": f("boolean"), "room_id": f("string"), "channel_id": f("string"),
+    "channel_type": f("string"), "sync_room": f("boolean"),
+    "creation_statement": f("string"), "with_associate": f("boolean"),
+    "associated_acts": f("array"), "need_anchor_vip": f("boolean"),
+    "vip_levels": f("array"),
+}
+
+DD_PLUGIN_META = {
+    "game_type": f("integer"), "scope": DD_COMMERCIAL["scope"], "addon_type": f("integer"),
+    "name": f("string", nonempty=True, max_length=80),
+    "description": f("string", nonempty=True, max_length=80),
+    "logo": f("string"), "logo_file": f("string", local_file=True),
+    "detail_imgs": f("array"), "detail_img_files": f("array"),
+    "primary_category_id": f("integer"), "second_category_ids": f("array"),
+    "html_desc": f("string"),
+    **DD_COMMERCIAL,
+}
+DD_PLUGIN_VERSION = {
+    "game_versions": f("array", nonempty=True), "detail_url": f("string"),
+    "file": f("string", local_file=True), "release_type": f("integer"),
+    "version": f("string", nonempty=True, max_length=80),
+    "update_desc": f("string", max_length=1000),
+}
+
+DD_CONFIG_META = {
+    "scope": DD_COMMERCIAL["scope"], "title": f("string", nonempty=True, max_length=40),
+    "brief_desc": f("string", nonempty=True, max_length=50), "desc": f("string", nonempty=True),
+    "display_imgs": f("array"), "display_img_files": f("array"),
+    **DD_COMMERCIAL,
+}
+DD_CONFIG_CONTENT = {
+    "backup_sn": f("string", nonempty=True), "update_desc": f("string", max_length=1000),
+    "known_addon_ids": f("array"), "known_addon_update_ids": f("array"),
+    "unknown_addon_ids": f("array"), "unknown_addon_update_ids": f("array"),
+    "wtf_role_ids": f("array"), "material_names": f("array"), "material_update_names": f("array"),
+    "font_names": f("array"), "font_update_names": f("array"),
+    "known_wa_ids": f("array"), "known_wa_update_ids": f("array"),
+    "unknown_wa_ids": f("array"), "unknown_wa_update_ids": f("array"),
+    "retail_ui_config": f(
+        "object", nullable=True,
+        description="safe selector object: edit_mode_selectors, default_edit_mode_selector, cool_down_selectors, enable_dd_setup_wizard",
+    ),
+}
+
+DD_WA_META = {
+    "game_type": f("integer"), "scope": DD_COMMERCIAL["scope"],
+    "name": f("string", nonempty=True, max_length=40), "game_version": f("string", nonempty=True),
+    "brief_desc": f("string", nonempty=True, max_length=50), "display_imgs": f("array"),
+    "display_img_files": f("array"), "category_ids": f("array", nonempty=True),
+    "desc": f("string", nonempty=True), **DD_COMMERCIAL,
+}
+DD_WA_CONTENT = {
+    "content": f("string", nonempty=True), "update_desc": f("string", nonempty=True, max_length=1000),
+    "version": f("string", nonempty=True, max_length=80), "with_file": f("boolean"),
+    "file_path": f("string"), "file": f("string", local_file=True),
+    "file_install_path": f("string"), "parse_wa_uid": f("string"), "parse_wa_id": f("string"),
+}
+
+
+def required(fields: Mapping[str, Field], names: Iterable[str]) -> Dict[str, Field]:
+    result = dict(fields)
+    for name in names:
+        old = result[name]
+        result[name] = Field(
+            old.type, required=True, nullable=old.nullable, choices=old.choices,
+            nonempty=old.nonempty, max_length=old.max_length,
+            local_file=old.local_file, description=old.description,
+        )
+    return result
+
+
+def with_id(fields: Mapping[str, Field], name: str = "id") -> Dict[str, Field]:
+    return {name: f("string" if name in ("sn", "share_sn") else "integer", required=True, nonempty=True), **fields}
+
+
+SCHEMAS: Dict[Tuple[str, str, str], Schema] = {}
+
+
+def register(platform: str, resource: str, action: str, fields: Mapping[str, Field]) -> None:
+    name = "fupload.v1.%s.%s.%s" % (platform, resource, action)
+    SCHEMAS[(platform, resource, action)] = Schema(name, fields)
+
+
+register("newbee", "plugin", "create", required(NB_PLUGIN_META, ("name", "mod_categories", "content_origin", "content_format", "intro", "description", "public")))
+register("newbee", "plugin", "update", required({"mod_id": f("integer"), "version": f("string", nonempty=True), "game_version_list": f("array", nonempty=True), "file": f("string", local_file=True), "changelog": f("string"), "link_to_channel": f("boolean")}, ("mod_id", "version", "game_version_list", "file")))
+register("newbee", "plugin", "edit", with_id(NB_PLUGIN_META))
+register("newbee", "plugin-changelog", "edit", required({"file_id": f("integer"), "changelog": f("string", nullable=True)}, ("file_id", "changelog")))
+
+register("newbee", "config", "create", required({**NB_CONFIG_META, **NB_CONFIG_BACKUP}, ("cloud_id", "title", "content", "content_format", "content_origin", "public", "linked_mods", "ignored_unknown_mods", "ignored_materials", "ignored_fronts", "roleid")))
+register("newbee", "config", "update", with_id(NB_CONFIG_BACKUP))
+register("newbee", "config", "edit", with_id(NB_CONFIG_META))
+
+register("newbee", "wa", "create", required({**NB_WA_META, "wa_str": f("string", nonempty=True), "wa_str_titles": f("array"), "wa_log": f("string", nonempty=True), "string_mode": f("string", choices=("single", "collection"))}, ("game_version_id", "name", "description", "content_format", "category_id_list", "content_origin", "public", "wa_str", "wa_log", "string_mode")))
+register("newbee", "wa", "update", required({"id": f("integer"), "version": f("string", nonempty=True), "wa_str": f("string", nonempty=True), "wa_str_titles": f("array"), "wa_log": f("string", nonempty=True), "link_to_channel": f("boolean")}, ("id", "wa_str", "wa_log")))
+register("newbee", "wa", "edit", with_id(NB_WA_META))
+register("newbee", "wa-media", "upload", required({"file": f("string", local_file=True), "kind": f("string", choices=("image", "attachment")), "install_type": f("integer"), "install_path": f("string")}, ("file", "kind")))
+register("newbee", "wa-changelog", "edit", required({"id": f("integer"), "wa_id": f("integer"), "wa_log": f("string", nullable=True)}, ("id", "wa_log")))
+register("newbee", "wa-co-author", "set", required({"content_id": f("integer"), "co_authors": f("array")}, ("content_id", "co_authors")))
+register("newbee", "wa-reference", "set", required({"source_id": f("integer"), "references": f("array")}, ("source_id", "references")))
+register("newbee", "wa-share-code", "set", required({"module_id": f("integer")}, ("module_id",)))
+
+register("dd", "plugin", "create", required(
+    {**DD_PLUGIN_META, **DD_PLUGIN_VERSION},
+    ("game_type", "scope", "addon_type", "name", "description",
+     "primary_category_id", "game_versions", "release_type", "version",
+     "html_desc", "update_desc", "creation_statement", "need_buy", "jump_room",
+     "with_associate", "need_anchor_vip"),
+))
+register("dd", "plugin", "update", with_id(required(DD_PLUGIN_VERSION, ("game_versions", "version", "update_desc")), "sn"))
+register("dd", "plugin", "edit", with_id(DD_PLUGIN_META, "sn"))
+register("dd", "config", "create", required(
+    {**DD_CONFIG_META, **DD_CONFIG_CONTENT},
+    ("scope", "backup_sn", "title", "brief_desc", "desc",
+     "creation_statement", "known_addon_ids", "unknown_addon_ids", "wtf_role_ids",
+     "material_names", "font_names", "known_wa_ids", "unknown_wa_ids", "need_buy",
+     "jump_room", "with_associate", "need_anchor_vip"),
+))
+register("dd", "config", "update", with_id(required(DD_CONFIG_CONTENT, ("backup_sn", "update_desc")), "share_sn"))
+register("dd", "config", "edit", with_id(DD_CONFIG_META, "share_sn"))
+register("dd", "wa", "create", required(
+    {**DD_WA_META, **DD_WA_CONTENT},
+    ("game_type", "scope", "name", "game_version", "brief_desc",
+     "category_ids", "content", "desc", "update_desc", "version", "creation_statement",
+     "with_file", "need_buy", "jump_room", "with_associate", "need_anchor_vip"),
+))
+register("dd", "wa", "update", with_id(required(DD_WA_CONTENT, ("content", "update_desc", "version", "with_file")), "sn"))
+register("dd", "wa", "edit", with_id(DD_WA_META, "sn"))
+
+
+def get_schema(platform: str, resource: str, action: str) -> Schema:
+    try:
+        return SCHEMAS[(platform, resource, action)]
+    except KeyError as exc:
+        raise ValidationError("no write schema for %s %s %s" % (platform, resource, action)) from exc
+
+
+def schema_help(platform: str, resource: str, action: str) -> str:
+    schema = get_schema(platform, resource, action)
+    rows = ["Input schema: %s" % schema.name, "Fields:"]
+    for name, spec in schema.fields.items():
+        flags = [spec.type, "required" if spec.required else "optional"]
+        if spec.nullable:
+            flags.append("nullable/explicit clear")
+        if spec.choices:
+            flags.append("choices=" + "|".join(map(str, spec.choices)))
+        if spec.max_length is not None:
+            flags.append("max-length=" + str(spec.max_length))
+        if spec.local_file:
+            flags.append("local file")
+        detail = ", ".join(flags)
+        if spec.description:
+            detail += "; " + spec.description
+        rows.append("  %-28s %s" % (name, detail))
+    rows.extend([
+        "Unknown fields are rejected. On edit/update, omission preserves the remote value.",
+        "Frontend preselected values are never used as business defaults.",
+        "Use --dry-run for local validation only; it does not validate remote IDs or permissions.",
+    ])
+    return "\n".join(rows)

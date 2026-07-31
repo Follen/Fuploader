@@ -1,4 +1,0 @@
-interface:
-  display_name: "Fupload"
-  short_description: "整理并发布新手盒子插件、WA 与配置分享"
-  default_prompt: "使用 $fupload 检查当前项目资料，并帮我发布或更新新手盒子插件、WA 或配置分享。"

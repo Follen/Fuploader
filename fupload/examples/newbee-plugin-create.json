@@ -1,0 +1,14 @@
+{
+  "schema": "fupload.v1.newbee.plugin.create",
+  "name": "Example AddOn",
+  "mod_categories": [101],
+  "content_origin": 1,
+  "content_format": 2,
+  "intro": "Short introduction",
+  "description": "Full description",
+  "logo_file": "./logo.png",
+  "screenshot_files": ["./screenshot.png"],
+  "public": false,
+  "subscribe_plan_level": 0,
+  "link_to_channel": false
+}

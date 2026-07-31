@@ -1,7 +1,0 @@
-schema: fupload.newbee.plugin-edit.v1
-id: 123
-intro: 更新后的一句话简介。
-description: |
-  ## 新说明
-
-  未提供的名称、分类和图片会保留远端当前值。本次更新会提交公开审核。

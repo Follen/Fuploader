@@ -1,9 +1,0 @@
-schema: fupload.newbee.plugin-version.v1
-plugin_id: 123
-version: 1.2.3
-game_versions: [1]
-archive: ./dist/ExampleAddon-1.2.3.zip
-changelog: |
-  - 修复已知问题
-  - 适配最新游戏版本
-link_to_channel: false

@@ -1,0 +1,8 @@
+{
+  "schema": "fupload.v1.newbee.wa.update",
+  "id": 12345,
+  "wa_str": "<WA string>",
+  "wa_str_titles": [],
+  "wa_log": "Version notes",
+  "link_to_channel": false
+}

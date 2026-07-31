@@ -1,0 +1,9 @@
+{
+  "schema": "fupload.v1.dd.plugin.update",
+  "sn": "plugin-share-sn",
+  "game_versions": ["100101"],
+  "file": "./addon.zip",
+  "release_type": 1,
+  "version": "2.0.0",
+  "update_desc": "Version notes"
+}

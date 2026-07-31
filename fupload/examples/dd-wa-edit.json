@@ -1,0 +1,9 @@
+{
+  "schema": "fupload.v1.dd.wa.edit",
+  "sn": "wa-share-sn",
+  "brief_desc": "Updated summary",
+  "need_buy": false,
+  "jump_room": false,
+  "with_associate": false,
+  "need_anchor_vip": false
+}

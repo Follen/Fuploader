@@ -1,0 +1,38 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 5
+name: python-fupload-newbee-dd
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: f06da9455c1e3f251e90c687811c1dad7b2690c97d99dad168854ff9b0e10135
+spec_changes:
+  - capability: dd-publishing
+    operation: create
+    source: specs/dd-publishing/spec.md
+    base_hash: null
+  - capability: fupload-cli
+    operation: replace
+    source: specs/fupload-cli/spec.md
+    base_hash: bd3f5419a1c970540522ac3b74bc72bb43e96a54477d8871565a17c15c70b606
+  - capability: fupload-skill
+    operation: replace
+    source: specs/fupload-skill/spec.md
+    base_hash: 46be3558b9bbee405ecf79a2117e4237f5ec2d256ac02b90674b0ee7e532a9c7
+  - capability: newbee-publishing
+    operation: create
+    source: specs/newbee-publishing/spec.md
+    base_hash: null
+  - capability: newbee-wa-workflows
+    operation: replace
+    source: specs/newbee-wa-workflows/spec.md
+    base_hash: e2bbbc9058f7c429063b3a0b0115a5e30d05ef6bce76603a69076e012adfa92b
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/5654d5a09359b542f0556807d0bdabefd863e8f17b590c73cb7c3acfd22ed231.json
+verification_evidence: runtime/evidence/verifications/a99d7ccb0e015e04e15767860cfa66859f43226aba27aa40cb15ab02e60b5d76.json
+partial_allowance: runtime/evidence/allowances/102869b0658b347bea399961fbf9a4dd25489af28b4a98366bf782cfe0e26d39.json
+archived: true
+created_at: 2026-07-30
+run_id: e3a35b3f-8a8b-4a2e-be1e-a0e89513933f
