@@ -1,0 +1,47 @@
+﻿{
+    "schema":  "fupload.v1.dd.config.create",
+    "scope":  "private",
+    "backup_sn":  "a91f4603ff4849f5a700475283fde900",
+    "title":  "Fupload DD Config 20260801-070048",
+    "brief_desc":  "Temporary DD config contract verification",
+    "desc":  "\u003cp\u003eTemporary DD config contract verification.\u003c/p\u003e",
+    "update_desc":  "Initial config contract verification",
+    "display_imgs":  [
+                         "https://uires.w.163.com/img/img/U2JyVpbkryjEylTG5GWknOYJsEpPFyRq"
+                     ],
+    "known_addon_ids":  [
+
+                        ],
+    "unknown_addon_ids":  [
+
+                          ],
+    "wtf_role_ids":  [
+                         "wtf_1f3b66d4cd26e159547c"
+                     ],
+    "material_names":  [
+                           "Icons"
+                       ],
+    "font_names":  [
+
+                   ],
+    "known_wa_ids":  [
+
+                     ],
+    "unknown_wa_ids":  [
+
+                       ],
+    "retail_ui_config":  null,
+    "share_code_life_type":  "seven_day",
+    "need_buy":  false,
+    "jump_room":  false,
+    "sync_room":  false,
+    "creation_statement":  "original",
+    "with_associate":  false,
+    "associated_acts":  [
+
+                        ],
+    "need_anchor_vip":  false,
+    "vip_levels":  [
+
+                   ]
+}

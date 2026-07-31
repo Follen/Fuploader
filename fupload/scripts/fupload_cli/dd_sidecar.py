@@ -27,9 +27,10 @@ _HTTP_STATUS = re.compile(r"\bHTTP\s+(\d{3})\b", re.IGNORECASE)
 _SENSITIVE_KEYS = {
     "token", "access_token", "refresh_token", "resource_token", "jwt", "jwttoken",
     "cookie", "set-cookie", "authorization", "authentication", "credential",
-    "clientno", "client_no", "device_proof", "signed_url", "upload_url",
+    "clientno", "client_no", "clientid", "client_id", "device_id", "device_proof", "signed_url", "upload_url",
     "presigneduri", "presigned_uri", "signature",
 }
+_MAX_LOG_BODY = 1024 * 1024
 
 
 def safe_exception_message(exc):
@@ -60,17 +61,52 @@ def _sanitize_log_value(value, key=None, depth=0):
     return safe_exception_message(str(value))
 
 
+def _bounded_json_fields(prefix, value):
+    sanitized = _sanitize_log_value(value)
+    encoded = json.dumps(sanitized, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+    size = len(encoded.encode("utf-8"))
+    fields = {prefix + "_bytes": size, prefix + "_truncated": size > _MAX_LOG_BODY}
+    if size <= _MAX_LOG_BODY:
+        fields[prefix + "_json"] = sanitized
+    else:
+        fields[prefix + "_body"] = encoded[:_MAX_LOG_BODY]
+    return fields
+
+
+def _bounded_text(value):
+    encoded = str(value).encode("utf-8")
+    original_size = len(encoded)
+    truncated = len(encoded) > _MAX_LOG_BODY
+    if truncated:
+        encoded = encoded[:_MAX_LOG_BODY]
+    return encoded.decode("utf-8", "ignore"), original_size, truncated
+
+
 def _response_log_content(probe, payload=None):
     if payload is not None:
-        return {"response_json": _sanitize_log_value(payload)}
+        return _bounded_json_fields("response", payload)
     if not isinstance(probe, dict) or not probe.get("body"):
         return {}
     body = str(probe["body"])
+    original_size = int(probe.get("body_bytes") or len(body.encode("utf-8")))
+    originally_truncated = bool(probe.get("body_truncated"))
+    if originally_truncated:
+        sanitized, _stored_size, _ = _bounded_text(safe_exception_message(body))
+        return {
+            "response_body": sanitized,
+            "response_bytes": original_size,
+            "response_truncated": True,
+        }
     try:
         parsed = json.loads(body)
     except (TypeError, ValueError):
-        return {"response_body": safe_exception_message(body)}
-    return {"response_json": _sanitize_log_value(parsed)}
+        sanitized, size, truncated = _bounded_text(safe_exception_message(body))
+        return {
+            "response_body": sanitized,
+            "response_bytes": size,
+            "response_truncated": truncated,
+        }
+    return _bounded_json_fields("response", parsed)
 
 
 def write_error_log(failure, command, probe=None, payload=None):
@@ -78,6 +114,8 @@ def write_error_log(failure, command, probe=None, payload=None):
     os.makedirs(log_dir, exist_ok=True)
     path = os.path.join(log_dir, "dd-errors-%s.jsonl" % time.strftime("%Y%m%d"))
     request = command.get("payload") if isinstance(command, dict) else None
+    if request is None and isinstance(command, dict) and command.get("action") == "upload":
+        request = command.get("meta")
     record = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "action": command.get("action") if isinstance(command, dict) else None,
@@ -91,6 +129,8 @@ def write_error_log(failure, command, probe=None, payload=None):
         "request_fields": sorted(str(key) for key in request) if isinstance(request, dict) else [],
         "validation": _sanitize_log_value(failure.details),
     }
+    if request is not None:
+        record.update(_bounded_json_fields("request", request))
     record.update(_response_log_content(probe, payload))
     with open(path, "a", encoding="utf-8") as handle:
         handle.write(json.dumps(record, ensure_ascii=True, sort_keys=True, separators=(",", ":")) + "\n")
@@ -163,8 +203,45 @@ def _validation_details(probe):
 
 
 def install_response_probe(client):
-    """Keep a bounded, secret-free summary of rejected native API responses."""
+    """Capture response objects and HTTPError bodies without changing DD behavior."""
     session = getattr(client, "_session", None)
+    restore = getattr(client, "_fupload_restore_response_probe", None)
+    if callable(restore):
+        restore()
+    original_opener_open = urllib.request.OpenerDirector.open
+
+    def opener_open(opener, *args, **kwargs):
+        try:
+            return original_opener_open(opener, *args, **kwargs)
+        except urllib.error.HTTPError as error:
+            original_read = error.read
+
+            def error_read(*read_args, _error=error, **read_kwargs):
+                body = original_read(*read_args, **read_kwargs)
+                try:
+                    text = bytes(body or b"").decode("utf-8", "replace")
+                except Exception:
+                    text = ""
+                bounded, size, truncated = _bounded_text(text)
+                client._fupload_last_response_error = {
+                    "status": int(getattr(_error, "code", 0) or 0),
+                    "body": bounded,
+                    "body_bytes": size,
+                    "body_truncated": truncated,
+                }
+                return body
+
+            error.read = error_read
+            raise
+
+    urllib.request.OpenerDirector.open = opener_open
+
+    def restore_probe():
+        if getattr(urllib.request.OpenerDirector, "open", None) is opener_open:
+            urllib.request.OpenerDirector.open = original_opener_open
+        client._fupload_restore_response_probe = None
+
+    client._fupload_restore_response_probe = restore_probe
     for method_name in ("get", "post"):
         original = getattr(session, method_name, None)
         if not callable(original):
@@ -183,9 +260,12 @@ def install_response_probe(client):
                         body = str(getattr(response, "text", "") or "")
                     except Exception:
                         body = ""
+                    bounded, size, truncated = _bounded_text(body)
                     client._fupload_last_response_error = {
                         "status": status,
-                        "body": body[:1048576],
+                        "body": bounded,
+                        "body_bytes": size,
+                        "body_truncated": truncated,
                     }
                 return response
             return wrapped
@@ -200,9 +280,35 @@ def failure_from_exception(exc, stage, response=None):
     if isinstance(exc, SidecarFailure):
         return exc
     if isinstance(exc, urllib.error.HTTPError):
+        probe = dict(response) if isinstance(response, dict) else {}
+        if not probe.get("body"):
+            try:
+                body = exc.read()
+            except Exception:
+                body = b""
+            if body:
+                text = bytes(body).decode("utf-8", "replace")
+                bounded, size, truncated = _bounded_text(text)
+                probe.update({
+                    "status": int(exc.code),
+                    "body": bounded,
+                    "body_bytes": size,
+                    "body_truncated": truncated,
+                })
+        business_code = None
+        if probe.get("body"):
+            try:
+                body_value = json.loads(probe["body"])
+                if isinstance(body_value, dict):
+                    business_code = body_value.get("code") or body_value.get("error_code")
+            except (TypeError, ValueError):
+                pass
         return SidecarFailure(
             "DD %s request returned HTTP %d" % (stage, exc.code), stage,
-            http_status=exc.code, verification_required=stage in ("object_put", "mutation") and exc.code >= 500,
+            http_status=exc.code,
+            business_code=business_code,
+            verification_required=stage in ("object_put", "mutation") and exc.code >= 500,
+            details=_validation_details(probe),
         )
     uncertain = stage in ("object_put", "mutation")
     message = safe_exception_message(exc)
@@ -216,6 +322,13 @@ def failure_from_exception(exc, stage, response=None):
     except (TypeError, ValueError):
         status = None
     business_code = getattr(exc, "code", None) or getattr(exc, "error_code", None)
+    if business_code is None and isinstance(probe, dict) and probe.get("body"):
+        try:
+            body_value = json.loads(probe["body"])
+            if isinstance(body_value, dict):
+                business_code = body_value.get("code") or body_value.get("error_code")
+        except (TypeError, ValueError):
+            pass
     if not message:
         message = type(exc).__name__
     return SidecarFailure(
@@ -458,6 +571,9 @@ def close_session(session):
     if not session:
         return
     qt, container, _flow, _jwt_helper, client = session
+    restore_probe = getattr(client, "_fupload_restore_response_probe", None)
+    if callable(restore_probe):
+        restore_probe()
     try:
         message_center = container.get_instance("MessageCenter")
         message_center.logout()

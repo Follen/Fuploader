@@ -25,19 +25,21 @@ Choose a parent, GET and display only that parent's child choices, then continue
 
 The Python provider repeats every live GET in the same session before any upload or mutation. A missing, duplicate, or cross-parent selection fails at its exact JSON path with `verification_required=false`. DD detail is authoritative for an existing object's form and ownership; author-list timestamps are not comparable freshness gates.
 
+Author-owned plugin/config/WA lists and association candidates traverse the real DD pagination contract instead of assuming the first 100 rows contain every selected SN. Repeated pages or the bounded page limit are platform-data failures and stop the write before upload.
+
 ## Shared fields
 
 All three create/edit form models use `scope`, `share_code_life_type`, `need_buy`, `price_fen`, `buy_life_type`, `jump_room`, `room_id`, `channel_id`, `channel_type`, `sync_room`, `creation_statement`, `with_associate`, `associated_acts`, `need_anchor_vip`, and `vip_levels`.
 
 - `scope` is `public` or `private`. Private requires `share_code_life_type`, clears anchor VIP and room sync. Plugin/WA public force `share_code_life_type=forever`; config public omits it.
-- `need_buy=true` requires `price_fen` in `10..20000` fen and `buy_life_type`. False uses zero price.
+- `need_buy=true` requires `buy_life_type`; `price_fen` may be `0` or `10..20000` fen because the official submit validation explicitly accepts zero. A free create resolves to zero, while an existing paid form may retain a hidden historical price when `need_buy` is turned off but the outer paid mode remains active through anchor VIP.
 - The outer free/paid selector is locked after an SN exists. It is derived from `need_buy || need_anchor_vip` and is not a wire field. Existing paid content may still adjust payment methods and their price/lifetime/VIP children while remaining paid.
 - `jump_room=true` requires `room_id`. `channel_id` and `channel_type` are both empty for a room-only link or both present for one live child channel.
 - `with_associate=true` requires nonempty `associated_acts`; each item is exactly `{sn,act_type}` with `act_type` `addon`, `share`, or `wa`.
-- `need_anchor_vip=true` requires live `vip_levels` and public scope.
+- `need_anchor_vip=true` requires public scope. `vip_levels` must contain only live values when supplied, but the official submit validation accepts an empty array. Turning only `need_anchor_vip` off preserves the existing level array; switching to private scope or switching the outer mode to free clears it.
 - `creation_statement` is `original`, `chinesize`, `renovate`, or `second`.
 
-Omission on edit preserves the remote value. Explicit false applies the official dependent-field normalization.
+Omission on edit preserves the remote value. Explicit false follows the field-specific official behavior: room and association children are cleared, while anchor VIP levels remain unless private scope or the outer free mode clears them.
 
 ## Plugin
 
@@ -45,9 +47,9 @@ Omission on edit preserves the remote value. Explicit false applies the official
 
 `game_type` and the outer free/paid state are create-only. `plugin update` requires `sn`, `game_versions`, `version`, and `update_desc`; optional `file`, `detail_url`, and `release_type` publish a new version. `plugin edit` requires `sn` and only accepts the official existing-record commercial and association controls (`scope`, payment/lifetime/VIP fields, room/channel linkage, `creation_statement`, and associated content). First-publication metadata (`addon_type`, `name`, `description`, logo, detail images, categories, and `html_desc`) and version fields are not edit fields; in particular, sending `description` to `/addon/modify` can be accepted while leaving the remote value unchanged, so the CLI rejects it instead of reporting a false success.
 
-When rebuilding a plugin update form, preserve field presence from the current DD record. A field absent from a legacy record must remain absent; do not synthesize JSON `null`, because the official web `pick -> JSON.stringify` path omits absent properties and DD can reject synthetic nulls with HTTP 422.
+When rebuilding a plugin update/edit form, preserve field presence from the current DD record. A field absent from both official projections must remain absent; do not synthesize JSON `null`, because the official web `pick -> JSON.stringify` path omits absent properties and DD can reject synthetic nulls with HTTP 422. The official detail dialog is opened from the matching author-list item and takes `detail_url`, `release_type`, and `version` from that item's `latest_version`; `detail_v2` supplies the stable detail fields and top-level `game_versions`. Python therefore uses the same-SN author item only to fill null/missing latest-version placeholders, never to overwrite stable metadata or top-level builds.
 
-After `plugin update`, confirm the submitted version fields from the matching item in the author plugin list, whose `latest_version` is the official update projection. `detail_v2` is a supplementary projection and may remain on the prior version. `/addon/addon_versions` is diagnostic-only: DD can return an empty history for a successfully updated private plugin, so an empty history never triggers an automatic replay or a failed update by itself.
+Before `plugin update`, query `/addon/addon_versions` as an optional duplicate guard. If it returns version rows, reject any candidate version already present anywhere in that history before upload; if it is empty or unavailable, retain the current-version check and continue. After update, confirm the submitted version fields from the matching item in the author plugin list, whose `latest_version` is the official update projection. `detail_v2` is supplementary. An empty history never marks a successful private-plugin update as failed and never triggers replay.
 
 Read `plugin categories`, choose `primary_category_id`, then choose only returned `second_category_ids`. Read `plugin game-versions --game-type <id>` and use its stable values. The package accepts `.zip` only. Authorization always uses `file_type=a19-ui-res`, `business_id=addon`, fixed `file_name=addon.zip`, and `mime_type=application/x-zip-compressed`. Plugin image authorization uses `a19-ui-media/img` with an explicit empty wire file name.
 
@@ -85,6 +87,8 @@ When `with_file=true`, create requires a local `.zip` `file` and nonempty `file_
 
 Stages are `session`, `dependency_get`, `upload_authorize`, `object_put`, `mutation`, `readback`, and `native_parser`. Explicit HTTP/business failures and all pre-mutation validation failures have `verification_required=false`. In particular, HTTP 4xx responses such as 422 are confirmed server rejections, not uncertain writes; the CLI reports `http_status` and a bounded, secret-free validation summary when the native response exposes one. PUT/mutation connection uncertainty and accepted-write readback uncertainty have `verification_required=true`; GET first and do not replay the write. Native failures retain a bounded exception message and the native `code`/`error_code` when present, with signed-URL query credentials, signatures, and tokens redacted before they leave the sidecar.
 
-Each DD native/API failure appends one ASCII JSON line to `<DD version directory>/Fupload/logs/dd-errors-YYYYMMDD.jsonl`. The record includes HTTP status, native business code, stage, endpoint, request field names, validation hints, and the sanitized response JSON or body. It never records request values; token, JWT, Cookie, authorization, credential, client identifier, signature, and signed upload URL fields are redacted recursively. A log write failure is reported as `log_write_error` without replacing the original DD error.
+Each DD native/API failure appends one ASCII JSON line to `<DD version directory>/Fupload/logs/dd-errors-YYYYMMDD.jsonl`. The record includes HTTP status, native business code, stage, endpoint, request field names, the sanitized request JSON/body, validation hints, and the sanitized response JSON/body. Token, JWT, Cookie, authorization, credential, client identifier, signature, and signed upload URL fields are redacted recursively. Request and response bodies are independently bounded to 1 MiB by UTF-8 bytes and record their original size and truncation state. A log write failure is reported as `log_write_error` without replacing the original DD error.
+
+After an accepted mutation, detail readback uses a short bounded GET-only poll and never resends the mutation. Plugin edit/version confirmation also checks the matching author-list projection because the official UI opens the modify dialog from that item while `detail_v2` can remain stale or contain null latest-version placeholders. Configuration readback compares its official integer `need_buy` wire value with the boolean detail projection through a resource-specific conversion.
 
 The parent process and native sidecar exchange ASCII-only JSONL, and Fuploader's final JSON output follows the same rule. Non-ASCII request, response, and output text is represented with JSON Unicode escapes so Chinese titles, descriptions, announcements, and URLs do not depend on either Windows process code page. JSON consumers recover original UTF-8 strings through normal parsing.

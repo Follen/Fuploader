@@ -13,6 +13,7 @@ Fuploader 是一个面向 Agent 的《魔兽世界》作者发布 Skill。新手
 - 第三方 Python 写入使用严格 JSON Schema：未知字段、重复键、`NaN` 和 `Infinity` 均会被拒绝；官方 `ncc` 使用参数和 `-o json` 结构化输出。
 - 新手盒子官方通道复用本机 `ncc login` 或预先注入的 `NCC_TOKEN`，第三方通道复用桌面客户端登录状态；不接收或输出 token、cookie、JWT、签名 URL、DD `clientNo`、原始 WA 字符串或原始配置内容。
 - DD 通过已安装官方客户端的无头运行环境完成原生登录、签名和 WA 解析；一次发布任务只建立一个串行会话，任务结束立即退出。
+- DD 写入前按官方网页的详情投影和表单校验重建完整请求；旧记录缺少新必填字段时会在上传前指出具体 JSON path。4xx/业务错误会在 DD 版本目录的 `Fupload/logs` 保存经过递归脱敏且按 UTF-8 字节限长的请求与响应记录。
 
 ## 目录
 

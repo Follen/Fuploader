@@ -109,8 +109,6 @@ class Schema:
             for name in ("price_fen", "buy_life_type"):
                 if name not in value or value[name] in (None, ""):
                     raise ValidationError("%s is required when need_buy=true" % name, path="$.%s" % name)
-            if int(value["price_fen"]) <= 0:
-                raise ValidationError("price_fen must be greater than zero when need_buy=true", path="$.price_fen")
         if value.get("jump_room") is True:
             if not value.get("room_id"):
                 raise ValidationError("room_id is required when jump_room=true", path="$.room_id")
@@ -128,8 +126,6 @@ class Schema:
                 raise ValidationError("sync_room=true requires public scope", path="$.scope")
         if value.get("with_associate") is True and not value.get("associated_acts"):
             raise ValidationError("associated_acts must contain at least one item when with_associate=true", path="$.associated_acts")
-        if value.get("need_anchor_vip") is True and not value.get("vip_levels"):
-            raise ValidationError("vip_levels must contain at least one item when need_anchor_vip=true", path="$.vip_levels")
         if value.get("need_anchor_vip") is True and value.get("scope") == "private":
             raise ValidationError("need_anchor_vip=true requires public scope", path="$.scope")
         if self.name.startswith("fupload.v1.dd.") and self.name.endswith(".create"):

@@ -10,7 +10,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from fupload_cli.dd import DD, LIFE_TYPES, Sidecar, _option_values, _verify_fields, config_form, created_reference, discover_dd, merge_plugin_version_fields, normalize_commercial, plugin_form, readable_author_list, resolve_retail_ui_config, safe_backup_detail, safe_channels, safe_detail, selected_group, validate_locked_usage_mode
+from fupload_cli.dd import DD, LIFE_TYPES, Sidecar, _option_values, _readback_until_fields, _verify_fields, config_form, config_readback_projection, created_reference, discover_dd, normalize_commercial, plugin_form, plugin_history_versions, plugin_version_projection, readable_author_list, resolve_retail_ui_config, safe_backup_detail, safe_channels, safe_detail, selected_group, validate_locked_usage_mode, wa_form
 from fupload_cli.errors import FuploadError, ValidationError, redact
 from fupload_cli.newbee import NewBee, RELATION_TYPES, _redact_wa, _require_readback, _wa_summary
 
@@ -94,6 +94,27 @@ class FailedDDKeywordIndex(DelayedDDIndex):
         return {"code": 0, "result": [{"title": "Delayed", "share_sn": "cfg"}]}
 
 
+class PagedDDIndex:
+    def __init__(self) -> None:
+        self.pages = []
+
+    def post(self, endpoint, body):
+        self.pages.append((endpoint, body["page"]))
+        if endpoint != "/addon/addon_list":
+            return {"code": 0, "result": []}
+        if body["page"] == 1:
+            page_items = [{"name": "Other %d" % index, "sn": "p-%d" % index} for index in range(100)]
+        elif body["page"] == 2:
+            page_items = [{"name": "Paged", "sn": "paged-sn"}]
+        else:
+            page_items = []
+        return {"code": 0, "result": {"items": page_items, "total": 101}}
+
+    def get(self, endpoint, body):
+        self.pages.append((endpoint, body["page"]))
+        return {"code": 0, "result": {"items": [], "total": 0}}
+
+
 class EmptyDDOptions:
     def get(self, endpoint, body):
         return {"code": 0, "result": []}
@@ -131,7 +152,7 @@ class DeleteDDSession:
     def get(self, endpoint, body):
         self.calls.append(("get", endpoint, dict(body)))
         if endpoint == "/addon/detail_v2":
-            return {"code": 0, "result": {"sn": "plugin-sn", "name": "Plugin", "game_type": 10001}}
+            return {"code": 0, "result": {"sn": "plugin-sn", "name": "Plugin", "game_type": 10001, "is_owner": True}}
         return {"code": 0, "result": []}
 
     def post(self, endpoint, body):
@@ -347,7 +368,7 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(group["inner_version"], {"a": 4, "b": 1})
         self.assertEqual([item["addon_id"] for item in group["items"]], ["a", "b"])
 
-    def test_dd_commercial_false_clears_dependents(self) -> None:
+    def test_dd_existing_commercial_values_preserve_hidden_price(self) -> None:
         form = {
             "scope": "private", "jump_room": False, "room_id": "r", "channel_id": "c",
             "channel_type": "x", "sync_room": True, "with_associate": False,
@@ -355,7 +376,7 @@ class BuilderTests(unittest.TestCase):
             "need_buy": False, "price_fen": 100, "buy_life_type": "month",
         }
         normalize_commercial(form)
-        self.assertEqual(form["price_fen"], 0)
+        self.assertEqual(form["price_fen"], 100)
         self.assertEqual(form["buy_life_type"], "month")
         self.assertEqual(form["room_id"], "")
         self.assertEqual(form["associated_acts"], [])
@@ -384,6 +405,17 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(created_reference(session, "config", "Delayed", 10001), "cfg")
         self.assertEqual(session.keywords, ["Delayed", ""])
 
+    def test_dd_create_reference_traverses_author_list_pages(self) -> None:
+        session = PagedDDIndex()
+        self.assertEqual(created_reference(session, "plugin", "Paged", 10001), "paged-sn")
+        self.assertEqual(session.pages, [("/addon/addon_list", 1), ("/addon/addon_list", 2)])
+
+    def test_dd_association_validation_traverses_author_list_pages(self) -> None:
+        session = PagedDDIndex()
+        references = DD()._associated_refs(session, 10001)
+        self.assertIn(("addon", "paged-sn"), references)
+        self.assertEqual(session.pages[:2], [("/addon/addon_list", 1), ("/addon/addon_list", 2)])
+
     def test_dd_readable_config_list_filters_after_failed_server_search(self) -> None:
         session = FailedDDKeywordIndex()
         result = readable_author_list(session, "config", "Delayed", 10001, 1, 50)
@@ -392,13 +424,13 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(session.keywords, ["Delayed", ""])
 
     def test_dd_plugin_form_removes_detail_summary_category(self) -> None:
-        form = plugin_form({"game_types": [10001], "second_category_ids": [1037, 999]})
+        form = plugin_form({"game_types": [10001], "second_category_ids": [1037, 12345]})
         self.assertEqual(form["second_category_ids"], [1037])
 
-    def test_dd_plugin_form_uses_author_list_pending_version(self) -> None:
-        form = plugin_form({"game_types": [10001], "latest_version": {"version": None}})
-        merge_plugin_version_fields(form, {
+    def test_dd_plugin_version_readback_is_separate_from_modify_form(self) -> None:
+        value = {
             "game_types": [10001],
+            "game_versions": ["12.0.5"],
             "latest_version": {
                 "file_path": "archive",
                 "game_versions": ["12.0.7"],
@@ -406,30 +438,70 @@ class BuilderTests(unittest.TestCase):
                 "version": "1.0.1",
             },
             "update_desc": "pending update",
+        }
+        form = plugin_form(value)
+        readback = plugin_version_projection(value)
+        self.assertEqual(form["game_versions"], ["12.0.5"])
+        self.assertEqual(readback["game_versions"], ["12.0.7"])
+        self.assertEqual(readback["detail_url"], "archive")
+        self.assertEqual(readback["version"], "1.0.1")
+        self.assertEqual(readback["update_desc"], "pending update")
+
+    def test_dd_plugin_form_drops_missing_latest_fields_instead_of_reusing_top_level(self) -> None:
+        form = plugin_form({
+            "game_types": [10001], "detail_url": "stale", "release_type": 1,
+            "version": "stale", "latest_version": {"version": None},
         })
-        self.assertEqual(form["detail_url"], "archive")
-        self.assertEqual(form["version"], "1.0.1")
-        self.assertEqual(form["update_desc"], "pending update")
+        self.assertNotIn("detail_url", form)
+        self.assertNotIn("release_type", form)
+        self.assertNotIn("version", form)
+
+    def test_dd_plugin_form_uses_author_item_latest_version_for_official_modify_open(self) -> None:
+        detail = {
+            "game_types": [10001],
+            "game_versions": ["12.0.7"],
+            "latest_version": {"file_path": None, "release_type": None, "version": None},
+        }
+        author = {
+            "latest_version": {
+                "file_path": "archive-url", "release_type": 1, "version": "2.0.0",
+                "game_versions": ["ignored-author-build"],
+            },
+        }
+        form = plugin_form(detail, author)
+        self.assertEqual(form["detail_url"], "archive-url")
+        self.assertEqual(form["release_type"], 1)
+        self.assertEqual(form["version"], "2.0.0")
+        self.assertEqual(form["game_versions"], ["12.0.7"])
 
     def test_dd_plugin_form_does_not_invent_null_fields_for_legacy_records(self) -> None:
         form = plugin_form({
             "game_types": [10001],
             "name": "Legacy",
             "scope": "private",
-            "latest_version": {"version": "1.3.5", "game_versions": ["12.0.7"]},
+            "game_versions": ["12.0.7"],
+            "latest_version": {"version": "1.3.5"},
         })
         self.assertNotIn("description", form)
         self.assertNotIn("logo", form)
         self.assertNotIn("html_desc", form)
         self.assertEqual(form["version"], "1.3.5")
 
+    def test_dd_plugin_history_version_parser_handles_nested_result_shapes(self) -> None:
+        self.assertEqual(plugin_history_versions({
+            "code": 0,
+            "result": {"rows": [{"version": "1.0.0"}, {"latest": {"version": "2.0.0"}}]},
+        }), {"1.0.0", "2.0.0"})
+
     def test_dd_plugin_update_confirms_detail_latest_version_without_history(self) -> None:
         before = {
-            "sn": "plugin-sn", "game_type": 10001, "name": "Plugin",
+            "sn": "plugin-sn", "game_type": 10001, "name": "Plugin", "game_versions": ["12.1.0"],
+            "description": "Description", "logo": "logo", "detail_imgs": ["image"],
+            "primary_category_id": 1, "second_category_ids": [], "html_desc": "Details",
             "scope": "public", "need_buy": False, "need_anchor_vip": False,
-            "jump_room": False, "with_associate": False,
+            "jump_room": False, "with_associate": False, "creation_statement": "original",
             "latest_version": {
-                "game_versions": ["12.1.0"], "file_path": "old-archive",
+                "file_path": "old-archive",
                 "release_type": 1, "version": "1.0.0",
             },
             "update_desc": "old update",
@@ -445,7 +517,7 @@ class BuilderTests(unittest.TestCase):
         session = mock.MagicMock()
         session.post.return_value = {"code": 0, "result": {"sn": "plugin-sn"}}
         with mock.patch.object(DD, "_fresh_detail", return_value=before), mock.patch(
-            "fupload_cli.dd.author_item", side_effect=[{}, after]
+            "fupload_cli.dd.author_item", return_value=after
         ), mock.patch.object(DD, "_validate_options"), mock.patch(
             "fupload_cli.dd.detail", return_value=before
         ):
@@ -455,7 +527,72 @@ class BuilderTests(unittest.TestCase):
                 "version": "1.0.1", "update_desc": "new update",
             })
         self.assertEqual(result["reference"], "plugin-sn")
-        self.assertFalse(any(call.args[0] == "/addon/addon_versions" for call in session.get.call_args_list))
+        submitted = session.post.call_args.args[1]
+        self.assertNotIn("buy_life_type", submitted)
+        self.assertTrue(any(call.args[0] == "/addon/addon_versions" for call in session.get.call_args_list))
+
+    def test_dd_plugin_update_rejects_any_version_visible_in_history_before_upload(self) -> None:
+        current = {
+            "sn": "plugin-sn", "game_type": 10001, "game_versions": ["12.1.0"], "name": "Plugin",
+            "description": "Description", "logo": "logo", "detail_imgs": ["image", 999],
+            "primary_category_id": 1, "second_category_ids": [999], "html_desc": "Details",
+            "scope": "public", "need_buy": False, "need_anchor_vip": False,
+            "jump_room": False, "with_associate": False, "creation_statement": "original",
+            "latest_version": {"file_path": "archive", "release_type": 1, "version": "2.0.0"},
+            "update_desc": "old",
+        }
+        session = mock.MagicMock()
+        session.get.return_value = {"code": 0, "result": {"rows": [{"version": "1.0.0"}]}}
+        with mock.patch.object(DD, "_fresh_detail", return_value=current):
+            with self.assertRaisesRegex(ValidationError, "already exists"):
+                DD()._write_plugin(session, "update", {
+                    "sn": "plugin-sn", "game_versions": ["12.1.0"],
+                    "version": "1.0.0", "update_desc": "duplicate",
+                })
+        session.upload.assert_not_called()
+        session.post.assert_not_called()
+
+    def test_dd_plugin_edit_accepts_matching_author_projection_when_detail_is_stale(self) -> None:
+        current = {
+            "sn": "plugin-sn", "game_type": 10001, "game_versions": ["12.1.0"], "name": "Plugin",
+            "description": "Description", "logo": "logo", "detail_imgs": ["image"],
+            "primary_category_id": 1, "second_category_ids": [999], "html_desc": "Details",
+            "scope": "private", "share_code_life_type": "seven_day",
+            "need_buy": False, "need_anchor_vip": False, "jump_room": False,
+            "with_associate": False, "creation_statement": "original",
+            "latest_version": {"file_path": None, "release_type": None, "version": None},
+            "update_desc": "old",
+        }
+        author_before = {
+            **current,
+            "latest_version": {"file_path": "archive", "release_type": 1, "version": "1.0.0"},
+        }
+        author_after = {**author_before, "share_code_life_type": "fourteen_day"}
+        session = mock.MagicMock()
+        session.post.return_value = {"code": 0, "result": {"sn": "plugin-sn"}}
+        with mock.patch.object(DD, "_fresh_detail", return_value=current), mock.patch(
+            "fupload_cli.dd.author_item", side_effect=[author_before, author_after]
+        ), mock.patch.object(DD, "_validate_options"), mock.patch(
+            "fupload_cli.dd.detail", return_value=current
+        ):
+            result = DD()._write_plugin(session, "edit", {
+                "sn": "plugin-sn", "share_code_life_type": "fourteen_day",
+            })
+        self.assertEqual(result["reference"], "plugin-sn")
+        self.assertEqual(session.post.call_args.args[1]["share_code_life_type"], "fourteen_day")
+
+    def test_dd_wa_legacy_modify_preserves_absent_create_defaults(self) -> None:
+        form = wa_form({
+            "sn": "wa-sn", "scope": "public", "name": "WA", "game_type": 10001,
+            "game_version": "12.1.0", "brief_desc": "Brief", "display_imgs": ["image"],
+            "category_ids": ["210"], "content": "plain", "desc": "Description",
+            "update_desc": "Update", "version": "2", "with_file": False,
+            "creation_statement": "original", "need_buy": False, "jump_room": False,
+            "with_associate": False, "need_anchor_vip": False,
+        })
+        self.assertNotIn("buy_life_type", form)
+        self.assertNotIn("file_install_path", form)
+        self.assertEqual(form["price_fen"], 0)
 
     def test_dd_wa_create_uses_official_form_defaults_and_string_categories(self) -> None:
         session = mock.MagicMock()
@@ -758,6 +895,14 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(form["associated_acts"], [])
         self.assertEqual(form["room_id"], "")
 
+    def test_dd_disabling_anchor_vip_preserves_levels_until_scope_or_outer_mode_clears_them(self) -> None:
+        form = {
+            "scope": "public", "need_anchor_vip": False, "vip_levels": [2, 3],
+            "jump_room": True, "with_associate": True,
+        }
+        normalize_commercial(form, "plugin")
+        self.assertEqual(form["vip_levels"], [2, 3])
+
     def test_dd_public_lifetime_and_locked_outer_usage_mode_match_resource_contract(self) -> None:
         config = {"scope": "public", "share_code_life_type": "seven_day"}
         normalize_commercial(config, "config")
@@ -786,7 +931,7 @@ class BuilderTests(unittest.TestCase):
             "name": "WA",
             "game_version": "12.1.0",
             "brief_desc": "Before",
-            "display_imgs": [],
+            "display_imgs": ["image"],
             "category_ids": ["210"],
             "content": "!WA:2!same",
             "desc": "Description",
@@ -795,6 +940,7 @@ class BuilderTests(unittest.TestCase):
             "with_file": True,
             "file_path": "https://cdn.example/wa.zip",
             "file_install_path": "Interface/Addons",
+            "creation_statement": "original",
             "need_buy": False,
             "need_anchor_vip": False,
             "jump_room": False,
@@ -858,6 +1004,34 @@ class BuilderTests(unittest.TestCase):
         actual["material"]["inner_version"]["Icons"] = 1
         with self.assertRaisesRegex(FuploadError, "material"):
             _verify_fields(expected, actual, ("material",), "/share/detail")
+
+    def test_dd_readback_polls_without_replaying_mutation(self) -> None:
+        responses = iter((
+            {"share_code_life_type": "seven_day"},
+            {"share_code_life_type": "fourteen_day"},
+        ))
+        calls = []
+
+        def getter():
+            calls.append("get")
+            return next(responses)
+
+        raw, actual = _readback_until_fields(
+            getter,
+            lambda value: value,
+            {"share_code_life_type": "fourteen_day"},
+            ("share_code_life_type",),
+            "/addon/detail_v2",
+            attempts=2,
+            delay=0,
+        )
+        self.assertEqual(raw, {"share_code_life_type": "fourteen_day"})
+        self.assertEqual(actual, raw)
+        self.assertEqual(calls, ["get", "get"])
+
+    def test_dd_config_readback_projects_boolean_need_buy_to_wire_integer(self) -> None:
+        self.assertEqual(config_readback_projection({"need_buy": False})["need_buy"], 0)
+        self.assertEqual(config_readback_projection({"need_buy": True})["need_buy"], 1)
 
     def test_dd_channel_parser_keeps_parent_room_on_nested_channels(self) -> None:
         value = safe_channels({"data": [{

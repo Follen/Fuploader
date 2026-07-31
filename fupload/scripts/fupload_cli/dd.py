@@ -615,6 +615,34 @@ def _readback(getter: Any, endpoint: str) -> Any:
         ) from exc
 
 
+def _readback_until_fields(
+    getter: Any,
+    projector: Any,
+    expected: Mapping[str, Any],
+    fields: Sequence[str],
+    endpoint: str,
+    *,
+    attempts: int = 6,
+    delay: float = 1.0,
+) -> Tuple[Any, Mapping[str, Any]]:
+    raw: Any = {}
+    actual: Mapping[str, Any] = {}
+    for attempt in range(attempts):
+        raw = _readback(getter, endpoint)
+        projected = projector(raw)
+        actual = projected if isinstance(projected, Mapping) else {}
+        mismatches = [
+            name for name in fields
+            if name in expected and (name not in actual or not _same_readback(expected[name], actual[name]))
+        ]
+        if not mismatches:
+            return raw, actual
+        if attempt + 1 < attempts:
+            time.sleep(delay)
+    _verify_fields(expected, actual, fields, endpoint)
+    return raw, actual
+
+
 def _dependency_post(session: Any, path: str, body: Mapping[str, Any]) -> Any:
     method = getattr(session, "post_read", None)
     if callable(method):
@@ -622,8 +650,10 @@ def _dependency_post(session: Any, path: str, body: Mapping[str, Any]) -> Any:
     return session.post(path, body)
 
 
-def author_listing(session: Sidecar, resource: str, keyword: str, game_type: Any) -> Any:
-    common = {"game_type": game_type, "origin": "created", "page": 1, "size": 100}
+def _author_page(
+    session: Sidecar, resource: str, keyword: str, game_type: Any, page: int, size: int,
+) -> Any:
+    common = {"game_type": game_type, "origin": "created", "page": page, "size": size}
     if resource == "plugin":
         return _dependency_post(session, "/addon/addon_list", {
             **common, "category": 0,
@@ -639,22 +669,60 @@ def author_listing(session: Sidecar, resource: str, keyword: str, game_type: Any
     })
 
 
+def _author_total(payload: Any) -> Optional[int]:
+    value = result(payload)
+    if not isinstance(value, dict):
+        return None
+    for key in ("total", "total_count", "count"):
+        try:
+            if value.get(key) is not None:
+                return max(0, int(value[key]))
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def _author_items(
+    session: Sidecar, resource: str, keyword: str, game_type: Any, *, size: int = 100,
+) -> List[Dict[str, Any]]:
+    collected: List[Dict[str, Any]] = []
+    seen_pages: set[Tuple[str, ...]] = set()
+    for page in range(1, 1001):
+        payload = _author_page(session, resource, keyword, game_type, page, size)
+        page_items = items(payload)
+        if not page_items:
+            return collected
+        signature = tuple(
+            str(item.get("sn") or item.get("share_sn") or item.get("id") or "")
+            for item in page_items
+        )
+        if signature in seen_pages:
+            raise FuploadError(
+                "DD author list pagination repeated a page",
+                kind="platform_data_error", stage="dependency_get",
+            )
+        seen_pages.add(signature)
+        collected.extend(page_items)
+        total = _author_total(payload)
+        if (total is not None and len(collected) >= total) or len(page_items) < size:
+            return collected
+    raise FuploadError(
+        "DD author list pagination exceeded the bounded page limit",
+        kind="platform_data_error", stage="dependency_get",
+    )
+
+
+def author_listing(session: Sidecar, resource: str, keyword: str, game_type: Any) -> Any:
+    author_items = _author_items(session, resource, keyword, game_type)
+    return {"code": 0, "result": {"items": author_items, "total": len(author_items)}}
+
+
 def readable_author_list(
     session: Sidecar, resource: str, keyword: str, game_type: Any,
     page: int, size: int,
 ) -> Dict[str, Any]:
-    common = {"game_type": game_type, "origin": "created", "page": page, "size": size}
     def load(search: str) -> Any:
-        if resource == "plugin":
-            return _dependency_post(session, "/addon/addon_list", {
-                **common, "category": 0,
-                "name_or_author_name_or_share_code": search, "sort_type": 2,
-            })
-        if resource == "config":
-            return session.get("/share/list", {**common, "search_text": search, "sort_type": "mtime"})
-        return session.get("/wa/list", {
-            **common, "search_text": search, "category_id": "", "sort_type": "mtime",
-        })
+        return _author_page(session, resource, search, game_type, page, size)
 
     fallback = False
     try:
@@ -1116,15 +1184,14 @@ def resolve_retail_ui_config(
 
 
 def safe_associated_acts(session: Sidecar, game_type: Any) -> Dict[str, Any]:
-    common = {"game_type": game_type, "origin": "created", "page": 1, "size": 100}
     sources = (
-        ("addon", _dependency_post(session, "/addon/addon_list", {**common, "category": 0, "name_or_author_name_or_share_code": "", "sort_type": 2})),
-        ("share", session.get("/share/list", {**common, "search_text": "", "sort_type": "mtime"})),
-        ("wa", session.get("/wa/list", {**common, "search_text": "", "category_id": "", "sort_type": "mtime"})),
+        ("addon", _author_items(session, "plugin", "", game_type)),
+        ("share", _author_items(session, "config", "", game_type)),
+        ("wa", _author_items(session, "wa", "", game_type)),
     )
     result_items = []
-    for kind, payload in sources:
-        for item in items(payload):
+    for kind, source_items in sources:
+        for item in source_items:
             reference = item.get("sn") or item.get("share_sn")
             if reference:
                 result_items.append({
@@ -1191,10 +1258,25 @@ COMMERCIAL = (
 )
 
 
-def normalize_commercial(form: Dict[str, Any], resource: Optional[str] = None) -> None:
-    if not form.get("need_buy"):
-        form["price_fen"] = 0
+def normalize_commercial(
+    form: Dict[str, Any], resource: Optional[str] = None, *, create: bool = False,
+) -> None:
+    """Apply the resource's official submit-time conditionals.
+
+    The three DD editors share controls but do not share one wire builder.
+    In particular, only the configuration builder always defaults
+    buy_life_type, while plugin/WA create defaults must not leak into legacy
+    modify payloads.
+    """
+    if resource == "config":
+        form["need_buy"] = 1 if form.get("need_buy") else 0
         form["buy_life_type"] = form.get("buy_life_type") or "seven_day"
+    elif create and not form.get("buy_life_type"):
+        form["buy_life_type"] = "seven_day"
+    if "price_fen" not in form or form.get("price_fen") is None:
+        form["price_fen"] = 0
+    if create and not form.get("need_buy"):
+        form["price_fen"] = 0
     if form.get("scope") == "private":
         form["sync_room"] = False
         form["need_anchor_vip"] = False
@@ -1208,8 +1290,6 @@ def normalize_commercial(form: Dict[str, Any], resource: Optional[str] = None) -
         form.update({"room_id": "", "channel_id": "", "channel_type": "", "sync_room": False})
     if not form.get("with_associate"):
         form["associated_acts"] = []
-    if not form.get("need_anchor_vip"):
-        form["vip_levels"] = []
 
 
 def validate_locked_usage_mode(current: Mapping[str, Any], form: Mapping[str, Any], doc: Mapping[str, Any]) -> None:
@@ -1228,6 +1308,23 @@ PLUGIN_FIELDS = (
     "version", "html_desc", "update_desc", *COMMERCIAL,
 )
 
+PLUGIN_OPEN_FIELDS = (
+    "game_type", "game_versions", "description", "addon_type", "name", "logo",
+    "detail_imgs", "primary_category_id", "second_category_ids", "detail_url",
+    "release_type", "version", "html_desc", "update_desc", "share_code_life_type",
+    "need_buy", "buy_life_type", "jump_room", "room_id", "channel_id",
+    "channel_type", "sync_room", "creation_statement", "with_associate",
+    "associated_acts", "need_anchor_vip",
+)
+
+PLUGIN_CREATE_DEFAULTS = {
+    "share_code_life_type": "seven_day",
+    "addon_type": 0,
+    "buy_life_type": "seven_day",
+    "need_buy": False,
+    "with_associate": False,
+}
+
 # DD's modify form is not a second create form.  The official edit page
 # rebuilds the payload from the existing commercial/association controls;
 # first-publication metadata and version fields belong to create/update.
@@ -1239,28 +1336,71 @@ PLUGIN_EDIT_FIELDS = (
 )
 
 
-def plugin_form(value: Mapping[str, Any]) -> Dict[str, Any]:
+def plugin_form(
+    value: Mapping[str, Any], author_value: Optional[Mapping[str, Any]] = None,
+) -> Dict[str, Any]:
     latest = value.get("latest_version") if isinstance(value.get("latest_version"), dict) else {}
-    # Match the official web pick/JSON.stringify path: absent properties stay absent,
-    # rather than becoming JSON null on legacy records.
-    form = {name: copy.deepcopy(value[name]) for name in PLUGIN_FIELDS if name in value}
-    for name in ("game_versions", "detail_url", "release_type", "version"):
-        if latest.get({"detail_url": "file_path"}.get(name, name)) is not None:
-            form[name] = copy.deepcopy(latest.get({"detail_url": "file_path"}.get(name, name)))
-    form["game_type"] = form.get("game_type") or (value.get("game_types") or [None])[0]
-    form["second_category_ids"] = [
-        category_id for category_id in (form.get("second_category_ids") or [])
-        if str(category_id) != "999"
-    ]
+    author_latest = (
+        author_value.get("latest_version")
+        if isinstance(author_value, Mapping) and isinstance(author_value.get("latest_version"), dict)
+        else {}
+    )
+    # Official detail dialog projection followed by the editor's pick list.
+    source = {name: copy.deepcopy(value[name]) for name in PLUGIN_FIELDS if name in value}
+    for name in ("detail_url", "release_type", "version"):
+        latest_name = {"detail_url": "file_path"}.get(name, name)
+        projected = latest.get(latest_name)
+        if projected is None:
+            projected = author_latest.get(latest_name)
+        if projected is None:
+            source.pop(name, None)
+        else:
+            source[name] = copy.deepcopy(projected)
+    source["game_type"] = source.get("game_type") or (value.get("game_types") or [None])[0]
+    form = {name: copy.deepcopy(source[name]) for name in PLUGIN_OPEN_FIELDS if name in source}
+    form["scope"] = copy.deepcopy(source.get("scope") or "public")
+    form["price_fen"] = copy.deepcopy(source.get("price_fen") or 0)
+    form["vip_levels"] = copy.deepcopy(source.get("vip_levels") or [])
+    categories = list(form.get("second_category_ids") or [])
+    form["second_category_ids"] = categories[:-1] if categories else []
     normalize_commercial(form, "plugin")
     return form
 
 
-def merge_plugin_version_fields(form: Dict[str, Any], fallback: Mapping[str, Any]) -> None:
-    fallback_form = plugin_form(fallback)
-    for name in ("game_versions", "detail_url", "release_type", "version", "update_desc"):
-        if fallback_form.get(name) not in (None, "", []):
-            form[name] = copy.deepcopy(fallback_form[name])
+def plugin_version_projection(value: Mapping[str, Any]) -> Dict[str, Any]:
+    """Project version fields for readback without feeding them into modify."""
+    latest = value.get("latest_version") if isinstance(value.get("latest_version"), dict) else {}
+    projection: Dict[str, Any] = {}
+    sources = {
+        "game_versions": (latest, "game_versions", value, "game_versions"),
+        "detail_url": (latest, "file_path", value, "detail_url"),
+        "release_type": (latest, "release_type", value, "release_type"),
+        "version": (latest, "version", value, "version"),
+        "update_desc": (latest, "update_desc", value, "update_desc"),
+    }
+    for name, (preferred, preferred_name, fallback, fallback_name) in sources.items():
+        if preferred.get(preferred_name) is not None:
+            projection[name] = copy.deepcopy(preferred[preferred_name])
+        elif fallback.get(fallback_name) is not None:
+            projection[name] = copy.deepcopy(fallback[fallback_name])
+    return projection
+
+
+def plugin_history_versions(payload: Any) -> set[str]:
+    versions: set[str] = set()
+
+    def visit(node: Any) -> None:
+        if isinstance(node, dict):
+            if node.get("version") not in (None, ""):
+                versions.add(str(node["version"]).strip().casefold())
+            for child in node.values():
+                visit(child)
+        elif isinstance(node, list):
+            for child in node:
+                visit(child)
+
+    visit(result(payload))
+    return versions
 
 
 def _key(item: Any, key: Optional[str]) -> Any:
@@ -1404,9 +1544,18 @@ def selected_wa_group(
 
 
 def config_form(current: Mapping[str, Any], backup: Mapping[str, Any], doc: Mapping[str, Any]) -> Dict[str, Any]:
-    form = {name: copy.deepcopy(current.get(name)) for name in (
-        "backup_sn", "scope", "title", "brief_desc", "desc", "update_desc", "display_imgs", *COMMERCIAL,
-    )}
+    defaults = {
+        "scope": "public", "backup_sn": "", "desc": "", "update_desc": "", "title": "",
+        "display_imgs": [], "share_code_life_type": "seven_day", "brief_desc": "",
+        "price_fen": 0, "need_buy": 0, "buy_life_type": "seven_day",
+        "jump_room": False, "room_id": "", "channel_id": "", "channel_type": "",
+        "sync_room": False, "creation_statement": "", "with_associate": False,
+        "associated_acts": [], "need_anchor_vip": False, "vip_levels": [],
+    }
+    form = {
+        name: copy.deepcopy(current[name] if name in current and current[name] is not None else default)
+        for name, default in defaults.items()
+    }
     apply_present(form, doc, form.keys())
     for group, key, selected_name, update_name in CONFIG_GROUPS:
         if selected_name in doc:
@@ -1448,8 +1597,17 @@ def config_form(current: Mapping[str, Any], backup: Mapping[str, Any], doc: Mapp
     if not any(form.get(name, {}).get("items") or form.get(name, {}).get("accounts") for name in content_groups):
         raise ValidationError("DD configuration content cannot contain only WA selections", path="$.known_addon_ids")
     validate_locked_usage_mode(current, form, doc)
-    normalize_commercial(form, "config")
+    normalize_commercial(form, "config", create=not bool(current))
     return form
+
+
+def config_readback_projection(value: Any) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping):
+        return {}
+    projected = dict(value)
+    if "need_buy" in projected:
+        projected["need_buy"] = 1 if projected["need_buy"] else 0
+    return projected
 
 
 WA_FIELDS = (
@@ -1467,6 +1625,71 @@ WA_CREATE_DEFAULTS = {
     "vip_levels": [],
     "version": "0",
 }
+
+
+def wa_form(value: Mapping[str, Any]) -> Dict[str, Any]:
+    form = {name: copy.deepcopy(value[name]) for name in WA_FIELDS if name in value}
+    form["scope"] = copy.deepcopy(value.get("scope") or "public")
+    form["price_fen"] = copy.deepcopy(value.get("price_fen") or 0)
+    form["vip_levels"] = copy.deepcopy(value.get("vip_levels") or [])
+    form["version"] = copy.deepcopy(value.get("version") or "0")
+    normalize_commercial(form, "wa")
+    return form
+
+
+def validate_commercial_submission(form: Mapping[str, Any], resource: str) -> None:
+    if form.get("scope") == "private" and not form.get("share_code_life_type"):
+        if resource != "config" or not form.get("need_buy"):
+            raise ValidationError("private publication requires share_code_life_type", path="$.share_code_life_type")
+    if form.get("need_buy"):
+        if form.get("price_fen") is None:
+            raise ValidationError("paid publication requires price_fen", path="$.price_fen")
+        price = int(form.get("price_fen") or 0)
+        if price != 0 and not 10 <= price <= 20000:
+            raise ValidationError("price_fen must be zero or between 10 and 20000", path="$.price_fen")
+        if not form.get("buy_life_type"):
+            raise ValidationError("paid publication requires buy_life_type", path="$.buy_life_type")
+    if form.get("jump_room") and not form.get("room_id"):
+        raise ValidationError("room association requires room_id", path="$.room_id")
+    if not form.get("creation_statement"):
+        raise ValidationError("creation_statement is required by the DD editor", path="$.creation_statement")
+    if form.get("with_associate") and not form.get("associated_acts"):
+        raise ValidationError("content association requires associated_acts", path="$.associated_acts")
+
+
+def validate_plugin_submission(form: Mapping[str, Any], doc: Mapping[str, Any]) -> None:
+    required = (
+        "game_versions", "name", "description", "primary_category_id", "release_type",
+        "version", "html_desc", "update_desc",
+    )
+    for name in required:
+        if not form.get(name):
+            raise ValidationError("field is required by the DD plugin editor", path="$.%s" % name)
+    if not (form.get("logo") or doc.get("logo_file")):
+        raise ValidationError("plugin logo is required", path="$.logo")
+    if not ((form.get("detail_imgs") or []) or doc.get("detail_img_files")):
+        raise ValidationError("at least one plugin detail image is required", path="$.detail_imgs")
+    if not (form.get("detail_url") or doc.get("file")):
+        raise ValidationError("plugin archive is required", path="$.file")
+    validate_commercial_submission(form, "plugin")
+
+
+def validate_config_submission(form: Mapping[str, Any], doc: Mapping[str, Any]) -> None:
+    for name in ("backup_sn", "title", "brief_desc", "desc"):
+        if not form.get(name):
+            raise ValidationError("field is required by the DD configuration editor", path="$.%s" % name)
+    if not ((form.get("display_imgs") or []) or doc.get("display_img_files")):
+        raise ValidationError("at least one configuration display image is required", path="$.display_imgs")
+    validate_commercial_submission(form, "config")
+
+
+def validate_wa_submission(form: Mapping[str, Any], doc: Mapping[str, Any]) -> None:
+    for name in ("name", "game_version", "brief_desc", "category_ids", "content", "desc", "update_desc"):
+        if not form.get(name):
+            raise ValidationError("field is required by the DD WA editor", path="$.%s" % name)
+    if not ((form.get("display_imgs") or []) or doc.get("display_img_files")):
+        raise ValidationError("at least one WA display image is required", path="$.display_imgs")
+    validate_commercial_submission(form, "wa")
 
 
 class DD:
@@ -1576,15 +1799,14 @@ class DD:
 
     @staticmethod
     def _associated_refs(session: Sidecar, game_type: Any) -> set[Tuple[str, str]]:
-        common = {"game_type": game_type, "origin": "created", "page": 1, "size": 100}
         payloads = (
-            ("addon", _dependency_post(session, "/addon/addon_list", {**common, "category": 0, "name_or_author_name_or_share_code": "", "sort_type": 2})),
-            ("share", session.get("/share/list", {**common, "search_text": "", "sort_type": "mtime"})),
-            ("wa", session.get("/wa/list", {**common, "search_text": "", "category_id": "", "sort_type": "mtime"})),
+            ("addon", _author_items(session, "plugin", "", game_type)),
+            ("share", _author_items(session, "config", "", game_type)),
+            ("wa", _author_items(session, "wa", "", game_type)),
         )
         references: set[Tuple[str, str]] = set()
-        for kind, payload in payloads:
-            for item in items(payload):
+        for kind, source_items in payloads:
+            for item in source_items:
                 reference = item.get("sn") or item.get("share_sn")
                 if reference:
                     references.add((kind, str(reference)))
@@ -1610,7 +1832,7 @@ class DD:
 
     def _delete(self, session: Sidecar, resource: str, doc: Mapping[str, Any]) -> Dict[str, Any]:
         reference = str(doc["sn"])
-        before = detail(session, resource, reference)
+        before = self._fresh_detail(session, resource, reference)
         endpoints = {"plugin": "/addon/delete", "config": "/share/delete", "wa": "/wa/delete"}
         game_type = before.get("game_type") or (before.get("game_types") or [None])[0]
         if not game_type and resource == "config" and before.get("backup_sn"):
@@ -1624,8 +1846,11 @@ class DD:
                 stage="dependency_get",
             )
         response = session.post(endpoints[resource], {"sn": reference})
-        listing = _readback(lambda: author_listing(session, resource, "", game_type), endpoints[resource])
-        if any(str(item.get("sn") or item.get("share_sn") or "") == reference for item in items(listing)):
+        name = str(before.get("name") or before.get("title") or "")
+        remaining = _readback(
+            lambda: author_item(session, resource, reference, name, game_type), endpoints[resource]
+        )
+        if remaining:
             raise FuploadError(
                 "delete response succeeded but the target remains in the author list",
                 kind="verification_required", stage="readback", endpoint=endpoints[resource], verification_required=True,
@@ -1635,16 +1860,15 @@ class DD:
     def _write_plugin(self, session: Sidecar, action: str, doc: Dict[str, Any]) -> Any:
         if action == "create":
             current: Dict[str, Any] = {}
-            form = {name: copy.deepcopy(doc.get(name)) for name in PLUGIN_FIELDS if name in doc}
+            form = copy.deepcopy(PLUGIN_CREATE_DEFAULTS)
+            apply_present(form, doc, PLUGIN_FIELDS)
         else:
             current = self._fresh_detail(session, "plugin", doc["sn"])
-            form = plugin_form(current)
-            fallback = author_item(
-                session, "plugin", str(doc["sn"]), str(current.get("name") or ""),
-                form.get("game_type"),
+            game_type = current.get("game_type") or (current.get("game_types") or [None])[0]
+            listing = author_item(
+                session, "plugin", str(doc["sn"]), str(current.get("name") or ""), game_type,
             )
-            if fallback:
-                merge_plugin_version_fields(form, fallback)
+            form = plugin_form(current, listing)
             allowed = PLUGIN_EDIT_FIELDS if action == "edit" else ("game_versions", "detail_url", "release_type", "version", "update_desc")
             current_version = str(form.get("version") or "").strip()
             apply_present(form, doc, allowed)
@@ -1653,10 +1877,21 @@ class DD:
             form["sn"] = doc["sn"]
             if action == "update" and current_version and str(form.get("version") or "").strip().casefold() == current_version.casefold():
                 raise ValidationError("version already exists; overwrite is not allowed", path="$.version")
+            if action == "update":
+                try:
+                    history = session.get("/addon/addon_versions", {
+                        "sn": doc["sn"], "game_type": form.get("game_type"), "page": 1,
+                    })
+                except FuploadError:
+                    history = None
+                candidate = str(form.get("version") or "").strip().casefold()
+                if candidate and candidate in plugin_history_versions(history):
+                    raise ValidationError("version already exists; overwrite is not allowed", path="$.version")
         if doc.get("file"):
             self._archive(doc["file"], (".zip",))
         validate_locked_usage_mode(current, form, doc)
-        normalize_commercial(form, "plugin")
+        normalize_commercial(form, "plugin", create=action == "create")
+        validate_plugin_submission(form, doc)
         self._validate_options(session, "plugin", form)
         if doc.get("logo_file"):
             form["logo"] = session.upload(doc["logo_file"], "addon", file_name="", media=True, max_bytes=10 * 1024 * 1024)
@@ -1677,10 +1912,6 @@ class DD:
                 "plugin was submitted but its reference could not be resolved; read the author list before retrying",
                 kind="verification_required", stage="readback", verification_required=True,
             )
-        raw_readback = _readback(
-            lambda: detail(session, "plugin", reference), "/addon/detail_v2"
-        ) if reference else {}
-        actual = plugin_form(raw_readback) if raw_readback else {}
         stable_fields = (
             "game_type", "scope", "addon_type", "name", "description", "logo", "detail_imgs",
             "primary_category_id", "second_category_ids", "html_desc", "update_desc", "share_code_life_type",
@@ -1689,18 +1920,63 @@ class DD:
             "sync_room", "with_associate", "associated_acts", "need_anchor_vip", "vip_levels",
         )
         if action != "update":
-            _verify_fields(form, actual, stable_fields, "/addon/detail_v2")
+            raw_readback: Any = {}
+            actual: Mapping[str, Any] = {}
+            unresolved: set[str] = set()
+            author = {}
+            for attempt in range(6):
+                raw_readback = _readback(
+                    lambda: detail(session, "plugin", reference), "/addon/detail_v2"
+                )
+                actual = plugin_form(raw_readback)
+                author = author_item(
+                    session, "plugin", reference, str(form.get("name") or ""), form.get("game_type")
+                )
+                author_actual = plugin_form(author) if author else {}
+                detail_mismatches = {
+                    name for name in stable_fields
+                    if name in form and (name not in actual or not _same_readback(form[name], actual[name]))
+                }
+                author_mismatches = {
+                    name for name in stable_fields
+                    if name in form and (name not in author_actual or not _same_readback(form[name], author_actual[name]))
+                }
+                unresolved = detail_mismatches & author_mismatches
+                if not unresolved:
+                    break
+                if attempt < 5:
+                    time.sleep(1)
+            if unresolved:
+                raise FuploadError(
+                    "write readback did not match field(s): %s" % ", ".join(sorted(unresolved)),
+                    kind="verification_required",
+                    stage="readback",
+                    endpoint="/addon/detail_v2",
+                    verification_required=True,
+                    details={
+                        "fields": sorted(unresolved),
+                        "projections": {
+                            "detail_v2": "mismatch",
+                            "author_list": "mismatch" if author else "missing",
+                        },
+                    },
+                )
         else:
-            # The official editor reads latest_version from detail_v2 after modify.
-            # addon_versions is declared by the web bundle but is not used there and
-            # can remain empty for private plugins, so it is not a write confirmation.
+            raw_readback = _readback(
+                lambda: detail(session, "plugin", reference), "/addon/detail_v2"
+            ) if reference else {}
+            actual = plugin_form(raw_readback) if raw_readback else {}
+        if action in ("create", "update"):
+            # addon_versions can remain empty for private plugins, so version
+            # confirmation uses the two projections the official author UI exposes.
             update_fields = ("game_versions", "detail_url", "release_type", "version", "update_desc")
+            detail_version = plugin_version_projection(raw_readback)
             detail_mismatches = [
                 name for name in update_fields
-                if name in form and (name not in actual or not _same_readback(form[name], actual[name]))
+                if name in form and (name not in detail_version or not _same_readback(form[name], detail_version[name]))
             ]
             author = author_item(session, "plugin", reference, str(form.get("name") or ""), form.get("game_type"))
-            author_actual = plugin_form(author) if author else {}
+            author_actual = plugin_version_projection(author) if author else {}
             author_mismatches = [
                 name for name in update_fields
                 if name in form and (name not in author_actual or not _same_readback(form[name], author_actual[name]))
@@ -1765,6 +2041,7 @@ class DD:
             form["share_sn"] = doc["share_sn"]
         validation_form = dict(form)
         validation_form["game_type"] = current.get("game_type") or backup.get("game_type")
+        validate_config_submission(form, doc)
         self._validate_options(session, "config", validation_form)
         if doc.get("display_img_files"):
             existing_images = list(form.get("display_imgs") or [])
@@ -1781,9 +2058,6 @@ class DD:
                 "configuration was submitted but its reference could not be resolved; read the author list before retrying",
                 kind="verification_required", stage="readback", verification_required=True,
             )
-        raw_readback = _readback(
-            lambda: detail(session, "config", reference), "/share/detail"
-        ) if reference else {}
         stable_fields = (
             "backup_sn", "scope", "title", "brief_desc", "desc", "update_desc", "display_imgs",
             "share_code_life_type", "creation_statement", "need_buy", "price_fen", "buy_life_type",
@@ -1791,7 +2065,13 @@ class DD:
             "associated_acts", "need_anchor_vip", "vip_levels", "known_addon", "unknown_addon", "wtf",
             "material", "font", "known_wa", "unknown_wa", "retail_ui_config",
         )
-        _verify_fields(form, raw_readback, stable_fields, "/share/detail")
+        raw_readback, _actual = _readback_until_fields(
+            lambda: detail(session, "config", reference),
+            config_readback_projection,
+            form,
+            stable_fields,
+            "/share/detail",
+        )
         return {"result": response, "reference": reference, "readback": safe_detail("config", raw_readback) if reference else None}
 
     def _write_wa(self, session: Sidecar, action: str, doc: Dict[str, Any]) -> Any:
@@ -1801,7 +2081,7 @@ class DD:
             apply_present(form, doc, WA_FIELDS)
         else:
             current = self._fresh_detail(session, "wa", doc["sn"])
-            form = {name: copy.deepcopy(current.get(name)) for name in WA_FIELDS}
+            form = wa_form(current)
             allowed = WA_FIELDS if action == "edit" else ("content", "update_desc", "version", "with_file", "file_path", "file_install_path", "parse_wa_uid", "parse_wa_id")
             apply_present(form, doc, allowed)
             if "game_type" in doc and str(doc["game_type"]) != str(current.get("game_type")):
@@ -1831,8 +2111,9 @@ class DD:
             form["parse_wa_uid"] = parsed["parse_wa_uid"]
             form["parse_wa_id"] = parsed["parse_wa_id"]
         validate_locked_usage_mode(current, form, doc)
-        normalize_commercial(form, "wa")
+        normalize_commercial(form, "wa", create=action == "create")
         form["category_ids"] = [str(category_id) for category_id in (form.get("category_ids") or [])]
+        validate_wa_submission(form, doc)
         self._validate_options(session, "wa", form)
         if doc.get("display_img_files"):
             existing_images = list(form.get("display_imgs") or [])
@@ -1851,9 +2132,6 @@ class DD:
                 "WA was submitted but its reference could not be resolved; read the author list before retrying",
                 kind="verification_required", stage="readback", verification_required=True,
             )
-        raw_readback = _readback(
-            lambda: detail(session, "wa", reference), "/wa/detail"
-        ) if reference else {}
         stable_fields = (
             "game_type", "scope", "name", "game_version", "brief_desc", "display_imgs", "category_ids",
             "content", "desc", "update_desc", "version", "with_file", "file_path", "file_install_path",
@@ -1861,7 +2139,13 @@ class DD:
             "price_fen", "buy_life_type", "jump_room", "room_id", "channel_id", "channel_type",
             "sync_room", "with_associate", "associated_acts", "need_anchor_vip", "vip_levels",
         )
-        _verify_fields(form, raw_readback, stable_fields, "/wa/detail")
+        raw_readback, _actual = _readback_until_fields(
+            lambda: detail(session, "wa", reference),
+            lambda value: value,
+            form,
+            stable_fields,
+            "/wa/detail",
+        )
         readback = safe_detail("wa", raw_readback) if reference else None
         return {"result": response, "reference": reference, "readback": readback}
 

@@ -1,0 +1,109 @@
+﻿{
+    "schema":  "fupload.dd.live-write-matrix.v1",
+    "generated_at":  "2026-08-01T07:01:29.8751938+08:00",
+    "login_count":  1,
+    "session_stop_exit_code":  0,
+    "references_after_cleanup":  {
+                                     "config":  null,
+                                     "plugin":  null,
+                                     "wa":  null
+                                 },
+    "steps":  [
+                  {
+                      "label":  "01-plugin-create",
+                      "operation":  "plugin.create",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  "761dca5c08a34b3a8e7bbf3d2a8d5065",
+                      "output":  "01-plugin-create-output.json"
+                  },
+                  {
+                      "label":  "02-plugin-update",
+                      "operation":  "plugin.update",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  "761dca5c08a34b3a8e7bbf3d2a8d5065",
+                      "output":  "02-plugin-update-output.json"
+                  },
+                  {
+                      "label":  "03-plugin-edit",
+                      "operation":  "plugin.edit",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  "761dca5c08a34b3a8e7bbf3d2a8d5065",
+                      "output":  "03-plugin-edit-output.json"
+                  },
+                  {
+                      "label":  "cleanup-plugin-delete",
+                      "operation":  "plugin.delete",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  null,
+                      "output":  "cleanup-plugin-delete-output.json"
+                  },
+                  {
+                      "label":  "04-config-create",
+                      "operation":  "config.create",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  "e75b740395a44d9aabd448caa6dffac9",
+                      "output":  "04-config-create-output.json"
+                  },
+                  {
+                      "label":  "05-config-update",
+                      "operation":  "config.update",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  "e75b740395a44d9aabd448caa6dffac9",
+                      "output":  "05-config-update-output.json"
+                  },
+                  {
+                      "label":  "06-config-edit",
+                      "operation":  "config.edit",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  "e75b740395a44d9aabd448caa6dffac9",
+                      "output":  "06-config-edit-output.json"
+                  },
+                  {
+                      "label":  "cleanup-config-delete",
+                      "operation":  "config.delete",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  null,
+                      "output":  "cleanup-config-delete-output.json"
+                  },
+                  {
+                      "label":  "07-wa-create",
+                      "operation":  "wa.create",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  "07223ff2578b43529b27fb94e906a6cc",
+                      "output":  "07-wa-create-output.json"
+                  },
+                  {
+                      "label":  "08-wa-update",
+                      "operation":  "wa.update",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  "07223ff2578b43529b27fb94e906a6cc",
+                      "output":  "08-wa-update-output.json"
+                  },
+                  {
+                      "label":  "09-wa-edit",
+                      "operation":  "wa.edit",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  "07223ff2578b43529b27fb94e906a6cc",
+                      "output":  "09-wa-edit-output.json"
+                  },
+                  {
+                      "label":  "cleanup-wa-delete",
+                      "operation":  "wa.delete",
+                      "success":  true,
+                      "exit_code":  0,
+                      "reference":  null,
+                      "output":  "cleanup-wa-delete-output.json"
+                  }
+              ]
+}

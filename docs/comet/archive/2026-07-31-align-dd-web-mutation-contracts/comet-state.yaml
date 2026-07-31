@@ -1,0 +1,22 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 5
+name: align-dd-web-mutation-contracts
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: 675060a0ce42c5c2778411058cecadb7db0bbd87c12543032fdd83157136cac2
+spec_changes:
+  - capability: dd-publishing
+    operation: replace
+    source: specs/dd-publishing/spec.md
+    base_hash: 6331202e20cb22a862281161d3f282f5c7062ed5a0f9a4291c00b0c8a30e2007
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/6e78289174384303ac69ba8feb660bae031777189aa6654431d565c89bcd49eb.json
+verification_evidence: runtime/evidence/verifications/c8a8c98808849644accc7ffdec56783e63b837c7e3c5679f50839c3695a2aa26.json
+partial_allowance: null
+archived: true
+created_at: 2026-07-31
+run_id: a24107e7-06db-40f7-9f40-8878c41e65bc

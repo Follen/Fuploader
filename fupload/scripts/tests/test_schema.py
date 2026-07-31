@@ -18,6 +18,50 @@ class SchemaTests(unittest.TestCase):
                 for action in ("create", "update", "edit"):
                     self.assertIn((platform, resource, action), SCHEMAS)
 
+    def test_dd_action_field_matrix_matches_official_form_surfaces(self) -> None:
+        commercial = {
+            "scope", "share_code_life_type", "need_buy", "price_fen", "buy_life_type",
+            "jump_room", "room_id", "channel_id", "channel_type", "sync_room",
+            "creation_statement", "with_associate", "associated_acts", "need_anchor_vip", "vip_levels",
+        }
+        plugin_meta = {
+            "game_type", "addon_type", "name", "description", "logo", "logo_file",
+            "detail_imgs", "detail_img_files", "primary_category_id", "second_category_ids", "html_desc",
+        } | commercial
+        plugin_version = {"game_versions", "detail_url", "file", "release_type", "version", "update_desc"}
+        config_meta = {"title", "brief_desc", "desc", "display_imgs", "display_img_files"} | commercial
+        config_content = {
+            "backup_sn", "update_desc", "known_addon_ids", "known_addon_update_ids",
+            "unknown_addon_ids", "unknown_addon_update_ids", "wtf_role_ids",
+            "material_names", "material_update_names", "font_names", "font_update_names",
+            "known_wa_ids", "known_wa_update_ids", "unknown_wa_ids", "unknown_wa_update_ids",
+            "retail_ui_config",
+        }
+        wa_meta = {
+            "game_type", "name", "game_version", "brief_desc", "display_imgs",
+            "display_img_files", "category_ids", "desc",
+        } | commercial
+        wa_content = {"content", "update_desc", "version", "with_file", "file", "file_install_path"}
+        expected = {
+            ("plugin", "create"): plugin_meta | plugin_version,
+            ("plugin", "update"): {"sn"} | plugin_version,
+            ("plugin", "edit"): {"sn"} | commercial,
+            ("config", "create"): config_meta | config_content,
+            ("config", "update"): {"share_sn"} | config_content,
+            ("config", "edit"): {"share_sn"} | config_meta,
+            ("wa", "create"): wa_meta | wa_content,
+            ("wa", "update"): {"sn"} | wa_content,
+            ("wa", "edit"): {"sn"} | wa_meta,
+        }
+        for key, fields in expected.items():
+            with self.subTest(resource=key[0], action=key[1]):
+                self.assertEqual(set(get_schema("dd", *key).fields), fields)
+        for resource in ("plugin", "config", "wa"):
+            self.assertEqual(
+                set(get_schema("dd", resource, "delete").fields),
+                {"sn", "confirm_delete"},
+            )
+
     def test_unknown_field_is_rejected(self) -> None:
         schema = get_schema("newbee", "plugin", "edit")
         with self.assertRaisesRegex(ValidationError, "unknown field"):
@@ -142,6 +186,21 @@ class SchemaTests(unittest.TestCase):
         schema = get_schema("dd", "wa", "edit")
         with self.assertRaisesRegex(ValidationError, "room_id"):
             schema.validate({"schema": schema.name, "sn": "abc", "jump_room": True})
+
+    def test_dd_paid_zero_price_and_empty_vip_levels_match_official_submit_validation(self) -> None:
+        schema = get_schema("dd", "wa", "edit")
+        value = schema.validate({
+            "schema": schema.name,
+            "sn": "wa",
+            "scope": "public",
+            "need_buy": True,
+            "price_fen": 0,
+            "buy_life_type": "seven_day",
+            "need_anchor_vip": True,
+            "vip_levels": [],
+        })
+        self.assertEqual(value["price_fen"], 0)
+        self.assertEqual(value["vip_levels"], [])
 
     def test_newbee_wa_create_requires_nonempty_description(self) -> None:
         schema = get_schema("newbee", "wa", "create")

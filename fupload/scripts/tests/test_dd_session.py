@@ -11,6 +11,7 @@ import threading
 import time
 import unittest
 import urllib.error
+import urllib.request
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
@@ -329,6 +330,20 @@ class DDSessionTests(unittest.TestCase):
         self.assertTrue(module.failure_from_exception(TimeoutError(), "object_put").verification_required)
         self.assertTrue(module.failure_from_exception(RuntimeError(), "mutation").verification_required)
 
+    def test_native_http_error_body_keeps_business_code_and_validation_hint(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        body = json.dumps({"code": 42201, "message": "invalid field", "field": "version"}).encode("utf-8")
+        error = urllib.error.HTTPError("https://object.invalid", 422, "invalid", {}, io.BytesIO(body))
+        failure = module.failure_from_exception(error, "object_put")
+        self.assertEqual(failure.http_status, 422)
+        self.assertEqual(failure.business_code, 42201)
+        self.assertEqual(failure.details["server_field"], "version")
+        self.assertFalse(failure.verification_required)
+
     def test_native_explicit_http_422_is_rejected_without_verification_required(self) -> None:
         with mock.patch.dict(os.environ, {
             "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
@@ -358,7 +373,33 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(client._fupload_last_response_error, {
             "status": 422,
             "body": '{"message":"invalid version"}',
+            "body_bytes": 29,
+            "body_truncated": False,
         })
+        client._fupload_restore_response_probe()
+
+    def test_native_response_probe_captures_http_error_read_and_restores_opener(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+
+        body = b'{"code":4312,"field":"version"}'
+        error = urllib.error.HTTPError("https://object.invalid", 422, "invalid", {}, io.BytesIO(body))
+        original_open = urllib.request.OpenerDirector.open
+        client = SimpleNamespace(_session=SimpleNamespace())
+        with mock.patch.object(urllib.request.OpenerDirector, "open", side_effect=error):
+            module.install_response_probe(client)
+            installed_open = urllib.request.OpenerDirector.open
+            with self.assertRaises(urllib.error.HTTPError) as raised:
+                urllib.request.OpenerDirector().open("https://object.invalid")
+            self.assertEqual(raised.exception.read(), body)
+            self.assertEqual(client._fupload_last_response_error["status"], 422)
+            self.assertEqual(client._fupload_last_response_error["body"], body.decode("utf-8"))
+            client._fupload_restore_response_probe()
+            self.assertIsNot(urllib.request.OpenerDirector.open, installed_open)
+        self.assertIs(urllib.request.OpenerDirector.open, original_open)
 
     def test_native_validation_details_redact_json_credentials(self) -> None:
         with mock.patch.dict(os.environ, {
@@ -400,10 +441,28 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(record["http_status"], 422)
         self.assertEqual(record["business_code"], 4312)
         self.assertEqual(record["request_fields"], ["token", "version"])
+        self.assertEqual(record["request_json"]["version"], "1.3.6")
+        self.assertEqual(record["request_json"]["token"], "[REDACTED]")
         self.assertEqual(record["response_json"]["token"], "[REDACTED]")
         self.assertEqual(record["response_json"]["signed_url"], "[REDACTED]")
         self.assertNotIn("request-secret", repr(record))
         self.assertNotIn("response-secret", repr(record))
+
+    def test_native_error_log_bounds_multibyte_response_by_utf8_bytes(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        body = "错" * (module._MAX_LOG_BODY // 2)
+        fields = module._response_log_content({
+            "body": body,
+            "body_bytes": len(body.encode("utf-8")),
+            "body_truncated": True,
+        })
+        self.assertTrue(fields["response_truncated"])
+        self.assertEqual(fields["response_bytes"], len(body.encode("utf-8")))
+        self.assertLessEqual(len(fields["response_body"].encode("utf-8")), module._MAX_LOG_BODY)
 
     def test_native_business_error_is_logged_and_returns_log_path(self) -> None:
         with mock.patch.dict(os.environ, {
