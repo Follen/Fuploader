@@ -2155,18 +2155,34 @@ class DD:
         if action in ("create", "update"):
             # addon_versions can remain empty for private plugins, so version
             # confirmation uses the two projections the official author UI exposes.
+            # Those projections can lag an accepted mutation briefly, so poll
+            # with GET-only reads and never replay the mutation.
             update_fields = ("game_versions", "detail_url", "release_type", "version", "update_desc")
-            detail_version = plugin_version_projection(raw_readback)
-            detail_mismatches = [
-                name for name in update_fields
-                if name in form and (name not in detail_version or not _same_readback(form[name], detail_version[name]))
-            ]
-            author = author_item(session, "plugin", reference, str(form.get("name") or ""), form.get("game_type"))
-            author_actual = plugin_version_projection(author) if author else {}
-            author_mismatches = [
-                name for name in update_fields
-                if name in form and (name not in author_actual or not _same_readback(form[name], author_actual[name]))
-            ]
+            detail_mismatches: List[str] = []
+            author_mismatches: List[str] = []
+            author: Mapping[str, Any] = {}
+            for attempt in range(6):
+                if attempt:
+                    raw_readback = _readback(
+                        lambda: detail(session, "plugin", reference), "/addon/detail_v2"
+                    )
+                detail_version = plugin_version_projection(raw_readback)
+                detail_mismatches = [
+                    name for name in update_fields
+                    if name in form and (name not in detail_version or not _same_readback(form[name], detail_version[name]))
+                ]
+                author = author_item(
+                    session, "plugin", reference, str(form.get("name") or ""), form.get("game_type")
+                )
+                author_actual = plugin_version_projection(author) if author else {}
+                author_mismatches = [
+                    name for name in update_fields
+                    if name in form and (name not in author_actual or not _same_readback(form[name], author_actual[name]))
+                ]
+                if not (detail_mismatches and author_mismatches):
+                    break
+                if attempt < 5:
+                    time.sleep(1)
             if detail_mismatches and author_mismatches:
                 raise FuploadError(
                     "submitted plugin version is not visible in official readback projections",
