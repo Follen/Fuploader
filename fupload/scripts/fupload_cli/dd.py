@@ -1455,7 +1455,10 @@ def _key(item: Any, key: Optional[str]) -> Any:
     return item.get(key) if isinstance(item, dict) else item
 
 
-def selected_group(backup: Mapping[str, Any], current: Mapping[str, Any], name: str, key: Optional[str], selected: Sequence[Any], updates: Sequence[Any]) -> Dict[str, Any]:
+def selected_group(
+    backup: Mapping[str, Any], current: Mapping[str, Any], name: str, key: Optional[str],
+    selected: Sequence[Any], updates: Sequence[Any], update_path: Optional[str] = None,
+) -> Dict[str, Any]:
     available = list(((backup.get(name) or {}).get("items") or []))
     by_key = {_key(item, key): item for item in available}
     missing = [value for value in selected if value not in by_key]
@@ -1464,6 +1467,12 @@ def selected_group(backup: Mapping[str, Any], current: Mapping[str, Any], name: 
     old_versions = dict(((current.get(name) or {}).get("inner_version") or {}))
     versions = {}
     update_keys = {str(value) for value in updates}
+    selected_keys = {str(value) for value in selected}
+    if update_keys - selected_keys:
+        raise ValidationError(
+            "update markers must refer to selected content",
+            path="$.%s" % (update_path or name),
+        )
     for item in available:
         value = _key(item, key)
         lookup = str(value)
@@ -1555,6 +1564,7 @@ def current_wtf_selectors(backup: Mapping[str, Any], current: Mapping[str, Any])
 def selected_wa_group(
     backup: Mapping[str, Any], current: Mapping[str, Any], name: str,
     selected: Sequence[str], updates: Sequence[str], account: str,
+    update_path: Optional[str] = None,
 ) -> Dict[str, Any]:
     available = list(((backup.get(name) or {}).get("items") or []))
     by_uid = {
@@ -1576,6 +1586,12 @@ def selected_wa_group(
     old_versions = dict(((current.get(name) or {}).get("inner_version") or {}))
     versions: Dict[str, int] = {}
     update_keys = {str(value) for value in updates}
+    selected_keys = {str(value) for value in selected}
+    if update_keys - selected_keys:
+        raise ValidationError(
+            "update markers must refer to selected content",
+            path="$.%s" % (update_path or (name + "_ids")),
+        )
     for item in available:
         uid = str(item.get("uid"))
         old = int(old_versions.get(uid, 0) or 0)
@@ -1605,12 +1621,16 @@ def config_form(current: Mapping[str, Any], backup: Mapping[str, Any], doc: Mapp
     apply_present(form, doc, form.keys())
     for group, key, selected_name, update_name in CONFIG_GROUPS:
         if selected_name in doc:
-            form[group] = selected_group(backup, current, group, key, doc[selected_name], doc.get(update_name, []))
+            form[group] = selected_group(
+                backup, current, group, key, doc[selected_name], doc.get(update_name, []), update_name,
+            )
         else:
             current_selected = [
                 _key(item, key) for item in ((current.get(group) or {}).get("items") or [])
             ]
-            form[group] = selected_group(backup, current, group, key, current_selected, [])
+            form[group] = selected_group(
+                backup, current, group, key, current_selected, doc.get(update_name, []), update_name,
+            )
     if "wtf_role_ids" in doc:
         form["wtf"] = wtf_tree(backup, doc["wtf_role_ids"])
     else:
@@ -1626,7 +1646,9 @@ def config_form(current: Mapping[str, Any], backup: Mapping[str, Any], doc: Mapp
             selected = doc[selected_name]
             if selected and not account:
                 raise ValidationError("select one WTF role before selecting WA content", path="$.wtf_role_ids")
-            form[group] = selected_wa_group(backup, current, group, selected, doc.get(update_name, []), account)
+            form[group] = selected_wa_group(
+                backup, current, group, selected, doc.get(update_name, []), account, update_name,
+            )
         elif account_changed:
             form[group] = selected_wa_group(backup, current, group, [], [], account)
         else:
@@ -1634,7 +1656,9 @@ def config_form(current: Mapping[str, Any], backup: Mapping[str, Any], doc: Mapp
                 str(item.get("uid")) for item in ((current.get(group) or {}).get("items") or [])
                 if isinstance(item, dict) and item.get("uid") is not None
             ]
-            form[group] = selected_wa_group(backup, current, group, current_selected, [], account)
+            form[group] = selected_wa_group(
+                backup, current, group, current_selected, doc.get(update_name, []), account, update_name,
+            )
     if current.get("retail_ui_config") is not None:
         form["retail_ui_config"] = copy.deepcopy(current["retail_ui_config"])
     if (form.get("known_addon", {}).get("items") or form.get("unknown_addon", {}).get("items")) and not form.get("wtf", {}).get("accounts"):

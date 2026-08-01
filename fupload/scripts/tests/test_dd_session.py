@@ -330,6 +330,24 @@ class DDSessionTests(unittest.TestCase):
         self.assertTrue(module.failure_from_exception(TimeoutError(), "object_put").verification_required)
         self.assertTrue(module.failure_from_exception(RuntimeError(), "mutation").verification_required)
 
+    def test_native_http_rejection_status_matrix_is_deterministic(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        for status in (400, 401, 403, 404, 422, 500):
+            body = json.dumps({"code": status * 10, "message": "field rejected", "field": "version"}).encode("utf-8")
+            error = urllib.error.HTTPError(
+                "https://uiapi.w.163.com/addon/modify", status, "rejected", {}, io.BytesIO(body)
+            )
+            with self.subTest(status=status):
+                failure = module.failure_from_exception(error, "mutation")
+                self.assertEqual(failure.http_status, status)
+                self.assertEqual(failure.business_code, status * 10)
+                self.assertEqual(failure.details["server_field"], "version")
+                self.assertEqual(failure.verification_required, status >= 500)
+
     def test_native_http_error_body_keeps_business_code_and_validation_hint(self) -> None:
         with mock.patch.dict(os.environ, {
             "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",

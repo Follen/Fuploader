@@ -1,0 +1,22 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 6
+name: dd-field-by-field-wire-regression
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: e6fc4a27856913080615b45a104bd32e0f1a4817c29eb9b853f2c4e61cb8145c
+spec_changes:
+  - capability: dd-publishing
+    operation: replace
+    source: specs/dd-publishing/spec.md
+    base_hash: fa8139070ac08b2076ea80555325be0bc9441db3acdb3b6460ac0129c3260dc3
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/f74ab03077792e01de461c523f4cff2989e46bafca57f10b60848d806ed5e310.json
+verification_evidence: runtime/evidence/verifications/1e93bb6cfa1a45e783e5f54d4c4e49787dd4aca1837daf16c04094fba48b7bb3.json
+partial_allowance: null
+archived: true
+created_at: 2026-08-01
+run_id: 1b4f7bba-7c13-4bc6-bbe0-6cb05950b875

@@ -47,6 +47,8 @@ Omission on edit preserves the remote value. Explicit false follows the field-sp
 
 `plugin create` fields: `game_type`, `scope`, `addon_type`, `name`, `description`, `logo`/`logo_file`, `detail_imgs`/`detail_img_files`, `primary_category_id`, `second_category_ids`, `html_desc`, `game_versions`, `detail_url`/`file`, `release_type`, `version`, `update_desc`, and all shared fields. Name, description, and version are at most 80 characters; update description is at most 1000; detail images are at most 8.
 
+Every path in `detail_img_files` must exist as a regular local file. Validation reports the exact indexed path, such as `$.detail_img_files[0]`, before any upload or mutation.
+
 `game_type` and the outer free/paid state are create-only. `plugin update` requires `sn`, `game_versions`, `version`, and `update_desc`; optional `file`, `detail_url`, and `release_type` publish a new version. `plugin edit` requires `sn` and only accepts the official existing-record commercial and association controls (`scope`, payment/lifetime/VIP fields, room/channel linkage, `creation_statement`, and associated content). First-publication metadata (`addon_type`, `name`, `description`, logo, detail images, categories, and `html_desc`) and version fields are not edit fields; in particular, sending `description` to `/addon/modify` can be accepted while leaving the remote value unchanged, so the CLI rejects it instead of reporting a false success.
 
 When `assign_user_sn` is present, the official UI exposes only the public scope option. Python validates the final rebuilt form and rejects a private scope before upload or mutation.
@@ -66,6 +68,10 @@ Title is at most 40 characters, brief description 50, update description 1000, a
 Run `config backups`, select `backup_sn`, then run `config backup-get --sn <backup>`. Choose content references only from that response. After choosing one WTF role, filter known/unknown WA by the selected role's account. Switching backup requires complete reselection. Switching the WTF account clears both WA groups. Unknown WA internal IDs are restored by Python from `extra.wa_account_info[account]`; they never appear in input JSON.
 
 Every wire content group is rebuilt from the latest backup. Each `inner_version` map covers every source item; a new entry is 1, an existing value is preserved, and only explicitly listed existing update entries increment.
+
+An incremental array may be submitted without repeating its unchanged selection array; Python applies it to the current selected items from the fresh detail. Every incremental marker must reference an item that remains selected. A stale or unselected marker is rejected at its exact `*_update_ids` or `*_update_names` path before upload or mutation.
+
+Every path in `display_img_files` must exist as a regular local file and is rejected at its indexed JSON path before upload when absent.
 
 For retail, `retail_ui_config` accepts `edit_mode_selectors`, `default_edit_mode_selector`, `cool_down_selectors`, and `enable_dd_setup_wizard`. Up to five edit modes are allowed and one selected mode is default. Only one cooldown per `spec_tag` is allowed. Selectors are bound to one backup; raw `import_string` and raw edit/cooldown objects are read-only and never emitted.
 

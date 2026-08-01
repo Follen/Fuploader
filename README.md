@@ -14,6 +14,7 @@ Fuploader 是一个面向 Agent 的《魔兽世界》作者发布 Skill。新手
 - 新手盒子官方通道复用本机 `ncc login` 或预先注入的 `NCC_TOKEN`，第三方通道复用桌面客户端登录状态；不接收或输出 token、cookie、JWT、签名 URL、DD `clientNo`、原始 WA 字符串或原始配置内容。
 - DD 通过已安装官方客户端的无头运行环境完成原生登录、签名和官方 `WowUIInterface.parseWa` WA2 解析；一次发布任务只建立一个串行会话，任务结束立即退出。
 - DD 写入前按官方网页的详情投影和表单校验重建完整请求；可选 VIP/频道依赖只在启用时查询，插件版本历史遍历分页，WA 新版本只接受纯数字。4xx/业务错误会在 DD 版本目录的 `Fupload/logs` 保存经过递归脱敏且按 UTF-8 字节限长的请求与响应记录。
+- DD 回归以 `resource × action × field × state` 表驱动矩阵覆盖 195 个 create/update/edit/delete 输入字段；每个字段校验正常值、替代值、遗漏、null、非法类型及适用的 false/0/空值/边界，并捕获 JSON 序列化后的最终 endpoint、请求体、上传和 mutation 次数。
 
 ## 目录
 
@@ -137,6 +138,13 @@ python -m compileall -q fupload\scripts
 ```
 
 当前回归测试覆盖 CLI 路由、严格 JSON、字段 Schema、双平台 builder、动态选项校验、字段保留与清空语义，以及所有内置示例的 dry-run。
+
+DD 逐字段 wire 矩阵可单独运行并生成本地审计报告：
+
+```powershell
+python -m unittest discover -s fupload\scripts\tests -p test_dd_wire_matrix.py -v
+python fupload\scripts\tests\generate_dd_wire_matrix_report.py > analyze\dd-field-by-field-wire-regression-20260801.md
+```
 
 ## 说明
 

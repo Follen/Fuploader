@@ -257,6 +257,13 @@ class Schema:
             scalar_array("category_ids", (str, int), "array must contain nonempty category IDs")
             for name in ("detail_imgs", "display_imgs", "detail_img_files", "display_img_files"):
                 scalar_array(name, (str,), "array must contain nonempty strings")
+            for name in ("detail_img_files", "display_img_files"):
+                for index, path in enumerate(value.get(name) or []):
+                    if not os.path.isfile(path):
+                        raise ValidationError(
+                            "file does not exist or is not a regular file",
+                            path="$.%s[%d]" % (name, index),
+                        )
             for name in ("known_addon_ids", "known_addon_update_ids"):
                 scalar_array(name, (int,), "array must contain integer addon IDs")
             for name in (
