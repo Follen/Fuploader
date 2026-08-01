@@ -129,8 +129,12 @@ class Schema:
         if value.get("need_anchor_vip") is True and value.get("scope") == "private":
             raise ValidationError("need_anchor_vip=true requires public scope", path="$.scope")
         if self.name.startswith("fupload.v1.dd.") and self.name.endswith(".create"):
-            if value.get("scope") == "private" and not value.get("share_code_life_type"):
+            paid_private_config = self.name == "fupload.v1.dd.config.create" and value.get("need_buy") is True
+            if value.get("scope") == "private" and not value.get("share_code_life_type") and not paid_private_config:
                 raise ValidationError("share_code_life_type is required when scope=private", path="$.share_code_life_type")
+        if self.name in ("fupload.v1.dd.wa.create", "fupload.v1.dd.wa.update") and "version" in value:
+            if not value["version"].isdigit():
+                raise ValidationError("WA version must contain digits only", path="$.version")
         if value.get("with_file") is True:
             if self.name == "fupload.v1.dd.wa.create" and not value.get("file"):
                 raise ValidationError("file is required when with_file=true on create", path="$.file")

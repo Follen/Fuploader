@@ -464,6 +464,78 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(fields["response_bytes"], len(body.encode("utf-8")))
         self.assertLessEqual(len(fields["response_body"].encode("utf-8")), module._MAX_LOG_BODY)
 
+    def test_native_truncated_text_redacts_device_and_client_credentials(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        body = (
+            'clientNo: client-secret client_id=client-id-secret '
+            'device_proof: device-secret signature=signature-secret token: token-secret'
+        )
+        fields = module._response_log_content({
+            "body": body,
+            "body_bytes": len(body.encode("utf-8")),
+            "body_truncated": True,
+        })
+        self.assertNotIn("client-secret", fields["response_body"])
+        self.assertNotIn("client-id-secret", fields["response_body"])
+        self.assertNotIn("device-secret", fields["response_body"])
+        self.assertNotIn("signature-secret", fields["response_body"])
+        self.assertNotIn("token-secret", fields["response_body"])
+
+    def test_native_upload_error_log_uses_sanitized_stage_endpoint(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        command = {"action": "upload", "meta": {"business_id": "addon"}}
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(module, "DD_DIR", directory):
+            authorize_path = module.write_error_log(
+                module.SidecarFailure("rejected", "upload_authorize", http_status=422), command,
+            )
+            put_path = module.write_error_log(
+                module.SidecarFailure("rejected", "object_put", http_status=403), command,
+            )
+            records = [json.loads(line) for line in Path(put_path).read_text(encoding="utf-8").splitlines()]
+        self.assertEqual(authorize_path, put_path)
+        self.assertEqual(records[-2]["endpoint"], "/file/upload")
+        self.assertEqual(records[-1]["endpoint"], "object-store-put")
+
+    def test_native_failure_preserves_falsy_business_code(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+
+        class NativeFailure(Exception):
+            code = 0
+            error_code = 4312
+
+        self.assertEqual(module.failure_from_exception(NativeFailure("failed"), "mutation").business_code, 0)
+
+    def test_native_wa_parser_uses_official_bridge_and_nested_result(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+
+        class NativeResult:
+            def toJson(self):
+                return json.dumps({"code": 200, "result": {"uid": "wa-uid", "id": "wa-id"}})
+
+        interface = mock.MagicMock()
+        interface.parseWa.return_value = NativeResult()
+        container = mock.MagicMock()
+        container.get_instance.return_value = interface
+        result = module.parse_native_wa((None, container, None, None, None), "!WA:2!content")
+        interface.parseWa.assert_called_once_with({"waStr": "!WA:2!content"})
+        self.assertEqual(result, {"parse_wa_uid": "wa-uid", "parse_wa_id": "wa-id"})
+
     def test_native_business_error_is_logged_and_returns_log_path(self) -> None:
         with mock.patch.dict(os.environ, {
             "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",

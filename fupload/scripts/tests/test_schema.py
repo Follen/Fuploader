@@ -238,6 +238,31 @@ class SchemaTests(unittest.TestCase):
         value["share_code_life_type"] = "forever"
         self.assertEqual(schema.validate(value)["share_code_life_type"], "forever")
 
+    def test_dd_private_paid_config_create_allows_omitted_lifetime(self) -> None:
+        schema = get_schema("dd", "config", "create")
+        value = {
+            "schema": schema.name, "scope": "private", "backup_sn": "backup",
+            "title": "Config", "brief_desc": "brief", "desc": "description",
+            "display_imgs": ["image"],
+            "creation_statement": "original", "known_addon_ids": [],
+            "unknown_addon_ids": [], "wtf_role_ids": [], "material_names": [],
+            "font_names": [], "known_wa_ids": [], "unknown_wa_ids": [],
+            "need_buy": True, "price_fen": 10, "buy_life_type": "seven_day",
+            "jump_room": False, "with_associate": False, "need_anchor_vip": False,
+        }
+        self.assertNotIn("share_code_life_type", schema.validate(value))
+
+    def test_dd_wa_versions_require_digits_only(self) -> None:
+        schema = get_schema("dd", "wa", "update")
+        base = {
+            "schema": schema.name, "sn": "wa", "content": "!WA:2!demo",
+            "update_desc": "update", "version": "12", "with_file": False,
+        }
+        self.assertEqual(schema.validate(base)["version"], "12")
+        for invalid in ("1.2", "v2", "2-beta"):
+            with self.subTest(version=invalid), self.assertRaisesRegex(ValidationError, "digits only"):
+                schema.validate({**base, "version": invalid})
+
     def test_dd_retail_config_rejects_raw_objects(self) -> None:
         schema = get_schema("dd", "config", "update")
         value = {

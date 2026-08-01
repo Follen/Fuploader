@@ -20,8 +20,15 @@ USER_AGENT = (
     "(KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 app/df_client dfVersion/%s"
     % os.path.basename(DD_DIR.rstrip("\\/"))
 )
-_SENSITIVE_ERROR_VALUE = re.compile(r"(?i)((?:x-amz-(?:credential|signature|security-token)|token|jwt|authorization|cookie)=)[^&\s]+")
-_SENSITIVE_JSON_VALUE = re.compile(r'''(?i)((?:["']?(?:token|jwt|authorization|cookie)["']?)\s*:\s*["']?)[^"',}\s]+''')
+_SENSITIVE_NAME = (
+    r"(?:x-amz-(?:credential|signature|security-token)|access[_-]?token|refresh[_-]?token|"
+    r"resource[_-]?token|token|jwt(?:token)?|authorization|authentication|cookie|set-cookie|"
+    r"credential|client[_-]?(?:no|id)|clientno|clientid|device[_-]?(?:id|proof)|"
+    r"signed[_-]?url|upload[_-]?url|presigned[_-]?(?:uri|url)|signature)"
+)
+_SENSITIVE_ERROR_VALUE = re.compile(
+    r'''(?i)((?:["']?''' + _SENSITIVE_NAME + r'''["']?)\s*(?:=|:)\s*["']?)[^"',}&\s]+'''
+)
 _BEARER_VALUE = re.compile(r"(?i)Bearer\s+[A-Za-z0-9._~+/=-]+")
 _HTTP_STATUS = re.compile(r"\bHTTP\s+(\d{3})\b", re.IGNORECASE)
 _SENSITIVE_KEYS = {
@@ -35,7 +42,6 @@ _MAX_LOG_BODY = 1024 * 1024
 
 def safe_exception_message(exc):
     value = _SENSITIVE_ERROR_VALUE.sub(r"\1[REDACTED]", str(exc).strip())
-    value = _SENSITIVE_JSON_VALUE.sub(r"\1[REDACTED]", value)
     return _BEARER_VALUE.sub("Bearer [REDACTED]", value)
 
 
@@ -116,11 +122,17 @@ def write_error_log(failure, command, probe=None, payload=None):
     request = command.get("payload") if isinstance(command, dict) else None
     if request is None and isinstance(command, dict) and command.get("action") == "upload":
         request = command.get("meta")
+    endpoint = command.get("path") if isinstance(command, dict) else None
+    if isinstance(command, dict) and command.get("action") == "upload":
+        if failure.stage == "upload_authorize":
+            endpoint = "/file/upload"
+        elif failure.stage == "object_put":
+            endpoint = "object-store-put"
     record = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "action": command.get("action") if isinstance(command, dict) else None,
         "method": command.get("method") if isinstance(command, dict) else None,
-        "endpoint": command.get("path") if isinstance(command, dict) else None,
+        "endpoint": endpoint,
         "stage": failure.stage,
         "message": safe_exception_message(failure),
         "http_status": failure.http_status,
@@ -300,7 +312,9 @@ def failure_from_exception(exc, stage, response=None):
             try:
                 body_value = json.loads(probe["body"])
                 if isinstance(body_value, dict):
-                    business_code = body_value.get("code") or body_value.get("error_code")
+                    business_code = body_value.get("code")
+                    if business_code is None:
+                        business_code = body_value.get("error_code")
             except (TypeError, ValueError):
                 pass
         return SidecarFailure(
@@ -321,12 +335,16 @@ def failure_from_exception(exc, stage, response=None):
         status = int(status) if status is not None else None
     except (TypeError, ValueError):
         status = None
-    business_code = getattr(exc, "code", None) or getattr(exc, "error_code", None)
+    business_code = getattr(exc, "code", None)
+    if business_code is None:
+        business_code = getattr(exc, "error_code", None)
     if business_code is None and isinstance(probe, dict) and probe.get("body"):
         try:
             body_value = json.loads(probe["body"])
             if isinstance(body_value, dict):
-                business_code = body_value.get("code") or body_value.get("error_code")
+                business_code = body_value.get("code")
+                if business_code is None:
+                    business_code = body_value.get("error_code")
         except (TypeError, ValueError):
             pass
     if not message:
@@ -444,33 +462,56 @@ def api_result(payload):
     return payload.get("result") if isinstance(payload, dict) else None
 
 
+def _native_json(value):
+    to_json = getattr(value, "toJson", None)
+    if callable(to_json):
+        value = to_json()
+    if isinstance(value, bytes):
+        value = value.decode("utf-8", "replace")
+    if isinstance(value, str):
+        value = json.loads(value)
+    return value
+
+
+def _native_wa_ids(value):
+    parsed = _native_json(value)
+    if isinstance(parsed, dict):
+        code = parsed.get("code")
+        if code not in (None, 0, 200):
+            raise RuntimeError(str(parsed.get("msg") or parsed.get("message") or "DD WA parser rejected the content"))
+        nested = _native_json(parsed.get("result")) if parsed.get("result") is not None else parsed
+        if isinstance(nested, dict):
+            uid = nested.get("parse_wa_uid") or nested.get("uid") or nested.get("wa_uid")
+            ident = nested.get("parse_wa_id") or nested.get("id") or nested.get("wa_id")
+        else:
+            uid = ident = None
+    elif isinstance(parsed, (list, tuple)) and len(parsed) >= 2:
+        uid, ident = parsed[0], parsed[1]
+    else:
+        uid = ident = None
+    if not uid or not ident:
+        raise RuntimeError("DD native WA parser did not return uid and id")
+    return {"parse_wa_uid": str(uid), "parse_wa_id": str(ident)}
+
+
 def parse_native_wa(session, content):
-    """Use a parser exposed by the installed DD runtime; never synthesize IDs."""
+    """Follow the installed DD bridge and parser chain; never synthesize IDs."""
     container = session[1]
-    service_names = (
-        "WaParser", "WAParser", "WeakAurasParser", "WastParser",
-        "WaParseService", "WAParseService", "UiWaParser",
-    )
-    method_names = ("parse", "parseWa", "parse_wa", "parseString", "parse_string")
-    for service_name in service_names:
-        try:
-            service = container.get_instance(service_name)
-        except Exception:
-            continue
-        for method_name in method_names:
-            method = getattr(service, method_name, None)
-            if not callable(method):
-                continue
-            parsed = method(content)
-            if isinstance(parsed, dict):
-                uid = parsed.get("parse_wa_uid") or parsed.get("uid") or parsed.get("wa_uid")
-                ident = parsed.get("parse_wa_id") or parsed.get("id") or parsed.get("wa_id")
-            elif isinstance(parsed, (list, tuple)) and len(parsed) >= 2:
-                uid, ident = parsed[0], parsed[1]
-            else:
-                continue
-            if uid and ident:
-                return {"parse_wa_uid": str(uid), "parse_wa_id": str(ident)}
+    try:
+        interface = container.get_instance("WowUIInterface")
+    except Exception:
+        interface = None
+    bridge = getattr(interface, "parseWa", None)
+    if callable(bridge):
+        return _native_wa_ids(bridge({"waStr": content}))
+
+    try:
+        from components.wow_ui.wa.wa_parser import WaParser
+        parser = WaParser(None)
+        return _native_wa_ids(parser.parseWa(content))
+    except ImportError:
+        pass
+
     raise RuntimeError("installed DD runtime does not expose a native WA parser")
 
 
@@ -534,7 +575,6 @@ def run_command(session, command):
                 url,
                 headers={
                     "Authentication": jwt_value,
-                    "Authorization": jwt_value,
                     "User-Agent": USER_AGENT,
                 },
             )

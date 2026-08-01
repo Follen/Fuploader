@@ -1,0 +1,46 @@
+﻿{
+    "schema":  "fupload.v1.dd.config.update",
+    "share_sn":  "61e05f24591947ad8a43e994061a04ec",
+    "backup_sn":  "a91f4603ff4849f5a700475283fde900",
+    "update_desc":  "Official config update verification",
+    "known_addon_ids":  [
+
+                        ],
+    "known_addon_update_ids":  [
+
+                               ],
+    "unknown_addon_ids":  [
+
+                          ],
+    "unknown_addon_update_ids":  [
+
+                                 ],
+    "wtf_role_ids":  [
+                         "wtf_1f3b66d4cd26e159547c"
+                     ],
+    "material_names":  [
+                           "Icons"
+                       ],
+    "material_update_names":  [
+                                  "Icons"
+                              ],
+    "font_names":  [
+
+                   ],
+    "font_update_names":  [
+
+                          ],
+    "known_wa_ids":  [
+
+                     ],
+    "known_wa_update_ids":  [
+
+                            ],
+    "unknown_wa_ids":  [
+
+                       ],
+    "unknown_wa_update_ids":  [
+
+                              ],
+    "retail_ui_config":  null
+}

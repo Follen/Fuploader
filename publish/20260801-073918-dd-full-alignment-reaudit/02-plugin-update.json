@@ -1,0 +1,11 @@
+﻿{
+    "schema":  "fupload.v1.dd.plugin.update",
+    "sn":  "f338678ba0694b748948b55f58db5575",
+    "game_versions":  [
+                          "12.0.7"
+                      ],
+    "file":  "D:\\Code\\Fuploader\\publish\\20260731-191228-cross-platform-contract-test\\assets\\FuploadContractTest.zip",
+    "release_type":  1,
+    "version":  "2.0.0",
+    "update_desc":  "Official contract update verification"
+}

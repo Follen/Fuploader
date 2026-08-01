@@ -1,0 +1,22 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 5
+name: dd-full-alignment-reaudit
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: d816413bfdcfc01395ddd4fb81fb8fe407f7321bc0d265bc661633f1dcb6728c
+spec_changes:
+  - capability: dd-publishing
+    operation: replace
+    source: specs/dd-publishing/spec.md
+    base_hash: 0c976b24e1ac688c74d9cb5f8b9963a289a855916d58d90e68ae965087f67bc5
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/5007788e2383a4832a8b3d78809501ccf7a79232dd033500fd5a8beb11aea2fa.json
+verification_evidence: runtime/evidence/verifications/af237e17a4f9b15b197fecff92fd19701057bd8b5deb52eebc3e0f897dab4e8f.json
+partial_allowance: null
+archived: true
+created_at: 2026-07-31
+run_id: fb87246f-67d1-4430-99f1-859e76bdaede

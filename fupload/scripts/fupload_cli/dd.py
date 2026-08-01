@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+from decimal import Decimal, InvalidOperation
 import hashlib
 import json
 import os
@@ -670,15 +671,15 @@ def _author_page(
 
 
 def _author_total(payload: Any) -> Optional[int]:
-    value = result(payload)
-    if not isinstance(value, dict):
-        return None
-    for key in ("total", "total_count", "count"):
-        try:
-            if value.get(key) is not None:
-                return max(0, int(value[key]))
-        except (TypeError, ValueError):
+    for value in (payload, result(payload)):
+        if not isinstance(value, dict):
             continue
+        for key in ("total", "total_count", "count"):
+            try:
+                if value.get(key) is not None:
+                    return max(0, int(value[key]))
+            except (TypeError, ValueError):
+                continue
     return None
 
 
@@ -704,7 +705,9 @@ def _author_items(
         seen_pages.add(signature)
         collected.extend(page_items)
         total = _author_total(payload)
-        if (total is not None and len(collected) >= total) or len(page_items) < size:
+        if total is not None and len(collected) >= total:
+            return collected
+        if total is None and len(page_items) < size:
             return collected
     raise FuploadError(
         "DD author list pagination exceeded the bounded page limit",
@@ -913,12 +916,23 @@ def safe_channels(payload: Any) -> Dict[str, Any]:
 def version_greater(candidate: Any, current: Any) -> bool:
     left = str(candidate or "").strip()
     right = str(current or "").strip()
-    if left.isdigit() and right.isdigit():
-        return int(left) > int(right)
-    def parts(value: str) -> List[int]:
-        return [int(part) for part in value.split(".") if part.isdigit()]
-    lp, rp = parts(left), parts(right)
-    return bool(lp and rp and lp > rp)
+    if not left.isdigit():
+        return False
+    try:
+        return Decimal(left) > Decimal(right)
+    except InvalidOperation:
+        return False
+
+
+def response_reference(payload: Any, *names: str) -> str:
+    value = result(payload)
+    if isinstance(value, Mapping):
+        for name in names:
+            candidate = value.get(name)
+            if candidate not in (None, ""):
+                return str(candidate)
+        return ""
+    return "" if value in (None, "") else str(value)
 
 
 def safe_author_list(kind: str, payload: Any) -> Dict[str, Any]:
@@ -1403,6 +1417,35 @@ def plugin_history_versions(payload: Any) -> set[str]:
     return versions
 
 
+def load_plugin_history_versions(
+    session: Sidecar, reference: str, game_type: Any, *, page_limit: int = 1000,
+) -> set[str]:
+    versions: set[str] = set()
+    seen_pages: set[Tuple[str, ...]] = set()
+    for page in range(1, page_limit + 1):
+        payload = session.get("/addon/addon_versions", {
+            "sn": reference, "game_type": game_type, "page": page,
+        })
+        page_items = items(payload)
+        if not page_items:
+            return versions
+        signature = tuple(
+            str(item.get("sn") or item.get("version") or item.get("id") or "")
+            for item in page_items
+        )
+        if signature in seen_pages:
+            return versions
+        seen_pages.add(signature)
+        versions.update(plugin_history_versions(payload))
+        total = _author_total(payload)
+        if total is not None and len(versions) >= total:
+            return versions
+    raise FuploadError(
+        "DD plugin version pagination exceeded the bounded page limit",
+        kind="platform_data_error", stage="dependency_get",
+    )
+
+
 def _key(item: Any, key: Optional[str]) -> Any:
     if key is None:
         return item if not isinstance(item, dict) else item.get("name", item.get("id"))
@@ -1772,14 +1815,14 @@ class DD:
         if form.get("share_code_life_type"):
             self._validate_choices(LIFE_TYPES, [form.get("share_code_life_type")], ("value",), "$.share_code_life_type")
 
-        vip_levels = session.get("/anchor_vip/level/list", {"enrich_acts": "false"})
         if form.get("need_anchor_vip"):
+            vip_levels = session.get("/anchor_vip/level/list", {"enrich_acts": "false"})
             self._validate_choices(vip_levels, form.get("vip_levels") or [], ("id", "level", "value"), "$.vip_levels")
 
-        channels = safe_channels(session.cc_get("https://api.cc.163.com/v1/mixteammsgproxy/channelList?source=pluginPublish"))
-        if form.get("jump_room") and not channels["items"]:
-            raise FuploadError("live channel response contained no selectable values", kind="platform_data_error")
         if form.get("jump_room"):
+            channels = safe_channels(session.cc_get("https://api.cc.163.com/v1/mixteammsgproxy/channelList?source=pluginPublish"))
+            if not channels["items"]:
+                raise FuploadError("live channel response contained no selectable values", kind="platform_data_error")
             wanted = (str(form.get("room_id")), str(form.get("channel_id")), str(form.get("channel_type")))
             available = {(str(item["room_id"]), str(item["channel_id"]), str(item["channel_type"])) for item in channels["items"]}
             if wanted not in available:
@@ -1872,6 +1915,8 @@ class DD:
             allowed = PLUGIN_EDIT_FIELDS if action == "edit" else ("game_versions", "detail_url", "release_type", "version", "update_desc")
             current_version = str(form.get("version") or "").strip()
             apply_present(form, doc, allowed)
+            if current.get("assign_user_sn") and form.get("scope", "public") != "public":
+                raise ValidationError("assigned plugins can only use public scope", path="$.scope")
             if "game_type" in doc and str(doc["game_type"]) != str(current.get("game_type") or (current.get("game_types") or [None])[0]):
                 raise ValidationError("game_type is locked after plugin creation", path="$.game_type")
             form["sn"] = doc["sn"]
@@ -1879,13 +1924,13 @@ class DD:
                 raise ValidationError("version already exists; overwrite is not allowed", path="$.version")
             if action == "update":
                 try:
-                    history = session.get("/addon/addon_versions", {
-                        "sn": doc["sn"], "game_type": form.get("game_type"), "page": 1,
-                    })
+                    history_versions = load_plugin_history_versions(
+                        session, str(doc["sn"]), form.get("game_type"),
+                    )
                 except FuploadError:
-                    history = None
+                    history_versions = set()
                 candidate = str(form.get("version") or "").strip().casefold()
-                if candidate and candidate in plugin_history_versions(history):
+                if candidate and candidate in history_versions:
                     raise ValidationError("version already exists; overwrite is not allowed", path="$.version")
         if doc.get("file"):
             self._archive(doc["file"], (".zip",))
@@ -1904,7 +1949,7 @@ class DD:
             form["detail_url"] = session.upload(doc["file"], "addon", file_name="addon.zip")
         endpoint = "/addon/create" if action == "create" else "/addon/modify"
         response = session.post(endpoint, form)
-        reference = str((result(response) or {}).get("sn") if isinstance(result(response), dict) else result(response) or form.get("sn") or "")
+        reference = response_reference(response, "sn") or str(form.get("sn") or "")
         if action == "create" and not reference:
             reference = created_reference(session, "plugin", str(form.get("name") or ""), form.get("game_type"))
         if action == "create" and not reference:
@@ -2050,7 +2095,7 @@ class DD:
             form["display_imgs"] = existing_images + [session.upload(path, "share", media=True, max_bytes=10 * 1024 * 1024) for path in doc["display_img_files"]]
         endpoint = "/share/create" if action == "create" else "/share/modify"
         response = session.post(endpoint, form)
-        reference = str((result(response) or {}).get("share_sn") if isinstance(result(response), dict) else result(response) or form.get("share_sn") or "")
+        reference = response_reference(response, "share_sn", "sn") or str(form.get("share_sn") or "")
         if action == "create" and not reference:
             reference = created_reference(session, "config", str(form.get("title") or ""), validation_form.get("game_type"))
         if action == "create" and not reference:
@@ -2084,6 +2129,8 @@ class DD:
             form = wa_form(current)
             allowed = WA_FIELDS if action == "edit" else ("content", "update_desc", "version", "with_file", "file_path", "file_install_path", "parse_wa_uid", "parse_wa_id")
             apply_present(form, doc, allowed)
+            if current.get("assign_user_sn") and form.get("scope", "public") != "public":
+                raise ValidationError("assigned WA records can only use public scope", path="$.scope")
             if "game_type" in doc and str(doc["game_type"]) != str(current.get("game_type")):
                 raise ValidationError("game_type is locked after WA creation", path="$.game_type")
             form["sn"] = doc["sn"]
@@ -2124,7 +2171,7 @@ class DD:
             form["file_path"] = session.upload(doc["file"], "wa", file_name="wa_materials.zip", max_bytes=50 * 1024 * 1024)
         endpoint = "/wa/create" if action == "create" else "/wa/modify"
         response = session.post(endpoint, form)
-        reference = str((result(response) or {}).get("sn") if isinstance(result(response), dict) else result(response) or form.get("sn") or "")
+        reference = response_reference(response, "sn") or str(form.get("sn") or "")
         if action == "create" and not reference:
             reference = created_reference(session, "wa", str(form.get("name") or ""), form.get("game_type"))
         if action == "create" and not reference:

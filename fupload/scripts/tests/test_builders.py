@@ -10,7 +10,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from fupload_cli.dd import DD, LIFE_TYPES, Sidecar, _option_values, _readback_until_fields, _verify_fields, config_form, config_readback_projection, created_reference, discover_dd, normalize_commercial, plugin_form, plugin_history_versions, plugin_version_projection, readable_author_list, resolve_retail_ui_config, safe_backup_detail, safe_channels, safe_detail, selected_group, validate_locked_usage_mode, wa_form
+from fupload_cli.dd import DD, LIFE_TYPES, Sidecar, _author_total, _option_values, _readback_until_fields, _verify_fields, config_form, config_readback_projection, created_reference, discover_dd, load_plugin_history_versions, normalize_commercial, plugin_form, plugin_history_versions, plugin_version_projection, readable_author_list, resolve_retail_ui_config, response_reference, safe_backup_detail, safe_channels, safe_detail, selected_group, validate_locked_usage_mode, version_greater, wa_form
 from fupload_cli.errors import FuploadError, ValidationError, redact
 from fupload_cli.newbee import NewBee, RELATION_TYPES, _redact_wa, _require_readback, _wa_summary
 
@@ -493,6 +493,33 @@ class BuilderTests(unittest.TestCase):
             "result": {"rows": [{"version": "1.0.0"}, {"latest": {"version": "2.0.0"}}]},
         }), {"1.0.0", "2.0.0"})
 
+    def test_dd_plugin_history_loader_traverses_later_pages(self) -> None:
+        session = mock.MagicMock()
+        session.get.side_effect = [
+            {"code": 0, "count": 2, "result": [{"version": "1"}]},
+            {"code": 0, "count": 2, "result": [{"version": "2"}]},
+        ]
+        self.assertEqual(load_plugin_history_versions(session, "plugin-sn", 10001), {"1", "2"})
+        self.assertEqual([call.args[1]["page"] for call in session.get.call_args_list], [1, 2])
+
+    def test_dd_author_total_accepts_installed_top_level_count(self) -> None:
+        self.assertEqual(_author_total({"code": 0, "count": 6, "result": []}), 6)
+
+    def test_dd_response_reference_uses_nested_config_sn_without_none_string(self) -> None:
+        self.assertEqual(response_reference({"code": 0, "result": {"sn": "config-sn"}}, "share_sn", "sn"), "config-sn")
+        self.assertEqual(response_reference({"code": 0, "result": {"share_sn": None}}, "share_sn", "sn"), "")
+
+    def test_dd_disabled_vip_and_channel_options_do_not_fetch_dependencies(self) -> None:
+        session = mock.MagicMock(wraps=ValidDDOptions())
+        DD()._validate_options(session, "plugin", {
+            "game_type": 10001, "game_versions": ["12.1.0"],
+            "primary_category_id": 1, "second_category_ids": [2],
+            "need_anchor_vip": False, "jump_room": False,
+        })
+        endpoints = [call.args[0] for call in session.get.call_args_list]
+        self.assertNotIn("/anchor_vip/level/list", endpoints)
+        session.cc_get.assert_not_called()
+
     def test_dd_plugin_update_confirms_detail_latest_version_without_history(self) -> None:
         before = {
             "sn": "plugin-sn", "game_type": 10001, "name": "Plugin", "game_versions": ["12.1.0"],
@@ -580,6 +607,18 @@ class BuilderTests(unittest.TestCase):
             })
         self.assertEqual(result["reference"], "plugin-sn")
         self.assertEqual(session.post.call_args.args[1]["share_code_life_type"], "fourteen_day")
+
+    def test_dd_assigned_plugin_rejects_private_final_scope_before_mutation(self) -> None:
+        current = {
+            "sn": "plugin-sn", "assign_user_sn": "assigned-user", "game_type": 10001,
+            "scope": "public", "name": "Plugin", "game_versions": ["12.1.0"],
+            "latest_version": {"file_path": "archive", "release_type": 1, "version": "1"},
+        }
+        session = mock.MagicMock()
+        with mock.patch.object(DD, "_fresh_detail", return_value=current):
+            with self.assertRaisesRegex(ValidationError, "assigned plugins"):
+                DD()._write_plugin(session, "edit", {"sn": "plugin-sn", "scope": "private"})
+        session.post.assert_not_called()
 
     def test_dd_wa_legacy_modify_preserves_absent_create_defaults(self) -> None:
         form = wa_form({
@@ -880,6 +919,11 @@ class BuilderTests(unittest.TestCase):
             "game_type": 10001, "game_version": "12.1.0", "category_ids": ["211"],
         })
 
+    def test_dd_wa_version_comparison_accepts_legacy_numeric_current_value(self) -> None:
+        self.assertTrue(version_greater("2", "1.2"))
+        self.assertFalse(version_greater("1", "1.2"))
+        self.assertFalse(version_greater("2", "legacy"))
+
     def test_dd_option_parser_accepts_internal_enum_lists(self) -> None:
         self.assertIn("seven_day", _option_values(LIFE_TYPES, ("value",)))
 
@@ -960,6 +1004,18 @@ class BuilderTests(unittest.TestCase):
         self.assertFalse(submitted["with_file"])
         self.assertEqual(submitted["file_path"], "https://cdn.example/wa.zip")
         self.assertEqual(submitted["file_install_path"], "Interface/Addons")
+
+    def test_dd_assigned_wa_rejects_private_final_scope_before_mutation(self) -> None:
+        current = {
+            "sn": "wa-sn", "assign_user_sn": "assigned-user", "game_type": 10001,
+            "scope": "public", "name": "WA", "game_version": "12.1.0",
+            "content": "plain", "version": "1",
+        }
+        session = mock.MagicMock()
+        with mock.patch.object(DD, "_fresh_detail", return_value=current):
+            with self.assertRaisesRegex(ValidationError, "assigned WA"):
+                DD()._write_wa(session, "edit", {"sn": "wa-sn", "scope": "private"})
+        session.post.assert_not_called()
 
     def test_dd_post_timeout_preserves_endpoint_and_uncertain_write(self) -> None:
         sidecar = Sidecar.__new__(Sidecar)
