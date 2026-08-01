@@ -8,21 +8,31 @@ from typing import Any, Dict, Optional
 
 _BEARER = re.compile(r"(?i)Bearer\s+[A-Za-z0-9._~+/=-]+")
 _JWT = re.compile(r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]+\b")
+_WA_VALUE = re.compile(r"!WA:\d+![^\s\"']+")
 _SIGNED = re.compile(r"(?i)(X-Amz-(?:Credential|Signature)=)[^&\s]+")
 _SIGNED_TOKEN = re.compile(r"(?i)(X-Amz-(?:Security-Token|Date|Expires)=)[^&\s]+")
 _URL_TOKEN = re.compile(r"(?i)([?&](?:token|jwt|clientNo|client_no|signature|credential)=)[^&\s]+")
 _COOKIE = re.compile(r"(?i)(Cookie|Set-Cookie|Authentication|Authorization)(\s*[:=]\s*)[^\s;]+")
-_TOKEN_PAIR = re.compile(r"(?i)(token|clientNo|client_no|login[_-]?code|jwt|credential)(\s*[:=]\s*)[A-Za-z0-9._~+/=-]{6,}")
+_SECRET_NAME = (
+    r"(?:access[_-]?token|refresh[_-]?token|resource[_-]?token|token|clientNo|client_no|"
+    r"clientId|client_id|client[_-]?secret|device[_-]?(?:id|proof)|login[_-]?code|jwt|"
+    r"credential|signature|api[_-]?key|auth[_-]?key|password|secret|cookie|set[_-]?cookie|"
+    r"authorization|authentication|signed[_-]?url|upload[_-]?url|presigned[_-]?(?:uri|url))"
+)
+_TOKEN_PAIR = re.compile(
+    r'''(?i)((?:["']?''' + _SECRET_NAME + r'''["']?)\s*[:=]\s*["']?)[^"',}&\s]+'''
+)
 
 
 def redact(value: str) -> str:
     value = _BEARER.sub("Bearer [REDACTED]", str(value))
     value = _JWT.sub("[REDACTED_JWT]", value)
+    value = _WA_VALUE.sub("[REDACTED_WA]", value)
     value = _SIGNED.sub(r"\1[REDACTED]", value)
     value = _SIGNED_TOKEN.sub(r"\1[REDACTED]", value)
     value = _URL_TOKEN.sub(r"\1[REDACTED]", value)
     value = _COOKIE.sub(r"\1\2[REDACTED]", value)
-    return _TOKEN_PAIR.sub(r"\1\2[REDACTED]", value)[:1000]
+    return _TOKEN_PAIR.sub(r"\1[REDACTED]", value)[:1000]
 
 
 class FuploadError(Exception):

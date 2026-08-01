@@ -10,7 +10,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from fupload_cli.dd import DD, LIFE_TYPES, Sidecar, _author_total, _option_values, _readback_until_fields, _verify_fields, config_form, config_readback_projection, created_reference, discover_dd, load_plugin_history_versions, normalize_commercial, plugin_form, plugin_history_versions, plugin_version_projection, readable_author_list, resolve_retail_ui_config, response_reference, safe_backup_detail, safe_channels, safe_detail, selected_group, validate_locked_usage_mode, version_greater, wa_form
+from fupload_cli.dd import DD, LIFE_TYPES, Sidecar, _author_total, _option_values, _readback_until_fields, _verify_fields, config_form, config_readback_projection, created_reference, discover_dd, load_plugin_history_versions, normalize_commercial, plugin_form, plugin_history_versions, plugin_version_projection, readable_author_list, resolve_retail_ui_config, response_reference, safe_backup_detail, safe_channels, safe_detail, selected_group, validate_locked_usage_mode, validate_no_display_objects, version_greater, wa_form
 from fupload_cli.errors import FuploadError, ValidationError, redact
 from fupload_cli.newbee import NewBee, RELATION_TYPES, _redact_wa, _require_readback, _wa_summary
 
@@ -565,7 +565,7 @@ class BuilderTests(unittest.TestCase):
     def test_dd_plugin_update_rejects_any_version_visible_in_history_before_upload(self) -> None:
         current = {
             "sn": "plugin-sn", "game_type": 10001, "game_versions": ["12.1.0"], "name": "Plugin",
-            "description": "Description", "logo": "logo", "detail_imgs": ["image", 999],
+            "description": "Description", "logo": "logo", "detail_imgs": ["image", "image-2"],
             "primary_category_id": 1, "second_category_ids": [999], "html_desc": "Details",
             "scope": "public", "need_buy": False, "need_anchor_vip": False,
             "jump_room": False, "with_associate": False, "creation_statement": "original",
@@ -774,6 +774,11 @@ class BuilderTests(unittest.TestCase):
         self.assertNotIn("secret", value)
         self.assertNotIn("abc.def.ghi", value)
 
+    def test_error_redaction_removes_raw_wa_payload_without_hiding_field_context(self) -> None:
+        value = redact("field content rejected: !WA:2!private-payload")
+        self.assertIn("field content rejected", value)
+        self.assertNotIn("private-payload", value)
+
     def test_dd_sidecar_timeout_marks_uncertain_write(self) -> None:
         sidecar = Sidecar.__new__(Sidecar)
         sidecar.responses = queue.Queue()
@@ -901,6 +906,151 @@ class BuilderTests(unittest.TestCase):
                     "name": "one.zip", "install_type": 7, "install_path": "Interface",
                     "value": "code", "is_compressed": True,
                 }])
+
+    def test_newbee_remote_plugin_categories_are_projected_to_ids(self) -> None:
+        form = NewBee()._plugin_form(7, {
+            "mod_categories": [
+                {"id": 11, "name": "Display", "children": [{"id": 99}]},
+                {"value": "12", "label": "Display 2"},
+            ],
+        })
+        self.assertEqual(form["mod_categories"], [11, 12])
+
+    def test_newbee_remote_config_nested_rows_are_projected_to_wire_shape(self) -> None:
+        form = NewBee()._config_form(7, {
+            "t_linked_mods": [{
+                "mod_id": 11, "mod_name": "One", "mod_file_id": 12,
+                "mod_version": "1.0", "display_name": "One", "updateType": 1,
+                "remote_display_only": "drop-me",
+            }],
+            "t_ignored_unknown_mods": [{"name": "Unknown", "size": 1}],
+            "t_ignored_materials": ["Material"],
+            "t_ignored_fronts": [{"display_name": "Font", "preview": "drop-me"}],
+        })
+        self.assertEqual(set(form["linked_mods"][0]), {
+            "mod_id", "mod_name", "mod_file_id", "mod_version", "display_name", "updateType",
+        })
+        self.assertEqual(form["ignored_unknown_mods"], ["Unknown"])
+        self.assertEqual(form["ignored_materials"], ["Material"])
+        self.assertEqual(form["ignored_fronts"], ["Font"])
+
+    def test_newbee_config_linked_mods_are_rebuilt_from_live_backup(self) -> None:
+        backup = {"linked_mods": [{
+            "mod_id": 11, "mod_name": "Live", "mod_file_id": 12,
+            "mod_version": "2.0", "display_name": "Live 2.0", "update_type": 5,
+        }]}
+        projected = NewBee._canonical_linked_mods(backup, [{
+            "mod_id": 11, "mod_name": "Stale", "mod_file_id": 1,
+            "mod_version": "1.0", "display_name": "Stale", "update_type": 1,
+        }])
+        self.assertEqual(projected, [{
+            "mod_id": 11, "mod_name": "Live", "mod_file_id": 12,
+            "mod_version": "2.0", "display_name": "Live 2.0", "updateType": 5,
+        }])
+
+    def test_newbee_attachment_values_are_type_checked(self) -> None:
+        provider = NewBee()
+        with mock.patch.object(provider, "attachment_paths", return_value={
+            "items": [{"value": 7, "extract_base_dir": "Interface"}],
+        }):
+            with self.assertRaisesRegex(ValidationError, "expected nonempty string"):
+                provider._validate_attachments([{
+                    "name": "one.zip", "install_type": 7, "install_path": "Interface",
+                    "value": {"display": "bad"}, "is_compressed": True,
+                }])
+
+    def test_newbee_remote_wa_attachments_are_projected_to_exact_wire_shape(self) -> None:
+        form = NewBee()._wa_form(7, {
+            "attachments": [{
+                "file_id": 88, "display_name": "material.zip", "url": "index-code",
+                "install_type": 7, "install_path": "Interface", "is_compressed": True,
+                "size": 123, "preview": "drop-me",
+            }],
+        })
+        self.assertEqual(form["attachments"], [{
+            "name": "material.zip", "install_type": 7, "install_path": "Interface",
+            "value": "index-code", "is_compressed": True, "timestamp": 0,
+        }])
+
+    def test_newbee_remote_wa_categories_do_not_collect_nested_option_ids(self) -> None:
+        form = NewBee()._wa_form(7, {
+            "category_list": [{
+                "id": 11, "name": "Selected",
+                "children": [{"id": 99, "name": "Display option only"}],
+            }],
+        })
+        self.assertEqual(form["category_id_list"], [11])
+
+    def test_newbee_malformed_remote_selection_fails_before_projection(self) -> None:
+        with self.assertRaisesRegex(FuploadError, "selected-ID field"):
+            NewBee()._plugin_form(7, {"mod_categories": {"id": 11}})
+        with self.assertRaisesRegex(FuploadError, "attachments response"):
+            NewBee()._wa_form(7, {"attachments": {"name": "material.zip"}})
+
+    def test_dd_remote_plugin_lists_are_projected_to_scalar_wire_values(self) -> None:
+        form = plugin_form({
+            "game_type": {"id": "10001", "name": "Retail"},
+            "game_versions": [{"version": "12.1.0", "label": "Retail"}],
+            "detail_imgs": [{"d_url": "image/path.png", "name": "Preview"}],
+            "primary_category_id": {"c_id": "10", "name": "UI"},
+            "second_category_ids": [
+                {"c_id": "11", "name": "Action bars"},
+                {"c_id": "999", "name": "Display sentinel"},
+            ],
+            "vip_levels": [{"id": "3", "name": "VIP 3"}],
+        })
+        self.assertEqual(form["game_type"], 10001)
+        self.assertEqual(form["game_versions"], ["12.1.0"])
+        self.assertEqual(form["detail_imgs"], ["image/path.png"])
+        self.assertEqual(form["primary_category_id"], 10)
+        self.assertEqual(form["second_category_ids"], [11])
+        self.assertEqual(form["vip_levels"], [3])
+
+    def test_dd_remote_wa_lists_are_projected_to_scalar_wire_values(self) -> None:
+        form = wa_form({
+            "game_type": {"id": "10001", "name": "Retail"},
+            "display_imgs": [{"url": "image/path.png", "name": "Preview"}],
+            "category_ids": [{"c_id": 11, "name": "UI"}],
+            "vip_levels": [{"value": 3, "name": "VIP 3"}],
+        })
+        self.assertEqual(form["game_type"], 10001)
+        self.assertEqual(form["display_imgs"], ["image/path.png"])
+        self.assertEqual(form["category_ids"], ["11"])
+        self.assertEqual(form["vip_levels"], [3])
+
+    def test_dd_mutation_guard_rejects_unexpected_display_objects(self) -> None:
+        with self.assertRaisesRegex(FuploadError, "unexpected object item"):
+            validate_no_display_objects({"display_imgs": [{"url": "image/path.png"}]}, "wa")
+        validate_no_display_objects({
+            "associated_acts": [{"sn": "one", "act_type": "addon"}],
+            "known_addon": {"items": [{"addon_id": 1}], "inner_version": {"1": 1}},
+        }, "config")
+
+    def test_dd_remote_media_list_rejects_non_string_items(self) -> None:
+        with self.assertRaisesRegex(FuploadError, "detail_imgs item"):
+            plugin_form({"game_type": 10001, "detail_imgs": [999]})
+
+    def test_newbee_remote_wa_titles_are_projected_before_version_update(self) -> None:
+        provider = NewBee()
+        calls = []
+
+        def post(endpoint, body):
+            calls.append((endpoint, body))
+            if endpoint == "/creator/wow/wa/get_next_version":
+                return {"version": "2"}
+            if endpoint == "/creator/wow/wa_log/latest_str_info":
+                return {"version": "2"}
+            return {}
+
+        with mock.patch.object(provider, "get_wa_raw", return_value={
+            "t_version": "1",
+            "t_wa_str_titles": [{"value": "One", "display_only": "drop-me"}],
+            "t_link_to_channel": False,
+        }), mock.patch.object(provider, "post", side_effect=post):
+            provider.update_wa({"id": 7, "wa_str": "!WA:2!payload", "wa_log": "Changed"})
+
+        update_body = next(body for endpoint, body in calls if endpoint == "/creator/wow/wa/update_wa_str")
+        self.assertEqual(update_body["wa_str_titles"], ["One"])
 
     def test_dd_plugin_categories_enforce_parent_child_relationship(self) -> None:
         form = {

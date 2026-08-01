@@ -15,7 +15,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional
 
-from .errors import FuploadError
+from .errors import FuploadError, redact
 from .trust import verify_dd_executable
 
 
@@ -608,7 +608,7 @@ def _serve(startup_id: str) -> int:
     except Exception as exc:
         _atomic_json(startup_path, {
             "startup_id": startup_id,
-            "error": str(exc)[:400],
+            "error": redact(str(exc))[:400],
         })
         return 1
     finally:

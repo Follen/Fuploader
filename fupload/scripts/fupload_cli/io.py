@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -11,6 +12,18 @@ from .errors import FuploadError, ValidationError, redact
 
 
 OUTPUT_SCHEMA = "fupload.output.v1"
+_SENSITIVE_KEYS = {
+    "token", "access_token", "refresh_token", "resource_token", "jwt", "jwttoken",
+    "cookie", "set_cookie", "authorization", "authentication", "clientno", "client_no",
+    "clientid", "client_id", "client_secret", "device_id", "device_proof", "cred",
+    "credential", "signature", "x_amz_credential", "x_amz_signature",
+    "x_amz_security_token", "signed_url", "upload_url", "presigneduri", "presigned_uri",
+    "api_key", "auth_key", "password", "secret",
+}
+_RAW_CONTENT_KEYS = {
+    "content", "wa_str", "t_wa_str", "raw_wtf", "wtf_zip", "download_url",
+    "import_string",
+}
 
 
 class _DuplicateKey(ValueError):
@@ -72,21 +85,21 @@ def write_output(platform: str, operation: str, data: Any, *, dry_run: bool = Fa
 
 
 def sanitize_output(value: Any) -> Any:
-    sensitive_keys = {
-        "token", "access_token", "refresh_token", "resource_token", "jwt", "jwtToken",
-        "cookie", "set-cookie", "authorization", "authentication", "clientNo", "client_no",
-        "cred", "credential", "signed_url", "upload_url", "presignedUri", "presigned_uri",
-    }
-    raw_content_keys = {"wa_str", "t_wa_str", "raw_wtf", "wtf_zip", "download_url"}
     if isinstance(value, dict):
         result: Dict[str, Any] = {}
         for key, item in value.items():
-            lower = str(key).lower()
-            if key in sensitive_keys or lower in {x.lower() for x in sensitive_keys}:
+            normalized = str(key).replace("-", "_").lower()
+            if normalized in _SENSITIVE_KEYS or any(
+                marker in normalized
+                for marker in ("token", "cookie", "credential", "signature", "password", "secret")
+            ):
                 result[key] = "[REDACTED]"
-            elif key in raw_content_keys or lower in {x.lower() for x in raw_content_keys}:
-                text = str(item or "")
-                result[key + "_summary"] = {"length": len(text)}
+            elif normalized in _RAW_CONTENT_KEYS:
+                text = str(item or "").encode("utf-8")
+                result[str(key) + "_summary"] = {
+                    "bytes": len(text),
+                    "sha256": hashlib.sha256(text).hexdigest(),
+                }
             else:
                 result[key] = sanitize_output(item)
         return result
@@ -99,9 +112,9 @@ def sanitize_output(value: Any) -> Any:
 
 def write_error(platform: str, operation: str, error: BaseException) -> None:
     if isinstance(error, FuploadError):
-        detail = error.as_dict()
+        detail = sanitize_output(error.as_dict())
     else:
-        detail = FuploadError(str(error)).as_dict()
+        detail = sanitize_output(FuploadError(str(error)).as_dict())
     payload = {
         "schema": OUTPUT_SCHEMA,
         "platform": platform,

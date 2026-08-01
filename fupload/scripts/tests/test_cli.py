@@ -179,6 +179,51 @@ class CLITests(unittest.TestCase):
         self.assertTrue(wire.isascii())
         self.assertEqual(json.loads(wire)["error"]["message"], "中文错误")
 
+    def test_cli_output_redacts_extended_credential_fields(self) -> None:
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            write_output("dd", "plugin.get", {
+                "signature": "signature-secret",
+                "device_proof": "device-secret",
+                "client_id": "client-secret",
+                "nested": {"x-amz-security-token": "amz-secret"},
+            })
+        data = json.loads(output.getvalue())["data"]
+        self.assertEqual(data["signature"], "[REDACTED]")
+        self.assertEqual(data["device_proof"], "[REDACTED]")
+        self.assertEqual(data["client_id"], "[REDACTED]")
+        self.assertEqual(data["nested"]["x-amz-security-token"], "[REDACTED]")
+
+    def test_cli_error_details_use_the_same_redaction_boundary(self) -> None:
+        from fupload_cli.errors import FuploadError
+
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            write_error("dd", "plugin.update", FuploadError(
+                "request failed",
+                details={"signature": "signature-secret", "field": "associated_acts"},
+            ))
+        detail = json.loads(output.getvalue())["error"]["details"]
+        self.assertEqual(detail["signature"], "[REDACTED]")
+        self.assertEqual(detail["field"], "associated_acts")
+
+    def test_cli_redacts_quoted_json_secrets_and_raw_content(self) -> None:
+        from fupload_cli.errors import FuploadError
+
+        secret = "private-secret-value"
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            write_error("dd", "plugin.update", FuploadError(
+                'response {"client_secret":"%s","api_key":"%s","cookie":"%s"}'
+                % (secret, secret, secret),
+                details={"content": "!WA:2!private-content", "password": secret},
+            ))
+        data = json.loads(output.getvalue())["error"]
+        self.assertNotIn(secret, repr(data))
+        self.assertNotIn("private-content", repr(data))
+        self.assertEqual(data["details"]["password"], "[REDACTED]")
+        self.assertIn("content_summary", data["details"])
+
     def test_wrong_stage_field_is_rejected_before_network(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "input.json"

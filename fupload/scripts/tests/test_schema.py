@@ -114,6 +114,44 @@ class SchemaTests(unittest.TestCase):
             }
             self.assertEqual(schema.validate(value)["logo_file"], str(logo))
 
+    def test_present_local_file_controls_reject_empty_paths(self) -> None:
+        cases = (
+            ("newbee", "plugin", "update", {
+                "mod_id": 1, "version": "2", "game_version_list": ["3.80.2"], "file": "",
+            }),
+            ("newbee", "wa-media", "upload", {"file": "", "kind": "image"}),
+            ("dd", "wa", "update", {
+                "sn": "wa", "content": "plain", "update_desc": "update",
+                "version": "2", "with_file": False, "file": "",
+            }),
+        )
+        for platform, resource, action, fields in cases:
+            with self.subTest(platform=platform, resource=resource, action=action):
+                schema = get_schema(platform, resource, action)
+                with self.assertRaises(ValidationError) as raised:
+                    schema.validate({"schema": schema.name, **fields})
+                self.assertEqual(raised.exception.details.get("path"), "$.file")
+
+    def test_newbee_cloud_id_must_be_positive(self) -> None:
+        schema = get_schema("newbee", "config", "create")
+        with self.assertRaises(ValidationError) as raised:
+            schema.validate({
+                "schema": schema.name,
+                "cloud_id": 0,
+                "title": "Config",
+                "content": "Content",
+                "content_format": 2,
+                "content_origin": 1,
+                "public": False,
+                "linked_mods": [],
+                "ignored_unknown_mods": [],
+                "ignored_materials": [],
+                "ignored_fronts": [],
+                "roleid": "",
+                "picture_urls": ["image"],
+            })
+        self.assertEqual(raised.exception.details.get("path"), "$.cloud_id")
+
     def test_newbee_plugin_create_requires_a_screenshot(self) -> None:
         schema = get_schema("newbee", "plugin", "create")
         with self.assertRaisesRegex(ValidationError, "screenshots"):

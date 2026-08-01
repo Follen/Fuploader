@@ -85,14 +85,14 @@ class Schema:
                     "must be one of: %s" % ", ".join(map(str, spec.choices)),
                     path="$.%s" % name,
                 )
-            if spec.local_file and item and (not os.path.isfile(item)):
+            if spec.local_file and (not item or not os.path.isfile(item)):
                 raise ValidationError("file does not exist or is not a regular file", path="$.%s" % name)
         checked = dict(value)
         self._validate_conditionals(checked)
         return checked
 
     def _validate_conditionals(self, value: Dict[str, Any]) -> None:
-        for name in ("id", "mod_id", "file_id", "content_id", "source_id", "module_id", "game_version_id"):
+        for name in ("id", "mod_id", "file_id", "content_id", "source_id", "module_id", "game_version_id", "cloud_id"):
             if name in value and isinstance(value[name], int) and value[name] <= 0:
                 raise ValidationError("must be greater than zero", path="$.%s" % name)
         if value.get("public") is True and value.get("submit_for_review") is not True:

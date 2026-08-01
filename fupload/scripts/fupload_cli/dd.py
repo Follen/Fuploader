@@ -1268,6 +1268,86 @@ def apply_present(form: Dict[str, Any], doc: Mapping[str, Any], names: Iterable[
             form[name] = copy.deepcopy(doc[name])
 
 
+def _remote_rows(value: Any, path: str) -> List[Any]:
+    if value is None:
+        return []
+    if not isinstance(value, list):
+        raise FuploadError("DD remote %s field was not an array" % path, kind="platform_data_error")
+    return value
+
+
+def _remote_candidate(item: Any, aliases: Sequence[str]) -> Any:
+    if not isinstance(item, Mapping):
+        return item
+    for name in aliases:
+        if item.get(name) is not None:
+            return item[name]
+    return None
+
+
+def _remote_strings(value: Any, aliases: Sequence[str], path: str, *, allow_int: bool = False) -> List[str]:
+    projected: List[str] = []
+    for item in _remote_rows(value, path):
+        candidate = _remote_candidate(item, aliases)
+        if isinstance(candidate, str) and candidate:
+            projected.append(candidate)
+            continue
+        if allow_int and not isinstance(candidate, bool) and isinstance(candidate, int):
+            projected.append(str(candidate))
+            continue
+        raise FuploadError("DD remote %s item was not a scalar string" % path, kind="platform_data_error")
+    return projected
+
+
+def _remote_ints(value: Any, aliases: Sequence[str], path: str) -> List[int]:
+    projected: List[int] = []
+    for item in _remote_rows(value, path):
+        candidate = _remote_candidate(item, aliases)
+        if isinstance(candidate, bool):
+            raise FuploadError("DD remote %s item was not an integer ID" % path, kind="platform_data_error")
+        try:
+            projected.append(int(candidate))
+        except (TypeError, ValueError) as exc:
+            raise FuploadError("DD remote %s item was not an integer ID" % path, kind="platform_data_error") from exc
+    return projected
+
+
+def _remote_urls(value: Any, path: str) -> List[str]:
+    return _remote_strings(value, ("d_url", "url", "media_url", "value"), path)
+
+
+def _remote_int(value: Any, aliases: Sequence[str], path: str) -> Any:
+    candidate = _remote_candidate(value, aliases)
+    if candidate is None:
+        return None
+    if isinstance(candidate, bool):
+        raise FuploadError("DD remote %s field was not an integer ID" % path, kind="platform_data_error")
+    try:
+        return int(candidate)
+    except (TypeError, ValueError) as exc:
+        raise FuploadError("DD remote %s field was not an integer ID" % path, kind="platform_data_error") from exc
+
+
+def validate_no_display_objects(form: Mapping[str, Any], resource: str) -> None:
+    allowed_objects = {"associated_acts"}
+    if resource == "config":
+        allowed_objects.update({
+            "known_addon", "unknown_addon", "wtf", "material", "font",
+            "known_wa", "unknown_wa", "retail_ui_config",
+        })
+    for name, value in form.items():
+        if isinstance(value, Mapping) and name not in allowed_objects:
+            raise FuploadError(
+                "DD %s mutation field %s contained an unexpected object" % (resource, name),
+                kind="platform_data_error", stage="mutation_projection",
+            )
+        if isinstance(value, list) and name not in allowed_objects and any(isinstance(item, Mapping) for item in value):
+            raise FuploadError(
+                "DD %s mutation field %s contained an unexpected object item" % (resource, name),
+                kind="platform_data_error", stage="mutation_projection",
+            )
+
+
 COMMERCIAL = (
     "scope", "share_code_life_type", "need_buy", "price_fen", "buy_life_type",
     "jump_room", "room_id", "channel_id", "channel_type", "sync_room",
@@ -1386,12 +1466,21 @@ def plugin_form(
             source.pop(name, None)
         else:
             source[name] = copy.deepcopy(projected)
-    source["game_type"] = source.get("game_type") or (value.get("game_types") or [None])[0]
+    source["game_type"] = _remote_int(
+        source.get("game_type") or (value.get("game_types") or [None])[0],
+        ("game_type", "id", "value"), "plugin.game_type",
+    )
     form = {name: copy.deepcopy(source[name]) for name in PLUGIN_OPEN_FIELDS if name in source}
     form["scope"] = copy.deepcopy(source.get("scope") or "public")
     form["price_fen"] = copy.deepcopy(source.get("price_fen") or 0)
-    form["vip_levels"] = copy.deepcopy(source.get("vip_levels") or [])
-    categories = list(form.get("second_category_ids") or [])
+    form["vip_levels"] = _remote_ints(source.get("vip_levels") or [], ("level", "id", "value"), "plugin.vip_levels")
+    if "game_versions" in form:
+        form["game_versions"] = _remote_strings(form["game_versions"], ("version", "build", "value"), "plugin.game_versions")
+    if "detail_imgs" in form:
+        form["detail_imgs"] = _remote_urls(form["detail_imgs"], "plugin.detail_imgs")
+    if "primary_category_id" in form:
+        form["primary_category_id"] = _remote_int(form["primary_category_id"], ("c_id", "category_id", "id", "value"), "plugin.primary_category_id")
+    categories = _remote_ints(form.get("second_category_ids") or [], ("c_id", "category_id", "id", "value"), "plugin.second_category_ids")
     form["second_category_ids"] = categories[:-1] if categories else []
     normalize_commercial(form, "plugin")
     return form
@@ -1674,6 +1763,8 @@ def config_form(current: Mapping[str, Any], backup: Mapping[str, Any], doc: Mapp
             )
     if current.get("retail_ui_config") is not None:
         form["retail_ui_config"] = copy.deepcopy(current["retail_ui_config"])
+    form["display_imgs"] = _remote_urls(form.get("display_imgs") or [], "config.display_imgs")
+    form["vip_levels"] = _remote_ints(form.get("vip_levels") or [], ("level", "id", "value"), "config.vip_levels")
     if (form.get("known_addon", {}).get("items") or form.get("unknown_addon", {}).get("items")) and not form.get("wtf", {}).get("accounts"):
         raise ValidationError("select at least one WTF role when selecting addon content", path="$.wtf_role_ids")
     content_groups = ("known_addon", "unknown_addon", "wtf", "material", "font")
@@ -1714,8 +1805,17 @@ def wa_form(value: Mapping[str, Any]) -> Dict[str, Any]:
     form = {name: copy.deepcopy(value[name]) for name in WA_FIELDS if name in value}
     form["scope"] = copy.deepcopy(value.get("scope") or "public")
     form["price_fen"] = copy.deepcopy(value.get("price_fen") or 0)
-    form["vip_levels"] = copy.deepcopy(value.get("vip_levels") or [])
+    form["vip_levels"] = _remote_ints(value.get("vip_levels") or [], ("level", "id", "value"), "wa.vip_levels")
     form["version"] = copy.deepcopy(value.get("version") or "0")
+    if "game_type" in form:
+        form["game_type"] = _remote_int(form["game_type"], ("game_type", "id", "value"), "wa.game_type")
+    if "display_imgs" in form:
+        form["display_imgs"] = _remote_urls(form["display_imgs"], "wa.display_imgs")
+    if "category_ids" in form:
+        form["category_ids"] = _remote_strings(
+            form["category_ids"], ("c_id", "category_id", "id", "value"),
+            "wa.category_ids", allow_int=True,
+        )
     normalize_commercial(form, "wa")
     return form
 
@@ -1978,6 +2078,7 @@ class DD:
         normalize_commercial(form, "plugin", create=action == "create")
         validate_plugin_submission(form, doc)
         self._validate_options(session, "plugin", form)
+        validate_no_display_objects(form, "plugin")
         if doc.get("logo_file"):
             form["logo"] = session.upload(doc["logo_file"], "addon", file_name="", media=True, max_bytes=10 * 1024 * 1024)
         if doc.get("detail_img_files"):
@@ -2128,6 +2229,7 @@ class DD:
         validation_form["game_type"] = current.get("game_type") or backup.get("game_type")
         validate_config_submission(form, doc)
         self._validate_options(session, "config", validation_form)
+        validate_no_display_objects(form, "config")
         if doc.get("display_img_files"):
             existing_images = list(form.get("display_imgs") or [])
             if len(existing_images) + len(doc["display_img_files"]) > 8:
@@ -2202,6 +2304,7 @@ class DD:
         form["category_ids"] = [str(category_id) for category_id in (form.get("category_ids") or [])]
         validate_wa_submission(form, doc)
         self._validate_options(session, "wa", form)
+        validate_no_display_objects(form, "wa")
         if doc.get("display_img_files"):
             existing_images = list(form.get("display_imgs") or [])
             if len(existing_images) + len(doc["display_img_files"]) > 8:

@@ -76,25 +76,41 @@ def _urls(value: Any) -> List[str]:
     return result
 
 
-def _numeric_ids(value: Any) -> List[int]:
+def _selected_ids(value: Any) -> List[int]:
+    """Project selected option rows to their top-level numeric wire IDs."""
+    decoded = _decode(value)
+    if decoded is None:
+        return []
+    if not isinstance(decoded, list):
+        raise FuploadError("remote selected-ID field was not an array", kind="platform_data_error")
     found: List[int] = []
-    def walk(node: Any) -> None:
-        if isinstance(node, dict):
-            for key in ("id", "t_id", "category_id", "t_category_id", "value"):
-                candidate = node.get(key)
-                if isinstance(candidate, int) and candidate > 0:
-                    found.append(candidate)
-                elif isinstance(candidate, str) and candidate.isdigit() and int(candidate) > 0:
-                    found.append(int(candidate))
-            for child in node.values():
-                if isinstance(child, (dict, list)):
-                    walk(child)
-        elif isinstance(node, list):
-            for child in node:
-                walk(child)
-        elif isinstance(node, int) and node > 0:
-            found.append(node)
-    walk(value)
+    for item in decoded:
+        candidate = _pick(item, "id", "t_id", "category_id", "t_category_id", "value", default=None) if isinstance(item, dict) else item
+        if isinstance(candidate, bool):
+            raise FuploadError("remote selected-ID item was not a positive integer", kind="platform_data_error")
+        if isinstance(candidate, int) and candidate > 0:
+            found.append(candidate)
+        elif isinstance(candidate, str) and candidate.isdigit() and int(candidate) > 0:
+            found.append(int(candidate))
+        else:
+            raise FuploadError("remote selected-ID item was not a positive integer", kind="platform_data_error")
+    return found
+
+
+def _selected_names(value: Any) -> List[str]:
+    """Project remote option rows to the string values accepted by mutations."""
+    decoded = _decode(value)
+    if decoded is None:
+        return []
+    if not isinstance(decoded, list):
+        raise FuploadError("remote selected-name field was not an array", kind="platform_data_error")
+    found: List[str] = []
+    for item in decoded:
+        candidate = _pick(item, "name", "display_name", "label", "value", default="") if isinstance(item, dict) else item
+        if isinstance(candidate, str) and candidate:
+            found.append(candidate)
+        else:
+            raise FuploadError("remote selected-name item was not a nonempty string", kind="platform_data_error")
     return found
 
 
@@ -798,7 +814,7 @@ class NewBee:
     def _plugin_form(self, ident: int, detail: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "id": ident,
-            "mod_categories": _list(_pick(detail, "category_ids", "mod_categories", default=[])),
+            "mod_categories": _selected_ids(_pick(detail, "category_ids", "mod_categories", default=[])),
             "content_origin": int(_pick(detail, "t_original", "content_origin", default=0) or 0),
             "content_format": int(_pick(detail, "t_content_format", "content_format", default=0) or 0),
             "name": str(_pick(detail, "t_name", "name", default="")),
@@ -902,21 +918,56 @@ class NewBee:
         }
 
     @staticmethod
-    def _linked_mods(value: Any) -> List[Dict[str, Any]]:
+    def _linked_mods(value: Any, *, strict: bool = True) -> List[Dict[str, Any]]:
+        decoded = _decode(value)
+        if decoded is None:
+            return []
+        if not isinstance(decoded, list):
+            raise FuploadError("linked_mods response was not an array", kind="platform_data_error")
         result = []
-        for item in _list(value):
+        for item in decoded:
             if not isinstance(item, dict):
                 raise ValidationError("each linked_mods item must be an object", path="$.linked_mods")
             allowed = {"mod_id", "mod_name", "mod_file_id", "mod_version", "display_name", "update_type", "updateType"}
             unknown = set(item) - allowed
-            if unknown:
+            if strict and unknown:
                 raise ValidationError("unknown linked_mods field: %s" % sorted(unknown)[0], path="$.linked_mods")
+            mod_id = item.get("mod_id")
+            if isinstance(mod_id, bool) or not isinstance(mod_id, int) or mod_id <= 0:
+                raise ValidationError("mod_id must be a positive integer", path="$.linked_mods")
+            for name in ("mod_name", "mod_version", "display_name"):
+                if item.get(name) is not None and not isinstance(item[name], str):
+                    raise ValidationError("%s must be a string or null" % name, path="$.linked_mods")
+            if item.get("mod_file_id") is not None and (isinstance(item["mod_file_id"], bool) or not isinstance(item["mod_file_id"], int)):
+                raise ValidationError("mod_file_id must be an integer or null", path="$.linked_mods")
+            update_type = item.get("update_type", item.get("updateType", 1))
+            if isinstance(update_type, bool) or not isinstance(update_type, int):
+                raise ValidationError("update_type must be an integer", path="$.linked_mods")
             result.append({
-                "mod_id": item.get("mod_id"), "mod_name": item.get("mod_name"),
+                "mod_id": mod_id, "mod_name": item.get("mod_name"),
                 "mod_file_id": item.get("mod_file_id"), "mod_version": item.get("mod_version") or None,
                 "display_name": item.get("display_name") or None,
-                "updateType": item.get("update_type", item.get("updateType", 1)),
+                "updateType": update_type,
             })
+        return result
+
+    @classmethod
+    def _canonical_linked_mods(cls, backup: Mapping[str, Any], value: Any) -> List[Dict[str, Any]]:
+        requested = cls._linked_mods(value)
+        live = {
+            item["mod_id"]: item
+            for item in cls._linked_mods(backup.get("linked_mods", []), strict=False)
+        }
+        result: List[Dict[str, Any]] = []
+        seen: set[int] = set()
+        for item in requested:
+            mod_id = item["mod_id"]
+            if mod_id in seen:
+                raise ValidationError("linked_mods contains a duplicate mod_id", path="$.linked_mods")
+            seen.add(mod_id)
+            if mod_id not in live:
+                raise ValidationError("linked_mods contains an item absent from the selected cloud backup", path="$.linked_mods")
+            result.append(dict(live[mod_id]))
         return result
 
     def _config_form(self, ident: int, detail: Dict[str, Any]) -> Dict[str, Any]:
@@ -933,16 +984,17 @@ class NewBee:
             "subscribe_plan_level": int(_pick(detail, "t_subscribe_plan_level", "subscribe_plan_level", default=0) or 0),
             "price": int(_pick(detail, "t_price", "price", default=0) or 0),
             "time_range": str(_pick(detail, "t_time_range", "time_range", default="")),
-            "linked_mods": self._linked_mods(_pick(detail, "t_linked_mods", "linked_mods", default=[])),
-            "ignored_unknown_mods": _list(_pick(detail, "t_ignored_unknown_mods", "ignored_unknown_mods", default=[])),
-            "ignored_materials": _list(_pick(detail, "t_ignored_materials", "ignored_materials", default=[])),
-            "ignored_fronts": _list(_pick(detail, "t_ignored_fronts", "ignored_fronts", default=[])),
+            "linked_mods": self._linked_mods(_pick(detail, "t_linked_mods", "linked_mods", default=[]), strict=False),
+            "ignored_unknown_mods": _selected_names(_pick(detail, "t_ignored_unknown_mods", "ignored_unknown_mods", default=[])),
+            "ignored_materials": _selected_names(_pick(detail, "t_ignored_materials", "ignored_materials", default=[])),
+            "ignored_fronts": _selected_names(_pick(detail, "t_ignored_fronts", "ignored_fronts", default=[])),
             "roleid": str(_pick(detail, "t_roleid", "roleid", "role_id", default="")),
         }
 
     def create_config(self, doc: Dict[str, Any]) -> Any:
         backup = self.get_backup(int(doc["cloud_id"]))
         self._validate_backup_selection(backup, doc)
+        linked_mods = self._canonical_linked_mods(backup, doc["linked_mods"])
         pictures = self._resolve_media("/creator/wow/share_config/upload", doc.get("picture_urls", []), doc.get("picture_files", []))
         if not pictures:
             raise ValidationError("picture_urls or picture_files must contain at least one image", path="$.picture_urls")
@@ -952,7 +1004,7 @@ class NewBee:
             "content_origin": doc["content_origin"], "sharing": 1 if doc["public"] else 0,
             "link_to_channel": bool(doc.get("link_to_channel", False)) if doc["public"] else False,
             "subscribe_plan_level": doc.get("subscribe_plan_level", 0), "price": doc.get("price", 0),
-            "time_range": doc.get("time_range", ""), "linked_mods": self._linked_mods(doc["linked_mods"]),
+            "time_range": doc.get("time_range", ""), "linked_mods": linked_mods,
             "ignored_unknown_mods": doc["ignored_unknown_mods"], "ignored_materials": doc["ignored_materials"],
             "ignored_fronts": doc["ignored_fronts"], "roleid": doc["roleid"],
         }
@@ -1002,9 +1054,10 @@ class NewBee:
             for source, target in mapping.items():
                 if source in doc:
                     form[target] = self._linked_mods(doc[source]) if source == "linked_mods" else doc[source]
-            backup = self.get_backup(int(form["cloud_id"]))
-            selection = {name: form[name] for name in ("linked_mods", "ignored_unknown_mods", "ignored_materials", "ignored_fronts", "roleid")}
-            self._validate_backup_selection(backup, selection)
+        backup = self.get_backup(int(form["cloud_id"]))
+        form["linked_mods"] = self._canonical_linked_mods(backup, form["linked_mods"])
+        selection = {name: form[name] for name in ("linked_mods", "ignored_unknown_mods", "ignored_materials", "ignored_fronts", "roleid")}
+        self._validate_backup_selection(backup, selection)
         self._normalize_commercial(form, bool(form["sharing"]))
         self._validate_changed_business_options(form, doc)
         result = self.post("/creator/wow/share_config/update", form)
@@ -1035,7 +1088,7 @@ class NewBee:
             "content_format": int(_pick(detail, "content_format", "t_content_format", default=0) or 0),
             "thumbnail": str(_pick(detail, "thumbnail", "t_thumbnail", default="")),
             "images": _urls(_pick(detail, "images", "t_images", default=[])),
-            "category_id_list": _numeric_ids(
+            "category_id_list": _selected_ids(
                 _pick(detail, "category_id_list", "category_ids", "category_list", default=[])
             ),
             "content_origin": int(_pick(detail, "content_origin", "t_content_origin", default=0) or 0),
@@ -1044,13 +1097,45 @@ class NewBee:
             "time_range": str(_pick(detail, "time_range", "t_time_range", default="")),
             "share_state": int(_pick(detail, "share_state", "t_share_state", default=2) or 2),
             "link_to_channel": bool(_pick(detail, "link_to_channel", "t_link_to_channel", default=False)),
-            "attachments": _list(_pick(detail, "attachments", default=[])), "wa_log": "",
+            "attachments": self._attachments(_pick(detail, "attachments", default=[]), strict=False), "wa_log": "",
         }
+
+    @staticmethod
+    def _attachments(value: Any, *, strict: bool) -> List[Dict[str, Any]]:
+        fields = ("name", "install_type", "install_path", "value", "is_compressed", "timestamp")
+        allowed = set(fields)
+        decoded = _decode(value)
+        if decoded is None:
+            return []
+        if not isinstance(decoded, list):
+            raise FuploadError("attachments response was not an array", kind="platform_data_error")
+        result: List[Dict[str, Any]] = []
+        for index, item in enumerate(decoded):
+            path = "$.attachments[%d]" % index
+            if not isinstance(item, dict):
+                raise ValidationError("attachment must be an object", path=path)
+            unknown = set(item) - allowed
+            if strict and unknown:
+                raise ValidationError("unknown attachment field: %s" % sorted(unknown)[0], path=path)
+            if strict:
+                projected = {name: item[name] for name in fields if name in item}
+            else:
+                projected = {
+                    "name": _pick(item, "name", "display_name", "filename", default=""),
+                    "install_type": item.get("install_type"),
+                    "install_path": item.get("install_path"),
+                    "value": _pick(item, "value", "url", default=""),
+                    "is_compressed": item.get("is_compressed", True),
+                }
+            projected["timestamp"] = item.get("timestamp", 0)
+            result.append(projected)
+        return result
 
     def create_wa(self, doc: Dict[str, Any]) -> Any:
         self._validate_ids([doc["game_version_id"]], [x["id"] for x in self.game_versions()["items"]], "$.game_version_id")
         self._validate_wa_categories(int(doc["game_version_id"]), doc["category_id_list"])
-        self._validate_attachments(doc.get("attachments", []))
+        attachments = self._attachments(doc.get("attachments", []), strict=True)
+        self._validate_attachments(attachments)
         thumbnail = doc.get("thumbnail", "")
         if doc.get("thumbnail_file"):
             thumbnail = self.upload_media("/creator/wow/wa/upload_media", doc["thumbnail_file"])
@@ -1065,7 +1150,7 @@ class NewBee:
             "price": doc.get("price", 0), "time_range": doc.get("time_range", ""),
             "share_state": 1 if doc["public"] else 2,
             "link_to_channel": bool(doc.get("link_to_channel", False)) if doc["public"] else False,
-            "attachments": doc.get("attachments", []), "wa_str": doc["wa_str"],
+            "attachments": attachments, "wa_str": doc["wa_str"],
             "wa_str_titles": doc.get("wa_str_titles", []), "wa_log": doc["wa_log"],
             "string_mode": doc["string_mode"],
         }
@@ -1080,11 +1165,10 @@ class NewBee:
         if ident <= 0:
             raise FuploadError("WA was submitted but its ID could not be resolved; read the author list before retrying", kind="verification_required", verification_required=True)
         readback = self.get_wa(ident)
-        expected = {name: doc[name] for name in (
+        expected = {name: payload[name] for name in (
             "game_version_id", "name", "intro", "description", "content_format", "content_origin",
             "subscribe_plan_level", "price", "time_range", "link_to_channel", "attachments",
         ) if name in payload}
-        expected = {name: payload[name] for name in expected}
         expected.update({"thumbnail": thumbnail, "images": images, "public": doc["public"], "categories": [{"id": value, "name": None} for value in doc["category_id_list"]]})
         actual_for_compare = dict(readback)
         actual_for_compare["categories"] = [{"id": item.get("id"), "name": None} for item in readback.get("categories", [])]
@@ -1104,7 +1188,7 @@ class NewBee:
         }
         for source, target in mapping.items():
             if source in doc:
-                form[target] = doc[source]
+                form[target] = self._attachments(doc[source], strict=True) if source == "attachments" else doc[source]
         if doc.get("thumbnail_file"):
             form["thumbnail"] = self.upload_media("/creator/wow/wa/upload_media", doc["thumbnail_file"])
         if doc.get("image_files"):
@@ -1119,7 +1203,7 @@ class NewBee:
         result = self.post("/creator/wow/wa/update", form)
         readback = self.get_wa(ident)
         mapping = {"category_id_list": "categories"}
-        expected = {mapping.get(name, name): form[mapping.get(name, name)] for name in doc if name in {
+        expected = {mapping.get(name, name): form[name] for name in doc if name in {
             "game_version_id", "name", "intro", "description", "content_format", "thumbnail", "images",
             "category_id_list", "content_origin", "subscribe_plan_level", "price", "time_range",
             "link_to_channel", "attachments",
@@ -1147,7 +1231,7 @@ class NewBee:
             "id": ident, "version": version, "wa_str": doc["wa_str"],
             "wa_str_titles": (
                 doc["wa_str_titles"] if "wa_str_titles" in doc
-                else _list(_pick(current, "t_wa_str_titles", "wa_str_titles", default=[]))
+                else _selected_names(_pick(current, "t_wa_str_titles", "wa_str_titles", default=[]))
             ),
             "wa_log": doc["wa_log"],
             "link_to_channel": (
@@ -1191,6 +1275,18 @@ class NewBee:
             for name in ("name", "install_type", "install_path", "value", "is_compressed"):
                 if name not in item:
                     raise ValidationError("field is required", path=path + "." + name)
+            if not isinstance(item["name"], str) or not item["name"]:
+                raise ValidationError("expected nonempty string", path=path + ".name")
+            if isinstance(item["install_type"], bool) or not isinstance(item["install_type"], int):
+                raise ValidationError("expected integer", path=path + ".install_type")
+            if not isinstance(item["install_path"], str):
+                raise ValidationError("expected string", path=path + ".install_path")
+            if not isinstance(item["value"], str) or not item["value"]:
+                raise ValidationError("expected nonempty string", path=path + ".value")
+            if not isinstance(item["is_compressed"], bool):
+                raise ValidationError("expected boolean", path=path + ".is_compressed")
+            if "timestamp" in item and (isinstance(item["timestamp"], bool) or not isinstance(item["timestamp"], int)):
+                raise ValidationError("expected integer", path=path + ".timestamp")
             if candidates and not any(
                 str(option.get("value")) == str(item["install_type"])
                 and str(option.get("extract_base_dir") or item["install_path"]) == str(item["install_path"])

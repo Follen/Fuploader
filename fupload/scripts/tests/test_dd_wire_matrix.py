@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import copy
+import importlib
 import json
+import os
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Tuple
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -157,8 +160,8 @@ class WireSession:
 
     def post(self, endpoint: str, body: Mapping[str, Any]) -> Dict[str, Any]:
         payload = json.loads(json.dumps(dict(body), ensure_ascii=True, separators=(",", ":")))
-        self.calls.append(("post", endpoint, payload))
-        self.mutations.append((endpoint, payload))
+        self.calls.append(("post", endpoint, copy.deepcopy(payload)))
+        self.mutations.append((endpoint, copy.deepcopy(payload)))
         resource = "plugin" if endpoint.startswith("/addon/") else "config" if endpoint.startswith("/share/") else "wa"
         if endpoint.endswith("/delete"):
             self.deleted.add(str(payload["sn"]))
@@ -570,6 +573,39 @@ class DDWireMatrixTests(unittest.TestCase):
                 self.assertEqual(set(catalog), set(schema.fields))
                 self.assertEqual(len(catalog), len(schema.fields))
 
+    def test_every_actual_wire_body_projects_to_sanitized_diagnostic_error_log(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            sidecar = importlib.import_module("fupload_cli.dd_sidecar")
+
+        count = 0
+        for resource, action in ACTIONS:
+            schema = get_schema("dd", resource, action)
+            for field in schema.fields:
+                session, body = self._execute(resource, action, self._field_doc(resource, action, field))
+                endpoint, _ = session.mutations[0]
+                with self.subTest(resource=resource, action=action, field=field, endpoint=endpoint):
+                    logged = sidecar._request_log_content(body, endpoint)
+                    self.assertIn("request_json", logged)
+                    self.assertEqual(len(logged["request_sha256"]), 64)
+                    projected = logged["request_json"]
+                    self.assertEqual(set(projected), set(body))
+                    for key, value in body.items():
+                        normalized = str(key).replace("-", "_").lower()
+                        if normalized in sidecar._SAFE_REQUEST_VALUE_KEYS:
+                            self.assertEqual(projected[key], sidecar._sanitize_log_value(value, key))
+                        elif normalized == "associated_acts":
+                            for raw_item, logged_item in zip(value, projected[key]):
+                                self.assertEqual(logged_item["act_type"], raw_item["act_type"])
+                                for private_key in set(raw_item) - {"act_type"}:
+                                    self.assertTrue(logged_item[private_key]["redacted"])
+                        else:
+                            self.assertTrue(projected[key]["redacted"], (key, projected[key]))
+                count += 1
+        self.assertEqual(count, 195)
+
     def test_every_field_rejects_invalid_json_type_at_exact_path(self) -> None:
         wrong = {
             "string": [], "integer": "bad", "number": {},
@@ -622,7 +658,7 @@ class DDWireMatrixTests(unittest.TestCase):
             for field, spec in schema.fields.items():
                 states = []
                 if spec.type == "string":
-                    states.append(("empty", "", not spec.nonempty and (not spec.choices or "" in spec.choices)))
+                    states.append(("empty", "", not spec.nonempty and not spec.local_file and (not spec.choices or "" in spec.choices)))
                     if resource == "config" and action == "update" and field == "update_desc":
                         states[-1] = ("empty", "", False)
                     if spec.max_length is not None:
@@ -859,6 +895,44 @@ class DDWireMatrixTests(unittest.TestCase):
                 self.assertEqual(caught.exception.details.get("path"), "$.%s" % field)
                 self.assertEqual(session.uploads, [])
                 self.assertEqual(session.mutations, [])
+
+    def test_config_full_object_exceptions_match_official_nested_wire_shapes(self) -> None:
+        _session, body = self._execute("config", "create", self.fixtures.document("config", "create"))
+        for group in ("known_addon", "unknown_addon", "material", "font", "known_wa", "unknown_wa"):
+            with self.subTest(group=group):
+                self.assertEqual(set(body[group]), {"items", "inner_version"})
+                self.assertEqual(len(body[group]["items"]), 1)
+                self.assertEqual(len(body[group]["inner_version"]), 1)
+
+        self.assertEqual(body["known_addon"]["items"][0], self.fixtures.backup["known_addon"]["items"][0])
+        self.assertEqual(body["unknown_addon"]["items"][0], self.fixtures.backup["unknown_addon"]["items"][0])
+        self.assertEqual(body["material"]["items"][0], self.fixtures.backup["material"]["items"][0])
+        self.assertEqual(body["font"]["items"][0], self.fixtures.backup["font"]["items"][0])
+        self.assertEqual(body["known_wa"]["items"][0], self.fixtures.backup["known_wa"]["items"][0])
+        expected_unknown_wa = copy.deepcopy(self.fixtures.backup["unknown_wa"]["items"][0])
+        expected_unknown_wa["id"] = "unknown-live"
+        self.assertEqual(body["unknown_wa"]["items"][0], expected_unknown_wa)
+
+        self.assertEqual(set(body["wtf"]), {"accounts"})
+        self.assertEqual(set(body["wtf"]["accounts"][0]), {"name", "servers"})
+        self.assertEqual(set(body["wtf"]["accounts"][0]["servers"][0]), {"name", "items"})
+        self.assertEqual(
+            body["wtf"]["accounts"][0]["servers"][0]["items"][0],
+            {"role_id": "role-a"},
+        )
+
+        retail = body["retail_ui_config"]
+        self.assertEqual(set(retail), {"edit_mode", "cool_down", "enable_dd_setup_wizard"})
+        self.assertEqual(set(retail["edit_mode"]), {"account-a"})
+        self.assertEqual(
+            set(retail["edit_mode"]["account-a"][0]),
+            {"name", "import_string", "is_default"},
+        )
+        self.assertEqual(set(retail["cool_down"]), {"account-a"})
+        self.assertEqual(
+            set(retail["cool_down"]["account-a"][0]),
+            {"name", "spec_tag", "char", "realm", "import_string"},
+        )
 
     def test_local_file_arrays_reject_missing_files_at_index_path(self) -> None:
         for resource, action, field in (

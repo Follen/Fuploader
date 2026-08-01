@@ -25,25 +25,50 @@ _SENSITIVE_NAME = (
     r"(?:x-amz-(?:credential|signature|security-token)|access[_-]?token|refresh[_-]?token|"
     r"resource[_-]?token|token|jwt(?:token)?|authorization|authentication|cookie|set-cookie|"
     r"credential|client[_-]?(?:no|id)|clientno|clientid|device[_-]?(?:id|proof)|"
-    r"signed[_-]?url|upload[_-]?url|presigned[_-]?(?:uri|url)|signature)"
+    r"client[_-]?secret|api[_-]?key|auth[_-]?key|password|secret|signed[_-]?url|upload[_-]?url|"
+    r"presigned[_-]?(?:uri|url)|signature)"
 )
 _SENSITIVE_ERROR_VALUE = re.compile(
     r'''(?i)((?:["']?''' + _SENSITIVE_NAME + r'''["']?)\s*(?:=|:)\s*["']?)[^"',}&\s]+'''
 )
 _BEARER_VALUE = re.compile(r"(?i)Bearer\s+[A-Za-z0-9._~+/=-]+")
+_JWT_VALUE = re.compile(r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]+\b")
+_WA_VALUE = re.compile(r"!WA:\d+![^\s\"']+")
 _HTTP_STATUS = re.compile(r"\bHTTP\s+(\d{3})\b", re.IGNORECASE)
 _SENSITIVE_KEYS = {
     "token", "access_token", "refresh_token", "resource_token", "jwt", "jwttoken",
     "cookie", "set-cookie", "authorization", "authentication", "credential",
     "clientno", "client_no", "clientid", "client_id", "device_id", "device_proof", "signed_url", "upload_url",
-    "presigneduri", "presigned_uri", "signature",
+    "presigneduri", "presigned_uri", "signature", "client_secret", "api_key", "auth_key", "password", "secret",
 }
 _MAX_LOG_BODY = 1024 * 1024
+_CONFIG_CONTENT_KEYS = {
+    "known_addon", "unknown_addon", "wtf", "material", "font",
+    "known_wa", "unknown_wa", "retail_ui_config",
+}
+_PRIVATE_BUSINESS_KEYS = _CONFIG_CONTENT_KEYS | {
+    "associated_acts", "brief_desc", "channel_id", "content", "cover",
+    "creation_statement", "desc", "description", "detail_imgs", "detail_url",
+    "display_imgs", "file_install_path", "file_path", "html_desc", "images",
+    "import_string", "logo", "name", "parse_wa_id", "parse_wa_uid", "room_id",
+    "share_sn", "sn", "t_wa_str", "title", "update_desc", "wa_str",
+}
+_SAFE_REQUEST_VALUE_KEYS = {
+    "act_type", "addon_type", "body_bytes", "body_sha256", "business_id",
+    "buy_life_type", "category_ids", "channel_type", "creation_statement",
+    "file_type", "game_type", "game_version", "game_versions", "headers",
+    "jump_room", "mime_type", "need_anchor_vip", "need_buy", "price_fen",
+    "primary_category_id", "release_type", "scope", "second_category_ids",
+    "share_code_life_type", "sync_room", "version", "vip_levels",
+    "with_associate", "with_file",
+}
 
 
 def safe_exception_message(exc):
     value = _SENSITIVE_ERROR_VALUE.sub(r"\1[REDACTED]", str(exc).strip())
-    return _BEARER_VALUE.sub("Bearer [REDACTED]", value)
+    value = _BEARER_VALUE.sub("Bearer [REDACTED]", value)
+    value = _JWT_VALUE.sub("[REDACTED_JWT]", value)
+    return _WA_VALUE.sub("[REDACTED_WA]", value)
 
 
 def _sanitize_log_value(value, key=None, depth=0):
@@ -51,7 +76,7 @@ def _sanitize_log_value(value, key=None, depth=0):
         return "[MAX_DEPTH]"
     normalized_key = str(key or "").replace("-", "_").lower()
     if normalized_key in _SENSITIVE_KEYS or any(
-        marker in normalized_key for marker in ("token", "cookie", "credential", "signature")
+        marker in normalized_key for marker in ("token", "cookie", "credential", "signature", "password", "secret")
     ):
         return "[REDACTED]"
     if isinstance(value, dict):
@@ -68,8 +93,96 @@ def _sanitize_log_value(value, key=None, depth=0):
     return safe_exception_message(str(value))
 
 
-def _bounded_json_fields(prefix, value):
-    sanitized = _sanitize_log_value(value)
+def _private_value_summary(value):
+    try:
+        encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    except (TypeError, ValueError):
+        encoded = str(value).encode("utf-8", "replace")
+    return {
+        "redacted": True,
+        "type": type(value).__name__,
+        "bytes": len(encoded),
+        "sha256": hashlib.sha256(encoded).hexdigest(),
+    }
+
+
+def _sanitize_business_payload(value, endpoint, direction, depth=0):
+    if depth > 12:
+        return "[MAX_DEPTH]"
+    if isinstance(value, dict):
+        result = {}
+        for key, item in value.items():
+            normalized = str(key).replace("-", "_").lower()
+            if direction == "request" and normalized in _SAFE_REQUEST_VALUE_KEYS:
+                result[str(key)] = _sanitize_log_value(item, key, depth + 1)
+            elif direction == "request" and normalized == "associated_acts":
+                result[str(key)] = _sanitize_business_payload(item, endpoint, direction, depth + 1)
+            elif normalized in _PRIVATE_BUSINESS_KEYS:
+                result[str(key)] = _private_value_summary(item)
+            elif endpoint == "/file/upload" and normalized in ("url", "d_url"):
+                result[str(key)] = _private_value_summary(item)
+            elif direction == "request" and isinstance(item, str):
+                result[str(key)] = _private_value_summary(item)
+            else:
+                result[str(key)] = _sanitize_business_payload(item, endpoint, direction, depth + 1)
+        return result
+    if isinstance(value, (list, tuple)):
+        return [_sanitize_business_payload(item, endpoint, direction, depth + 1) for item in value]
+    return value
+
+
+def _request_shape(value, depth=0):
+    if depth > 12:
+        return {"type": "max_depth"}
+    if isinstance(value, dict):
+        return {
+            "type": "object",
+            "fields": {
+                str(key): _request_shape(item, depth + 1)
+                for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
+            },
+        }
+    if isinstance(value, (list, tuple)):
+        return {
+            "type": "array",
+            "length": len(value),
+            "item_types": sorted({type(item).__name__ for item in value}),
+        }
+    if isinstance(value, str):
+        return {"type": "string", "bytes": len(value.encode("utf-8"))}
+    if value is None:
+        return {"type": "null"}
+    return {"type": type(value).__name__}
+
+
+def _request_log_content(value, endpoint=""):
+    try:
+        encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    except (TypeError, ValueError):
+        encoded = str(value).encode("utf-8", "replace")
+    projected = _sanitize_business_payload(value, str(endpoint or ""), "request")
+    sanitized = _sanitize_log_value(projected)
+    sanitized_encoded = json.dumps(
+        sanitized, ensure_ascii=True, sort_keys=True, separators=(",", ":"),
+    )
+    sanitized_size = len(sanitized_encoded.encode("utf-8"))
+    result = {
+        "request_bytes": len(encoded),
+        "request_sha256": hashlib.sha256(encoded).hexdigest(),
+        "request_shape": _request_shape(value),
+        "request_log_bytes": sanitized_size,
+        "request_truncated": sanitized_size > _MAX_LOG_BODY,
+    }
+    if sanitized_size <= _MAX_LOG_BODY:
+        result["request_json"] = sanitized
+    else:
+        result["request_body"] = sanitized_encoded[:_MAX_LOG_BODY]
+    return result
+
+
+def _bounded_json_fields(prefix, value, endpoint="", direction=""):
+    projected = _sanitize_business_payload(value, str(endpoint or ""), direction)
+    sanitized = _sanitize_log_value(projected)
     encoded = json.dumps(sanitized, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
     size = len(encoded.encode("utf-8"))
     fields = {prefix + "_bytes": size, prefix + "_truncated": size > _MAX_LOG_BODY}
@@ -121,9 +234,9 @@ def _response_status(payload):
     return None
 
 
-def _response_log_content(probe, payload=None):
+def _response_log_content(probe, payload=None, endpoint=""):
     if payload is not None:
-        return _bounded_json_fields("response", payload)
+        return _bounded_json_fields("response", payload, endpoint, "response")
     if not isinstance(probe, dict) or not probe.get("body"):
         return {}
     body = str(probe["body"])
@@ -145,7 +258,7 @@ def _response_log_content(probe, payload=None):
             "response_bytes": size,
             "response_truncated": truncated,
         }
-    return _bounded_json_fields("response", parsed)
+    return _bounded_json_fields("response", parsed, endpoint, "response")
 
 
 def write_error_log(failure, command, probe=None, payload=None):
@@ -177,8 +290,8 @@ def write_error_log(failure, command, probe=None, payload=None):
         "validation": _sanitize_log_value(failure.details),
     }
     if request is not None:
-        record.update(_bounded_json_fields("request", request))
-    record.update(_response_log_content(probe, payload))
+        record.update(_request_log_content(request, endpoint))
+    record.update(_response_log_content(probe, payload, endpoint))
     with open(path, "a", encoding="utf-8") as handle:
         handle.write(json.dumps(record, ensure_ascii=True, sort_keys=True, separators=(",", ":")) + "\n")
     return os.path.abspath(path)
@@ -202,7 +315,7 @@ class SidecarFailure(Exception):
         result = {
             "kind": "platform_error",
             "stage": self.stage,
-            "message": self.args[0],
+            "message": safe_exception_message(self.args[0]),
             "verification_required": bool(self.verification_required),
         }
         if self.http_status is not None:
@@ -733,7 +846,10 @@ def main():
                         "error": error})
         return 0
     except Exception as exc:
-        output({"ready": False, "error": {"type": type(exc).__name__, "message": str(exc)[:400]}})
+        output({"ready": False, "error": {
+            "type": type(exc).__name__,
+            "message": safe_exception_message(exc)[:400],
+        }})
         return 1
     finally:
         machine_data.clientNo = original

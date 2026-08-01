@@ -461,10 +461,123 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(record["request_fields"], ["token", "version"])
         self.assertEqual(record["request_json"]["version"], "1.3.6")
         self.assertEqual(record["request_json"]["token"], "[REDACTED]")
+        self.assertEqual(record["request_shape"]["fields"]["version"]["type"], "string")
+        self.assertEqual(record["request_shape"]["fields"]["token"]["type"], "string")
         self.assertEqual(record["response_json"]["token"], "[REDACTED]")
         self.assertEqual(record["response_json"]["signed_url"], "[REDACTED]")
         self.assertNotIn("request-secret", repr(record))
         self.assertNotIn("response-secret", repr(record))
+
+    def test_native_error_log_summarizes_raw_wa_content_in_request_and_response(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        raw = "!WA:2!private-payload"
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(module, "DD_DIR", directory):
+            path = module.write_error_log(
+                module.SidecarFailure("invalid content", "mutation", http_status=422),
+                {
+                    "action": "request", "method": "POST", "path": "/wa/modify",
+                    "payload": {"sn": "wa-sn", "content": raw, "version": "2"},
+                },
+                payload={"code": 42201, "field": "content", "content": raw},
+            )
+            record = json.loads(Path(path).read_text(encoding="utf-8").strip())
+        self.assertEqual(record["request_fields"], ["content", "sn", "version"])
+        self.assertTrue(record["request_json"]["content"]["redacted"])
+        self.assertTrue(record["request_json"]["sn"]["redacted"])
+        self.assertEqual(record["request_json"]["version"], "2")
+        self.assertEqual(record["request_shape"]["fields"]["content"]["type"], "string")
+        self.assertTrue(record["response_json"]["content"]["redacted"])
+        self.assertEqual(record["response_json"]["field"], "content")
+        self.assertNotIn(raw, repr(record))
+
+    def test_native_error_log_summarizes_config_backup_groups_but_keeps_field_hints(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        request = {
+            "share_sn": "config-sn",
+            "known_addon": {"items": [{"addon_id": 1, "name": "private-addon"}]},
+            "wtf": {"accounts": [{"name": "private-account"}]},
+            "retail_ui_config": {"edit_mode": {"account": [{"import_string": "private-import"}]}},
+        }
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(module, "DD_DIR", directory):
+            path = module.write_error_log(
+                module.SidecarFailure("invalid group", "mutation", http_status=422),
+                {
+                    "action": "request", "method": "POST", "path": "/share/modify",
+                    "payload": request,
+                },
+                payload={"code": 42202, "field": "known_addon", "known_addon": request["known_addon"]},
+            )
+            record = json.loads(Path(path).read_text(encoding="utf-8").strip())
+        self.assertEqual(record["response_json"]["field"], "known_addon")
+        for name in ("known_addon", "wtf", "retail_ui_config"):
+            self.assertEqual(record["request_shape"]["fields"][name]["type"], "object")
+            self.assertTrue(record["request_json"][name]["redacted"])
+        self.assertTrue(record["response_json"]["known_addon"]["redacted"])
+        self.assertNotIn("private-addon", repr(record))
+        self.assertNotIn("private-account", repr(record))
+        self.assertNotIn("private-import", repr(record))
+
+    def test_native_error_log_keeps_safe_plugin_diagnostics_and_redacts_private_values(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        request = {
+            "sn": "private-sn", "name": "private-name", "description": "private-description",
+            "html_desc": "<p>private-html</p>", "channel_id": "private-channel",
+            "game_type": 10001, "version": "1.3.6", "game_versions": ["12.0.0"],
+            "scope": "public", "primary_category_id": 1002, "need_buy": False,
+            "associated_acts": [{
+                "sn": "private-related", "name": "private-related-name", "act_type": "addon",
+            }],
+        }
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(module, "DD_DIR", directory):
+            path = module.write_error_log(
+                module.SidecarFailure("invalid plugin", "mutation", http_status=422),
+                {"action": "request", "method": "POST", "path": "/addon/modify", "payload": request},
+                payload={"code": 42201, "field": "description", "description": "private-description"},
+            )
+            record = json.loads(Path(path).read_text(encoding="utf-8").strip())
+        self.assertEqual(record["response_json"]["field"], "description")
+        self.assertTrue(record["response_json"]["description"]["redacted"])
+        logged = record["request_json"]
+        self.assertEqual(logged["game_type"], 10001)
+        self.assertEqual(logged["version"], "1.3.6")
+        self.assertEqual(logged["game_versions"], ["12.0.0"])
+        self.assertEqual(logged["scope"], "public")
+        self.assertEqual(logged["primary_category_id"], 1002)
+        self.assertIs(logged["need_buy"], False)
+        self.assertEqual(logged["associated_acts"][0]["act_type"], "addon")
+        for name in ("sn", "name", "description", "html_desc", "channel_id"):
+            self.assertTrue(logged[name]["redacted"])
+        self.assertTrue(logged["associated_acts"][0]["sn"]["redacted"])
+        self.assertTrue(logged["associated_acts"][0]["name"]["redacted"])
+        for value in (
+            "private-sn", "private-name", "private-description", "private-html",
+            "private-channel", "private-related",
+        ):
+            self.assertNotIn(value, repr(record))
+
+    def test_native_log_text_redacts_unlabelled_jwt_and_wa_payload(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        jwt = "eyJabcdefghijk.abcdefghijk.abcdefghijk"
+        raw = "!WA:2!private-payload"
+        sanitized = module.safe_exception_message("values %s %s" % (jwt, raw))
+        self.assertNotIn(jwt, sanitized)
+        self.assertNotIn(raw, sanitized)
 
     def test_native_error_log_bounds_multibyte_response_by_utf8_bytes(self) -> None:
         with mock.patch.dict(os.environ, {
@@ -602,7 +715,7 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(raised.exception.details["log_path"], "D:/DD/Fupload/logs/error.jsonl")
         self.assertEqual(logged.call_args.args[3]["field"], "version")
 
-    def test_native_rejected_post_writes_request_and_response_to_log_path(self) -> None:
+    def test_native_rejected_post_writes_sanitized_request_and_response_to_log_path(self) -> None:
         with mock.patch.dict(os.environ, {
             "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
             "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
@@ -632,7 +745,10 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(record["stage"], "mutation")
         self.assertEqual(record["http_status"], None)
         self.assertEqual(record["business_code"], 42201)
+        self.assertTrue(record["request_json"]["sn"]["redacted"])
         self.assertEqual(record["request_json"]["version"], "1.3.6")
+        self.assertEqual(record["request_shape"]["fields"]["version"]["type"], "string")
+        self.assertEqual(record["request_shape"]["fields"]["version"]["bytes"], 5)
         self.assertEqual(record["response_json"]["field"], "version")
         self.assertEqual(record["validation"]["server_field"], "version")
         self.assertEqual(raised.exception.details["server_field"], "version")
@@ -668,6 +784,11 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(record["endpoint"], "/file/upload")
         self.assertEqual(record["business_code"], 42202)
         self.assertEqual(record["request_json"]["upload_authorize"]["business_id"], "addon")
+        self.assertEqual(
+            record["request_json"]["upload_authorize"]["mime_type"],
+            "application/x-zip-compressed",
+        )
+        self.assertEqual(record["request_shape"]["fields"]["upload_authorize"]["type"], "object")
         self.assertEqual(record["response_json"]["field"], "mime_type")
         self.assertEqual(record["validation"]["server_field"], "mime_type")
 
@@ -714,6 +835,11 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(record["http_status"], 403)
         self.assertEqual(record["request_json"]["object_put"]["body_bytes"], len(b"zip-payload"))
         self.assertEqual(record["request_json"]["object_put"]["headers"]["X-Amz-Acl"], "public-read")
+        self.assertEqual(record["request_shape"]["fields"]["object_put"]["type"], "object")
+        self.assertEqual(
+            record["request_shape"]["fields"]["object_put"]["fields"]["body_bytes"]["type"],
+            "int",
+        )
         self.assertEqual(record["response_json"]["field"], "signature")
         self.assertEqual(record["validation"]["server_field"], "signature")
 
