@@ -562,6 +562,45 @@ class BuilderTests(unittest.TestCase):
         self.assertNotIn("buy_life_type", submitted)
         self.assertTrue(any(call.args[0] == "/addon/addon_versions" for call in session.get.call_args_list))
 
+    def test_dd_plugin_update_polls_lagging_projections_without_replaying_mutation(self) -> None:
+        before = {
+            "sn": "plugin-sn", "game_type": 10001, "name": "Plugin",
+            "game_versions": ["12.1.0"], "description": "Description", "logo": "logo",
+            "detail_imgs": ["image"], "primary_category_id": 1,
+            "second_category_ids": [], "html_desc": "Details", "scope": "public",
+            "need_buy": False, "need_anchor_vip": False, "jump_room": False,
+            "with_associate": False, "creation_statement": "original",
+            "latest_version": {
+                "file_path": "old-archive", "release_type": 1, "version": "1.0.0",
+            },
+            "update_desc": "old update",
+        }
+        after = {
+            **before,
+            "latest_version": {
+                "game_versions": ["12.1.0"], "file_path": "new-archive",
+                "release_type": 1, "version": "1.0.1",
+            },
+            "update_desc": "new update",
+        }
+        session = mock.MagicMock()
+        session.post.return_value = {"code": 0, "result": {"sn": "plugin-sn"}}
+        with mock.patch.object(DD, "_fresh_detail", return_value=before), mock.patch(
+            "fupload_cli.dd.author_item", side_effect=[before, before, after]
+        ) as author_read, mock.patch.object(DD, "_validate_options"), mock.patch(
+            "fupload_cli.dd.detail", return_value=before
+        ) as detail_read, mock.patch("fupload_cli.dd.time.sleep") as sleep:
+            result = DD()._write_plugin(session, "update", {
+                "sn": "plugin-sn", "game_versions": ["12.1.0"],
+                "detail_url": "new-archive", "release_type": 1,
+                "version": "1.0.1", "update_desc": "new update",
+            })
+        self.assertEqual(result["reference"], "plugin-sn")
+        session.post.assert_called_once()
+        self.assertEqual(author_read.call_count, 3)
+        self.assertEqual(detail_read.call_count, 2)
+        sleep.assert_called_once_with(1)
+
     def test_dd_plugin_update_rejects_any_version_visible_in_history_before_upload(self) -> None:
         current = {
             "sn": "plugin-sn", "game_type": 10001, "game_versions": ["12.1.0"], "name": "Plugin",
