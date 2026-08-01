@@ -38,6 +38,7 @@ All three create/edit form models use `scope`, `share_code_life_type`, `need_buy
 - The outer free/paid selector is locked after an SN exists. It is derived from `need_buy || need_anchor_vip` and is not a wire field. Existing paid content may still adjust payment methods and their price/lifetime/VIP children while remaining paid.
 - `jump_room=true` requires `room_id`. `channel_id` and `channel_type` are both empty for a room-only link or both present for one live child channel.
 - `with_associate=true` requires nonempty `associated_acts`; each item is exactly `{sn,act_type}` with `act_type` `addon`, `share`, or `wa`.
+- Remote detail/list projections may enrich associated items with display-only fields such as names, covers, or timestamps. Python validates the live reference, then strips every item back to exactly `{sn,act_type}` before any create/modify mutation.
 - `need_anchor_vip=true` requires public scope. `vip_levels` must contain only live values when supplied, but the official submit validation accepts an empty array. Turning only `need_anchor_vip` off preserves the existing level array; switching to private scope or switching the outer mode to free clears it.
 - `creation_statement` is `original`, `chinesize`, `renovate`, or `second`.
 

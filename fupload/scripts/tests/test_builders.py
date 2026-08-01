@@ -426,6 +426,10 @@ class BuilderTests(unittest.TestCase):
     def test_dd_plugin_form_removes_detail_summary_category(self) -> None:
         form = plugin_form({"game_types": [10001], "second_category_ids": [1037, 12345]})
         self.assertEqual(form["second_category_ids"], [1037])
+        self.assertEqual(
+            plugin_form({"game_types": [10001], "second_category_ids": [999]})["second_category_ids"],
+            [],
+        )
 
     def test_dd_plugin_version_readback_is_separate_from_modify_form(self) -> None:
         value = {

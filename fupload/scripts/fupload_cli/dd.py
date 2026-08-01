@@ -1305,7 +1305,20 @@ def normalize_commercial(
             form.pop("share_code_life_type", None)
     if not form.get("jump_room"):
         form.update({"room_id": "", "channel_id": "", "channel_type": "", "sync_room": False})
-    if not form.get("with_associate"):
+    if form.get("with_associate"):
+        associated_acts = []
+        for index, item in enumerate(form.get("associated_acts") or []):
+            if not isinstance(item, Mapping) or not item.get("sn") or not item.get("act_type"):
+                raise ValidationError(
+                    "associated item must contain sn and act_type",
+                    path="$.associated_acts[%d]" % index,
+                )
+            associated_acts.append({
+                "sn": copy.deepcopy(item["sn"]),
+                "act_type": copy.deepcopy(item["act_type"]),
+            })
+        form["associated_acts"] = associated_acts
+    else:
         form["associated_acts"] = []
 
 

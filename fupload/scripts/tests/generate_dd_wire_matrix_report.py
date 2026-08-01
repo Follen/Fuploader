@@ -86,6 +86,7 @@ def main() -> None:
     targeted = [
         ("plugin.edit.jump_room.disabled_stale_child", "plugin", "edit", "jump_room", "disabled_stale_child", "accept + clear room/channel/sync", "/addon/modify", "jump_room/room_id/channel_id/channel_type/sync_room"),
         ("all.edit.with_associate.disabled_stale_child", "all", "edit", "with_associate", "disabled_stale_child", "accept + clear associated_acts", "modify", "with_associate/associated_acts"),
+        ("all.modify.associated_acts.remote_enriched", "all", "update/edit", "associated_acts", "remote_enriched", "accept + strip display-only fields", "modify", "associated_acts[{sn,act_type}]"),
         ("config.update.update_markers.stale_child", "config", "update", "*_update_*", "stale_child", "reject at exact marker path", "/share/modify", "none"),
         ("config.update.wtf_role_ids.stale_selector", "config", "update", "wtf_role_ids", "stale_selector", "reject before upload", "/share/modify", "none"),
         ("plugin.create.primary_category_id.stale_child", "plugin", "create", "primary_category_id", "stale_child", "reject before upload", "/addon/create", "none"),

@@ -266,7 +266,7 @@ class WireFixtures:
         }
 
     def plugin_current(self) -> Dict[str, Any]:
-        return {
+        current = {
             "sn": "plugin-sn",
             "is_owner": True,
             "game_type": 10001,
@@ -285,6 +285,11 @@ class WireFixtures:
             "update_desc": "Initial",
             **self.commercial(),
         }
+        current["associated_acts"] = [{
+            **current["associated_acts"][0],
+            "cover": "https://cdn.invalid/cover.png", "mtime": "2026-08-01", "name": "Remote plugin",
+        }]
+        return current
 
     def config_selections(self) -> Dict[str, Any]:
         return {
@@ -317,10 +322,14 @@ class WireFixtures:
         value = config_form({}, self.backup, {**base, **self.config_selections()})
         value["retail_ui_config"] = resolve_retail_ui_config(self.backup, {}, self.retail_selection)
         value.update({"share_sn": "config-sn", "is_owner": True, "game_type": 10001})
+        value["associated_acts"] = [{
+            **value["associated_acts"][0],
+            "cover": "https://cdn.invalid/cover.png", "mtime": "2026-08-01", "name": "Remote config",
+        }]
         return value
 
     def wa_current(self) -> Dict[str, Any]:
-        return {
+        current = {
             "sn": "wa-sn",
             "is_owner": True,
             "game_type": 10001,
@@ -340,6 +349,11 @@ class WireFixtures:
             "parse_wa_id": "old-id",
             **self.commercial(),
         }
+        current["associated_acts"] = [{
+            **current["associated_acts"][0],
+            "cover": "https://cdn.invalid/cover.png", "mtime": "2026-08-01", "name": "Remote WA",
+        }]
+        return current
 
     def document(self, resource: str, action: str) -> Dict[str, Any]:
         schema = get_schema("dd", resource, action)
@@ -787,6 +801,17 @@ class DDWireMatrixTests(unittest.TestCase):
                     self.assertEqual(body[name], value)
                 if values.get("jump_room") is False:
                     self.assertFalse(any(call[0] == "cc_get" for call in session.calls))
+
+    def test_remote_association_objects_are_projected_to_exact_wire_shape(self) -> None:
+        expected = [{"sn": "assoc-plugin", "act_type": "addon"}]
+        for resource, action in (
+            ("plugin", "update"), ("plugin", "edit"),
+            ("config", "update"), ("config", "edit"),
+            ("wa", "update"), ("wa", "edit"),
+        ):
+            with self.subTest(resource=resource, action=action):
+                _session, body = self._execute(resource, action, self.fixtures.document(resource, action))
+                self.assertEqual(body["associated_acts"], expected)
 
     def test_preflight_rejections_make_zero_uploads_and_zero_mutations(self) -> None:
         cases = (
