@@ -1,0 +1,22 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 5
+name: dd-request-body-full-reaudit
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: fcc9f5b4c17fe72ee08df436656d801f19bc03fd44708aedb4601ad695acd74b
+spec_changes:
+  - capability: dd-publishing
+    operation: replace
+    source: specs/dd-publishing/spec.md
+    base_hash: acc4fa4e9d613cbffc264894abc06e5202ecd9d81564e22288f2815881402a37
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/52d698f597291ecfbf15c9c2948b0993ae9721e1391e23e4b7fc95167486b110.json
+verification_evidence: runtime/evidence/verifications/0ffa8298338ec2d9dcd3e1773155e3ef645f77be21228968804dee38f6e3fcc1.json
+partial_allowance: null
+archived: true
+created_at: 2026-08-01
+run_id: c245f26e-f634-41b3-a3a3-28ea20aaefa7

@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import ctypes
+import hashlib
 import json
 import logging
 import os
@@ -88,6 +89,38 @@ def _bounded_text(value):
     return encoded.decode("utf-8", "ignore"), original_size, truncated
 
 
+def _response_probe(status, body):
+    if isinstance(body, bytes):
+        text = body.decode("utf-8", "replace")
+    else:
+        text = str(body or "")
+    bounded, size, truncated = _bounded_text(text)
+    return {
+        "status": int(status or 0),
+        "body": bounded,
+        "body_bytes": size,
+        "body_truncated": truncated,
+    }
+
+
+def _response_status(payload):
+    if not isinstance(payload, dict):
+        return None
+    for key in ("http_status", "status_code", "status", "httpStatus"):
+        value = payload.get(key)
+        if value not in (None, ""):
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                pass
+    for key in ("error", "data", "result"):
+        nested = payload.get(key)
+        status = _response_status(nested)
+        if status is not None:
+            return status
+    return None
+
+
 def _response_log_content(probe, payload=None):
     if payload is not None:
         return _bounded_json_fields("response", payload)
@@ -119,7 +152,9 @@ def write_error_log(failure, command, probe=None, payload=None):
     log_dir = os.path.join(DD_DIR, "Fupload", "logs")
     os.makedirs(log_dir, exist_ok=True)
     path = os.path.join(log_dir, "dd-errors-%s.jsonl" % time.strftime("%Y%m%d"))
-    request = command.get("payload") if isinstance(command, dict) else None
+    request = command.get("wire_request") if isinstance(command, dict) else None
+    if request is None and isinstance(command, dict):
+        request = command.get("payload")
     if request is None and isinstance(command, dict) and command.get("action") == "upload":
         request = command.get("meta")
     endpoint = command.get("path") if isinstance(command, dict) else None
@@ -528,9 +563,11 @@ def run_command(session, command):
             response_payload = client.get(path, params) if method == "GET" else client.post(path, params)
             if isinstance(response_payload, dict) and response_payload.get("code") not in (None, 0):
                 rejected_payload = response_payload
+                response_probe = getattr(client, "_fupload_last_response_error", None)
                 raise SidecarFailure(
                     str(response_payload.get("msg") or response_payload.get("message") or "DD operation failed"),
                     command.get("request_stage") or ("dependency_get" if method == "GET" else "mutation"),
+                    http_status=(response_probe or {}).get("status") if isinstance(response_probe, dict) else _response_status(response_payload),
                     business_code=response_payload.get("code"),
                     details=_validation_details({"body": json.dumps(response_payload, ensure_ascii=False)}),
                 )
@@ -538,19 +575,24 @@ def run_command(session, command):
         if action == "upload":
             path = command["file"]
             meta = command["meta"]
+            command["wire_request"] = {"upload_authorize": meta}
             try:
                 auth = client.get("/file/upload", meta)
             except Exception as exc:
                 raise failure_from_exception(exc, "upload_authorize", getattr(client, "_fupload_last_response_error", None))
             if isinstance(auth, dict) and auth.get("code") not in (None, 0):
                 rejected_payload = auth
+                response_probe = getattr(client, "_fupload_last_response_error", None)
                 raise SidecarFailure(
                     "DD upload authorization was rejected",
                     "upload_authorize",
+                    http_status=(response_probe or {}).get("status") if isinstance(response_probe, dict) else _response_status(auth),
                     business_code=auth.get("code"),
+                    details=_validation_details({"body": json.dumps(auth, ensure_ascii=False)}),
                 )
             info = api_result(auth)
             if not isinstance(info, dict) or not info.get("url") or not info.get("d_url"):
+                rejected_payload = auth
                 raise SidecarFailure("DD upload authorization did not return a usable upload target", "upload_authorize")
             size = os.path.getsize(path)
             maximum = int(info.get("maxSize") or 0)
@@ -558,13 +600,32 @@ def run_command(session, command):
                 raise SidecarFailure("file exceeds DD server size limit", "upload_authorize")
             try:
                 with open(path, "rb") as handle:
-                    request = urllib.request.Request(
-                        info["url"], data=handle.read(), method="PUT",
-                        headers={"Content-Type": meta["mime_type"], "X-Amz-Acl": "public-read"},
-                    )
+                    data = handle.read()
+                headers = {"Content-Type": meta["mime_type"], "X-Amz-Acl": "public-read"}
+                command["wire_request"]["object_put"] = {
+                    "headers": headers,
+                    "body_bytes": size,
+                    "body_sha256": hashlib.sha256(data).hexdigest(),
+                }
+                request = urllib.request.Request(
+                    info["url"], data=data, method="PUT", headers=headers,
+                )
                 with urllib.request.urlopen(request, timeout=180) as response:
                     if response.status != 200:
-                        raise SidecarFailure("DD object upload returned HTTP %d" % response.status, "object_put", http_status=response.status)
+                        try:
+                            response_body = response.read()
+                        except Exception:
+                            response_body = b""
+                        response_probe = _response_probe(response.status, response_body)
+                        raise SidecarFailure(
+                            "DD object upload returned HTTP %d" % response.status,
+                            "object_put",
+                            http_status=response.status,
+                            details=_validation_details(response_probe),
+                        )
+            except urllib.error.HTTPError as exc:
+                response_probe = _response_probe(exc.code, exc.read())
+                raise failure_from_exception(exc, "object_put", response_probe)
             except Exception as exc:
                 raise failure_from_exception(exc, "object_put")
             return {"d_url": info["d_url"], "size": size}
@@ -594,11 +655,14 @@ def run_command(session, command):
             stage = "native_parser"
         else:
             stage = "session"
-        failure = failure_from_exception(exc, stage, getattr(client, "_fupload_last_response_error", None))
+        response_probe = locals().get("response_probe")
+        if not isinstance(response_probe, dict):
+            response_probe = getattr(client, "_fupload_last_response_error", None)
+        failure = failure_from_exception(exc, stage, response_probe)
         try:
             log_path = write_error_log(
                 failure, command,
-                getattr(client, "_fupload_last_response_error", None),
+                response_probe,
                 rejected_payload,
             )
             failure.details["log_path"] = log_path

@@ -325,7 +325,10 @@ class Sidecar:
                 kind=value.kind,
                 stage=stage or value.stage,
                 endpoint=endpoint or value.endpoint,
+                http_status=value.http_status,
+                business_code=value.business_code,
                 verification_required=verification_required or value.verification_required,
+                details=dict(value.details),
             )
         if not isinstance(value, dict):
             raise FuploadError("DD sidecar returned an invalid result", kind="sidecar_error")

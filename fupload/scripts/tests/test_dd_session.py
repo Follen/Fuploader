@@ -517,6 +517,32 @@ class DDSessionTests(unittest.TestCase):
 
         self.assertEqual(module.failure_from_exception(NativeFailure("failed"), "mutation").business_code, 0)
 
+    def test_native_business_rejection_keeps_status_from_parsed_response(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            post=lambda *_args, **_kwargs: {
+                "code": 42201,
+                "status_code": 422,
+                "message": "invalid field",
+                "field": "version",
+            },
+        )
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(module, "DD_DIR", directory):
+            with self.assertRaises(module.SidecarFailure) as raised:
+                module.run_command((None, None, None, None, client), {
+                    "action": "request", "method": "POST", "path": "/addon/modify",
+                    "payload": {"version": "1.3.6"},
+                })
+            record = json.loads(Path(raised.exception.details["log_path"]).read_text(encoding="utf-8").strip())
+        self.assertEqual(raised.exception.http_status, 422)
+        self.assertEqual(record["http_status"], 422)
+        self.assertEqual(record["business_code"], 42201)
+
     def test_native_wa_parser_uses_official_bridge_and_nested_result(self) -> None:
         with mock.patch.dict(os.environ, {
             "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
@@ -557,6 +583,121 @@ class DDSessionTests(unittest.TestCase):
         self.assertFalse(raised.exception.verification_required)
         self.assertEqual(raised.exception.details["log_path"], "D:/DD/Fupload/logs/error.jsonl")
         self.assertEqual(logged.call_args.args[3]["field"], "version")
+
+    def test_native_rejected_post_writes_request_and_response_to_log_path(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            post=lambda *_args, **_kwargs: {
+                "code": 42201,
+                "message": "invalid version",
+                "field": "version",
+            },
+        )
+        session = (None, None, None, None, client)
+        command = {
+            "action": "request",
+            "method": "POST",
+            "path": "/addon/modify",
+            "payload": {"sn": "target", "version": "1.3.6"},
+        }
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(module, "DD_DIR", directory):
+            with self.assertRaises(module.SidecarFailure) as raised:
+                module.run_command(session, command)
+            log_path = raised.exception.details["log_path"]
+            record = json.loads(Path(log_path).read_text(encoding="utf-8").strip())
+        self.assertEqual(record["endpoint"], "/addon/modify")
+        self.assertEqual(record["stage"], "mutation")
+        self.assertEqual(record["http_status"], None)
+        self.assertEqual(record["business_code"], 42201)
+        self.assertEqual(record["request_json"]["version"], "1.3.6")
+        self.assertEqual(record["response_json"]["field"], "version")
+        self.assertEqual(record["validation"]["server_field"], "version")
+        self.assertEqual(raised.exception.details["server_field"], "version")
+
+    def test_native_upload_authorization_rejection_logs_request_response_and_field(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            get=lambda *_args, **_kwargs: {
+                "code": 42202,
+                "message": "invalid mime",
+                "field": "mime_type",
+            },
+        )
+        session = (None, None, None, None, client)
+        command = {
+            "action": "upload",
+            "file": "D:/missing.zip",
+            "meta": {
+                "file_type": "a19-ui-res",
+                "business_id": "addon",
+                "mime_type": "application/x-zip-compressed",
+            },
+        }
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(module, "DD_DIR", directory):
+            with self.assertRaises(module.SidecarFailure) as raised:
+                module.run_command(session, command)
+            record = json.loads(Path(raised.exception.details["log_path"]).read_text(encoding="utf-8").strip())
+        self.assertEqual(record["endpoint"], "/file/upload")
+        self.assertEqual(record["business_code"], 42202)
+        self.assertEqual(record["request_json"]["upload_authorize"]["business_id"], "addon")
+        self.assertEqual(record["response_json"]["field"], "mime_type")
+        self.assertEqual(record["validation"]["server_field"], "mime_type")
+
+    def test_native_object_put_http_error_logs_response_and_wire_descriptor(self) -> None:
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            module = importlib.import_module("fupload_cli.dd_sidecar")
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "payload.zip"
+            path.write_bytes(b"zip-payload")
+            body = b'{"code":40301,"message":"signature rejected","field":"signature"}'
+            client = SimpleNamespace(
+                _fupload_last_response_error=None,
+                get=lambda *_args, **_kwargs: {
+                    "code": 0,
+                    "result": {
+                        "url": "https://object.invalid/signed",
+                        "d_url": "https://cdn.invalid/object",
+                        "maxSize": 1000,
+                    },
+                },
+            )
+            error = urllib.error.HTTPError(
+                "https://object.invalid/signed", 403, "Forbidden", {}, io.BytesIO(body)
+            )
+            with mock.patch.object(module, "DD_DIR", directory), mock.patch.object(
+                module.urllib.request, "urlopen", side_effect=error
+            ):
+                with self.assertRaises(module.SidecarFailure) as raised:
+                    module.run_command((None, None, None, None, client), {
+                        "action": "upload",
+                        "file": str(path),
+                        "meta": {
+                            "file_type": "a19-ui-res",
+                            "business_id": "addon",
+                            "mime_type": "application/x-zip-compressed",
+                            "file_name": "addon.zip",
+                        },
+                    })
+                record = json.loads(Path(raised.exception.details["log_path"]).read_text(encoding="utf-8").strip())
+        self.assertEqual(record["endpoint"], "object-store-put")
+        self.assertEqual(record["http_status"], 403)
+        self.assertEqual(record["request_json"]["object_put"]["body_bytes"], len(b"zip-payload"))
+        self.assertEqual(record["request_json"]["object_put"]["headers"]["X-Amz-Acl"], "public-read")
+        self.assertEqual(record["response_json"]["field"], "signature")
+        self.assertEqual(record["validation"]["server_field"], "signature")
 
     def test_native_object_put_preserves_signed_url_headers_and_literal_status(self) -> None:
         with mock.patch.dict(os.environ, {
