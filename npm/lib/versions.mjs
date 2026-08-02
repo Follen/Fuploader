@@ -56,3 +56,8 @@ export function assertUnifiedVersions(versions) {
   }
   return expected;
 }
+
+export function selectedReleaseTag({ env = process.env, argv = process.argv.slice(2) } = {}) {
+  const candidates = [env.GITHUB_REF_NAME, ...argv];
+  return candidates.find((value) => /^v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(value || "")) || "";
+}
