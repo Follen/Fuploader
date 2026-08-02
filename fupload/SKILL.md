@@ -1,11 +1,15 @@
 ---
 name: fupload
 description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox and NetEase DD. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, plugins, configurations, or WA.
+metadata:
+  version: "0.0.1"
 ---
 
 # Fupload
 
 Act as the publishing operator. For NewBeeBox, prefer the official `ncc` CLI whenever it is installed unless the user explicitly requests the third-party Python management tool. For DD, and for an explicitly selected third-party NewBeeBox workflow, use the bundled Python CLI. Keep investigation, choices, planning, confirmation, and recovery in the conversation.
+
+When installed from npm, interpret `<fupload-cli>` as `fupload`. Only while maintaining the source repository, directly installing this Skill, or when `fupload` is absent from PATH, use `python <skill-root>/scripts/fupload.py`. Keep the user's current project as the working directory in either mode.
 
 ## Establish intent
 
@@ -44,15 +48,13 @@ Prefer an existing official `ncc login`, then a caller-provided `NCC_TOKEN`, the
 
 If a token is pasted into the conversation, do not repeat or use it. Tell the user to revoke it from the official CLI token page and create a replacement through local login or pre-launch environment injection. Check only whether `NCC_TOKEN` is present, never its length, prefix, hash, or value.
 
-## Locate the bundled Python CLI
+## Locate the Fuploader CLI
 
-Resolve paths relative to this `SKILL.md`, never relative to the user's project:
+Run `<fupload-cli> --help` from the user's project. The npm launcher resolves and verifies the installed Skill relative to the package, then invokes its bundled Python implementation; do not change the working directory to the Skill.
 
-```text
-python <skill-root>/scripts/fupload.py --help
-```
+When the npm command is absent and the source/direct-Skill fallback is required, resolve `<skill-root>` from this `SKILL.md` and use `python <skill-root>/scripts/fupload.py`. On Windows, prefer `py -3` only if `python` is unavailable. Do not use a binary, Go source, repository-relative fallback, browser automation, Computer Use, or direct handcrafted HTTP calls. NewBeeBox's official `ncc` is not this bundled CLI and must not be wrapped as a Python `--input` command.
 
-On Windows, prefer `py -3` only if `python` is unavailable. Do not use a binary, Go source, repository-relative fallback, browser automation, Computer Use, or direct handcrafted HTTP calls. NewBeeBox's official `ncc` is not this bundled CLI and must not be wrapped as a Python `--input` command.
+For npm package maintenance, use `fupload update` to update the CLI and every registered managed Skill to `@follenfang/fupload@latest`. For a complete removal, use `fupload uninstall`; it removes every registered Skill that still has a valid Fuploader npm ownership marker, then removes the npm package and command. Do not use direct `npm install -g` or `npm uninstall -g` as the normal Agent-managed update/removal workflow.
 
 ## Load only the needed contract
 

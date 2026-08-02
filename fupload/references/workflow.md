@@ -14,7 +14,7 @@ Machine calls include `-o json`. Its exit codes are `0` success, `1` business er
 failure, and `3` network error. Never pass a real credential through `--token`; reuse official local login or
 an `NCC_TOKEN` already injected into the Agent environment.
 
-Run `python <skill-root>/scripts/fupload.py <platform> <resource> <action>`. Every command supports `--help`; every write accepts only `--input <path|->`, with optional `--dry-run`.
+Run `fupload <platform> <resource> <action>` when installed from npm. Only source maintenance or direct-Skill installations without the npm command use `python <skill-root>/scripts/fupload.py <platform> <resource> <action>`. Every command supports `--help`; every write accepts only `--input <path|->`, with optional `--dry-run`.
 
 DD live commands additionally require one opaque `--session <id>`. Run local-only `dd session doctor` first. If it reports a running GUI, obtain explicit user consent before `dd session start --confirm-close-gui`; otherwise use `dd session start`. Reuse that session for all dependency GETs, serial writes, and readbacks, then always run `dd session stop --session <id>` in `finally`. A task must not start one native login per item.
 

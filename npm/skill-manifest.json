@@ -1,0 +1,164 @@
+{
+  "schema": "fupload.npm-skill-manifest.v1",
+  "package_name": "@follenfang/fupload",
+  "package_version": "0.0.1",
+  "skill_version": "0.0.1",
+  "tree_sha256": "9237bf2d851d791bd95267c36692db6bece1604849e9c6f0b76ce1dffca16b57",
+  "files": [
+    {
+      "path": "agents/openai.yaml",
+      "bytes": 364,
+      "sha256": "8316fb299d1e77fbbca1cfc6ec80b2078372dff96940d154af425e692ea9bd58"
+    },
+    {
+      "path": "examples/dd-config-delete.json",
+      "bytes": 93,
+      "sha256": "6710aa8fac85c5ba6ed4d017d6ffcaaf331c10e84c07ef73faecd646f9eb3d7a"
+    },
+    {
+      "path": "examples/dd-config-update.json",
+      "bytes": 719,
+      "sha256": "fa61cbe35a198bdc74068fcc89596d4007badd2e4a847cf70fea1f8704903085"
+    },
+    {
+      "path": "examples/dd-plugin-delete.json",
+      "bytes": 93,
+      "sha256": "6cedf5f811852a7d0e9f02896571936f363dae14a2f596795b19d6ffc04d6376"
+    },
+    {
+      "path": "examples/dd-plugin-update.json",
+      "bytes": 206,
+      "sha256": "fbfcbaabcb56cecc56de3bef8db53f3b3e8e961623eef58b1ff342391ace8e6a"
+    },
+    {
+      "path": "examples/dd-wa-delete.json",
+      "bytes": 85,
+      "sha256": "3fb981d22516ed0274c5063b6f41073778dbdd575d58f8802c60eed5c3745d72"
+    },
+    {
+      "path": "examples/dd-wa-edit.json",
+      "bytes": 196,
+      "sha256": "73059a88fefd67a00718219d6e01a2c69c7e8ae34b833bb44efa0215454577f9"
+    },
+    {
+      "path": "examples/newbee-config-delete.json",
+      "bytes": 86,
+      "sha256": "c13e52acfd822c7d24fc5c091ad5997e05471a436e422082ac869eaf89e3bddb"
+    },
+    {
+      "path": "examples/newbee-config-update.json",
+      "bytes": 220,
+      "sha256": "4a9aff6e5cca9710330b43b158066aeb0793331d6b088b96788794be43113210"
+    },
+    {
+      "path": "examples/newbee-plugin-create.json",
+      "bytes": 369,
+      "sha256": "d88b478600d3f97c9c98959980dc592fae36e00d461479dc227093b884fcca15"
+    },
+    {
+      "path": "examples/newbee-plugin-delete.json",
+      "bytes": 86,
+      "sha256": "84bd50820899adf1d52980e6768f6c21f8852c613ef477128f418215dd4b3f62"
+    },
+    {
+      "path": "examples/newbee-wa-delete.json",
+      "bytes": 82,
+      "sha256": "8122fdf80de6b1bb560cf06a42974d95b60af36e38bd060b4c402ed9fdf67567"
+    },
+    {
+      "path": "examples/newbee-wa-update.json",
+      "bytes": 168,
+      "sha256": "40491e9aeddc71a4e9578264e5c42b40613e0ea5f0321da29e170b84ff9f1905"
+    },
+    {
+      "path": "references/dd.md",
+      "bytes": 16543,
+      "sha256": "782d7c89d865df545fb6ffe4d7ee4492e6e5b192a3f71e4aef6424183a6a4f24"
+    },
+    {
+      "path": "references/newbee-official-cli.md",
+      "bytes": 24919,
+      "sha256": "f0ddeca7415f2351ca03cdb9a9f4cb7fd9f08d87a28b13003abe800e57c7f7dd"
+    },
+    {
+      "path": "references/newbee.md",
+      "bytes": 8218,
+      "sha256": "3fa375a6719c5c0080f209245c575fd0f568c8797f0e5d49af1ea3cc4f2278a8"
+    },
+    {
+      "path": "references/workflow.md",
+      "bytes": 6540,
+      "sha256": "717274d6ab4bbc5b448cfeab36da4813b3f31492b67f9be2dfe6883d41e7c961"
+    },
+    {
+      "path": "scripts/fupload_cli/__init__.py",
+      "bytes": 49,
+      "sha256": "c324e2309cb62d40e43669d5cf8c09f9ffe354ddb4cee317fc9d68caa0740b50"
+    },
+    {
+      "path": "scripts/fupload_cli/cli.py",
+      "bytes": 22260,
+      "sha256": "4ab353e8c322dfaea76bce52d39fb777bcf0296a515d4065e52afe62f38ed92c"
+    },
+    {
+      "path": "scripts/fupload_cli/dd_broker.py",
+      "bytes": 25750,
+      "sha256": "48ace5b13687c0d8364c62ee9407ed6ead16946df62ce34d04de1aa83ca44026"
+    },
+    {
+      "path": "scripts/fupload_cli/dd_sidecar.py",
+      "bytes": 35279,
+      "sha256": "255b9cb5af61b0dc6ecdda53ed3139068f5747b63909071f75ee9a5f29277be6"
+    },
+    {
+      "path": "scripts/fupload_cli/dd.py",
+      "bytes": 113135,
+      "sha256": "e89538e64f408aa17db212d68d0e7473d9071678e5c8b46eda5b3d5a3f73e9bd"
+    },
+    {
+      "path": "scripts/fupload_cli/errors.py",
+      "bytes": 3854,
+      "sha256": "6608a78e2fdc5e2ed9e5b329ce7dbed78d6c1dd9fc2144b6c9bc488c5c366a05"
+    },
+    {
+      "path": "scripts/fupload_cli/io.py",
+      "bytes": 4353,
+      "sha256": "b63791254e4f63787d1380c86553ee18308069986df8e2558e6df5a9244d6602"
+    },
+    {
+      "path": "scripts/fupload_cli/newbee_auth.py",
+      "bytes": 5314,
+      "sha256": "7bc00be625dd139cc4d3abe3c753eaa9bc7339a4e879e0de6fc191d5a43f4e56"
+    },
+    {
+      "path": "scripts/fupload_cli/newbee.py",
+      "bytes": 79718,
+      "sha256": "a654668b7465fbfe553b75c6aefccccb1cd3a8704f24c6f0af233865f1cb642a"
+    },
+    {
+      "path": "scripts/fupload_cli/schema.py",
+      "bytes": 31522,
+      "sha256": "8256229fd2b82db42628bc7c61ba7881035b37640483f3398bb771aa327fea21"
+    },
+    {
+      "path": "scripts/fupload_cli/transport.py",
+      "bytes": 4895,
+      "sha256": "0489493c1250c50d460c408394824eba7fc0f6efea9a3c1ec06f3ad67e6b89a7"
+    },
+    {
+      "path": "scripts/fupload_cli/trust.py",
+      "bytes": 9501,
+      "sha256": "3605da87400aeef7c1ec20b54751c0b55a4319752aba6fdaed63ec82248979ff"
+    },
+    {
+      "path": "scripts/fupload.py",
+      "bytes": 336,
+      "sha256": "6ad85f8363c8251edce368cb9b7315e8e8ebfb80a31687f422ae983afa6beaf2"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 18699,
+      "sha256": "ff3b6e220ffbe94361f59e9cbcc925c9ddb3568c655ce908ad4117b75f0a89fc"
+    }
+  ]
+}

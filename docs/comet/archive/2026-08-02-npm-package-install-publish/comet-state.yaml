@@ -1,0 +1,22 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 5
+name: npm-package-install-publish
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: 103375d767aeb59bd6ec3b73aedd01fc1221321393f0a2d1d740e528ac3db59f
+spec_changes:
+  - capability: npm-distribution
+    operation: create
+    source: specs/npm-distribution/spec.md
+    base_hash: null
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/8ec5989f9f0e06392b8ed96a4d5685f253c5062a8535b37fa66e701dca7f6cc6.json
+verification_evidence: runtime/evidence/verifications/30814d69ff7fb4c14ec898dda9ddceb1dcdad54f01e850bc9614314bfa3e30a7.json
+partial_allowance: null
+archived: true
+created_at: 2026-08-02
+run_id: 195d0131-f1e6-480f-8e4c-c0a534b99959

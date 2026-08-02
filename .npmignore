@@ -1,0 +1,10 @@
+analyze/
+publish/
+docs/
+fupload/scripts/tests/
+**/__pycache__/
+**/.pytest_cache/
+**/*.pyc
+**/*.pyo
+**/.env
+**/auth-store/

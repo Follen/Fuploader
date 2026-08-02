@@ -1,0 +1,54 @@
+{
+  "name": "@follenfang/fupload",
+  "version": "0.0.1",
+  "description": "Install and run the Fuploader Agent Skill and Python CLI.",
+  "type": "module",
+  "bin": {
+    "fupload": "npm/bin/fupload.mjs"
+  },
+  "files": [
+    "npm/bin/",
+    "npm/lib/",
+    "npm/postinstall.mjs",
+    "npm/skill-manifest.json",
+    "fupload/SKILL.md",
+    "fupload/agents/",
+    "fupload/examples/",
+    "fupload/references/",
+    "fupload/scripts/fupload.py",
+    "fupload/scripts/fupload_cli/*.py",
+    "README.md"
+  ],
+  "scripts": {
+    "build:manifest": "node npm/scripts/build-skill-manifest.mjs",
+    "check:manifest": "node npm/scripts/build-skill-manifest.mjs --check",
+    "check:versions": "node npm/scripts/check-release-version.mjs",
+    "check:release": "node npm/scripts/check-release-version.mjs --require-tag",
+    "test": "node npm/scripts/run-node-tests.mjs",
+    "test:pack": "node npm/scripts/verify-package.mjs",
+    "test:install": "node npm/scripts/test-install.mjs",
+    "prepack": "node npm/scripts/build-skill-manifest.mjs",
+    "postinstall": "node npm/postinstall.mjs"
+  },
+  "engines": {
+    "node": ">=18.18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Follen/Fuploader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Follen/Fuploader/issues"
+  },
+  "homepage": "https://github.com/Follen/Fuploader#readme",
+  "keywords": [
+    "codex",
+    "skill",
+    "world-of-warcraft",
+    "cli"
+  ],
+  "license": "UNLICENSED"
+}

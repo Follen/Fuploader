@@ -1,0 +1,82 @@
+name: CI and publish npm package
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install npm metadata without lifecycle scripts
+        run: npm ci --ignore-scripts
+      - name: Check package and Skill versions
+        run: npm run check:versions
+      - name: Check release tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: npm run check:release
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+      - name: Run Node tests
+        run: npm test
+      - name: Check Skill manifest
+        run: npm run check:manifest
+      - name: Verify package inventory and credentials
+        run: npm run test:pack
+      - name: Test global install, Python launch, and complete uninstall
+        run: npm run test:install
+      - name: Run Python tests
+        run: python -m unittest discover -s fupload/scripts/tests -v
+      - name: Compile Python sources
+        run: python -m compileall -q fupload/scripts
+
+  publish:
+    name: Publish @follenfang/fupload
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install Trusted Publishing capable npm
+        run: npm install --global "npm@^11.5.1"
+      - name: Install npm metadata without lifecycle scripts
+        run: npm ci --ignore-scripts
+      - name: Check release versions
+        run: npm run check:release
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+      - name: Check Skill manifest
+        run: npm run check:manifest
+      - name: Verify package inventory and credentials
+        run: npm run test:pack
+      - name: Publish with Trusted Publishing
+        run: npm publish --access public
