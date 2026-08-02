@@ -22,6 +22,8 @@ from fupload_cli.trust import (
     verify_dd_executable,
 )
 
+TEST_POWERSHELL = "/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+
 
 class TrustBoundaryTests(unittest.TestCase):
     def test_generic_transport_keeps_standard_urlopen_path(self) -> None:
@@ -55,10 +57,12 @@ class TrustBoundaryTests(unittest.TestCase):
 
     def test_environment_overrides_do_not_change_newbee_targets(self) -> None:
         script = (
+            "import os; "
             "from fupload_cli.newbee_auth import API_BASE, AUTH_BASE, auth_store_dir; "
             "from fupload_cli.newbee import METADATA_URL, NEXT_API_BASE, UPLOAD_SERVER; "
             "print(API_BASE); print(AUTH_BASE); print(METADATA_URL); "
-            "print(NEXT_API_BASE); print(UPLOAD_SERVER); print(auth_store_dir())"
+            "print(NEXT_API_BASE); print(UPLOAD_SERVER); "
+            "print(auth_store_dir()) if os.name == 'nt' else None"
         )
         environment = os.environ.copy()
         environment.update({
@@ -80,7 +84,8 @@ class TrustBoundaryTests(unittest.TestCase):
         self.assertEqual(values[2], NEWBEE_ORIGINS["metadata"] + "/modconfig.json")
         self.assertEqual(values[3], NEWBEE_ORIGINS["next"])
         self.assertEqual(values[4], NEWBEE_ORIGINS["upload"] + "/uploadserver")
-        self.assertTrue(values[5].endswith(os.path.join("NewBeeBox", "auth-store")))
+        if os.name == "nt":
+            self.assertTrue(values[5].endswith(os.path.join("NewBeeBox", "auth-store")))
         self.assertNotIn("attacker", result.stdout)
 
     def test_untrusted_http_and_host_are_rejected(self) -> None:
@@ -108,7 +113,9 @@ class TrustBoundaryTests(unittest.TestCase):
             }),
             stderr="",
         )
-        with mock.patch("fupload_cli.trust.subprocess.run", return_value=completed):
+        with mock.patch("fupload_cli.trust._powershell_path", return_value=TEST_POWERSHELL), mock.patch(
+            "fupload_cli.trust.subprocess.run", return_value=completed
+        ):
             with self.assertRaisesRegex(FuploadError, "trusted official signature"):
                 verify_dd_executable(Path("C:/fake/netease_dd.exe"))
 
@@ -124,7 +131,9 @@ class TrustBoundaryTests(unittest.TestCase):
             }),
             stderr="",
         )
-        with mock.patch("fupload_cli.trust.subprocess.run", return_value=completed) as run:
+        with mock.patch("fupload_cli.trust._powershell_path", return_value=TEST_POWERSHELL), mock.patch(
+            "fupload_cli.trust.subprocess.run", return_value=completed
+        ) as run:
             result = verify_dd_executable(Path("C:/official/netease_dd.exe"))
         self.assertEqual(result, {
             "status": "Valid",
@@ -136,7 +145,9 @@ class TrustBoundaryTests(unittest.TestCase):
 
     def test_dd_signature_none_stdout_fails_closed(self) -> None:
         completed = subprocess.CompletedProcess(args=[], returncode=1, stdout=None, stderr=None)
-        with mock.patch("fupload_cli.trust.subprocess.run", return_value=completed):
+        with mock.patch("fupload_cli.trust._powershell_path", return_value=TEST_POWERSHELL), mock.patch(
+            "fupload_cli.trust.subprocess.run", return_value=completed
+        ):
             with self.assertRaisesRegex(FuploadError, "Authenticode verification process"):
                 verify_dd_executable(Path("C:/official/netease_dd.exe"))
 

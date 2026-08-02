@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "0.0.1",
   "skill_version": "0.0.1",
-  "tree_sha256": "9237bf2d851d791bd95267c36692db6bece1604849e9c6f0b76ce1dffca16b57",
+  "tree_sha256": "310b805667d90a590f5e1ac9f8833224e5b6a6050e4d2e3c412f712993e362a7",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -147,8 +147,8 @@
     },
     {
       "path": "scripts/fupload_cli/trust.py",
-      "bytes": 9501,
-      "sha256": "3605da87400aeef7c1ec20b54751c0b55a4319752aba6fdaed63ec82248979ff"
+      "bytes": 9392,
+      "sha256": "83298b6aaf63144381451b9e486469215aa5fa5fbde115a20c376d5daf4cef11"
     },
     {
       "path": "scripts/fupload.py",

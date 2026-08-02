@@ -175,8 +175,7 @@ def _powershell_path() -> str:
 
 
 def verify_dd_executable(executable: Path) -> Dict[str, str]:
-    if os.name != "nt":
-        raise FuploadError("DD executable signature validation requires Windows", kind="trust_boundary")
+    powershell = _powershell_path()
     script = (
         "Import-Module Microsoft.PowerShell.Security -ErrorAction Stop; "
         "$OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false); "
@@ -186,10 +185,10 @@ def verify_dd_executable(executable: Path) -> Dict[str, str]:
     ) % str(executable).replace("'", "''")
     try:
         environment = os.environ.copy()
-        windows_root = str(Path(_powershell_path()).parents[3])
+        windows_root = str(Path(powershell).parents[3])
         environment["PSModulePath"] = windows_root + "\\System32\\WindowsPowerShell\\v1.0\\Modules"
         completed = subprocess.run(
-            [_powershell_path(), "-NoProfile", "-NonInteractive", "-Command", script],
+            [powershell, "-NoProfile", "-NonInteractive", "-Command", script],
             capture_output=True, text=True, encoding="utf-8", errors="strict",
             timeout=20, check=False, env=environment,
         )
