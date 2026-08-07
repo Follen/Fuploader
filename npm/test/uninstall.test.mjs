@@ -12,6 +12,7 @@ import { cleanupManagedSkills, resolveGlobalInstall, resolveNpmCli, uninstallSel
 import { updateSelf } from "../lib/update.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const packageVersion = JSON.parse(fs.readFileSync(path.join(packageRoot, "package.json"), "utf8")).version;
 
 function temporaryDirectory(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "fupload-uninstall-test-"));
@@ -160,8 +161,8 @@ test("self update installs latest and synchronizes managed Skills", async (t) =>
     },
   });
   assert.equal(result.success, true);
-  assert.equal(result.from_version, "0.0.2");
-  assert.equal(result.to_version, "0.0.2");
+  assert.equal(result.from_version, packageVersion);
+  assert.equal(result.to_version, packageVersion);
   assert.deepEqual(npmArgs, ["install", "-g", "--ignore-scripts", "--prefix", path.resolve(prefix), "@follenfang/fupload@latest"]);
   assert.ok(fs.existsSync(path.join(target, ".fupload-npm-install.json")));
   assert.equal(result.curseforge_config.path, curseForgeEnvPath(options));
