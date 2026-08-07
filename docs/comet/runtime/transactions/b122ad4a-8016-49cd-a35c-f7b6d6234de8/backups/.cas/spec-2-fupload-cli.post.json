@@ -1,0 +1,11 @@
+{
+  "schema": "comet.native.archive-cas.v1",
+  "operationId": "spec-2-fupload-cli",
+  "role": "post",
+  "hash": "4dcaf198b9ed888eff14baeba1c853a837b01556ad513116c0ab4b08c73fe354",
+  "identity": {
+    "dev": 2421791372,
+    "ino": 281474980327405,
+    "birthtimeMs": 1785520266279.064
+  }
+}

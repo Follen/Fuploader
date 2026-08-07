@@ -1,0 +1,109 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "build-fupload-newbee-cli-skill",
+  "sourceRevision": 6,
+  "result": "pass",
+  "freshness": "partial",
+  "contractHash": "5ae8f03d2e594b4b3dcee21961e6543746e73435344dc1f6c341a0b687c4adb3",
+  "acceptanceCriteriaHash": "c6e03b83ac1a21aad89f0366dd98bde7056df05c4dd13cdc4284d4c73e9ff19e",
+  "implementationScopeRef": "runtime/evidence/scopes/7ba7c8ecd4c00231e43e8ce5df850dfdac43c8c5518e5f72c94c8a0730761791.json",
+  "implementationScopeHash": "7ba7c8ecd4c00231e43e8ce5df850dfdac43c8c5518e5f72c94c8a0730761791",
+  "reportRef": "verification.md",
+  "reportHash": "4f48af067293edb8b8fe283075842c09c8a3d03dd4583cd35c4b44401c62dbf5",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "c6e03b83ac1a21aad89f0366dd98bde7056df05c4dd13cdc4284d4c73e9ff19e",
+    "total": 8,
+    "evidenced": 8,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-192f996e4613da710fe53c10a55b64a9220fc020578c5c599e954349da74f71b",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          ".agents/skills/fupload/SKILL.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-20b902a219b424aa1b0b25d85685de6fc5e0c90b105f1e8538df9ef191796e7c",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          ".agents/skills/fupload/SKILL.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-21caee4f8aa62afe2228ba62536c3ca411dc9d35ac4863abca74a1702666141b",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          ".agents/skills/fupload/SKILL.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-5b017ff91863e975cb1d801040ad1a25c366f66ba6ee2e5ec362444b180814f3",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/cli/root_test.go",
+          "internal/platform/platform_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-8ece9b060911081c25c7104cff3505cab123d83469b129a8e438b4d9d4fd5aa8",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          ".agents/skills/fupload/SKILL.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-958caeeafc82b122ec5f6c23ee9e099753437f784aa0596ef434a6f243aa929e",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          ".agents/skills/fupload/SKILL.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-a674949bdc7b3dfc4b018cd090fd35c530b3f62662eb3792607611e9500bfaa2",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/cli/root.go",
+          "internal/cli/root_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-fa8e66d54b1411f96b1972a1504319a6569d5d5307763c8b509d9cb804f523a1",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/cli/root.go",
+          "internal/platform/platform.go"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "74d9dafdf13414352f27defd0de949d9ca427f2c5c7fef21f15fdd5481942819"
+  },
+  "partialAllowanceRef": "runtime/evidence/allowances/e25e6631ad55089e8029aaec0aab2f0147b840333522ccfa8ee90ffda816e827.json",
+  "partialAllowanceHash": "e25e6631ad55089e8029aaec0aab2f0147b840333522ccfa8ee90ffda816e827",
+  "receiptRef": null,
+  "createdAt": "2026-07-30T12:14:29.773Z",
+  "envelopeHash": "7da5ee5226b3f1d74b0aa4832cdd03421813fde75d8171e1467898e9a36d8182"
+}

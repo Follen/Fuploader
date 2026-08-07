@@ -1,0 +1,107 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "prefer-newbee-official-cli",
+  "sourceRevision": 3,
+  "result": "pass",
+  "freshness": "complete",
+  "contractHash": "89500076bd974d12ddf7119ac7c8aeb2de6a30bcd7ad49e227572c1735fc0b27",
+  "acceptanceCriteriaHash": "83c7fe7e4e3c7d111c077848e445582015ab8115faf813e0a2cd183f2129b2b7",
+  "implementationScopeRef": "runtime/evidence/scopes/09704a58ae74b655033cf1f53c4c5854825ea208ebf2fd2cd43ffd2b5cf4e20d.json",
+  "implementationScopeHash": "09704a58ae74b655033cf1f53c4c5854825ea208ebf2fd2cd43ffd2b5cf4e20d",
+  "reportRef": "verification.md",
+  "reportHash": "e2e6a520197398dc0f054d4bfadd61b52c7df349cafce46d0afeea4196541255",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "83c7fe7e4e3c7d111c077848e445582015ab8115faf813e0a2cd183f2129b2b7",
+    "total": 7,
+    "evidenced": 7,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-384f2561cf884e1144b69c3f1fbd72b2a51813735cc9aeea9e91e372e035f690",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/references/newbee-official-cli.md",
+          "fupload/scripts/tests/test_cli.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-556062af80816b25f312069f6cea209e011bd9879748a66fe981243926353554",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/SKILL.md",
+          "fupload/scripts/tests/test_cli.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-80c4ce1dafc5c3f77dc4935b24e192e3fced01a398556abdac2cb6fb27521f7a",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "README.md",
+          "fupload/SKILL.md",
+          "fupload/references/newbee-official-cli.md",
+          "fupload/scripts/tests/test_cli.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-c35a2a4128a25febd90e74a846602420f2a088a59efc54a488a07d5008223de1",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/SKILL.md",
+          "fupload/references/workflow.md",
+          "fupload/scripts/tests/test_cli.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-d5b31e8dcbc8855cca3390dd32b904d119143dcc29a1a9b6af46d13a35b22ae5",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/SKILL.md",
+          "fupload/references/newbee.md",
+          "fupload/references/workflow.md",
+          "fupload/scripts/tests/test_cli.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-db351c4b4c976137f358910d94145ebdf1dd5cfe71b8ef9ec92810ba05495e24",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "README.md",
+          "fupload/SKILL.md",
+          "fupload/scripts/tests/test_cli.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-fb6c69eacbd1783e1bc0e57e9cae44cdaa4cdf25b9bb6e483948975751d103ad",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/SKILL.md",
+          "fupload/agents/openai.yaml",
+          "fupload/references/workflow.md",
+          "fupload/scripts/tests/test_cli.py"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "adfb4075840fbb1e73ac1cd78a6ea56e33c78ad53701f64c965246b6dfb14f98"
+  },
+  "partialAllowanceRef": null,
+  "partialAllowanceHash": null,
+  "receiptRef": "runtime/evidence/check-receipts/cc748dc7fea888ca88b158fae65f8b146bcb16598fe79b3c1b80a39f2f785382.json",
+  "createdAt": "2026-07-31T12:15:49.317Z",
+  "envelopeHash": "daef5a983ca1bcce2b45405bb8d115387b52453ebdc7639002ac39bde6caea49"
+}

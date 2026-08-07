@@ -1,0 +1,28 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "74093980-55e8-4da1-aa62-bd6c65e9cf73",
+  "kind": "archive",
+  "status": "committed",
+  "change": "dd-full-alignment-reaudit",
+  "createdAt": "2026-08-01T00:50:30.596Z",
+  "preflightHash": "8d336daf897bfeb4f76ab171bb1250ccc9bc3610541b64d654092ab36dee04ac",
+  "operations": [
+    {
+      "id": "spec-1-dd-publishing",
+      "type": "write",
+      "target": "specs/dd-publishing/spec.md",
+      "staged": "runtime/transactions/74093980-55e8-4da1-aa62-bd6c65e9cf73/staged/specs/dd-publishing/spec.md",
+      "backup": "runtime/transactions/74093980-55e8-4da1-aa62-bd6c65e9cf73/backups/specs/dd-publishing/spec.md",
+      "expectedTargetHash": "0c976b24e1ac688c74d9cb5f8b9963a289a855916d58d90e68ae965087f67bc5",
+      "stagedHash": "acc4fa4e9d613cbffc264894abc06e5202ecd9d81564e22288f2815881402a37"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/dd-full-alignment-reaudit",
+      "target": "archive/2026-08-01-dd-full-alignment-reaudit",
+      "expectedSourceHash": "13ead5c74c3b7fa38c9dbf1bb47720e15d976731c21d187a8236cb8dceb16660",
+      "expectedTargetHash": null
+    }
+  ]
+}

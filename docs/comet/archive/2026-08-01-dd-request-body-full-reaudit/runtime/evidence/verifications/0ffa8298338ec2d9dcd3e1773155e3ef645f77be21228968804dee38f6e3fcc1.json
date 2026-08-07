@@ -1,0 +1,95 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "dd-request-body-full-reaudit",
+  "sourceRevision": 3,
+  "result": "pass",
+  "freshness": "complete",
+  "contractHash": "fcc9f5b4c17fe72ee08df436656d801f19bc03fd44708aedb4601ad695acd74b",
+  "acceptanceCriteriaHash": "13060a8e1e9cd0b72931c0f4a3b66be0dae64e8fd8a3bedd56292f7c42442397",
+  "implementationScopeRef": "runtime/evidence/scopes/52d698f597291ecfbf15c9c2948b0993ae9721e1391e23e4b7fc95167486b110.json",
+  "implementationScopeHash": "52d698f597291ecfbf15c9c2948b0993ae9721e1391e23e4b7fc95167486b110",
+  "reportRef": "verification.md",
+  "reportHash": "2fcbf0fbaabbfd1118719838b6167fc3f305be75826fe8dacff99b5aa1efe20a",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "13060a8e1e9cd0b72931c0f4a3b66be0dae64e8fd8a3bedd56292f7c42442397",
+    "total": 6,
+    "evidenced": 6,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-01639e6d41879ced6895dba0be645d9de19965c1c52bc42f65b5a89cd30706e7",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "publish/20260801-091500-dd-request-body-full-reaudit/read-matrix.json",
+          "publish/20260801-091500-dd-request-body-full-reaudit/session-stop-output.json",
+          "publish/20260801-091500-dd-request-body-full-reaudit/verification.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-39c9e7c288e74dc8ac3ad7d208ddb5565886a0b586b12339ba20212df8ac9142",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/fupload_cli/dd_sidecar.py",
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-4184dd6606d9728a3570637bb92a132a07143380bf1b88e66d8a6e60984547e9",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/references/dd.md",
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/fupload_cli/schema.py",
+          "fupload/scripts/tests/test_schema.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-690692902460983a121c71bc294c94ab3e1759f0183ce5702d880e154305683e",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd_sidecar.py",
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-8ce17ad817fa59a99dfbcb34f3107a0d088e858921bf8e677b9b8141fc11f4b2",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "README.md",
+          "fupload/references/dd.md",
+          "publish/20260801-091500-dd-request-body-full-reaudit/verification.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-9777d52d5648435ebd7616665e4576dc57d02d5460b80d23974fcbb2c8f6f769",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd_sidecar.py",
+          "fupload/scripts/tests/test_dd_session.py",
+          "publish/20260801-091500-dd-request-body-full-reaudit/verification.json"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "19c282f8658464fdbb94fd24f34c49ca4cd0cd33767b2e4682cb49c8a624e4c9"
+  },
+  "partialAllowanceRef": null,
+  "partialAllowanceHash": null,
+  "receiptRef": "runtime/evidence/check-receipts/96dfa425bc3c235f7001e54cf56b69bcb53435234ac8c6b2f82c506578d6b0f4.json",
+  "createdAt": "2026-08-01T02:01:06.608Z",
+  "envelopeHash": "0ffa8298338ec2d9dcd3e1773155e3ef645f77be21228968804dee38f6e3fcc1"
+}

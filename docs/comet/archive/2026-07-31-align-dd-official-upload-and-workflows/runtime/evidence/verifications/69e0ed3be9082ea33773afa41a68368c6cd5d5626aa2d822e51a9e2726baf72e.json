@@ -1,0 +1,159 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "align-dd-official-upload-and-workflows",
+  "sourceRevision": 9,
+  "result": "pass",
+  "freshness": "complete",
+  "contractHash": "2995e9f196044074c3bad83af5dd020cb6d836b85e4a7bcbcc4d22267be5a704",
+  "acceptanceCriteriaHash": "a5a4cb2ad12430ec7415109cd2ced958bbcfa640ee0464b13437bca2b056120a",
+  "implementationScopeRef": "runtime/evidence/scopes/22a0f3dc2f4a88d2b91d3b6b02ad5e30dfaf1e796676f08b7cab300406027270.json",
+  "implementationScopeHash": "22a0f3dc2f4a88d2b91d3b6b02ad5e30dfaf1e796676f08b7cab300406027270",
+  "reportRef": "verification.md",
+  "reportHash": "d15a925ab0d73421908d5e1eeab8ebe7ab66cbe20030310ce4c5e3dd1871cbef",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "a5a4cb2ad12430ec7415109cd2ced958bbcfa640ee0464b13437bca2b056120a",
+    "total": 12,
+    "evidenced": 12,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-2cf35196fd736938ad41d2c6fe7b0e45a96ac3c704161066826e50eba5b1f6d9",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_session.py",
+          "publish/20260801-013200-dd-plugin-author-readback/verification.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-3eb6884db27fb0dcf61674b2e5759ed0cef82d66c7b994d0aaa61effc7b336f0",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_builders.py",
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-512212df2f64f3d11ebf92b36995276cfdf258d4f69f35ff5abd5a21ea786e78",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/references/dd.md",
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_builders.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-5778643d11c606a88515ca7ad6f8b49f491a84f71acb31099515327cbb805f3e",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/SKILL.md",
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-7377e1d12a999415140832bad5f375c6a1c106c5a5b067c21c9323e992d1cc80",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/SKILL.md",
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-7f5b3732f4012922f9d627868dca7214e2d9d281e3cce4feb0181b3114be771a",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/references/dd.md",
+          "fupload/scripts/fupload_cli/dd.py",
+          "publish/20260801-013400-dd-config-wa-real-matrix/verification.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-821e55eed1253f48c2985b5689f299a1e47349dd8d03bcaa8345e2d9050391b7",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/references/dd.md",
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_builders.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-84dad2c45b848ec9178cd094969e656e7435fa5a4428588a2961df73d36473a5",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd_broker.py",
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-a397ff4907e7cde1088ce1d2b702982449e8afa4fcede2e1e2bfc9027ae3ed2f",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_session.py",
+          "publish/20260801-013400-dd-config-wa-real-matrix/wa-fixed-verification.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-b01d8c70e18be4aca15df5e1ab6aeb19156a7a8f10c59d70ccadf25ee0abf91e",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-c225c5a231d1f951ab27687663f0af265e9b3918a83537603e3d6db54d32df83",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/SKILL.md",
+          "fupload/scripts/fupload_cli/dd_broker.py",
+          "fupload/scripts/tests/test_dd_session.py",
+          "publish/20260731-215431-dd-plugin-create-six-clientno-test/01-create.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-e0e906fe04ae1f4ef8c40e297a768b41cce5573a3f3046d2a447fc85b1c018d8",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd_broker.py",
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "1336d4ca65abf24e084b5cfa95d4a350ddd16336abe23885e1e2aee83b2d052a"
+  },
+  "partialAllowanceRef": null,
+  "partialAllowanceHash": null,
+  "receiptRef": "runtime/evidence/check-receipts/f0db7691512d4fb28866bf805cfa66bb1a7c484c52b688c4d001a8ac0c123057.json",
+  "createdAt": "2026-07-31T17:50:40.497Z",
+  "envelopeHash": "69e0ed3be9082ea33773afa41a68368c6cd5d5626aa2d822e51a9e2726baf72e"
+}

@@ -1,0 +1,253 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "6a7c313d5c886430fb9135546ed12c38c238c8afd253c446a5b6676a4face5d5",
+  "baselineProjectionRef": "runtime/evidence/snapshots/d182881524ff673bfc929ab66258086e953c42463ce40f8d98f7b6f236ccfca8.json",
+  "baselineProjectionHash": "d182881524ff673bfc929ab66258086e953c42463ce40f8d98f7b6f236ccfca8",
+  "currentProjectionRef": "runtime/evidence/snapshots/5c342ac4dca92b22469d9d45c4e4ade1801dfcf144001e3f5792fd06c0d5642e.json",
+  "currentProjectionHash": "5c342ac4dca92b22469d9d45c4e4ade1801dfcf144001e3f5792fd06c0d5642e",
+  "complete": true,
+  "declaredArtifacts": [
+    {
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload",
+      "kind": "directory"
+    }
+  ],
+  "changes": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "b2bb838c71d8f1c35820896d05ea9d6c0ce6bce5cf75653d864997c9d10f2a60",
+        "size": 5244
+      },
+      "after": {
+        "hash": "d9742c5afe5caf2ec4d22303eb1f5091f9625370dcd0d69e47dbd7da5afdda32",
+        "size": 5509
+      },
+      "attributedTo": [
+        {
+          "path": "README.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "modified",
+      "before": {
+        "hash": "881ee6ff5b31fec21306cd8853e4a8160d35bc5257d8394329cf791b1da01496",
+        "size": 5800
+      },
+      "after": {
+        "hash": "bd4075ce6a9708df1f0f4959375258e45cc109f079b3d0c8c365c530611d779c",
+        "size": 6205
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "kind": "modified",
+      "before": {
+        "hash": "4ada01a96eea70107c857282ccd63fbfd6b2dcdec6f018b00c1b2d26faa8772e",
+        "size": 7877
+      },
+      "after": {
+        "hash": "1c8546da4154b743593ebf26619d69a5a550818d19feeb86f4b3ec2772897034",
+        "size": 8049
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/newbee.md",
+      "kind": "modified",
+      "before": {
+        "hash": "f6c790076fe7ef85ea4f1d917d6d889ea9250a7d4466df44e6dd7b8d20605800",
+        "size": 5857
+      },
+      "after": {
+        "hash": "92465c7068c70f560cf30c9eb3059f12e4a541ac69cb19315bb5e05f768e88c9",
+        "size": 6050
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "bfbc2a6c9c5f3a1ddf5519ba785e6648032d6d3749ce7c13a135209e1856ee74",
+        "size": 19521
+      },
+      "after": {
+        "hash": "cdc57cda91dbdf56ca7942fa5fd4c8a67a4cfaaa9e2015385eede43450fc72ec",
+        "size": 19585
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "kind": "modified",
+      "before": {
+        "hash": "aed32971a231d92b6ea501539ec5a06c571c02e87df374faaf529cb92184b150",
+        "size": 67116
+      },
+      "after": {
+        "hash": "9c0d906d62ee459d4e0a1bfbc4beb97c06c3b9af423e9ba323621d87cab5a7b7",
+        "size": 67551
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/newbee.py",
+      "kind": "modified",
+      "before": {
+        "hash": "18704a37287d143966d6734c9a865c96a52e4ddf93c1a983a784e89bb5a8e44e",
+        "size": 54139
+      },
+      "after": {
+        "hash": "05a611cfeecdd91268e7aeb374c8c2deb520f8f4954e5131fa0f83c03bba3024",
+        "size": 54779
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/newbee_auth.py",
+      "kind": "modified",
+      "before": {
+        "hash": "a21795e47b25f6bca9c16c8d5ad89c9e6d173648626d7ba55e7f342c571bb54d",
+        "size": 5418
+      },
+      "after": {
+        "hash": "6ebbff764f246a6ab52a0923c6e1d2a7444430227e4e27bd03875ffad6993d38",
+        "size": 5419
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/transport.py",
+      "kind": "modified",
+      "before": {
+        "hash": "03394010920817c8019e39c3d909f61387ab0a6d7146c35d5f9ac90b630ae6cd",
+        "size": 4509
+      },
+      "after": {
+        "hash": "bbe1bf95f7072a16ec8352a699cea3bb3699fe047dfb4743a21484f4be922ee7",
+        "size": 5028
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/trust.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "8d8b65b0868e4b3a26fb83b4e5073ea2ad408c4660e1ce66e2db4d4d8cfc18b0",
+        "size": 9209
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_builders.py",
+      "kind": "modified",
+      "before": {
+        "hash": "01e0b53c5aa0184a86403fab54056ef6ce52d46fd51ce9ab3a4f3dc9f5d43873",
+        "size": 24130
+      },
+      "after": {
+        "hash": "b4d86dc08b1048d509b81be44f20dd7f1c38e94d5ea085b4e33d8aaf3b75f281",
+        "size": 24490
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "e9a37161d878b3726b3a574d6dad51c18146b9ce7f2a7220c3a7613aad3b3523",
+        "size": 8852
+      },
+      "after": {
+        "hash": "dbb06833d785e20a817de28da93f5227e753ad0c4ee435760ab9f266b27ee319",
+        "size": 9239
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_trust.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "fd5e6b7f050022c8f66d44418d2651dc6d332d007becd539d7cd522454b0a077",
+        "size": 5478
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    }
+  ],
+  "unattributed": [],
+  "unresolvedScopes": [],
+  "noCodeReason": null,
+  "scopeHash": "66581562d748f4f7c7cc3d3f283601d40418af76cd5811947762adc90347a2f8"
+}

@@ -1,0 +1,101 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "npm-package-install-publish",
+  "sourceRevision": 3,
+  "result": "pass",
+  "freshness": "complete",
+  "contractHash": "103375d767aeb59bd6ec3b73aedd01fc1221321393f0a2d1d740e528ac3db59f",
+  "acceptanceCriteriaHash": "4b0219c27b6458a468912b63f81871b3ebd1bd497176b9b6b556909dccd1c697",
+  "implementationScopeRef": "runtime/evidence/scopes/8ec5989f9f0e06392b8ed96a4d5685f253c5062a8535b37fa66e701dca7f6cc6.json",
+  "implementationScopeHash": "8ec5989f9f0e06392b8ed96a4d5685f253c5062a8535b37fa66e701dca7f6cc6",
+  "reportRef": "verification.md",
+  "reportHash": "7c61d39ff9c22b55e7f9f0bb77cb6d087ef89f8f3c55061f0e62703c9bbbadc6",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "4b0219c27b6458a468912b63f81871b3ebd1bd497176b9b6b556909dccd1c697",
+    "total": 7,
+    "evidenced": 7,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-12fd31a2b9bc9407e927bdf7b4b8550a931eff625f06d23880d457a279486f54",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "npm/lib/uninstall.mjs",
+          "npm/scripts/test-install.mjs",
+          "npm/test/uninstall.test.mjs"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-2e537f56365d0c006953215b7297d380d9adcf4d0205294ccabd92fe7b4d2454",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "npm/lib/update.mjs",
+          "npm/test/uninstall.test.mjs"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-65652e0ab61390ae239ff3ad08a307c60e6bf176081969673faf54cafe77759c",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "npm/bin/fupload.mjs",
+          "npm/scripts/test-install.mjs"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-826dfd1ae4aefd4fd0c2cfa7b8aed9719d3c954dd997ea27a6bd5e496b5615f2",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "npm/lib/uninstall.mjs",
+          "npm/test/uninstall.test.mjs"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-89bb2a4dc9f61f3ae727b207955099ec5788ebbb145a958b82a39eef7556b963",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          ".github/workflows/publish-npm.yml",
+          "npm/scripts/test-install.mjs"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-df34e4e24063a60e68e761aa3e063647a762fd92882c46bb5d82d2fc90c3523b",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "npm/lib/skill-installer.mjs",
+          "npm/lib/update.mjs",
+          "npm/test/skill-installer.test.mjs"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-f7e44e7b2572b0dcab2e9a2d979a5063f2288ea4fd3d515b8c96d6c3a4db9f80",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "npm/scripts/verify-package.mjs",
+          "package.json"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "074b364e398343f56fcf2c27aa0bd0b1e2ab2ecfc33c82e673dd03b5d482f6e1"
+  },
+  "partialAllowanceRef": null,
+  "partialAllowanceHash": null,
+  "receiptRef": "runtime/evidence/check-receipts/912625a6c3deb2c0b95aee6cd8b4d56953298acd06b56d2c26a61df4c678e050.json",
+  "createdAt": "2026-08-02T07:54:26.591Z",
+  "envelopeHash": "30814d69ff7fb4c14ec898dda9ddceb1dcdad54f01e850bc9614314bfa3e30a7"
+}

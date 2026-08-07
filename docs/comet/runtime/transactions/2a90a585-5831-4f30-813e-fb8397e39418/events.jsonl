@@ -1,0 +1,12 @@
+{"sequence":1,"timestamp":"2026-07-31T18:45:15.704Z","type":"prepared"}
+{"sequence":2,"timestamp":"2026-07-31T18:45:16.273Z","type":"operation-started","operationId":"spec-1-fupload-cli"}
+{"sequence":3,"timestamp":"2026-07-31T18:45:16.538Z","type":"operation-completed","operationId":"spec-1-fupload-cli"}
+{"sequence":4,"timestamp":"2026-07-31T18:45:16.565Z","type":"operation-started","operationId":"spec-2-fupload-skill"}
+{"sequence":5,"timestamp":"2026-07-31T18:45:16.804Z","type":"operation-completed","operationId":"spec-2-fupload-skill"}
+{"sequence":6,"timestamp":"2026-07-31T18:45:16.829Z","type":"operation-started","operationId":"spec-3-newbee-publishing"}
+{"sequence":7,"timestamp":"2026-07-31T18:45:17.115Z","type":"operation-completed","operationId":"spec-3-newbee-publishing"}
+{"sequence":8,"timestamp":"2026-07-31T18:45:17.143Z","type":"operation-started","operationId":"archive-change"}
+{"sequence":9,"timestamp":"2026-07-31T18:45:17.702Z","type":"operation-completed","operationId":"archive-change"}
+{"sequence":10,"timestamp":"2026-07-31T18:45:17.969Z","type":"archive-finalization-started"}
+{"sequence":11,"timestamp":"2026-07-31T18:45:18.064Z","type":"archive-finalized"}
+{"sequence":12,"timestamp":"2026-07-31T18:45:18.303Z","type":"commit"}

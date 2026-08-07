@@ -1,0 +1,555 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "3f528b41e9d8575b3c5a9d404c3ccbba180ae04cd7d64d330b230dcf54aa594b",
+  "baselineProjectionRef": "runtime/evidence/snapshots/5844d7bbc34b6650bb3575eeef1d3a8136aef4a65e0d901cbb1dd062c72dea2e.json",
+  "baselineProjectionHash": "5844d7bbc34b6650bb3575eeef1d3a8136aef4a65e0d901cbb1dd062c72dea2e",
+  "currentProjectionRef": "runtime/evidence/snapshots/6ecc461af889be98be649dac349e7fabbea56bf8f7e1d1609d773c46f60e864f.json",
+  "currentProjectionHash": "6ecc461af889be98be649dac349e7fabbea56bf8f7e1d1609d773c46f60e864f",
+  "complete": false,
+  "declaredArtifacts": [
+    {
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "path": "Release",
+      "kind": "directory"
+    },
+    {
+      "path": "examples",
+      "kind": "directory"
+    },
+    {
+      "path": "internal",
+      "kind": "directory"
+    },
+    {
+      "path": "newbee.md",
+      "kind": "file"
+    }
+  ],
+  "changes": [
+    {
+      "path": "DD/auth-analysis.md",
+      "kind": "modified",
+      "before": {
+        "hash": "1215fd1d6219b69decb61da6b2efaaa10dd81c453fb2c5b238b7c155d5b1623f",
+        "size": 4330
+      },
+      "after": {
+        "hash": "eea8418d521ea50fb7b8e51badb1537334a0d5dc783988212a0caaa1a693548e",
+        "size": 4441
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "9680a882335b8053d0b6e9f121467ca05e1526543311f47e58b65f40b539682a",
+        "size": 4456
+      },
+      "after": {
+        "hash": "0f61c0d4193c5807b8468e51e544f2a9d229f197cc781c00fe19e39909140e36",
+        "size": 5338
+      },
+      "attributedTo": [
+        {
+          "path": "README.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "Release/fupload.zip",
+      "kind": "modified",
+      "before": {
+        "hash": "548ecac140656f98ebe41c45a99c14a1dd055b7118b7cf1335bfde2f0e586826",
+        "size": 5966359
+      },
+      "after": {
+        "hash": "5df8c84987e80255522a8e23f5f3fb395ae9c0328f5f3d71f15da718dde1c1c6",
+        "size": 6031460
+      },
+      "attributedTo": [
+        {
+          "path": "Release",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "Release/fupload/SKILL.md",
+      "kind": "modified",
+      "before": {
+        "hash": "b3447abd05b9c389554ab77972fcef4c0a57405caa28501cfece81b471417649",
+        "size": 3453
+      },
+      "after": {
+        "hash": "b64197e4be8ddaa242592cc714444754bbfed45139b85d365e6317fab355a6d9",
+        "size": 3601
+      },
+      "attributedTo": [
+        {
+          "path": "Release",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "Release/fupload/agents/openai.yaml",
+      "kind": "modified",
+      "before": {
+        "hash": "f2196c695e6aa2bd784cbb1f71ad98e9221be11984c54876aca8fb1f09364444",
+        "size": 272
+      },
+      "after": {
+        "hash": "a70501cb4304122065480cd1289a58de6b49d3b8b51955f7f238eb151a20640a",
+        "size": 247
+      },
+      "attributedTo": [
+        {
+          "path": "Release",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "Release/fupload/bin/fupload.exe",
+      "kind": "modified",
+      "before": {
+        "hash": "e3de2c2ed7a0f54e63a7f4d02964a5568fade07ef22987da3d1aa23a4d6c1428",
+        "size": 10747392
+      },
+      "after": {
+        "hash": "49f6a1268ec6b7d3836cd8841d20dde46c93507047fd6d688cf969558b4f53a5",
+        "size": 10887680
+      },
+      "attributedTo": [
+        {
+          "path": "Release",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "Release/fupload/references/cli-contract.md",
+      "kind": "modified",
+      "before": {
+        "hash": "44123aa830713591d2446d32198952d8cbcaee25fd332b9f7ef179f616893b60",
+        "size": 1666
+      },
+      "after": {
+        "hash": "2f591d1fd26c47695dec0a97d93e165c5c5694dafa6ed6079e33f39a70a71958",
+        "size": 3172
+      },
+      "attributedTo": [
+        {
+          "path": "Release",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "Release/fupload/references/plugin.md",
+      "kind": "modified",
+      "before": {
+        "hash": "a030ae06a307eb5755619510a3793f14a7b7dfdd3992e13a02c239dab32c4ba7",
+        "size": 2741
+      },
+      "after": {
+        "hash": "6ab94ab1801812d5b1a7b67d3881b283ba3b0de922f22fb62bfac43d02932dbb",
+        "size": 3359
+      },
+      "attributedTo": [
+        {
+          "path": "Release",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "Release/fupload/references/wa.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b9f07af5701721a310989d1dc9c64499952916e7eecfdf5b07de4542cd684fd3",
+        "size": 2852
+      },
+      "attributedTo": [
+        {
+          "path": "Release",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "bin/fupload.exe",
+      "kind": "modified",
+      "before": {
+        "hash": "e3de2c2ed7a0f54e63a7f4d02964a5568fade07ef22987da3d1aa23a4d6c1428",
+        "size": 10747392
+      },
+      "after": {
+        "hash": "49f6a1268ec6b7d3836cd8841d20dde46c93507047fd6d688cf969558b4f53a5",
+        "size": 10887680
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "dd.md",
+      "kind": "modified",
+      "before": {
+        "hash": "993ee4b5d55add7f28dd81c0f786ed4faef82fd924de4b9afb84e8d6edf005ca",
+        "size": 8671
+      },
+      "after": {
+        "hash": "2e85e6d56b3f129128acaefea3cf427bb1e2432425a4b942de313facd2e6f7c6",
+        "size": 8758
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "examples/newbee/plugin-changelog-edit.yaml",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a58337a5a4b6fc949bf66043930d6b178abc0927f08daa0cc63e624e5edae0bb",
+        "size": 105
+      },
+      "attributedTo": [
+        {
+          "path": "examples",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "examples/newbee/wa-changelog-edit.yaml",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0b502050267815f19a174e83dfe6b923c5100b1d5739ed2ae65b22c54a5fd98a",
+        "size": 82
+      },
+      "attributedTo": [
+        {
+          "path": "examples",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "examples/newbee/wa-create.yaml",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "13d04683b8f1455a1ad992a25026d3aa7f3c100eb8052cc43d7277bcffb79516",
+        "size": 347
+      },
+      "attributedTo": [
+        {
+          "path": "examples",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "examples/newbee/wa-edit.yaml",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "9a6ca493c72856a3a80650b6c96e9ab3f495e1b613c995023b8b0cc416a89109",
+        "size": 256
+      },
+      "attributedTo": [
+        {
+          "path": "examples",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "examples/newbee/wa-version.yaml",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "9892ff4c39255349aa36ce3d49aedb6f188fd0f974d86aeb0d36f76201a3402e",
+        "size": 157
+      },
+      "attributedTo": [
+        {
+          "path": "examples",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "internal/cli/plugin_changelog.go",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "28fe4d7372f5c54d487526c3d3fccf49b4cc2d263cff78dc7f70f484158708f6",
+        "size": 6338
+      },
+      "attributedTo": [
+        {
+          "path": "internal",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "internal/cli/root.go",
+      "kind": "modified",
+      "before": {
+        "hash": "b3f27046a8cb64f68feb4ddbc82100b56eb4a439462a442a094b13fdb84c7ca9",
+        "size": 22785
+      },
+      "after": {
+        "hash": "33657ff3c2a8413e54557c164ebf15f9099f3a4017d9d797d5f496e98dd91714",
+        "size": 22913
+      },
+      "attributedTo": [
+        {
+          "path": "internal",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "internal/cli/root_test.go",
+      "kind": "modified",
+      "before": {
+        "hash": "e3d4bcbd4202709a103f1ef70b1133ffe1df3ca13c675a657dedf71f47ffd268",
+        "size": 2452
+      },
+      "after": {
+        "hash": "c4b1abd62796e540b8d9d9eca09842b0a7544413761024f711adf51410a9b55c",
+        "size": 3342
+      },
+      "attributedTo": [
+        {
+          "path": "internal",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "internal/cli/validate.go",
+      "kind": "modified",
+      "before": {
+        "hash": "2a6ca7cf9be3efa4dd381a8f0fa1a445dc7527f9d85e76be81a0c20757a17738",
+        "size": 3924
+      },
+      "after": {
+        "hash": "04dd4e986040c4296bd9647a9dfc8f0025a1b72dfe8f9a7b8a941910b4ef1760",
+        "size": 6454
+      },
+      "attributedTo": [
+        {
+          "path": "internal",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "internal/cli/wa.go",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1556b44470a17dccf1e65b15a78f814052aa38e30a487dd3fbc05871712ce215",
+        "size": 14598
+      },
+      "attributedTo": [
+        {
+          "path": "internal",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "internal/cli/wa_relations.go",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "cff3d95a4df2ed37b10457a347463154b1b558bdf812718b9e22d680cd7e50ae",
+        "size": 9793
+      },
+      "attributedTo": [
+        {
+          "path": "internal",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "internal/newbee/changelog.go",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "cab63ce2921f8c0f9ec4ed40ff8f7d66dbc3c20e6df0ca4a7b466bf93bad6aa4",
+        "size": 2595
+      },
+      "attributedTo": [
+        {
+          "path": "internal",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "internal/newbee/service_test.go",
+      "kind": "modified",
+      "before": {
+        "hash": "08ce4151ed4216071513f13b924f4f3b0da3042e3b0b13f940b9c5701e68caab",
+        "size": 17134
+      },
+      "after": {
+        "hash": "4f6dbac25ca5f811b1ddd318b1175062ecf2b71dfa97cf92b223c15d94d4c458",
+        "size": 24601
+      },
+      "attributedTo": [
+        {
+          "path": "internal",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "internal/newbee/wa.go",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "dd0980c546f68d4c0f623d3b3fbadd32f26940904d5af56fcab1c086be208394",
+        "size": 13964
+      },
+      "attributedTo": [
+        {
+          "path": "internal",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "internal/platform/platform.go",
+      "kind": "modified",
+      "before": {
+        "hash": "0656526c05509ed81fb062f2458867120f25905a7fab767f474ee69d64fbb38f",
+        "size": 8569
+      },
+      "after": {
+        "hash": "a8117b7b1d4ef3930bf2bcb7f154250ad292f6bc4dfc371646f497aab97dcc93",
+        "size": 13778
+      },
+      "attributedTo": [
+        {
+          "path": "internal",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "internal/skill/skill_test.go",
+      "kind": "modified",
+      "before": {
+        "hash": "43036e6e0f26773b4a26526f7474fadb65fda2948bae964ed8b4f8bd01dfe183",
+        "size": 2567
+      },
+      "after": {
+        "hash": "d7c9699e4f5794578f349177ce8faf4a5af6be8c3019eb25fa31d4828cfe6e1a",
+        "size": 2962
+      },
+      "attributedTo": [
+        {
+          "path": "internal",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "newbee.md",
+      "kind": "modified",
+      "before": {
+        "hash": "46c797dac071e9dc6ce5c56552e90905e12a9613335c4ae6d63ba534db7a1ecb",
+        "size": 29581
+      },
+      "after": {
+        "hash": "4c750a859342d1f67905808f68008ef82a14acbed8c60044857b2b64124150b3",
+        "size": 31292
+      },
+      "attributedTo": [
+        {
+          "path": "newbee.md",
+          "kind": "file"
+        }
+      ]
+    }
+  ],
+  "unattributed": [
+    {
+      "path": "DD/auth-analysis.md",
+      "kind": "modified",
+      "before": {
+        "hash": "1215fd1d6219b69decb61da6b2efaaa10dd81c453fb2c5b238b7c155d5b1623f",
+        "size": 4330
+      },
+      "after": {
+        "hash": "eea8418d521ea50fb7b8e51badb1537334a0d5dc783988212a0caaa1a693548e",
+        "size": 4441
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "bin/fupload.exe",
+      "kind": "modified",
+      "before": {
+        "hash": "e3de2c2ed7a0f54e63a7f4d02964a5568fade07ef22987da3d1aa23a4d6c1428",
+        "size": 10747392
+      },
+      "after": {
+        "hash": "49f6a1268ec6b7d3836cd8841d20dde46c93507047fd6d688cf969558b4f53a5",
+        "size": 10887680
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "dd.md",
+      "kind": "modified",
+      "before": {
+        "hash": "993ee4b5d55add7f28dd81c0f786ed4faef82fd924de4b9afb84e8d6edf005ca",
+        "size": 8671
+      },
+      "after": {
+        "hash": "2e85e6d56b3f129128acaefea3cf427bb1e2432425a4b942de313facd2e6f7c6",
+        "size": 8758
+      },
+      "attributedTo": []
+    }
+  ],
+  "unresolvedScopes": [
+    {
+      "id": "scope:94cd8433a460b1ad7ddab5ba21ed99e6ddc9f81bfd2d9e7be23b7ef9c222cba8",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/auth-analysis.md",
+      "reason": "Changed path is not covered by a declared artifact: DD/auth-analysis.md"
+    },
+    {
+      "id": "scope:6e2c5e7f35e714b04b2276e44cf77f8863460ed7a68d582663ceb4234cf8ac1e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "bin/fupload.exe",
+      "reason": "Changed path is not covered by a declared artifact: bin/fupload.exe"
+    },
+    {
+      "id": "scope:505bf99586e02089b1a49b0dce7e5bea3fed8cdcf0b9e8a3140f5764415f4053",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "dd.md",
+      "reason": "Changed path is not covered by a declared artifact: dd.md"
+    }
+  ],
+  "noCodeReason": null,
+  "scopeHash": "bda693c75288559fc2f7d2ad99c76f78c561d65c7ddbdbb339273b3fea9e12fe"
+}

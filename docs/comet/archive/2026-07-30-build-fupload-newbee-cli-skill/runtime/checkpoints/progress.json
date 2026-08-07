@@ -1,0 +1,15 @@
+{
+  "schema": "comet.native.progress-checkpoint.v1",
+  "id": "de8432f7-3bf8-40fd-95ff-c2cffc75ce08",
+  "change": "build-fupload-newbee-cli-skill",
+  "phase": "build",
+  "previousRevision": 2,
+  "stateRevision": 3,
+  "summary": "Fupload CLI、普通 Agent Skill、测试与构建已完成；Skill Creator 校验通过。Build 封印被基线后新增的无关 DD 目录触发 partial scope。",
+  "nextAction": "取得用户对仅验收 Fupload、排除 DD 目录变化的明确确认后，使用 prepared scope hash f53d417cb963c1518e25eff376ca3a5e99e7b7f27f1fd494d8100e34d1ce2c20 推进 Build。",
+  "inputHash": "c20bb3462029f0e62291e16b0d432247a3cbf5c84037bc8d26931e851a12ce02",
+  "manifestHash": "9b3558825c0c0b3fb45dfd4249f66be52cb64637c944e40b89eb0ad998fca5d9",
+  "manifestRef": "runtime/checkpoints/manifests/9b3558825c0c0b3fb45dfd4249f66be52cb64637c944e40b89eb0ad998fca5d9.json",
+  "artifactCount": 1,
+  "createdAt": "2026-07-30T11:54:54.178Z"
+}

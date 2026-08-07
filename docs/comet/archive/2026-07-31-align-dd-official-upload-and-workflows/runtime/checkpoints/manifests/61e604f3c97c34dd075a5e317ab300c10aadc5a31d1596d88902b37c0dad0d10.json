@@ -1,0 +1,12 @@
+{
+  "schema": "comet.native.checkpoint-manifest.v1",
+  "change": "align-dd-official-upload-and-workflows",
+  "artifacts": [
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "hash": "bec9d0e59b4f5d400a3678258dcbd9fab02bcc1fa75889d322671c046753ac6b",
+      "size": 92998
+    }
+  ],
+  "totalBytes": 92998
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "comet.native.checkpoint-manifest.v1",
+  "change": "dd-field-by-field-wire-regression",
+  "artifacts": [
+    {
+      "path": "fupload/references/dd.md",
+      "hash": "a3e03f536002166516f789748d3607bc6e8813c8fed2d1fb3dfe2b1c8c53f9d8",
+      "size": 16292
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "hash": "a94a3565dd1a7056f1062ce4188315010cc3d6a24ac72410546a9ca1c24ccffe",
+      "size": 107750
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "hash": "d7c5a2711a6a209fde44c1e7b006990d33d81a877049ae49dcc91f5c52b5f00a",
+      "size": 31898
+    },
+    {
+      "path": "fupload/scripts/tests/generate_dd_wire_matrix_report.py",
+      "hash": "e185220367757232efe2b0d0b21092305972c27d747b76a5af3cf56e8cf3daf0",
+      "size": 7478
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "hash": "b32ac2933770e203cc2ae1d29f49e24164148f482961a500cc0ac087249fbc9a",
+      "size": 38891
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_wire_matrix.py",
+      "hash": "b8fb8c7878e95b7355a6471da3a7a8c9368f9e791cbff44259decd7815930ad4",
+      "size": 43134
+    }
+  ],
+  "totalBytes": 245443
+}

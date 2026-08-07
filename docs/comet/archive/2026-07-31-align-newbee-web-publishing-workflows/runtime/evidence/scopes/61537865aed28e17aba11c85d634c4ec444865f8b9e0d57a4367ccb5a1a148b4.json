@@ -1,0 +1,221 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "3622acede5de930f63978118b5c5e9ac25f8ef7a466a38a2959989cfb15bd926",
+  "baselineProjectionRef": "runtime/evidence/snapshots/42828a9b8429ea72053302db2f7995e40c3e1e093f9bed00b35b3042ffa59a85.json",
+  "baselineProjectionHash": "42828a9b8429ea72053302db2f7995e40c3e1e093f9bed00b35b3042ffa59a85",
+  "currentProjectionRef": "runtime/evidence/snapshots/bd8752e179958ac98ca15318a33cebbb23e60287d92d273b60d33f1e02146351.json",
+  "currentProjectionHash": "bd8752e179958ac98ca15318a33cebbb23e60287d92d273b60d33f1e02146351",
+  "complete": true,
+  "declaredArtifacts": [
+    {
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload",
+      "kind": "directory"
+    },
+    {
+      "path": "publish",
+      "kind": "directory"
+    }
+  ],
+  "changes": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "3792617c49c59982224279d76ea11d5b1536ba3d355dcc5e303a7423e43832a9",
+        "size": 7866
+      },
+      "after": {
+        "hash": "019d02eb6e464f291a6df5b769ded0596370529ac05e78b9a799bf9e9501136d",
+        "size": 7988
+      },
+      "attributedTo": [
+        {
+          "path": "README.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "modified",
+      "before": {
+        "hash": "1ed0b850b1ac67af25eccf6f61ffe885486cf93fd13fb2f618ca5f6e88eff55a",
+        "size": 15732
+      },
+      "after": {
+        "hash": "018f10d6c6c5f655d0e70043c9cb7640fb63ae2cc64a5ccd221e6199802d5c12",
+        "size": 16036
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/newbee.md",
+      "kind": "modified",
+      "before": {
+        "hash": "6f8093c0eea65227e8a1c725a4669e2d27edfa059b451b0ae220db3683f284b3",
+        "size": 7526
+      },
+      "after": {
+        "hash": "e8fd9adb6c29cb4ccef64589d9a880cfc6674b5cdcd4fc0d8c6bb2ecbaf98a7e",
+        "size": 8273
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "2d23dda4e9e35555be3a30b11365c663b99ee57b49ac752470c55d669ea1dc72",
+        "size": 22101
+      },
+      "after": {
+        "hash": "ffd64f47930a634b45e25ae7b79bc6ccbf90d50592dccc04927e7454921bd71b",
+        "size": 22467
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/newbee.py",
+      "kind": "modified",
+      "before": {
+        "hash": "46ee6385d13694e2662eef9c0a0e20c46bfc171e381f72f14195eb464c832368",
+        "size": 68661
+      },
+      "after": {
+        "hash": "9b45ce084a1ef0ada6961c65d959bc2aef2f6b862cb57f6dc8e6510b93b6579e",
+        "size": 74753
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "8c5519365d1f19be12e1c472d7fb61e87429ccec2ef896431a558b710960c758",
+        "size": 30566
+      },
+      "after": {
+        "hash": "cf64c092c2df7edf79292b48256348c53edbee5ac97808c320c6bd56192b6281",
+        "size": 31502
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_builders.py",
+      "kind": "modified",
+      "before": {
+        "hash": "b68522d28e9923e595b4795b476beb815ac732190fed72dcd494592f206a303d",
+        "size": 39840
+      },
+      "after": {
+        "hash": "0b2265b797e7b9a6db354d74fdd7613ce5b702e3a34c0b0de8681e8ef1f3b546",
+        "size": 42089
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "749bb0cba6de0dc99b8cad50f64a30dc6cc55548a4bf2996cce7a05d0debb97e",
+        "size": 12251
+      },
+      "after": {
+        "hash": "30dc890e3517ee88aaa9fe36efdf0d937a307d4c554b489b4b5c3fa5bf79d8c3",
+        "size": 12251
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "7ebe49eb978516416bc9c5016ec330273a6ef7c04389089dfe484d5be61f9087",
+        "size": 11283
+      },
+      "after": {
+        "hash": "1ab9f8e654a375e8cf389ba709d4d312cbb0fbc7236f3cfbc42513d485a4a014",
+        "size": 12793
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-034000-newbee-web-alignment/plan.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "92033160fc9bae87125fa20a62051a378cfdb7e9a40c7f9bad60ad2d8a68dd8d",
+        "size": 575
+      },
+      "attributedTo": [
+        {
+          "path": "publish",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-034000-newbee-web-alignment/verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ab25af81aa2c67e59fb5de4049bf5dbeae1fc8cd559c3e2ac2936d5b87a4f673",
+        "size": 2381
+      },
+      "attributedTo": [
+        {
+          "path": "publish",
+          "kind": "directory"
+        }
+      ]
+    }
+  ],
+  "unattributed": [],
+  "unresolvedScopes": [],
+  "noCodeReason": null,
+  "scopeHash": "61537865aed28e17aba11c85d634c4ec444865f8b9e0d57a4367ccb5a1a148b4"
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "comet.native.archive-cas.v1",
+  "operationId": "spec-1-cross-platform-contract-audit",
+  "role": "post",
+  "hash": "c201af634ef0d5c875c320a90e780f3ed80df24c722fe3c8c8a7e369c617632d",
+  "identity": {
+    "dev": 2421791372,
+    "ino": 281474980315377,
+    "birthtimeMs": 1785498888362.878
+  }
+}

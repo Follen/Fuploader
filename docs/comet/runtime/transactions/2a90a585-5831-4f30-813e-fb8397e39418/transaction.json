@@ -1,0 +1,46 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "2a90a585-5831-4f30-813e-fb8397e39418",
+  "kind": "archive",
+  "status": "committed",
+  "change": "align-newbee-web-publishing-workflows",
+  "createdAt": "2026-07-31T18:45:14.760Z",
+  "preflightHash": "448037b284cfa5bd284e465117fdcac5ab32494874ff78868ae39324954e989b",
+  "operations": [
+    {
+      "id": "spec-1-fupload-cli",
+      "type": "write",
+      "target": "specs/fupload-cli/spec.md",
+      "staged": "runtime/transactions/2a90a585-5831-4f30-813e-fb8397e39418/staged/specs/fupload-cli/spec.md",
+      "backup": "runtime/transactions/2a90a585-5831-4f30-813e-fb8397e39418/backups/specs/fupload-cli/spec.md",
+      "expectedTargetHash": "4dcaf198b9ed888eff14baeba1c853a837b01556ad513116c0ab4b08c73fe354",
+      "stagedHash": "85c85086e6fc71919ff885b559b0f99e5b9afbb7eae3f8505e0d4c1365b264c2"
+    },
+    {
+      "id": "spec-2-fupload-skill",
+      "type": "write",
+      "target": "specs/fupload-skill/spec.md",
+      "staged": "runtime/transactions/2a90a585-5831-4f30-813e-fb8397e39418/staged/specs/fupload-skill/spec.md",
+      "backup": "runtime/transactions/2a90a585-5831-4f30-813e-fb8397e39418/backups/specs/fupload-skill/spec.md",
+      "expectedTargetHash": "21096040a51dec5a505605e25802666f98ac893a8c49488429ee8a004d98345e",
+      "stagedHash": "6872c16486f11c476c274142de016de2cb3ffee0d4110e8807ed3a93157bcacc"
+    },
+    {
+      "id": "spec-3-newbee-publishing",
+      "type": "write",
+      "target": "specs/newbee-publishing/spec.md",
+      "staged": "runtime/transactions/2a90a585-5831-4f30-813e-fb8397e39418/staged/specs/newbee-publishing/spec.md",
+      "backup": "runtime/transactions/2a90a585-5831-4f30-813e-fb8397e39418/backups/specs/newbee-publishing/spec.md",
+      "expectedTargetHash": "3aa89898d317507a0c5860529cd8f9bb01a6a84d6aa67b5af94c0166fc6cbe46",
+      "stagedHash": "f6c4f05b3e1290a8535c05dbe20f44a1773b623f2ce85092fbc05fa84ccfc0ca"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/align-newbee-web-publishing-workflows",
+      "target": "archive/2026-07-31-align-newbee-web-publishing-workflows",
+      "expectedSourceHash": "ec9728e503808433e08576da291124d27b94627440bc24fe190c7fdf4f5ced63",
+      "expectedTargetHash": null
+    }
+  ]
+}

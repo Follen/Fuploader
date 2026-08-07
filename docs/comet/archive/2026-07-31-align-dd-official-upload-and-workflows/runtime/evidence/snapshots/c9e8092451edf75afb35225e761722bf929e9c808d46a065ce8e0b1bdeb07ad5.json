@@ -1,0 +1,846 @@
+{
+  "schema": "comet.native.content-snapshot-projection.v1",
+  "origin": "explicit",
+  "capture": {
+    "provider": "git"
+  },
+  "complete": true,
+  "limits": {
+    "maxFiles": 10000,
+    "maxFileBytes": 268435456,
+    "maxTotalBytes": 268435456,
+    "maxManifestBytes": 1048576,
+    "maxDurationMs": 60000
+  },
+  "policy": {
+    "schema": "comet.native.snapshot-policy.v1",
+    "include": [
+      "**/*"
+    ],
+    "exclude": [
+      "newbee/app/**",
+      "newbee/source/**"
+    ],
+    "hash": "b9f39b331a5422e3b89551642379411ce6533ae1c4cc7973ae873ae9c1e82b25"
+  },
+  "entries": [
+    {
+      "path": ".codex/hooks.json",
+      "hash": "a68d8ae9c874122c1ec8e404737647f0e78f5425099459b2d64ddc4b9c7a16bc",
+      "size": 341,
+      "type": "file"
+    },
+    {
+      "path": ".codex/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".gitignore",
+      "hash": "baae7fb2f514b349b7142cb2c76c3ce5c9b9fbce2b433688943b668cd2507f20",
+      "size": 502,
+      "type": "file"
+    },
+    {
+      "path": "AGENTS.md",
+      "hash": "5d39a2d9525253b95066731f5be5be3a5bb67622252c8da29f09f021bc1c3b71",
+      "size": 1446,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "hash": "3792617c49c59982224279d76ea11d5b1536ba3d355dcc5e303a7423e43832a9",
+      "size": 7866,
+      "type": "file"
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "hash": "1ed0b850b1ac67af25eccf6f61ffe885486cf93fd13fb2f618ca5f6e88eff55a",
+      "size": 15732,
+      "type": "file"
+    },
+    {
+      "path": "fupload/agents/openai.yaml",
+      "hash": "9b6f98abf97028aaf45f17fa3ced0a61698db11b4dd8afb7588ccaec808d0ef5",
+      "size": 366,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-config-delete.json",
+      "hash": "6710aa8fac85c5ba6ed4d017d6ffcaaf331c10e84c07ef73faecd646f9eb3d7a",
+      "size": 93,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-config-update.json",
+      "hash": "42522607a5e3553413010c9f238019fd52530b429dfa178797bc0f12e60b1be8",
+      "size": 744,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-plugin-delete.json",
+      "hash": "6cedf5f811852a7d0e9f02896571936f363dae14a2f596795b19d6ffc04d6376",
+      "size": 93,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-plugin-update.json",
+      "hash": "a4263e060f5f36ded6d82416af6c6be79fc5a0cb07c223c4d904d75ec80936e1",
+      "size": 215,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-wa-delete.json",
+      "hash": "3fb981d22516ed0274c5063b6f41073778dbdd575d58f8802c60eed5c3745d72",
+      "size": 85,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-wa-edit.json",
+      "hash": "4959b0e869047879140f0efc4df85c0ccb91c02660027e904b93bb8a0fde72a1",
+      "size": 205,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-config-delete.json",
+      "hash": "c13e52acfd822c7d24fc5c091ad5997e05471a436e422082ac869eaf89e3bddb",
+      "size": 86,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-config-update.json",
+      "hash": "ff34b56ba1d9bda8eda6ea487662bece875a578b8ed70e87bbc14ac49fea607d",
+      "size": 230,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-plugin-create.json",
+      "hash": "53b05baa69babc693159a50ad23b1cbb4f34f760cea2362a1f585199143444d9",
+      "size": 383,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-plugin-delete.json",
+      "hash": "84bd50820899adf1d52980e6768f6c21f8852c613ef477128f418215dd4b3f62",
+      "size": 86,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-wa-delete.json",
+      "hash": "8122fdf80de6b1bb560cf06a42974d95b60af36e38bd060b4c402ed9fdf67567",
+      "size": 82,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-wa-update.json",
+      "hash": "e6786622859d6726f1a4def98eac86c2fda4519f915b21e74a91ee705a707bd6",
+      "size": 176,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "hash": "495965b4b50e8838a4e56a266d3101eabdfcbb02d73fe306bb330ced64ac9d93",
+      "size": 10976,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/newbee-official-cli.md",
+      "hash": "f0ddeca7415f2351ca03cdb9a9f4cb7fd9f08d87a28b13003abe800e57c7f7dd",
+      "size": 24919,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/newbee.md",
+      "hash": "6f8093c0eea65227e8a1c725a4669e2d27edfa059b451b0ae220db3683f284b3",
+      "size": 7526,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/workflow.md",
+      "hash": "9013d1b1715b8ef3b614dda20b79a4d5d81c9308de53d539f2761d94c8511877",
+      "size": 6166,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload.py",
+      "hash": "fc8fd0d6e4c1de6e2cfb624acf0f683dde543cec1f63e77a7e482ca7d3d62389",
+      "size": 353,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/__init__.py",
+      "hash": "c5d55cca0c030e5f785c8e371e889525cdb45fbdcb3f36536b20d0b807051381",
+      "size": 52,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "hash": "2d23dda4e9e35555be3a30b11365c663b99ee57b49ac752470c55d669ea1dc72",
+      "size": 22101,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "hash": "bec9d0e59b4f5d400a3678258dcbd9fab02bcc1fa75889d322671c046753ac6b",
+      "size": 92998,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_broker.py",
+      "hash": "65a86c3c3a75a22a8db4180903d9e61e6cf3abd0736c25f84bc1d5a50cacd12b",
+      "size": 25734,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_sidecar.py",
+      "hash": "f94cc457c22d6a4d8115d2ae2b026316f3567648add79e8ceae16c2c2e7c041a",
+      "size": 13823,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/errors.py",
+      "hash": "70dc2cb98f59b7a36487408a5e7aeecbc8608a28effdef31e4c1d346b9d07df5",
+      "size": 3443,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/io.py",
+      "hash": "c45aafc096d5dab4d80ea724b1ad67cd29ea3cba1c1be0f27f7f663cc81cdad2",
+      "size": 3894,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/newbee.py",
+      "hash": "46ee6385d13694e2662eef9c0a0e20c46bfc171e381f72f14195eb464c832368",
+      "size": 68661,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/newbee_auth.py",
+      "hash": "6ebbff764f246a6ab52a0923c6e1d2a7444430227e4e27bd03875ffad6993d38",
+      "size": 5419,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "hash": "8c5519365d1f19be12e1c472d7fb61e87429ccec2ef896431a558b710960c758",
+      "size": 30566,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/transport.py",
+      "hash": "bbe1bf95f7072a16ec8352a699cea3bb3699fe047dfb4743a21484f4be922ee7",
+      "size": 5028,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/trust.py",
+      "hash": "dc57a1abdd76105cbecc90e9edcf81834f99917fa00ab5bc54e67788a03b021b",
+      "size": 9404,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/__init__.py",
+      "hash": "6634feb298a2be4510d94c101d7886d22be05b05d9ed77f18cec07eab19d8448",
+      "size": 22,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_builders.py",
+      "hash": "b68522d28e9923e595b4795b476beb815ac732190fed72dcd494592f206a303d",
+      "size": 39840,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "hash": "749bb0cba6de0dc99b8cad50f64a30dc6cc55548a4bf2996cce7a05d0debb97e",
+      "size": 12251,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "hash": "cb9121f48d16bed420b4425f35b6accee06e1e5b19871c10f4b6bd6b4b99692c",
+      "size": 16118,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_schema.py",
+      "hash": "7ebe49eb978516416bc9c5016ec330273a6ef7c04389089dfe484d5be61f9087",
+      "size": 11283,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_trust.py",
+      "hash": "55b3483eab0c2faf410dd675931d314e08a86fb38036aab8a440a3b6a63479df",
+      "size": 6035,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/01-newbee-plugin-create.json",
+      "hash": "dca25b1358cc62e7069ff6c1813e0b1cf1acbf39d904e0656ea2415195e2b5e6",
+      "size": 575,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/02-newbee-plugin-update.json",
+      "hash": "793cf30117f221de8c0d050d352c5d81b9dcd19cfac9706f0d7890111e97b4e0",
+      "size": 339,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/03-newbee-plugin-edit.json",
+      "hash": "f57a31cd5dbc41e81810fca3433148f80deb4ea9287c8d6a16b6c3de4a2195a7",
+      "size": 605,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/04-newbee-plugin-delete.json",
+      "hash": "a29c9b88cf5fb4a4bcfabeec34f8c194908551c3c768092e2ba7fbfd8310bb3b",
+      "size": 88,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/05-newbee-config-create.json",
+      "hash": "c93cfbe118a7669a8c432f3c2af8423628a7541f2dcb328991f91eee4d082eb4",
+      "size": 601,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/06-newbee-config-update.json",
+      "hash": "91c575ca7523398654c7ed8ed69329a87c8df8c790927dc992a0b68b81d97339",
+      "size": 215,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/07-newbee-config-edit.json",
+      "hash": "8c3c432537602d1356ece6a7cebb3f93c7b8ac10a0e7ae1ecf066ecf6139552b",
+      "size": 519,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/08-newbee-config-delete.json",
+      "hash": "ec8eee0abb0eb829ca4837c0f0c5abe9d7050128fd2f271a1fd7e75a49a706f4",
+      "size": 88,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/09-newbee-wa-create.json",
+      "hash": "82a9010acfce5311d8e6e1e3154d28bdb80b27eede6ab67f9f406b1b970d5dd1",
+      "size": 644,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/10-newbee-wa-update.json",
+      "hash": "17018173eb45b1bfc912c0921d2acc12949e3198c06cda3a6e2146414225a0dc",
+      "size": 248,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/11-newbee-wa-edit.json",
+      "hash": "3c22e5085f9605a2b651828d478c512740835a3af81ed632643d377ae6ead483",
+      "size": 576,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/12-newbee-wa-delete.json",
+      "hash": "92222c4da663f57b6332751d2a2c1bc328b031e5ef4045b31e2fde666cc77623",
+      "size": 83,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/13-dd-plugin-create.json",
+      "hash": "bfa69385a8dea01d337df1f2266cd325c4fd4d50dfa1237ff59624f6b471412a",
+      "size": 965,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/14-dd-plugin-update.json",
+      "hash": "7f10173ab381256204012207e1c3236d9643cc998e70e8be9060febadf031739",
+      "size": 348,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/15-dd-plugin-edit.json",
+      "hash": "e72c8e55e17049dc644d0da1ff04ebc8aa0357adb12478e3044530cbb0b28378",
+      "size": 925,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/16-dd-plugin-delete.json",
+      "hash": "2c085cd7cf8cf7f917745d862036c1017290b14efa6a24255eef22ceac58187c",
+      "size": 113,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/17-dd-config-create.json",
+      "hash": "f6d6ba1b39f9b90779fd5b5934b65202291473f3596bfcd718f3944ecddfd410",
+      "size": 838,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/18-dd-config-update.json",
+      "hash": "4da5d7ee9dec90f77fcf2c3ba6f84fd027150ca098587085561a6f11b6891845",
+      "size": 633,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/19-dd-config-edit.json",
+      "hash": "1e4a89a09640b43298a062268986d8d99e866d6eadbdf514870491582d72da92",
+      "size": 745,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/20-dd-config-delete.json",
+      "hash": "06931476391c07171ed82f1eb9e1c0a35d68121af2567cbf4b8fb8ea9d1cfe26",
+      "size": 113,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/21-dd-wa-create.json",
+      "hash": "0cf8710fb6ac19a467a47191077b49816e3d5dbfd528ede83c5059d1acc1a12c",
+      "size": 720,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/22-dd-wa-update.json",
+      "hash": "cf59f56da80f7af29885ed0d2e059c43acda82cc71e9025ea55728e12e164937",
+      "size": 277,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/23-dd-wa-edit.json",
+      "hash": "00630548706b286cff472970f6fea631235fdfe85e1f0d403cf1e8568bbde164",
+      "size": 800,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/24-dd-wa-delete.json",
+      "hash": "04307d434a0eb7d0f412c5d772dd243f2de08a1c7fc59900148f3e277e689b45",
+      "size": 109,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/assets/FuploadContractTest.zip",
+      "hash": "e22b51dca38ab95e48c5d26e27e1ac1fa81e2d1eff290343bd90f6b48678916e",
+      "size": 539,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/assets/FuploadContractTest/FuploadContractTest.lua",
+      "hash": "cfb532e91491c4825a03ca1e24d2669c7e2a6e71bbf42e3ff026b4164f818c46",
+      "size": 84,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/assets/FuploadContractTest/FuploadContractTest.toc",
+      "hash": "b010725c893352d8e97afeb22642ade5fa0b5d45b0e78b9af201d554c7a6bac3",
+      "size": 153,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/01-create.json",
+      "hash": "8eb37d2fbce1c8aa91411a370a1fad0d6760c8ad46fa69280577eccefde244be",
+      "size": 846,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/02-update.json",
+      "hash": "58b8ea371c32538427f3eda12cc1aef0cf006273d24df124e58a4c533aadf966",
+      "size": 621,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/03-edit.json",
+      "hash": "9b1652f13899b25ce4a345621777783c5e72441be9d4cd96edc3fd8db16e5963",
+      "size": 721,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/04-delete.json",
+      "hash": "9839fa0c9c22874c0971cdcb3349d5dd1bf3f8cfdc8ad27df92a3b1f9fd09c50",
+      "size": 113,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/01-create.json",
+      "hash": "302b82746b03bfadabca009652f359c5c8f5441aa10d1242a9acf58651d1df64",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/02-create.json",
+      "hash": "c6f90b296ac4cac11754a325f2036415370ced6f331f9036bbf0b6e3e7a894ff",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/03-create.json",
+      "hash": "46174ce74df8462c2889103d2247f86998e03207c17fac525483cdc2d5985fd1",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/04-create.json",
+      "hash": "7f6823dcfb61af6d41a06b39f4c13892715007d0928e5f8d81ee42d6b1cb526f",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/05-create.json",
+      "hash": "5215cf4288c6a06eb495409ffda2f7fd4c5775ca3c94995eec45365bee1a1e84",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/06-create.json",
+      "hash": "2dcadfb877af0327bceeb314c6bf0067a286038b6f8f0504b31c5954cb47d3a3",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/01-plugin-create.json",
+      "hash": "03db331105b4a69d67d20904ad9deab89a1377bf6795d97e71cc46ee8e40bfc0",
+      "size": 1047,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/02-plugin-create.json",
+      "hash": "7cc51110dc74c4ebb3e7a36dca69b76d3e4ff919ef95fcfeab84547c56a0b038",
+      "size": 1043,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/03-plugin-create.json",
+      "hash": "ede0d37e027d258879ee870ce29e96bc6a2d42d66a98d268b152b89d778a9f77",
+      "size": 1042,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/04-plugin-create.json",
+      "hash": "4fd11d147d184b5e42ee9973e9defcfd5a455a8b1900303163311b70023a2ad8",
+      "size": 1042,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/05-plugin-create.json",
+      "hash": "26f933e270b268531126334cb449d7106770b142a42306be211d58f594413a3d",
+      "size": 1043,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/06-plugin-create.json",
+      "hash": "ad1bba1c91ff35dc7ab629d632fa26dbbf71d7aa195322e056ea5c52853ea6d7",
+      "size": 1047,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/07-config-create.json",
+      "hash": "f6cacf37928b9c446044887f3cf8d62abebe3caf3096fd049e5c014dd53e4fd1",
+      "size": 1317,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/08-config-create.json",
+      "hash": "a75f73398a60e85a284356e1c142e07c5759a39a1119fb70c88ff8d48fa685f4",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/09-config-create.json",
+      "hash": "c2c40b686be42d46378f5a146cd4c450f490b5e747eaffc82e928e945b999aa0",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/10-config-create.json",
+      "hash": "bb77fb5e40515a20db49247d1c5962441258906450ee48297db69194dd8fac8d",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/11-config-create.json",
+      "hash": "8b5121b96eee1e4fe457fe3e25733c4f715f6165b500b9d108b16ffb8c8429f8",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/12-wa-create.json",
+      "hash": "ef55f7b64d010d86e6899f9aac0d8349ab8a164abb9705460b048ebe9369d9be",
+      "size": 774,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/13-wa-create.json",
+      "hash": "aa0d830ed1e13560bdd9b798f8469f191aa8ed5ab00b57a0eb35c6cd886d7881",
+      "size": 771,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/14-wa-create.json",
+      "hash": "4598989fc0bae428d80578ad478c2ead8970dfb3bbca5ca68ed26c7ea6a6b9e1",
+      "size": 770,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/15-wa-create.json",
+      "hash": "c339051073a5c3bd993ddbfef2d8176953b9687de7360421384ef183f3e4d3da",
+      "size": 770,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/16-wa-create.json",
+      "hash": "bc28cebce690d8819cb1beb388b736a4b24715fe44788d584191ff032e1d7659",
+      "size": 771,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/17-plugin-edit.json",
+      "hash": "4f9fe8e3b93749f1492bbb1135eb4f2bed26b5176b7176a26e2f44a74656b702",
+      "size": 159,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/18-plugin-update.json",
+      "hash": "5ca42a24cf41d10cef57c098ae7a4c07785742106d4c9ecb41473c84a8f1fd0c",
+      "size": 347,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/19-plugin-edit-commercial.json",
+      "hash": "e6138d79eed6eac8c2edc8e27b74c548f1900bb2809a461eb3224e2c1508eaab",
+      "size": 130,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/20-plugin-delete.json",
+      "hash": "bfb87e5831cd51ae2a1a24f3713f12eb48d7685d6e1e9795cb9b4db18a5fe8a6",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/21-plugin-delete.json",
+      "hash": "0be955c349986409168a484a35a48e73ad89fbea1f3b1c95ea265e46eff300f2",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/22-plugin-delete.json",
+      "hash": "5b1fe9714d8eed23e52a56d51f866379152d5769812a1e265b8d72a043920b9b",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/23-plugin-delete.json",
+      "hash": "33fb7f7916a9571b14c506314d69359e1dbfd736e571c51409d6b4d36441c29e",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/24-plugin-delete.json",
+      "hash": "9112946e923871173155d731e208f21565dab98f81f1a558b895910c69c81a22",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/25-plugin-delete.json",
+      "hash": "7f9c676a079b33263d88ad8b2cfd13fd4c5afffa6080731f9f2d3c1490e2a9fe",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/01-plugin-create.json",
+      "hash": "69cff4510caf747de8d863121c94a9ee50cd6fe1ab52939aaf846c7139f65a5a",
+      "size": 1012,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/02-plugin-update.json",
+      "hash": "7ab65ace1c13471874b4fffc548608ad3d19d99652a9cceab73158856291025c",
+      "size": 345,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/04-plugin-delete.json",
+      "hash": "96d3fa8192a96e59918d285345daeec9f5f66e03642862e6f28cad9a97fca120",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/01-plugin-create.json",
+      "hash": "df7c553ef704645641898b707db232a3e7cbb9566f70473d1bebf22070e82301",
+      "size": 995,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/02-plugin-update.json",
+      "hash": "b5436dde65e8c8da93800c375f3cc1e4556245f69ed2cb5efce2a777e7d30a8d",
+      "size": 342,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/03-plugin-delete.json",
+      "hash": "c7c7f3bf4e8eb48c8e63301be0088adba82bced941e970542490b39ea41f171a",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010600-dd-plugin-update-projection/01-plugin-create.json",
+      "hash": "400ecd040c467a94f23b646b339d806b5a75ca95290fd9595997ccc5d59c5c8b",
+      "size": 978,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010600-dd-plugin-update-projection/03-plugin-delete.json",
+      "hash": "e579a3c8e539fafbddd6797d57c0a3f8dc5dc9d0e88649c791630c16c26cfc85",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-011000-dd-plugin-edit-commercial/01-plugin-create.json",
+      "hash": "44dd39115d0276edbf3508b1d4da0969e364236f442b7bcecdb142fc686366c5",
+      "size": 976,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/01-plugin-create.json",
+      "hash": "831244f5fc45a26743714b33097403476b625baeea7c89ab72612b69c8c49137",
+      "size": 994,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/02-plugin-update.json",
+      "hash": "ecd43c93e6e812fe5085e04ee9c4452cc6eab97b3d1b9d136abebde98c19b774",
+      "size": 347,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/03-plugin-delete.json",
+      "hash": "1eddb11af587c18cf65cb9b14b7e9beb8dedda7a48ed81bb6083b0ad84b60441",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/verification.json",
+      "hash": "941c89c7a1492c5075d350156accc1a2652688b81770e26e5ad789b3218b10a3",
+      "size": 1276,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/01-plugin-create.json",
+      "hash": "c021d67b0a2b04874d2bc8cd7a6e9355b4ae4b77dc10b3d38ad62e34d910c551",
+      "size": 970,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/02-plugin-update.json",
+      "hash": "3ed5ef90482c21201ee6425875fa503d92876a25177d007d992ecf30a3905478",
+      "size": 343,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/03-plugin-delete.json",
+      "hash": "53d9ac993538c61a60430e19b6ead421c96392ef729ed186b880447569a3b527",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/verification.json",
+      "hash": "b15df0de12ab651c61bb200028e3174032821423ec0429283c79aa563e5bc980",
+      "size": 1972,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/01-plugin-create.json",
+      "hash": "d4c9cab23fe96aafb6e2a9f2f05c020fae31702b20c3c9bcff2293cb42efdccb",
+      "size": 986,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/02-plugin-update.json",
+      "hash": "9612a296425d376b77bae06fc7f26448436f68c96628f4b204b2f8fe1508cddd",
+      "size": 347,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/03-plugin-delete.json",
+      "hash": "e9f8b442f46c6c96072a70a9787a7dcbade71ba2ee9517863308db70acd40893",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/verification.json",
+      "hash": "7261d0990e6c514f068a1ff41a8f406d42ee3b6fc17c4727779ede67ed511a7d",
+      "size": 877,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/01-config-create.json",
+      "hash": "650d96d385219a2f036d0d63316c61e8c825d08933ace66dfc17a83a1a44c949",
+      "size": 906,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/02-config-update.json",
+      "hash": "428272c1a1943587f3d20247865c1d59fc688ac13dffc500d1ba4c0db588b53a",
+      "size": 662,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/03-config-edit.json",
+      "hash": "ff63c202297cf021e5842d02c1e45718612ef639dde1ccbd6703180742f91bab",
+      "size": 305,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/04-config-delete.json",
+      "hash": "2a28527f049c9cb50efca8a34da3d115f9204c832f7649308dd2d2e63d604cf3",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/05-wa-create.json",
+      "hash": "a500722757aba980286603dae746d8a0edcaf72810f62ded93b97a104a9c571b",
+      "size": 777,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/06-wa-update.json",
+      "hash": "29f60bf73152c9e90aebdd9e2629578f358fbe298180777e4024ec8e1e85a206",
+      "size": 240,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/07-wa-edit.json",
+      "hash": "d84a36ff4c96f2c720d567edcffc2d065fe2a81576fee9f9ac90b3f04cfdc3ec",
+      "size": 187,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/08-wa-delete.json",
+      "hash": "6ef4248feb52e28ed789530b60bb50ae1782e631a25c8061c0f2b8dad6df8799",
+      "size": 117,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/verification.json",
+      "hash": "fafb3af911da2e7033c74caac9cea5c88fe6bc85a9113b62ce1891440ea6f5bd",
+      "size": 1221,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-create-retry-verification.json",
+      "hash": "8204ab7c9013df27c1807be21b2809bb9ff2feb2f5459bf8abad3c51d1f975f6",
+      "size": 624,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-fixed-verification.json",
+      "hash": "64b2424530ab8998517b4c7944a6e0249b84a9aa58a8cfedddc452edbc6c5517",
+      "size": 888,
+      "type": "file"
+    }
+  ],
+  "omitted": [],
+  "omittedCount": 0
+}

@@ -1,0 +1,55 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "408c7e2d-a284-4f51-ae54-541e57b69b9c",
+  "kind": "archive",
+  "status": "committed",
+  "change": "harden-auth-trust-boundaries",
+  "createdAt": "2026-07-31T07:28:59.189Z",
+  "preflightHash": "e1d24c549fec13f5efec7d58fd02690eb95212f1c013f3fc453108b5a2526277",
+  "operations": [
+    {
+      "id": "spec-1-dd-publishing",
+      "type": "write",
+      "target": "specs/dd-publishing/spec.md",
+      "staged": "runtime/transactions/408c7e2d-a284-4f51-ae54-541e57b69b9c/staged/specs/dd-publishing/spec.md",
+      "backup": "runtime/transactions/408c7e2d-a284-4f51-ae54-541e57b69b9c/backups/specs/dd-publishing/spec.md",
+      "expectedTargetHash": "3e2ad0747ae0f25a3784414ac2032577aeee93d11df8fc94d9f7cfda439cf53d",
+      "stagedHash": "84844fe07e675aa9e960fb0107a81537908e2c1d32c9c1414648f6ae27b259d6"
+    },
+    {
+      "id": "spec-2-fupload-cli",
+      "type": "write",
+      "target": "specs/fupload-cli/spec.md",
+      "staged": "runtime/transactions/408c7e2d-a284-4f51-ae54-541e57b69b9c/staged/specs/fupload-cli/spec.md",
+      "backup": "runtime/transactions/408c7e2d-a284-4f51-ae54-541e57b69b9c/backups/specs/fupload-cli/spec.md",
+      "expectedTargetHash": "1e514733bf3df14180e51d86a35c43b6042543cdf892b9856a2154d477170b69",
+      "stagedHash": "dc6c4191f443860668cfc21ec890657d021d3e7b0821086868bd84f076c58501"
+    },
+    {
+      "id": "spec-3-fupload-skill",
+      "type": "write",
+      "target": "specs/fupload-skill/spec.md",
+      "staged": "runtime/transactions/408c7e2d-a284-4f51-ae54-541e57b69b9c/staged/specs/fupload-skill/spec.md",
+      "backup": "runtime/transactions/408c7e2d-a284-4f51-ae54-541e57b69b9c/backups/specs/fupload-skill/spec.md",
+      "expectedTargetHash": "0d03b17a965b633c28b3fe9c36dccf7a834290464e9577d8b6f24bef05006ea2",
+      "stagedHash": "ffce294891eeb1041f25b280f10c6678c11fe2b2e31d0b308d22b582149bc720"
+    },
+    {
+      "id": "spec-4-newbee-publishing",
+      "type": "write",
+      "target": "specs/newbee-publishing/spec.md",
+      "staged": "runtime/transactions/408c7e2d-a284-4f51-ae54-541e57b69b9c/staged/specs/newbee-publishing/spec.md",
+      "backup": "runtime/transactions/408c7e2d-a284-4f51-ae54-541e57b69b9c/backups/specs/newbee-publishing/spec.md",
+      "expectedTargetHash": "70883599969117023d61a448f8dc33e0218553a63cf9e9e6cab642c3ab0919cb",
+      "stagedHash": "33e10a3ed065d8f7988e1314cac572c26e26549f815795be8755c58f9ea01ed9"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/harden-auth-trust-boundaries",
+      "target": "archive/2026-07-31-harden-auth-trust-boundaries",
+      "expectedSourceHash": "6ca321880cc7eaea31bba13cb8f38d7062e8dd7a2cd83fe31e685a93cf776001",
+      "expectedTargetHash": null
+    }
+  ]
+}

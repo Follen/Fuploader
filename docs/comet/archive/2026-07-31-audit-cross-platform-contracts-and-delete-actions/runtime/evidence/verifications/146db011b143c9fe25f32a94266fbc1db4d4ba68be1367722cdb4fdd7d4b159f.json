@@ -1,0 +1,87 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "audit-cross-platform-contracts-and-delete-actions",
+  "sourceRevision": 5,
+  "result": "pass",
+  "freshness": "complete",
+  "contractHash": "91e2a59077b98b04ba9562cfb351387785d539b8914c5a762e930a8948c3bf70",
+  "acceptanceCriteriaHash": "954f1f5db7ab6d3937a58f39a8c5df481628f4bb9c2cd20ae6f7819236ea305e",
+  "implementationScopeRef": "runtime/evidence/scopes/c1c09523e7569c55e12693d875fc06626f28345220f9359cc82e559e92666e95.json",
+  "implementationScopeHash": "c1c09523e7569c55e12693d875fc06626f28345220f9359cc82e559e92666e95",
+  "reportRef": "verification.md",
+  "reportHash": "3ef285c1260e53cb9aa0461dba071329bf1ead2cfba68eaf381893e8872ef709",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "954f1f5db7ab6d3937a58f39a8c5df481628f4bb9c2cd20ae6f7819236ea305e",
+    "total": 4,
+    "evidenced": 4,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-02af1c9f2fb2b4b2462c59ca16d1cf9633c75325ee2adf07c786ed301e870d89",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/newbee.py",
+          "fupload/scripts/fupload_cli/schema.py",
+          "fupload/scripts/tests/test_builders.py",
+          "fupload/scripts/tests/test_schema.py",
+          "publish/20260731-191228-cross-platform-contract-test/02-newbee-plugin-update.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-c488a5c173ded4e745630188aca2b7e6261f34eba4a393cdf48e8afe84182fbe",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/tests/test_builders.py",
+          "fupload/scripts/tests/test_cli.py",
+          "fupload/scripts/tests/test_schema.py",
+          "fupload/scripts/tests/test_trust.py",
+          "publish/20260731-191228-cross-platform-contract-test"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-cc2a9a0ae8ba44a1764fbbc18fad3822fd39743096489610850da2c47905f9aa",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/references/dd.md",
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/fupload_cli/schema.py",
+          "fupload/scripts/tests/test_builders.py",
+          "publish/20260731-191228-cross-platform-contract-test/13-dd-plugin-create.json",
+          "publish/20260731-191228-cross-platform-contract-test/17-dd-config-create.json",
+          "publish/20260731-191228-cross-platform-contract-test/21-dd-wa-create.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-d1ab89af4cb730f64028270c098b05c4893d9f66340d3877dcd6978286f93694",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/SKILL.md",
+          "fupload/examples/dd-plugin-delete.json",
+          "fupload/examples/newbee-plugin-delete.json",
+          "fupload/scripts/fupload_cli/cli.py",
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/fupload_cli/newbee.py",
+          "fupload/scripts/fupload_cli/schema.py",
+          "fupload/scripts/tests/test_cli.py",
+          "fupload/scripts/tests/test_schema.py"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "52b8565d129469bd4394461f2e42a41843bf0ce9334d2f55995ea34c6ef2da1f"
+  },
+  "partialAllowanceRef": null,
+  "partialAllowanceHash": null,
+  "receiptRef": "runtime/evidence/check-receipts/d63e1dd689545fb27d308501c2c5fcb2bc63a498703eab79c3690f1620cfcb85.json",
+  "createdAt": "2026-07-31T11:54:32.942Z",
+  "envelopeHash": "146db011b143c9fe25f32a94266fbc1db4d4ba68be1367722cdb4fdd7d4b159f"
+}

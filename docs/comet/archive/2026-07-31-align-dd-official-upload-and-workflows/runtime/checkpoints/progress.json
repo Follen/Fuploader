@@ -1,0 +1,15 @@
+{
+  "schema": "comet.native.progress-checkpoint.v1",
+  "id": "7776a2da-ff87-4fe7-87c4-152707bafef9",
+  "change": "align-dd-official-upload-and-workflows",
+  "phase": "build",
+  "previousRevision": 7,
+  "stateRevision": 8,
+  "summary": "完成 DD 官方 WA 表单默认值与字符串分类修复；补齐原生错误脱敏契约、真实矩阵审计报告和完整回归。",
+  "nextAction": "封存 Build 实现范围，进入 Verify 并记录 108 项测试、编译、差异检查与只读 doctor 证据。",
+  "inputHash": "f69a16e7e0a64d3da7c399cc31c148bf05816f0f3c991161f8e75f9fb94babab",
+  "manifestHash": "61e604f3c97c34dd075a5e317ab300c10aadc5a31d1596d88902b37c0dad0d10",
+  "manifestRef": "runtime/checkpoints/manifests/61e604f3c97c34dd075a5e317ab300c10aadc5a31d1596d88902b37c0dad0d10.json",
+  "artifactCount": 1,
+  "createdAt": "2026-07-31T17:45:30.945Z"
+}

@@ -1,0 +1,183 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "dd-field-by-field-wire-regression",
+  "sourceRevision": 4,
+  "result": "pass",
+  "freshness": "complete",
+  "contractHash": "e6fc4a27856913080615b45a104bd32e0f1a4817c29eb9b853f2c4e61cb8145c",
+  "acceptanceCriteriaHash": "d99239ae276f10f22004768e7ebd5d8c2cea43e561563fd34b2f02dc1e2d17bc",
+  "implementationScopeRef": "runtime/evidence/scopes/f74ab03077792e01de461c523f4cff2989e46bafca57f10b60848d806ed5e310.json",
+  "implementationScopeHash": "f74ab03077792e01de461c523f4cff2989e46bafca57f10b60848d806ed5e310",
+  "reportRef": "verification.md",
+  "reportHash": "9334df9d339fa00085db5a2a894603dc19743b755c9b6c6a946b19f7b89fadf1",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "d99239ae276f10f22004768e7ebd5d8c2cea43e561563fd34b2f02dc1e2d17bc",
+    "total": 15,
+    "evidenced": 15,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-183629b6fc7ae465e26cd5d559a60ab40f21b9eca7eb514138c8d5df8d54b7d8",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/schema.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-1b64f08a6f890ea4a943843e1eb5e7de236c7191f9bbbbd15ca2a9262c47cd12",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-1b8bdef8c73b83b1a99799549954c21e7d1bd8441765175d240698ac8b77ed0c",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/schema.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-1e1d4bfc95f5a82b1b47a949a15b525635a3added74b67ed3df4198239a9d40f",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/fupload_cli/schema.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-612ab103ca1629bf45a64e07d7e2fba8765fb57e6049ff293133d1db4ff2915a",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-6713a43b896becea2b106cbf0734e75f2ff9ae3dab249aec6ee419cdaf14174e",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-78c317d8d9a57ba0804291765bccaed600dbbce83de9d7ca932e44ad4b862c00",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-84c3b31607167bed5753ccbf2f7dde7d76da057cad9abc5e78bc80ab98d632e1",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_session.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-a978e83f4d72c2d725396a4964ef82cc7b652b0ba3bbd59192666bfd45dee538",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-d9b5713c68f879d1f92b57588910fc5acad0c49b1d99ae7c7902a04e8930ac02",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/fupload_cli/schema.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-ed6b9abb8a0ec4d9b53f159ed5203ad187a843a4a5e33493ac2bff977b02e3e0",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "README.md",
+          "fupload/scripts/tests/generate_dd_wire_matrix_report.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-f0972f844d8ed7b4958d93ef815e8c5515b194151889003c3adb26231b72eb34",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-f342e95983e0298f9c393c490cf94d71fd6dfdbd54b306b54aab4e60a81d48d6",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-f8ae38a7ef39e8a74f54a4566904e46f851e43d05b2fcffce173c8cb7837936c",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_dd_wire_matrix.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-fdb673edc9b8a2435bb7e20f0b16a933b25801e16e4d935c76478c29db771726",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_builders.py"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "c01ed042593c9ecb3b74d4084e4c73080cc0b2dd243e482fc50445788f12562d"
+  },
+  "partialAllowanceRef": null,
+  "partialAllowanceHash": null,
+  "receiptRef": "runtime/evidence/check-receipts/235d865119097910bbd958ca6a58ea6f6a511cb7b886cf04bae8e3f6f5d9b254.json",
+  "createdAt": "2026-08-01T06:21:19.227Z",
+  "envelopeHash": "1e93bb6cfa1a45e783e5f54d4c4e49787dd4aca1837daf16c04094fba48b7bb3"
+}

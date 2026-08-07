@@ -1,0 +1,35 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "c8a5c46a-0592-42eb-bebe-177a7a4ed7ac",
+  "kind": "archive",
+  "status": "committed",
+  "change": "audit-cross-platform-contracts-and-delete-actions",
+  "createdAt": "2026-07-31T11:54:47.318Z",
+  "preflightHash": "c8275e0ae7451490efc471ba31c35a1fb1f64dbd1b7a82a5af91bb71b2897fbe",
+  "operations": [
+    {
+      "id": "spec-1-cross-platform-contract-audit",
+      "type": "write",
+      "target": "specs/cross-platform-contract-audit/spec.md",
+      "staged": "runtime/transactions/c8a5c46a-0592-42eb-bebe-177a7a4ed7ac/staged/specs/cross-platform-contract-audit/spec.md",
+      "expectedTargetHash": null,
+      "stagedHash": "c201af634ef0d5c875c320a90e780f3ed80df24c722fe3c8c8a7e369c617632d"
+    },
+    {
+      "id": "spec-2-delete-actions",
+      "type": "write",
+      "target": "specs/delete-actions/spec.md",
+      "staged": "runtime/transactions/c8a5c46a-0592-42eb-bebe-177a7a4ed7ac/staged/specs/delete-actions/spec.md",
+      "expectedTargetHash": null,
+      "stagedHash": "57588b3a71a885beb7beff2f0500bd12cfee722bbe7e32ca1a5b4e23af5c4395"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/audit-cross-platform-contracts-and-delete-actions",
+      "target": "archive/2026-07-31-audit-cross-platform-contracts-and-delete-actions",
+      "expectedSourceHash": "c1af6c9702327ad45f463e8a0be6fd5c20a288ab94a8095b3f7ba815591ffe0a",
+      "expectedTargetHash": null
+    }
+  ]
+}

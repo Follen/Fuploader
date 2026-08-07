@@ -1,0 +1,10 @@
+{"sequence":1,"timestamp":"2026-07-30T14:12:47.787Z","type":"prepared"}
+{"sequence":2,"timestamp":"2026-07-30T14:12:51.892Z","type":"operation-started","operationId":"spec-1-fupload-cli"}
+{"sequence":3,"timestamp":"2026-07-30T14:12:52.061Z","type":"operation-completed","operationId":"spec-1-fupload-cli"}
+{"sequence":4,"timestamp":"2026-07-30T14:12:52.086Z","type":"operation-started","operationId":"spec-2-fupload-skill"}
+{"sequence":5,"timestamp":"2026-07-30T14:12:52.256Z","type":"operation-completed","operationId":"spec-2-fupload-skill"}
+{"sequence":6,"timestamp":"2026-07-30T14:12:52.281Z","type":"operation-started","operationId":"archive-change"}
+{"sequence":7,"timestamp":"2026-07-30T14:12:53.097Z","type":"operation-completed","operationId":"archive-change"}
+{"sequence":8,"timestamp":"2026-07-30T14:12:53.523Z","type":"archive-finalization-started"}
+{"sequence":9,"timestamp":"2026-07-30T14:12:53.599Z","type":"archive-finalized"}
+{"sequence":10,"timestamp":"2026-07-30T14:12:53.690Z","type":"commit"}

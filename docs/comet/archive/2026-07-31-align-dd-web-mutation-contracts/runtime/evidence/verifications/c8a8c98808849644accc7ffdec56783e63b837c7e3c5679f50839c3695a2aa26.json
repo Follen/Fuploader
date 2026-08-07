@@ -1,0 +1,110 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "align-dd-web-mutation-contracts",
+  "sourceRevision": 3,
+  "result": "pass",
+  "freshness": "complete",
+  "contractHash": "675060a0ce42c5c2778411058cecadb7db0bbd87c12543032fdd83157136cac2",
+  "acceptanceCriteriaHash": "83750add7bd9311275dde755b97827f6c7dd6f115aa9910342febfe522c3efba",
+  "implementationScopeRef": "runtime/evidence/scopes/6e78289174384303ac69ba8feb660bae031777189aa6654431d565c89bcd49eb.json",
+  "implementationScopeHash": "6e78289174384303ac69ba8feb660bae031777189aa6654431d565c89bcd49eb",
+  "reportRef": "verification.md",
+  "reportHash": "6e7286b10325856caec996697df3056dbb1069040219a320ddaf240d3f6139b5",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "83750add7bd9311275dde755b97827f6c7dd6f115aa9910342febfe522c3efba",
+    "total": 8,
+    "evidenced": 8,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-228d83f231eb3dfa4b331221aafe6af9757d1e678ee126531245699ac3a03d3f",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/tests/test_builders.py",
+          "fupload/scripts/tests/test_schema.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-2683a243642a87fc5d2452d22b2137107af6f377f139c8993d72b4cea0cf7b9c",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/tests/test_dd_session.py",
+          "publish/20260801-064532-dd-web-mutation-alignment/01-plugin-create.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-2937ce2f7abab11fec7ea36f4a280e9d0996694ea0644840f488de455284236c",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/tests/test_builders.py",
+          "publish/20260801-064532-dd-web-mutation-alignment/05-config-update-output.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-3d2521fa78ed0d4312543bf5cb38de4553b8d4606307a18461a670f99f5ac87b",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/tests/test_builders.py",
+          "publish/20260801-064532-dd-web-mutation-alignment/02-plugin-update-output.json",
+          "publish/20260801-064532-dd-web-mutation-alignment/03-plugin-edit-output.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-6c9ae907b5ea90b558e4ad43b216ff298f4df3001606edf3b86dfd40b9fabb00",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-7fa64efce3cf754c3f34931c4d59d0eb1a4a07aa55161f50268ef1140e9f490f",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "publish/20260801-064532-dd-web-mutation-alignment/read-matrix.json",
+          "publish/20260801-064532-dd-web-mutation-alignment/verification.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-99d5cfda52dc8c853751f904b20d23c58793bd829abb686bda5495ff932f84c2",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/tests/test_builders.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-b1b2040565821aa71b3b1e1613b138254373f740431cd363d40243df2335af55",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/tests/test_builders.py",
+          "publish/20260801-064532-dd-web-mutation-alignment/07-wa-create-output.json",
+          "publish/20260801-064532-dd-web-mutation-alignment/08-wa-update-output.json",
+          "publish/20260801-064532-dd-web-mutation-alignment/09-wa-edit-output.json"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "e9b2d7370e4c353ad7bad8311c8fd100fe092154f660e23249c23b231c580da7"
+  },
+  "partialAllowanceRef": null,
+  "partialAllowanceHash": null,
+  "receiptRef": "runtime/evidence/check-receipts/e8c32f48bc699910fd61d24e80f29251076a2d8f3f22758a8151edbcbc0e2628.json",
+  "createdAt": "2026-07-31T23:06:39.062Z",
+  "envelopeHash": "c8a8c98808849644accc7ffdec56783e63b837c7e3c5679f50839c3695a2aa26"
+}

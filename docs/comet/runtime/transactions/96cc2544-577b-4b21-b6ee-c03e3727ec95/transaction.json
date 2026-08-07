@@ -1,0 +1,28 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "96cc2544-577b-4b21-b6ee-c03e3727ec95",
+  "kind": "archive",
+  "status": "committed",
+  "change": "align-dd-web-mutation-contracts",
+  "createdAt": "2026-07-31T23:06:57.534Z",
+  "preflightHash": "c2289aae5ed870df19340ccc2e2eea9695f258c06f86208c4f4acf85d9f36dd5",
+  "operations": [
+    {
+      "id": "spec-1-dd-publishing",
+      "type": "write",
+      "target": "specs/dd-publishing/spec.md",
+      "staged": "runtime/transactions/96cc2544-577b-4b21-b6ee-c03e3727ec95/staged/specs/dd-publishing/spec.md",
+      "backup": "runtime/transactions/96cc2544-577b-4b21-b6ee-c03e3727ec95/backups/specs/dd-publishing/spec.md",
+      "expectedTargetHash": "6331202e20cb22a862281161d3f282f5c7062ed5a0f9a4291c00b0c8a30e2007",
+      "stagedHash": "0c976b24e1ac688c74d9cb5f8b9963a289a855916d58d90e68ae965087f67bc5"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/align-dd-web-mutation-contracts",
+      "target": "archive/2026-07-31-align-dd-web-mutation-contracts",
+      "expectedSourceHash": "f15765bfd51770b9b38b937980948228b4ec6cbc6d83053ab52ce7c4aed0bff0",
+      "expectedTargetHash": null
+    }
+  ]
+}

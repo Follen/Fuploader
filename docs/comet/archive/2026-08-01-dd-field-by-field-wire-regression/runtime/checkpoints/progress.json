@@ -1,0 +1,15 @@
+{
+  "schema": "comet.native.progress-checkpoint.v1",
+  "id": "99aead3d-7994-422d-8091-b0f15e706bf9",
+  "change": "dd-field-by-field-wire-regression",
+  "phase": "build",
+  "previousRevision": 2,
+  "stateRevision": 3,
+  "summary": "已完成DD逐字段wire回归矩阵、生产修复、172项测试与单会话真实CRUD验证；敏感publish证据已移出工作树。",
+  "nextAction": "重新封印完整实现作用域并进入Verify，逐项记录Runtime派生的acceptance证据。",
+  "inputHash": "06f6540c1c294d027b174c913c7a2ea35d3162c6bb3ae8355c8bffe383fb9d7f",
+  "manifestHash": "dfc2a48b63cceac6df6471e2a39e19d2f987f6011e0a3eceed7b842763c58a99",
+  "manifestRef": "runtime/checkpoints/manifests/dfc2a48b63cceac6df6471e2a39e19d2f987f6011e0a3eceed7b842763c58a99.json",
+  "artifactCount": 6,
+  "createdAt": "2026-08-01T06:10:36.758Z"
+}

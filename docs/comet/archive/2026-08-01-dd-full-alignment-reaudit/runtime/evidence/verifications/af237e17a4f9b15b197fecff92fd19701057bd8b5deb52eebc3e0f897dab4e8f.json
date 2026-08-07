@@ -1,0 +1,84 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "dd-full-alignment-reaudit",
+  "sourceRevision": 3,
+  "result": "pass",
+  "freshness": "complete",
+  "contractHash": "d816413bfdcfc01395ddd4fb81fb8fe407f7321bc0d265bc661633f1dcb6728c",
+  "acceptanceCriteriaHash": "3e33aa68e79eb3b859d1fad250cc2abfeda72fcdee401494aeeca1b134c6af97",
+  "implementationScopeRef": "runtime/evidence/scopes/5007788e2383a4832a8b3d78809501ccf7a79232dd033500fd5a8beb11aea2fa.json",
+  "implementationScopeHash": "5007788e2383a4832a8b3d78809501ccf7a79232dd033500fd5a8beb11aea2fa",
+  "reportRef": "verification.md",
+  "reportHash": "4807ac950a1a53f1242569c506169267988920cf99ce6066441a6e900530f80d",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "3e33aa68e79eb3b859d1fad250cc2abfeda72fcdee401494aeeca1b134c6af97",
+    "total": 5,
+    "evidenced": 5,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-5e41a8a7028814f1a6c2a7adf79b610b07edca0b00d7874ea8f34b31e593e269",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/references/dd.md",
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_builders.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-6b0c60f07825974938fcc938ee59fb69f2cd0187628cc361bc8bf4eb3bbbeb09",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "publish/20260801-073918-dd-full-alignment-reaudit/read-matrix.json",
+          "publish/20260801-073918-dd-full-alignment-reaudit/session-stop-output.json",
+          "publish/20260801-073918-dd-full-alignment-reaudit/verification.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-7bf7a8606c4f5024586c89da54b901449bd37d5f45b3b79621245c9dc231c25a",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/references/dd.md",
+          "fupload/scripts/tests/test_builders.py",
+          "fupload/scripts/tests/test_schema.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-817675f51edc8bb3434331f1407e752bc6bce07b651f6b322be905d16062bb78",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/tests/test_builders.py",
+          "publish/20260801-073918-dd-full-alignment-reaudit/verification.json"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-8c1b9a6318aa653d34cbcd5bef2abf488ca9f22601790b1d0e41b84016810cee",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/references/dd.md",
+          "fupload/scripts/fupload_cli/dd_sidecar.py",
+          "fupload/scripts/tests/test_dd_session.py"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "7ef736bd2c1cfe7845bc0fc065d2bb930c8c85ff6887e7c4c080d731678dfdf1"
+  },
+  "partialAllowanceRef": null,
+  "partialAllowanceHash": null,
+  "receiptRef": null,
+  "createdAt": "2026-08-01T00:49:18.976Z",
+  "envelopeHash": "af237e17a4f9b15b197fecff92fd19701057bd8b5deb52eebc3e0f897dab4e8f"
+}

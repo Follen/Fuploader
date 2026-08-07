@@ -1,0 +1,12 @@
+{
+  "schema": "comet.native.checkpoint-manifest.v1",
+  "change": "build-fupload-newbee-cli-skill",
+  "artifacts": [
+    {
+      "path": "README.md",
+      "hash": "d28de62e9874330ba7c04f6ed37ea74bfda91a9274dfb1f5b28813518219188f",
+      "size": 3466
+    }
+  ],
+  "totalBytes": 3466
+}

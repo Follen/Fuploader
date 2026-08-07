@@ -1,0 +1,111 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "harden-auth-trust-boundaries",
+  "sourceRevision": 3,
+  "result": "pass",
+  "freshness": "complete",
+  "contractHash": "6a7c313d5c886430fb9135546ed12c38c238c8afd253c446a5b6676a4face5d5",
+  "acceptanceCriteriaHash": "1f0b25e241d5414cf43cb7de0ccd495bdc7d24985fd7bbcc57f362ecf50f0279",
+  "implementationScopeRef": "runtime/evidence/scopes/66581562d748f4f7c7cc3d3f283601d40418af76cd5811947762adc90347a2f8.json",
+  "implementationScopeHash": "66581562d748f4f7c7cc3d3f283601d40418af76cd5811947762adc90347a2f8",
+  "reportRef": "verification.md",
+  "reportHash": "2534036046f519fdca15f74fa5f985dfb3fdf28be8341aa102cabe02ce8f4b7e",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "1f0b25e241d5414cf43cb7de0ccd495bdc7d24985fd7bbcc57f362ecf50f0279",
+    "total": 7,
+    "evidenced": 7,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-0e747c2581bbae493fab8b9d95d2edc158997dc7fa05d8cfb067e9539c935bdc",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/fupload_cli/trust.py",
+          "fupload/scripts/tests/test_builders.py",
+          "fupload/scripts/tests/test_trust.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-36cd01d6dfb53ff8f67a9b71311c6200a971e3426eae6832ea73dc0d2dee5d37",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/references/dd.md",
+          "fupload/references/newbee.md",
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/fupload_cli/newbee.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-44c1d4e03a67dbe0f9a9871ad62489d2711c26e40993e809e222c8724d9030fc",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/newbee_auth.py",
+          "fupload/scripts/fupload_cli/trust.py",
+          "fupload/scripts/tests/test_trust.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-55da2a03da7e2031b7667723a8f70cd1397115a13040b633e70dbdd30eeb0d27",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/transport.py",
+          "fupload/scripts/fupload_cli/trust.py",
+          "fupload/scripts/tests/test_trust.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-bc10f0ffed545a4bd5f756c236543e3892b8932a7cc540382a590a8bf4328c39",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/tests/test_builders.py",
+          "fupload/scripts/tests/test_cli.py",
+          "fupload/scripts/tests/test_schema.py",
+          "fupload/scripts/tests/test_trust.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-c23a16850fe085949e4d17c4c51c7fbd808584eba1c6e8e752b18e5556852119",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/dd.py",
+          "fupload/scripts/fupload_cli/newbee.py",
+          "fupload/scripts/fupload_cli/trust.py",
+          "fupload/scripts/tests/test_trust.py"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-d8e1e58d4502e7bde58471667ffc25975144defd417d53991c8cb11288769f80",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "fupload/scripts/fupload_cli/newbee.py",
+          "fupload/scripts/fupload_cli/newbee_auth.py",
+          "fupload/scripts/fupload_cli/trust.py",
+          "fupload/scripts/tests/test_trust.py"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "6a2232466414a3373b805180769fa3133fc733cc24efafe753185118c0b8cdd4"
+  },
+  "partialAllowanceRef": null,
+  "partialAllowanceHash": null,
+  "receiptRef": "runtime/evidence/check-receipts/e842a36bfd418e22dffe6214c1b842ad0610dd852b365ef41a939f80580ea4c9.json",
+  "createdAt": "2026-07-31T07:28:36.124Z",
+  "envelopeHash": "834a9e9c90161e2a2edc5893d58fdbe2acc13ef4a02e8456354d5112d4ce0fa1"
+}

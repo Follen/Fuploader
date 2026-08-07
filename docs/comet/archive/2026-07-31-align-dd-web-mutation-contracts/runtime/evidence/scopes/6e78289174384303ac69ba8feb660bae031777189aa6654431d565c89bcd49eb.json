@@ -1,0 +1,624 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "675060a0ce42c5c2778411058cecadb7db0bbd87c12543032fdd83157136cac2",
+  "baselineProjectionRef": "runtime/evidence/snapshots/ed48a9203ffd16fc3683ad8e408f6a2284e08728be546a8f89841dc95c1c3adc.json",
+  "baselineProjectionHash": "ed48a9203ffd16fc3683ad8e408f6a2284e08728be546a8f89841dc95c1c3adc",
+  "currentProjectionRef": "runtime/evidence/snapshots/63b0bbb4c9cc0d563dbd83fb44fcb95afafb1613d97d559bef30e24017c0d32b.json",
+  "currentProjectionHash": "63b0bbb4c9cc0d563dbd83fb44fcb95afafb1613d97d559bef30e24017c0d32b",
+  "complete": true,
+  "declaredArtifacts": [
+    {
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_sidecar.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_builders.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_schema.py",
+      "kind": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment",
+      "kind": "directory"
+    }
+  ],
+  "changes": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "019d02eb6e464f291a6df5b769ded0596370529ac05e78b9a799bf9e9501136d",
+        "size": 7988
+      },
+      "after": {
+        "hash": "5c518ad3b2116d3760b8bb02caa414b6fb334ab01a8c7e08ec75e06c8ac6dddf",
+        "size": 8275
+      },
+      "attributedTo": [
+        {
+          "path": "README.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "modified",
+      "before": {
+        "hash": "c8c17a888eb7a57d985784ef764dc76eb1533a1d2398b99ae1c7ef695a577f17",
+        "size": 16385
+      },
+      "after": {
+        "hash": "37dca77fa5f84d7cb2993c89b38d603616b9a5d9ff5412e45e368c9e7544fda7",
+        "size": 17164
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/SKILL.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "kind": "modified",
+      "before": {
+        "hash": "87db296aafcf3139b4f93da1689c427333c9a175d04a090da32d821edbb6fedf",
+        "size": 12418
+      },
+      "after": {
+        "hash": "37e8f8c2055d4897f3c54c29c1443c880a0e2aab753c97b033bd81bfea86b94a",
+        "size": 14431
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/references/dd.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "kind": "modified",
+      "before": {
+        "hash": "659583be03799e73c0b25f401bc43b2f94b467d7fef3debb8010564652efa119",
+        "size": 93431
+      },
+      "after": {
+        "hash": "8534416d637c443f5555381278bd314d98847d5a411d180551433b6ea46508c0",
+        "size": 105217
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/dd.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_sidecar.py",
+      "kind": "modified",
+      "before": {
+        "hash": "2d02369e760161f7e8f2ef0c1915e59f7e59373c258abd112349f8f0b27fafb8",
+        "size": 21666
+      },
+      "after": {
+        "hash": "a8ca025a25a47763ede4ff7a1a136464142181b89dfffcd4a934895c2b10875b",
+        "size": 26336
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/dd_sidecar.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "cf64c092c2df7edf79292b48256348c53edbee5ac97808c320c6bd56192b6281",
+        "size": 31502
+      },
+      "after": {
+        "hash": "b90e84ca760a0ea49e2373dc91d50df8711337f2a27dc9425f75a2146c3571e7",
+        "size": 31125
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/schema.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_builders.py",
+      "kind": "modified",
+      "before": {
+        "hash": "64d16e9e25103788fb9e541f00c86364462ad9e6f309802c8f8deb6395b29d04",
+        "size": 42578
+      },
+      "after": {
+        "hash": "6cb5eb62cd9b486df9fa8413af33d6a597af99b4fa15649020d4b415aa59e629",
+        "size": 51175
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/test_builders.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "kind": "modified",
+      "before": {
+        "hash": "6eea39c51e3a2b3409beee8c521f67927a02c6c45df92fa7ef2ffe17e4743f23",
+        "size": 23611
+      },
+      "after": {
+        "hash": "d96bdfee6d4a67fc8f8661049b0c5b12be8a4a81486aae82c9b7b67cfa95ece0",
+        "size": 26976
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/test_dd_session.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "1ab9f8e654a375e8cf389ba709d4d312cbb0fbc7236f3cfbc42513d485a4a014",
+        "size": 12793
+      },
+      "after": {
+        "hash": "307b2e6ea0d042a2686afab6e856ab92c84ce023a4c6dd183057d0bf20e6a952",
+        "size": 15799
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/test_schema.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/01-plugin-create-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a6d7de325367f6fae7ac307c48e69563a3d8a13837e9c7d1834317ec05f5b4b8",
+        "size": 1706
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "47927f89f6512d3ea795f33d4155dac9d7bd55a777c364cc584516743fc4062f",
+        "size": 1316
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/02-plugin-update-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d7c70f123cca5245f9b62700612cbde4a99edd90eea9193bfb17793cd140ece8",
+        "size": 1706
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/02-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7bb8af816669e940302696da347a6d058dbd08d332752819360b8f9e3f3ab0f8",
+        "size": 428
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/03-plugin-edit-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7532e8a6214e61aa0bec2a522e4bcaa260815c16d839d421cdc1173421c32211",
+        "size": 1704
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/03-plugin-edit.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f4f5772fdecdce7371351efec70dd160e394e817bb3e09894a604982b432bf0d",
+        "size": 147
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/04-config-create-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "579b341a29e858cdc5a951dd3167c0f0960af508a13b209c37488ee6bafaf7d4",
+        "size": 3099
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/04-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "61c49c619cc6b1df37008b67b12d850ab84d2fb6c6f55a269681d48c7eb266ff",
+        "size": 1364
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/05-config-update-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b01a73fb823a0c29e80f2812639471d274732dd451bf7fca45a3104ef3b5fb5f",
+        "size": 3098
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/05-config-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "07b2839db2fe0f8c9d47624b4fe8dc56b67399053187571edea32b3f1b3fe3b1",
+        "size": 1169
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/06-config-edit-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1fbbbcd6be4495e9588ab56cc01bf3857e137fde24f9f6ef679b86b0a0543a01",
+        "size": 3092
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/06-config-edit.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d8a86686adfbbf6ad6cef64c42ea125c865db0212dd7ffe0cfbcbccbfe9837cc",
+        "size": 350
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/07-wa-create-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f9adf6a4b61c2ef25feafe99ee8133ffb4b00229ea1d75fe5f11d5c8e6662dfb",
+        "size": 1504
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/07-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "80d956fc14bfc1b313687eb13e72c9793f147c6c2850cea66c12745fb66d7677",
+        "size": 1011
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/08-wa-update-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a748097e16934c9ba70b25f825155ba6099806025e10b89a129e156e914137d9",
+        "size": 1503
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/08-wa-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "8960dfed4084853cde0ffe4e8fc34eca145b9fec1818b0c9375770a88651dfe6",
+        "size": 263
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/09-wa-edit-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b5788aa511e59e60ec9335dfeb1d1c9cd3e6743b3182bad4447376364831c68b",
+        "size": 1497
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/09-wa-edit.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c42203b63de66364f4f8781984611d49c27a89f700e16336da22a802d44ea171",
+        "size": 197
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-config-delete-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "740b37631e0fa87d876ec3c3f42131f516df0e1f5816be047e6c029645a417ea",
+        "size": 3124
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-config-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f94ff8adc39051d5d8e81973d8460b68343021a38a5175e7c91f1d62e0c47c84",
+        "size": 133
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-plugin-delete-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "24193f9356897960e80fcfcf26ca0513d549df61c062a799f792a8abecf167fc",
+        "size": 1741
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2632852c747abd70ad3d6a2ad90272bdb31ae78d999464e8cdcc7c952ead1bb0",
+        "size": 133
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-wa-delete-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "5c936d1602ff283e81470d97f113b6287ec752dd8915a0622a7df6459f966e8c",
+        "size": 1534
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-wa-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "78e7bc2d956a9e876550765e7cb2d474e75acb606c76af000d2edce4b81eedfe",
+        "size": 129
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/read-matrix.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "51db8ef1d6311c93b21d0169ec065981f64f26c41e4f1a628b32fe763d3ef0f7",
+        "size": 4336
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/session-stop-output.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "72a01ad905ca0ef4c0f0d7897a108c89a029c216c8a457071ac3af155deefbd9",
+        "size": 230
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "726e26ad50e6c5074acc8d6a5944da796db31593834aa4f36294d075915e6b23",
+        "size": 4746
+      },
+      "attributedTo": [
+        {
+          "path": "publish/20260801-064532-dd-web-mutation-alignment",
+          "kind": "directory"
+        }
+      ]
+    }
+  ],
+  "unattributed": [],
+  "unresolvedScopes": [],
+  "noCodeReason": null,
+  "scopeHash": "6e78289174384303ac69ba8feb660bae031777189aa6654431d565c89bcd49eb"
+}

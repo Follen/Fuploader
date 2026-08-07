@@ -1,0 +1,147 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "build-fupload-newbee-cli-skill",
+  "sourceRevision": 14,
+  "result": "pass",
+  "freshness": "partial",
+  "contractHash": "09186be9a484e29f00992bda62813c474d22aa5966de59552bcc54939645ba1c",
+  "acceptanceCriteriaHash": "1c82868fd3531f15e66ae32233c744836f8f6ecb4c06ce72d4ffbc6dd2ea327b",
+  "implementationScopeRef": "runtime/evidence/scopes/a27cadea38faf6a61952055921f695e4d671a8bd9461e19df029f346fb64dc72.json",
+  "implementationScopeHash": "a27cadea38faf6a61952055921f695e4d671a8bd9461e19df029f346fb64dc72",
+  "reportRef": "verification.md",
+  "reportHash": "3abdba5148380d07391b86d140e9af3aeac2cdcc39a9acc1edd31c9f8b0299f9",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "1c82868fd3531f15e66ae32233c744836f8f6ecb4c06ce72d4ffbc6dd2ea327b",
+    "total": 12,
+    "evidenced": 12,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-192f996e4613da710fe53c10a55b64a9220fc020578c5c599e954349da74f71b",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "Release/fupload/SKILL.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-20b902a219b424aa1b0b25d85685de6fc5e0c90b105f1e8538df9ef191796e7c",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "Release/fupload/SKILL.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-21caee4f8aa62afe2228ba62536c3ca411dc9d35ac4863abca74a1702666141b",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "Release/fupload/SKILL.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-5b017ff91863e975cb1d801040ad1a25c366f66ba6ee2e5ec362444b180814f3",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/cli/root_test.go",
+          "internal/platform/platform_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-66ba65e3788175d8ea36c47b0fbe1992b37f5093fe4e44d17615fa9781573f46",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "Release/fupload/references/plugin.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-7c079bedca25d6865242245ab2aa4276737537b68fdecadf5669bf79f18165f8",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "Release/fupload/references/config.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-8ece9b060911081c25c7104cff3505cab123d83469b129a8e438b4d9d4fd5aa8",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "Release/fupload/SKILL.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-958caeeafc82b122ec5f6c23ee9e099753437f784aa0596ef434a6f243aa929e",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "Release/fupload/SKILL.md",
+          "internal/newbee/service_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-a674949bdc7b3dfc4b018cd090fd35c530b3f62662eb3792607611e9500bfaa2",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/cli/root.go",
+          "internal/cli/root_test.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-b973f5926ac13604f85f9ebfe89b90131560d5f54133dabc76ae6c7b63fbbee5",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "newbee.md"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-d3db079048ba7b14f057b03a7384dfd07abb2bea9c0a1e6254c48af50be6a4de",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "newbee.md"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-fa8e66d54b1411f96b1972a1504319a6569d5d5307763c8b509d9cb804f523a1",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/cli/root.go",
+          "internal/platform/platform.go"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "2a42ac937bb544abaffe42add42137dcfd3aef7c7982ac0e3bf1416a483032f3"
+  },
+  "partialAllowanceRef": "runtime/evidence/allowances/8b9466ae51ceaf9ba5bbadf5d4212abb406aee50a1d7b06d765f0b0e6728a732.json",
+  "partialAllowanceHash": "8b9466ae51ceaf9ba5bbadf5d4212abb406aee50a1d7b06d765f0b0e6728a732",
+  "receiptRef": null,
+  "createdAt": "2026-07-30T14:10:28.511Z",
+  "envelopeHash": "5c7464b2516fa702e633bbf3897594b7582117133513040f68d4896c3f6822bb"
+}

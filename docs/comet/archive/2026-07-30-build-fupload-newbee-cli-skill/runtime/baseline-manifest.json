@@ -1,0 +1,4231 @@
+{
+  "schema": "comet.native.content-snapshot.v1",
+  "origin": "change-created",
+  "capture": {
+    "provider": "physical-tree"
+  },
+  "createdAt": "2026-07-30T11:23:48.590Z",
+  "complete": true,
+  "limits": {
+    "maxFiles": 10000,
+    "maxFileBytes": 268435456,
+    "maxTotalBytes": 268435456,
+    "maxManifestBytes": 1048576,
+    "maxDurationMs": 60000
+  },
+  "policy": {
+    "schema": "comet.native.snapshot-policy.v1",
+    "include": [
+      "**/*"
+    ],
+    "exclude": [
+      "newbee/app/**",
+      "newbee/source/**"
+    ],
+    "hash": "b9f39b331a5422e3b89551642379411ce6533ae1c4cc7973ae873ae9c1e82b25"
+  },
+  "entries": [
+    {
+      "path": ".agents/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".agents/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/settings.local.json",
+      "hash": "02434bc793ba34abca3b61911c5e37696a32dfb732af675f997e02cbcb88b37f",
+      "size": 345,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".augment/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".augment/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".bob/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".claude/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".claude/settings.local.json",
+      "hash": "1fff4b189bf57d869701f6a28232a696c9c4cf24d90bb5d6aa7e9e8c5853e711",
+      "size": 342,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".cline/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".clinerules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/settings.json",
+      "hash": "03c2ab7498bb1a06da37b70c69b1a9a8d5cd25c96dfa36dfb9c8e64c52fd5567",
+      "size": 447,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".codex/hooks.json",
+      "hash": "a68d8ae9c874122c1ec8e404737647f0e78f5425099459b2d64ddc4b9c7a16bc",
+      "size": 341,
+      "type": "file"
+    },
+    {
+      "path": ".codex/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".continue/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".continue/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".cospec/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".crush/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/rules/comet-workflow-guard.mdc",
+      "hash": "c77805b3f3b0ca9af8b13b4c72ad28a230547a23fe4223e5b86ac7b4f680c464",
+      "size": 2264,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".cursor/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".factory/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".forge/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/settings.json",
+      "hash": "63bc043fcd0f784ea0bb7cd00a9f0c7f984fbaf492cd2171a521fccb648d5c4b",
+      "size": 444,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".github/hooks/comet-guard.json",
+      "hash": "b4f3747909f7dcc701e8bf538b4f41d16bc10f9f26abadbd529ebba5d9207390",
+      "size": 477,
+      "type": "file"
+    },
+    {
+      "path": ".github/instructions/comet-workflow-guard.instructions.md",
+      "hash": "626307824b0c601cfc1d68212562a48aa98fb132db6b4e948f33a9dd9f4a979d",
+      "size": 2219,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".iflow/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".junie/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".kilocode/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".kimi-code/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/hooks/comet-hook-router.kiro.hook",
+      "hash": "04507fa38bcfdfd8b35f4a5bafdc63def50ef7860893a3eb5fd8ad042270abcd",
+      "size": 471,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/steering/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".lingma/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/commands/comet-any.md",
+      "hash": "cab88116eeb1df60fd338415bdc8e7429845341170ef9fd763f5ac4f187a4138",
+      "size": 7944,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/commands/comet-native.md",
+      "hash": "4a7b91fb302d21de94abac9738f84635c798fb24ed0deef9c1f9296700ab0582",
+      "size": 23606,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/commands/comet.md",
+      "hash": "34c806f507e594df579ad908c44c7cec11d18fad727cd9e8bdcaef3d2e9a10dd",
+      "size": 1372,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".mimocode/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/commands/comet-any.md",
+      "hash": "cab88116eeb1df60fd338415bdc8e7429845341170ef9fd763f5ac4f187a4138",
+      "size": 7944,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/commands/comet-native.md",
+      "hash": "4a7b91fb302d21de94abac9738f84635c798fb24ed0deef9c1f9296700ab0582",
+      "size": 23606,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/commands/comet.md",
+      "hash": "34c806f507e594df579ad908c44c7cec11d18fad727cd9e8bdcaef3d2e9a10dd",
+      "size": 1372,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".opencode/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".pi/extensions/comet-commands.ts",
+      "hash": "7345dac71954190f666399284eb770f08029b05cb7c52325592d4a75374f32a1",
+      "size": 449,
+      "type": "file"
+    },
+    {
+      "path": ".pi/settings.json",
+      "hash": "2664355916cead9ce71efaa49377170bf65d664c7e59c3992d152d8714a5298e",
+      "size": 34,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".pi/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/settings.json",
+      "hash": "30f72692c08bd99979145bb4b32719c86d7fc5cc0254a2181d9daf2c3e27843c",
+      "size": 439,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/settings.json",
+      "hash": "34e3ab41e7fa5aa90c00abe13472837cab9b3a4ececff21c85affcd91c55c2fd",
+      "size": 437,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".roo/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".roo/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".trae-cn/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".trae/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".trae/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/hooks.json",
+      "hash": "cfe860990fe2f9beb7286f9846e1fee72e211067008b759b9330c6a88e864738",
+      "size": 258,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-any/reference/authored-zone-example.md",
+      "hash": "440f1e4ef3f9ba2404110ed0a220492b0c902e5f4ed8a0346be69eedaf2e6a08",
+      "size": 8362,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-any/reference/authoring-subagents.md",
+      "hash": "6fbbee8ceb9c3fd7844e9d9f9336f8cbc1e3d79b7f318120498d23eb35512b11",
+      "size": 6534,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-any/reference/bundle-authoring.md",
+      "hash": "5c3199221e608b20f70e4ebc06c44b1a82b848af3740c069aa1c8a29ee77e500",
+      "size": 6432,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-any/reference/eval-provider.md",
+      "hash": "5998c9588c18dc52413f73a7b2ed50d28081e682f2a28b4ba44018c448d61e5b",
+      "size": 3218,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-any/reference/subagents/pause-points-author.md",
+      "hash": "543a34062573b5e6f8c47e37650cb450cf81edde4c618ef346f4fc079a076f75",
+      "size": 4515,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-any/reference/subagents/reference-author.md",
+      "hash": "6ded3e85ef29003236a78d82bed92100f851e1928857bc7ae29c2258ff7cc733",
+      "size": 3273,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-any/reference/subagents/script-author.md",
+      "hash": "c54904e095445b02ba8ef0e6ca21253aa980193a7feaf7c715b1eea85550b4aa",
+      "size": 3785,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-any/reference/subagents/skill-core-author.md",
+      "hash": "84ef68efec0e7b708f09ce5988575a087b63089b38849ef394c70ed3db66f895",
+      "size": 7302,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-any/reference/subagents/skill-reviewer.md",
+      "hash": "9e3fd0743297f1bc8d196ffcdb1704c4bdfc6c08ff14b2a05b7340c6b1c7f013",
+      "size": 6777,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-any/reference/subagents/workflow-entry-author.md",
+      "hash": "cef96c63ec69966719c7a3059abf39a358bd610ba75153b98978ab08fdc4083f",
+      "size": 6427,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-any/SKILL.md",
+      "hash": "49d907f2813e5912159022d0c58d5db9c43843f70f655b527cd4026cea924245",
+      "size": 7986,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-native/reference/artifacts.md",
+      "hash": "3342cf0e73212a28408b193cb65fb0e3ea3604eea397ca2d38b3653f8244e079",
+      "size": 14312,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-native/reference/commands.md",
+      "hash": "f54caf112db3203e1b98511c915036e961c7cc5107e18e72a0599516d43244e6",
+      "size": 8938,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-native/reference/recovery.md",
+      "hash": "eeee898d3b8c6a32c1e9bb0ff4179015b28045f169c51c9d396ba7037720b641",
+      "size": 12069,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-native/scripts/comet-native-hook-guard.mjs",
+      "hash": "819de5cb6b2e32e79e6978988b50083a3faf2247683ff09d57d335883752c19d",
+      "size": 145,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-native/scripts/comet-native-runtime.mjs",
+      "hash": "ea4476965f04a81dc1c4d7868c90bae4ca91d98cebabf3d684d5ce0f3441649d",
+      "size": 1145894,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet-native/SKILL.md",
+      "hash": "7182d95ab2ee74916fc9d666339f5d40b7027002130546334a77327361bfa87a",
+      "size": 23620,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet/scripts/comet-entry-runtime.mjs",
+      "hash": "d9f03607329ec1d58b668d86d5e175b589b401e92d294d68101aaf1afbb7b6c9",
+      "size": 289020,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "ef8f37e3267c8753bf095c1c95718e425a69102884f6cebefe066acd0d9b3d1b",
+      "size": 386166,
+      "type": "file"
+    },
+    {
+      "path": ".zcode/skills/comet/SKILL.md",
+      "hash": "7a7262b67bc15afcd14d246243db9e6e7713988bbc8be6bee06f6f610b549329",
+      "size": 1343,
+      "type": "file"
+    },
+    {
+      "path": "AGENTS.md",
+      "hash": "5d39a2d9525253b95066731f5be5be3a5bb67622252c8da29f09f021bc1c3b71",
+      "size": 1446,
+      "type": "file"
+    },
+    {
+      "path": "CLAUDE.md",
+      "hash": "5d39a2d9525253b95066731f5be5be3a5bb67622252c8da29f09f021bc1c3b71",
+      "size": 1446,
+      "type": "file"
+    },
+    {
+      "path": "newbee.md",
+      "hash": "70959381db006d79ec392412f5a9484366e97548727146364eca4694f736ab8b",
+      "size": 26414,
+      "type": "file"
+    },
+    {
+      "path": "newbee/.gitignore",
+      "hash": "23f3cff922f0bb2fbd9f02fd50f0ba48a22af4dc3c90b34941e47d87ef3ef9cd",
+      "size": 44,
+      "type": "file"
+    },
+    {
+      "path": "newbee/analysis/2261.pretty.js",
+      "hash": "31bb72dd878223b9b60303922a44db0975b28bac9e0d7f53ca77e4e2207f4de5",
+      "size": 315918,
+      "type": "file"
+    },
+    {
+      "path": "newbee/analysis/5945.pretty.js",
+      "hash": "af8b74c5c6b6f69c0eb50c71a11a77391a24d0814f00b1aeda31119c3e49b1fb",
+      "size": 77635,
+      "type": "file"
+    },
+    {
+      "path": "newbee/analysis/app.pretty.js",
+      "hash": "11dcb79556a1733a24a5520bbb2e4976f5a84569a6f6e611c9810ac590fa7afb",
+      "size": 3634186,
+      "type": "file"
+    },
+    {
+      "path": "newbee/analysis/chunk-common.pretty.js",
+      "hash": "84843b5b1d2d9439cca7280b5015f59c8422067a5982c53848b3d4e5d2574bdb",
+      "size": 3615147,
+      "type": "file"
+    },
+    {
+      "path": "newbee/analysis/creator.pretty.js",
+      "hash": "417a407ecfabc6bea8f2b898c1ffb23ccb8cdfb22b37cd6345d8d0082e324cd2",
+      "size": 2820469,
+      "type": "file"
+    },
+    {
+      "path": "newbee/analysis/electron-main.pretty.js",
+      "hash": "bbd184b5201ba08f93f80a05e1da3e5e80e60d48af6dda03221672322728ee89",
+      "size": 773944,
+      "type": "file"
+    },
+    {
+      "path": "newbee/auth-state.mjs",
+      "hash": "ca0bd76a043d5fd60eb5dae2b88ef6cd72ee683a2bbab6b103468ee0c3abeea2",
+      "size": 5223,
+      "type": "file"
+    },
+    {
+      "path": "newbee/auth-state.test.mjs",
+      "hash": "1044e113b9605ce33dad478b1d6d41a333051dbe5ccf55cfc89ff90e325c4344",
+      "size": 2021,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator-auth.mjs",
+      "hash": "26f19b0bf2fbd466d73692a775ea8c99c810f2c6e30d38058f367ec6d2b0c5cd",
+      "size": 3864,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator-auth.test.mjs",
+      "hash": "c74e26d99b23f32d8e0d66b718982743e5c20777077cdacc23183f67caf6a555",
+      "size": 1605,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator-content.mjs",
+      "hash": "2e7eb02a1bdd5a48835432f36cc22e239caad83c4a364e3987be6a90ffb82127",
+      "size": 6782,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator-content.test.mjs",
+      "hash": "81a0cc4cda28ac1769a4e72258f016ea859a9e40faf5c32e3884956c460d1bed",
+      "size": 3081,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/ContentEdit-Cc5yf4Lj.js",
+      "hash": "c3ce6361dad4b6a13eea418bf7ef6b20c7c618562b092c1293ec8bd76d39e179",
+      "size": 1558,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/contentTypes-1bRKzcHe.js",
+      "hash": "da9d03cff8830662382ba02ede6b1438710289bad4d9e4cec4636f88fd4f18d3",
+      "size": 1268,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/draft-CK_IzdTr.js",
+      "hash": "bcdd501205de4cb3b77699c25cce7cc11bb33cd3750ea77de62ca877b107fd7f",
+      "size": 590,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/index-Bcac5D5W.js",
+      "hash": "4fd4010a7674ac5287472aa5cb3f68f84d9ccdc4eb5a1af5061e4bb712b52581",
+      "size": 273104,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/index-DjHYS3zl.js",
+      "hash": "89214e4a55652c1d1084e1fe541ccb59a859de46740f2e2d522e8d811820001e",
+      "size": 1543318,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/PackageUpload-ByCd3Jzn.js",
+      "hash": "8be9e79e7fbea7089599252e274b8a47e7c533cae7c179028e98158f3166ee56",
+      "size": 22250,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/PackageUpload-VItZ84rl.js",
+      "hash": "57a1a253d693a3029909c87ca3f7c96be399128dcf9f3148a2d04452517b0169",
+      "size": 12035,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/publication-Dr-W8XPv.js",
+      "hash": "ff487c49c03f48d1715050d391bb21b509789435a65e65283bbddc829c0dff05",
+      "size": 955,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/PublishContentUpload-Bk2aDvN7.js",
+      "hash": "708b7fbb608b8427d6e2c8fd8b070a85f790872ed5f62123eecc3f273ea5a736",
+      "size": 25188,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/PublishModForm-D2K_Upx5.js",
+      "hash": "ecd74b51bcc0118d15cd500ea69b6c02c488d27638e9ae3a5e865e579f0871b4",
+      "size": 39337,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/Step3ArticleForm-DV-TTd-7.js",
+      "hash": "3b9d95b3f3da91a3f840d8ad3b6690cbf1f7255e32ec05ab40122586a8317195",
+      "size": 25771,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/Step3PluginForm-DlHiNxtf.js",
+      "hash": "a01bd31044aee15e2b1dee12ee7e19ec34bc881850b96678983241b64ab71afa",
+      "size": 56678,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js",
+      "hash": "82071685b43f663a5c2a789bf2fbec320796ed26a69716757c16deb707937276",
+      "size": 90971,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/Step3StringForm-Bx7R9KLT.js",
+      "hash": "328775936a4bfe93c235066d3582adc43779e15f7bad5ab54f0148afa4ecb086",
+      "size": 84472,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/Step4PluginUpload-ut4XYEw2.js",
+      "hash": "a74fe70961e25828a1ab3863b2e17c00219f9545d0e7e10f23dbb69555d072dd",
+      "size": 32544,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/Step4StringUpload-B_v8Qzpz.js",
+      "hash": "99afe5fbb7c6c2896283b14ff645b223601fdd27292cf12f287125a98641a11c",
+      "size": 28154,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/Step4Upload-RGp1HGks.js",
+      "hash": "b1900cdf5990b9108d1969c62694ef327cfe268106db5aee9c79460557531258",
+      "size": 3948,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/useDraft-DuNG2WGx.js",
+      "hash": "37de959b9ca7835f0769d1b8a4ec1db9f7da59c2a83c00e1accf20c65b295310",
+      "size": 5213,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/VersionHistory-1SnQ6yy7.js",
+      "hash": "4f054478f9084ef4581606bfd5da87ed03d687a30a6a289dc7d5e47e20960be0",
+      "size": 7683,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/wa-D9vo7Lg1.js",
+      "hash": "2fd72bde628659b1c942dd69fd5e7da328baa83edef477f3c7bf64cf90dbdcb4",
+      "size": 1776,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/WeakaurasForm-MUhCy7es.js",
+      "hash": "99d4bfca6c13147712ae1dc051beb3cdf56cc5834b998d1056e70cc58995908f",
+      "size": 27274,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/assets/wow-B3Q5o_B3.js",
+      "hash": "6aa61df33f2e3d6ef64e0e5655842b1293fddfd9dbf370edcb1303ca143603eb",
+      "size": 5587,
+      "type": "file"
+    },
+    {
+      "path": "newbee/creator/index.html",
+      "hash": "48ae35891dab80b9af6eb4301e308cd55ae45aa6916d61b08fa6766ee964c025",
+      "size": 552,
+      "type": "file"
+    },
+    {
+      "path": "newbee/FINDINGS.md",
+      "hash": "7b8d341026dd290362adee514f9ec55cc9f129efe88c155922b4e4fd5339e659",
+      "size": 10286,
+      "type": "file"
+    },
+    {
+      "path": "newbee/probe-auth.mjs",
+      "hash": "d6d9f3c03860478cf802ed69f0cb9e78b26a4f4b2e78534364d3b501ab8cf3bb",
+      "size": 1025,
+      "type": "file"
+    },
+    {
+      "path": "newbee/probe-creator.mjs",
+      "hash": "be4bc502e0d5234d2d91d27248f1a2dfb677aa50522ca77110da15c9892d7365",
+      "size": 667,
+      "type": "file"
+    }
+  ],
+  "omitted": [],
+  "omittedCount": 0
+}

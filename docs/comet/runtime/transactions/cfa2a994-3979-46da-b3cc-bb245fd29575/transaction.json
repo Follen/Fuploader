@@ -1,0 +1,27 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "cfa2a994-3979-46da-b3cc-bb245fd29575",
+  "kind": "archive",
+  "status": "committed",
+  "change": "prefer-newbee-official-cli",
+  "createdAt": "2026-07-31T12:16:02.731Z",
+  "preflightHash": "a7b3c11fa1f4a16a858787900fc8d88d612cd5d0756ec1475c937e24b1d5f044",
+  "operations": [
+    {
+      "id": "spec-1-newbee-official-cli",
+      "type": "write",
+      "target": "specs/newbee-official-cli/spec.md",
+      "staged": "runtime/transactions/cfa2a994-3979-46da-b3cc-bb245fd29575/staged/specs/newbee-official-cli/spec.md",
+      "expectedTargetHash": null,
+      "stagedHash": "3e6568f048409c434311f02c4134cccaf1ebef835ef6ca204928b9ce4f9eadf2"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/prefer-newbee-official-cli",
+      "target": "archive/2026-07-31-prefer-newbee-official-cli",
+      "expectedSourceHash": "a378e73fc713932626582c937b36dcce5ce14691885dc9e04724ae8068ddcd7f",
+      "expectedTargetHash": null
+    }
+  ]
+}

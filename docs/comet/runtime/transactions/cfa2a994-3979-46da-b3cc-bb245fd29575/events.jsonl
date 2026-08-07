@@ -1,0 +1,8 @@
+{"sequence":1,"timestamp":"2026-07-31T12:16:03.239Z","type":"prepared"}
+{"sequence":2,"timestamp":"2026-07-31T12:16:03.621Z","type":"operation-started","operationId":"spec-1-newbee-official-cli"}
+{"sequence":3,"timestamp":"2026-07-31T12:16:03.715Z","type":"operation-completed","operationId":"spec-1-newbee-official-cli"}
+{"sequence":4,"timestamp":"2026-07-31T12:16:03.730Z","type":"operation-started","operationId":"archive-change"}
+{"sequence":5,"timestamp":"2026-07-31T12:16:03.939Z","type":"operation-completed","operationId":"archive-change"}
+{"sequence":6,"timestamp":"2026-07-31T12:16:04.070Z","type":"archive-finalization-started"}
+{"sequence":7,"timestamp":"2026-07-31T12:16:04.126Z","type":"archive-finalized"}
+{"sequence":8,"timestamp":"2026-07-31T12:16:04.161Z","type":"commit"}

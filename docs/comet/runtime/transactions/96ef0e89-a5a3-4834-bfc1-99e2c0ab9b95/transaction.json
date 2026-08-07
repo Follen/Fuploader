@@ -1,0 +1,28 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "96ef0e89-a5a3-4834-bfc1-99e2c0ab9b95",
+  "kind": "archive",
+  "status": "committed",
+  "change": "dd-field-by-field-wire-regression",
+  "createdAt": "2026-08-01T06:21:35.096Z",
+  "preflightHash": "5c1b9885e8706f596cda0ad18f742ea2e0b1a7a7ff4ae10ba81a7a2e31446d68",
+  "operations": [
+    {
+      "id": "spec-1-dd-publishing",
+      "type": "write",
+      "target": "specs/dd-publishing/spec.md",
+      "staged": "runtime/transactions/96ef0e89-a5a3-4834-bfc1-99e2c0ab9b95/staged/specs/dd-publishing/spec.md",
+      "backup": "runtime/transactions/96ef0e89-a5a3-4834-bfc1-99e2c0ab9b95/backups/specs/dd-publishing/spec.md",
+      "expectedTargetHash": "fa8139070ac08b2076ea80555325be0bc9441db3acdb3b6460ac0129c3260dc3",
+      "stagedHash": "2b1e96c7aafc2f4a70b1e6539c9b30c6955f144e93f781282644d7d365615e0a"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/dd-field-by-field-wire-regression",
+      "target": "archive/2026-08-01-dd-field-by-field-wire-regression",
+      "expectedSourceHash": "313627c9e00fc14c827e519bde3fc02e696ea0c444330a787fe012ae90c57717",
+      "expectedTargetHash": null
+    }
+  ]
+}

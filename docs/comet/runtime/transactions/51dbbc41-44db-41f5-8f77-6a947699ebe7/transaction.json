@@ -1,0 +1,27 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "51dbbc41-44db-41f5-8f77-6a947699ebe7",
+  "kind": "archive",
+  "status": "committed",
+  "change": "npm-package-install-publish",
+  "createdAt": "2026-08-02T07:54:48.770Z",
+  "preflightHash": "933090e5450471e5ab118fb824ae21e6acc3b532c6c6d4c079ad88cad48a13a1",
+  "operations": [
+    {
+      "id": "spec-1-npm-distribution",
+      "type": "write",
+      "target": "specs/npm-distribution/spec.md",
+      "staged": "runtime/transactions/51dbbc41-44db-41f5-8f77-6a947699ebe7/staged/specs/npm-distribution/spec.md",
+      "expectedTargetHash": null,
+      "stagedHash": "ab032e67f77fba3d297fd9cb04b461c0b3a8b2bb09607fd459708716761019fe"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/npm-package-install-publish",
+      "target": "archive/2026-08-02-npm-package-install-publish",
+      "expectedSourceHash": "f6ce1cadb7fcebb566c73dce4dbb5337dd5ee0559af7b905d0314f35ec63d260",
+      "expectedTargetHash": null
+    }
+  ]
+}

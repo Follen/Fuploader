@@ -1,0 +1,46 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "b122ad4a-8016-49cd-a35c-f7b6d6234de8",
+  "kind": "archive",
+  "status": "committed",
+  "change": "align-dd-official-upload-and-workflows",
+  "createdAt": "2026-07-31T17:51:04.423Z",
+  "preflightHash": "b86a742340c0a01dfed6ed0078419d2df7cca8f8965b44a49c6bcd9304b3bb20",
+  "operations": [
+    {
+      "id": "spec-1-dd-publishing",
+      "type": "write",
+      "target": "specs/dd-publishing/spec.md",
+      "staged": "runtime/transactions/b122ad4a-8016-49cd-a35c-f7b6d6234de8/staged/specs/dd-publishing/spec.md",
+      "backup": "runtime/transactions/b122ad4a-8016-49cd-a35c-f7b6d6234de8/backups/specs/dd-publishing/spec.md",
+      "expectedTargetHash": "84844fe07e675aa9e960fb0107a81537908e2c1d32c9c1414648f6ae27b259d6",
+      "stagedHash": "6331202e20cb22a862281161d3f282f5c7062ed5a0f9a4291c00b0c8a30e2007"
+    },
+    {
+      "id": "spec-2-fupload-cli",
+      "type": "write",
+      "target": "specs/fupload-cli/spec.md",
+      "staged": "runtime/transactions/b122ad4a-8016-49cd-a35c-f7b6d6234de8/staged/specs/fupload-cli/spec.md",
+      "backup": "runtime/transactions/b122ad4a-8016-49cd-a35c-f7b6d6234de8/backups/specs/fupload-cli/spec.md",
+      "expectedTargetHash": "dc6c4191f443860668cfc21ec890657d021d3e7b0821086868bd84f076c58501",
+      "stagedHash": "4dcaf198b9ed888eff14baeba1c853a837b01556ad513116c0ab4b08c73fe354"
+    },
+    {
+      "id": "spec-3-fupload-skill",
+      "type": "write",
+      "target": "specs/fupload-skill/spec.md",
+      "staged": "runtime/transactions/b122ad4a-8016-49cd-a35c-f7b6d6234de8/staged/specs/fupload-skill/spec.md",
+      "backup": "runtime/transactions/b122ad4a-8016-49cd-a35c-f7b6d6234de8/backups/specs/fupload-skill/spec.md",
+      "expectedTargetHash": "ffce294891eeb1041f25b280f10c6678c11fe2b2e31d0b308d22b582149bc720",
+      "stagedHash": "21096040a51dec5a505605e25802666f98ac893a8c49488429ee8a004d98345e"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/align-dd-official-upload-and-workflows",
+      "target": "archive/2026-07-31-align-dd-official-upload-and-workflows",
+      "expectedSourceHash": "02fea0d6352cd0543138ed7052a39ae272c13aa532967ffc06545fedcdb7d3cb",
+      "expectedTargetHash": null
+    }
+  ]
+}

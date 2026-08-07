@@ -1,0 +1,11 @@
+{
+  "schema": "comet.native.archive-cas.v1",
+  "operationId": "spec-2-delete-actions",
+  "role": "post",
+  "hash": "57588b3a71a885beb7beff2f0500bd12cfee722bbe7e32ca1a5b4e23af5c4395",
+  "identity": {
+    "dev": 2421791372,
+    "ino": 562949957026036,
+    "birthtimeMs": 1785498888526.2852
+  }
+}

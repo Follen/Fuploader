@@ -1,0 +1,216 @@
+{
+  "schema": "comet.native.content-snapshot-projection.v1",
+  "origin": "change-created",
+  "capture": {
+    "provider": "git"
+  },
+  "complete": true,
+  "limits": {
+    "maxFiles": 10000,
+    "maxFileBytes": 268435456,
+    "maxTotalBytes": 268435456,
+    "maxManifestBytes": 1048576,
+    "maxDurationMs": 60000
+  },
+  "policy": {
+    "schema": "comet.native.snapshot-policy.v1",
+    "include": [
+      "**/*"
+    ],
+    "exclude": [
+      "newbee/app/**",
+      "newbee/source/**"
+    ],
+    "hash": "b9f39b331a5422e3b89551642379411ce6533ae1c4cc7973ae873ae9c1e82b25"
+  },
+  "entries": [
+    {
+      "path": ".codex/hooks.json",
+      "hash": "a68d8ae9c874122c1ec8e404737647f0e78f5425099459b2d64ddc4b9c7a16bc",
+      "size": 341,
+      "type": "file"
+    },
+    {
+      "path": ".codex/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".gitignore",
+      "hash": "55113de39146d5ff51cf3f92f922eac40ad1ab9c6fd35596523b97d6b6677fab",
+      "size": 580,
+      "type": "file"
+    },
+    {
+      "path": "AGENTS.md",
+      "hash": "5d39a2d9525253b95066731f5be5be3a5bb67622252c8da29f09f021bc1c3b71",
+      "size": 1446,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "hash": "b2bb838c71d8f1c35820896d05ea9d6c0ce6bce5cf75653d864997c9d10f2a60",
+      "size": 5244,
+      "type": "file"
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "hash": "881ee6ff5b31fec21306cd8853e4a8160d35bc5257d8394329cf791b1da01496",
+      "size": 5800,
+      "type": "file"
+    },
+    {
+      "path": "fupload/agents/openai.yaml",
+      "hash": "27745679724ae30a10fad5400f9b44afa00493778f293e7b8d6abacfe2cd4b1a",
+      "size": 280,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-config-update.json",
+      "hash": "42522607a5e3553413010c9f238019fd52530b429dfa178797bc0f12e60b1be8",
+      "size": 744,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-plugin-update.json",
+      "hash": "a4263e060f5f36ded6d82416af6c6be79fc5a0cb07c223c4d904d75ec80936e1",
+      "size": 215,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-wa-edit.json",
+      "hash": "4959b0e869047879140f0efc4df85c0ccb91c02660027e904b93bb8a0fde72a1",
+      "size": 205,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-config-update.json",
+      "hash": "ff34b56ba1d9bda8eda6ea487662bece875a578b8ed70e87bbc14ac49fea607d",
+      "size": 230,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-plugin-create.json",
+      "hash": "53b05baa69babc693159a50ad23b1cbb4f34f760cea2362a1f585199143444d9",
+      "size": 383,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-wa-update.json",
+      "hash": "e6786622859d6726f1a4def98eac86c2fda4519f915b21e74a91ee705a707bd6",
+      "size": 176,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "hash": "4ada01a96eea70107c857282ccd63fbfd6b2dcdec6f018b00c1b2d26faa8772e",
+      "size": 7877,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/newbee.md",
+      "hash": "f6c790076fe7ef85ea4f1d917d6d889ea9250a7d4466df44e6dd7b8d20605800",
+      "size": 5857,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/workflow.md",
+      "hash": "0bb810d9eda806d573632410bf920412cde34892ec0afaa102e781a9a133ea6f",
+      "size": 2666,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload.py",
+      "hash": "fc8fd0d6e4c1de6e2cfb624acf0f683dde543cec1f63e77a7e482ca7d3d62389",
+      "size": 353,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/__init__.py",
+      "hash": "c5d55cca0c030e5f785c8e371e889525cdb45fbdcb3f36536b20d0b807051381",
+      "size": 52,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "hash": "bfbc2a6c9c5f3a1ddf5519ba785e6648032d6d3749ce7c13a135209e1856ee74",
+      "size": 19521,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "hash": "aed32971a231d92b6ea501539ec5a06c571c02e87df374faaf529cb92184b150",
+      "size": 67116,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_sidecar.py",
+      "hash": "c6f732651d45ffd06914e0dbbd58d7e99c4b94e0845530d489e7dc11be3d2838",
+      "size": 9894,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/errors.py",
+      "hash": "01135290d45f1d5d2a3410f64c7a335739bd2f6d4ca3f38a01d38e4dad31975c",
+      "size": 2619,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/io.py",
+      "hash": "c45aafc096d5dab4d80ea724b1ad67cd29ea3cba1c1be0f27f7f663cc81cdad2",
+      "size": 3894,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/newbee.py",
+      "hash": "18704a37287d143966d6734c9a865c96a52e4ddf93c1a983a784e89bb5a8e44e",
+      "size": 54139,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/newbee_auth.py",
+      "hash": "a21795e47b25f6bca9c16c8d5ad89c9e6d173648626d7ba55e7f342c571bb54d",
+      "size": 5418,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "hash": "31f6f2ca63ff5887e66a70e18e3dadef580829c3d016e5497cfe6c6dfe52f608",
+      "size": 27877,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/transport.py",
+      "hash": "03394010920817c8019e39c3d909f61387ab0a6d7146c35d5f9ac90b630ae6cd",
+      "size": 4509,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/__init__.py",
+      "hash": "6634feb298a2be4510d94c101d7886d22be05b05d9ed77f18cec07eab19d8448",
+      "size": 22,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_builders.py",
+      "hash": "01e0b53c5aa0184a86403fab54056ef6ce52d46fd51ce9ab3a4f3dc9f5d43873",
+      "size": 24130,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "hash": "e9a37161d878b3726b3a574d6dad51c18146b9ce7f2a7220c3a7613aad3b3523",
+      "size": 8852,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_schema.py",
+      "hash": "1be2e0444552aa8840e1ae6cfc828e49fa2b1be00ee37aec9eee5e08039c7935",
+      "size": 8095,
+      "type": "file"
+    }
+  ],
+  "omitted": [],
+  "omittedCount": 0
+}

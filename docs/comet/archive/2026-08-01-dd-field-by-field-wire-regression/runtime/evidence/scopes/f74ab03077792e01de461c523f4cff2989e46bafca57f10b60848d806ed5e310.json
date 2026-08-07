@@ -1,0 +1,165 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "e6fc4a27856913080615b45a104bd32e0f1a4817c29eb9b853f2c4e61cb8145c",
+  "baselineProjectionRef": "runtime/evidence/snapshots/90a78603f460a47f0f82b4dfe0b414d44fff9b24d5a3fed1c67c3fea841d40b1.json",
+  "baselineProjectionHash": "90a78603f460a47f0f82b4dfe0b414d44fff9b24d5a3fed1c67c3fea841d40b1",
+  "currentProjectionRef": "runtime/evidence/snapshots/505b9815c10b1701061298b9fcd39e65bf6c2c48648fe84bb9b504b26874219b.json",
+  "currentProjectionHash": "505b9815c10b1701061298b9fcd39e65bf6c2c48648fe84bb9b504b26874219b",
+  "complete": true,
+  "declaredArtifacts": [
+    {
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/generate_dd_wire_matrix_report.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_wire_matrix.py",
+      "kind": "file"
+    }
+  ],
+  "changes": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "231439ff3ce45a59d5d6b05883755a712af78d180c082431f12a4f51bae4a6a1",
+        "size": 8347
+      },
+      "after": {
+        "hash": "a7509a8b5260cbf291845f89f5ae9ab138579d96b061f5b5f2c833c187f89660",
+        "size": 8959
+      },
+      "attributedTo": [
+        {
+          "path": "README.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "kind": "modified",
+      "before": {
+        "hash": "b835416aadc8ffe22d4ad36633afb300755f1a2e8ede3c6e1f65b9f4c54a9f1f",
+        "size": 15626
+      },
+      "after": {
+        "hash": "a3e03f536002166516f789748d3607bc6e8813c8fed2d1fb3dfe2b1c8c53f9d8",
+        "size": 16292
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/references/dd.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "kind": "modified",
+      "before": {
+        "hash": "30723a96533b0f418f86c1b9c629160c948daabc9e721cb7df155544905127d5",
+        "size": 106954
+      },
+      "after": {
+        "hash": "a94a3565dd1a7056f1062ce4188315010cc3d6a24ac72410546a9ca1c24ccffe",
+        "size": 107750
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/dd.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "908ba9c211b127b80b69cfd2dfe1931d25a7f24c2c4bb19db7110a9da6c5235b",
+        "size": 31505
+      },
+      "after": {
+        "hash": "d7c5a2711a6a209fde44c1e7b006990d33d81a877049ae49dcc91f5c52b5f00a",
+        "size": 31898
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/schema.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/generate_dd_wire_matrix_report.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e185220367757232efe2b0d0b21092305972c27d747b76a5af3cf56e8cf3daf0",
+        "size": 7478
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/generate_dd_wire_matrix_report.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "kind": "modified",
+      "before": {
+        "hash": "60955be6e70375d44f225febf529489dd993da12e1a978a8c76b0d7bcf66a87b",
+        "size": 37815
+      },
+      "after": {
+        "hash": "b32ac2933770e203cc2ae1d29f49e24164148f482961a500cc0ac087249fbc9a",
+        "size": 38891
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/test_dd_session.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_wire_matrix.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b8fb8c7878e95b7355a6471da3a7a8c9368f9e791cbff44259decd7815930ad4",
+        "size": 43134
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/test_dd_wire_matrix.py",
+          "kind": "file"
+        }
+      ]
+    }
+  ],
+  "unattributed": [],
+  "unresolvedScopes": [],
+  "noCodeReason": null,
+  "scopeHash": "f74ab03077792e01de461c523f4cff2989e46bafca57f10b60848d806ed5e310"
+}

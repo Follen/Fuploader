@@ -1,0 +1,168 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "89500076bd974d12ddf7119ac7c8aeb2de6a30bcd7ad49e227572c1735fc0b27",
+  "baselineProjectionRef": "runtime/evidence/snapshots/99618c4f463fb56a6d96dbe02ae22f1e4d048627a44c3e4d5b4e7e9e6dd0c454.json",
+  "baselineProjectionHash": "99618c4f463fb56a6d96dbe02ae22f1e4d048627a44c3e4d5b4e7e9e6dd0c454",
+  "currentProjectionRef": "runtime/evidence/snapshots/c34cb2e85c6f4398c52ccba473527251c1da33f421db050725eaf5ca9aecef12.json",
+  "currentProjectionHash": "c34cb2e85c6f4398c52ccba473527251c1da33f421db050725eaf5ca9aecef12",
+  "complete": true,
+  "declaredArtifacts": [
+    {
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/agents/openai.yaml",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/references/newbee-official-cli.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/references/newbee.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/references/workflow.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "kind": "file"
+    }
+  ],
+  "changes": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "d9742c5afe5caf2ec4d22303eb1f5091f9625370dcd0d69e47dbd7da5afdda32",
+        "size": 5509
+      },
+      "after": {
+        "hash": "ae67c9e4b0f71cb8082a96f79702a76432364ee7e9977916bcf0384ed710b323",
+        "size": 7098
+      },
+      "attributedTo": [
+        {
+          "path": "README.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "modified",
+      "before": {
+        "hash": "c47b869637fbec70faabe9b68cdebc149899c2c286d31bc0cb6d02a1b62dacbe",
+        "size": 7631
+      },
+      "after": {
+        "hash": "3cd993f11053ae4dbcc097a20b2af4598f4c3379b6db16cb5b218a37e4778a77",
+        "size": 12712
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/SKILL.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/agents/openai.yaml",
+      "kind": "modified",
+      "before": {
+        "hash": "27745679724ae30a10fad5400f9b44afa00493778f293e7b8d6abacfe2cd4b1a",
+        "size": 280
+      },
+      "after": {
+        "hash": "9b6f98abf97028aaf45f17fa3ced0a61698db11b4dd8afb7588ccaec808d0ef5",
+        "size": 366
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/agents/openai.yaml",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/newbee-official-cli.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f0ddeca7415f2351ca03cdb9a9f4cb7fd9f08d87a28b13003abe800e57c7f7dd",
+        "size": 24919
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/references/newbee-official-cli.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/newbee.md",
+      "kind": "modified",
+      "before": {
+        "hash": "d4896720a0b0a2edde6f655d257004a8ff262add89d2ebfdfce7aed71a5efa0d",
+        "size": 7212
+      },
+      "after": {
+        "hash": "6f8093c0eea65227e8a1c725a4669e2d27edfa059b451b0ae220db3683f284b3",
+        "size": 7526
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/references/newbee.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/workflow.md",
+      "kind": "modified",
+      "before": {
+        "hash": "a7d49d80143ebccbcd42cd8566ba95e38e22bca83686b428450453a0f7413cdd",
+        "size": 3081
+      },
+      "after": {
+        "hash": "f408a016eca81577911603628cb68bc19e9557643c8ee224ccff52dd01a24bc2",
+        "size": 5223
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/references/workflow.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "12b022d44e20992fe54555123e7a7fbd7cc79354bfe5fdf469ce0497e3de3f32",
+        "size": 9633
+      },
+      "after": {
+        "hash": "9ada7a7d82ff383ba5c693c2a5be49e6b19470a1ea3c6bd9dd4c51db8e6bb505",
+        "size": 11410
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/test_cli.py",
+          "kind": "file"
+        }
+      ]
+    }
+  ],
+  "unattributed": [],
+  "unresolvedScopes": [],
+  "noCodeReason": null,
+  "scopeHash": "09704a58ae74b655033cf1f53c4c5854825ea208ebf2fd2cd43ffd2b5cf4e20d"
+}

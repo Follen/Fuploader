@@ -1,0 +1,14 @@
+{
+  "schema": "comet.native.partial-allowance.v1",
+  "change": "add-newbee-plugin-changelog-and-wa-workflows",
+  "scopeHash": "95ddb8c397b4ef2992d26711e2a7140cca308806edec762fbc289b0ae2667a9b",
+  "scopeIds": [
+    "scope:505bf99586e02089b1a49b0dce7e5bea3fed8cdcf0b9e8a3140f5764415f4053",
+    "scope:94cd8433a460b1ad7ddab5ba21ed99e6ddc9f81bfd2d9e7be23b7ef9c222cba8"
+  ],
+  "reason": "dd.md 与 DD/auth-analysis.md 属于用户明确要求另开 change 的 DD 工作，不属于本次 NewBee 实现；当前只验证声明的实现产物",
+  "confirmedSummary": "按用户要求拆分后续大变更，当前 change 收口现有 WA 与插件日志能力并进入验证",
+  "sourceRevision": 2,
+  "confirmedAt": "2026-07-30T14:57:40.645Z",
+  "allowanceHash": "33e8037fe36f365b7f17adc8ae17ea7e1fe1244329a0c37670edc8845ef456ed"
+}

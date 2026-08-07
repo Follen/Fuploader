@@ -1,0 +1,11 @@
+{
+  "schema": "comet.native.archive-cas.v1",
+  "operationId": "spec-1-newbee-plugin-changelog",
+  "role": "post",
+  "hash": "430dce78a36ae0d6f36b9cf194309e41e978e7fac6433a8b0c3748a37fab7ff6",
+  "identity": {
+    "dev": 2421791372,
+    "ino": 1688849861336476,
+    "birthtimeMs": 1785423746092.8696
+  }
+}

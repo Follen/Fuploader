@@ -1,0 +1,28 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "966c59ef-5853-4ff2-b3e8-7dd27f66bdac",
+  "kind": "archive",
+  "status": "committed",
+  "change": "dd-request-body-full-reaudit",
+  "createdAt": "2026-08-01T02:02:18.178Z",
+  "preflightHash": "9ed7c94fea8890edfd8b0c58c0adb811988b77da5dea9e03c8175fb364e43ab8",
+  "operations": [
+    {
+      "id": "spec-1-dd-publishing",
+      "type": "write",
+      "target": "specs/dd-publishing/spec.md",
+      "staged": "runtime/transactions/966c59ef-5853-4ff2-b3e8-7dd27f66bdac/staged/specs/dd-publishing/spec.md",
+      "backup": "runtime/transactions/966c59ef-5853-4ff2-b3e8-7dd27f66bdac/backups/specs/dd-publishing/spec.md",
+      "expectedTargetHash": "acc4fa4e9d613cbffc264894abc06e5202ecd9d81564e22288f2815881402a37",
+      "stagedHash": "fa8139070ac08b2076ea80555325be0bc9441db3acdb3b6460ac0129c3260dc3"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/dd-request-body-full-reaudit",
+      "target": "archive/2026-08-01-dd-request-body-full-reaudit",
+      "expectedSourceHash": "73ac28abd4f337729984b53d9722f8f21df84de683c08a640d7e38dea240c0bb",
+      "expectedTargetHash": null
+    }
+  ]
+}

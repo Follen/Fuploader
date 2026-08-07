@@ -1,0 +1,1176 @@
+{
+  "schema": "comet.native.content-snapshot-projection.v1",
+  "origin": "explicit",
+  "capture": {
+    "provider": "git"
+  },
+  "complete": true,
+  "limits": {
+    "maxFiles": 10000,
+    "maxFileBytes": 268435456,
+    "maxTotalBytes": 268435456,
+    "maxManifestBytes": 1048576,
+    "maxDurationMs": 60000
+  },
+  "policy": {
+    "schema": "comet.native.snapshot-policy.v1",
+    "include": [
+      "**/*"
+    ],
+    "exclude": [
+      "newbee/app/**",
+      "newbee/source/**"
+    ],
+    "hash": "b9f39b331a5422e3b89551642379411ce6533ae1c4cc7973ae873ae9c1e82b25"
+  },
+  "entries": [
+    {
+      "path": ".codex/hooks.json",
+      "hash": "a68d8ae9c874122c1ec8e404737647f0e78f5425099459b2d64ddc4b9c7a16bc",
+      "size": 341,
+      "type": "file"
+    },
+    {
+      "path": ".codex/rules/comet-workflow-guard.md",
+      "hash": "d670067cd1c1573b4c655de3ec553252f20126d3dba3d187a78717c2c87cb3c8",
+      "size": 2196,
+      "type": "file"
+    },
+    {
+      "path": ".gitignore",
+      "hash": "baae7fb2f514b349b7142cb2c76c3ce5c9b9fbce2b433688943b668cd2507f20",
+      "size": 502,
+      "type": "file"
+    },
+    {
+      "path": "AGENTS.md",
+      "hash": "5d39a2d9525253b95066731f5be5be3a5bb67622252c8da29f09f021bc1c3b71",
+      "size": 1446,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "hash": "231439ff3ce45a59d5d6b05883755a712af78d180c082431f12a4f51bae4a6a1",
+      "size": 8347,
+      "type": "file"
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "hash": "1ebc1fa6e542f0a07d38365f5b9ef666a4e1a4854b4482cf12cd51a0067a366e",
+      "size": 17720,
+      "type": "file"
+    },
+    {
+      "path": "fupload/agents/openai.yaml",
+      "hash": "9b6f98abf97028aaf45f17fa3ced0a61698db11b4dd8afb7588ccaec808d0ef5",
+      "size": 366,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-config-delete.json",
+      "hash": "6710aa8fac85c5ba6ed4d017d6ffcaaf331c10e84c07ef73faecd646f9eb3d7a",
+      "size": 93,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-config-update.json",
+      "hash": "42522607a5e3553413010c9f238019fd52530b429dfa178797bc0f12e60b1be8",
+      "size": 744,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-plugin-delete.json",
+      "hash": "6cedf5f811852a7d0e9f02896571936f363dae14a2f596795b19d6ffc04d6376",
+      "size": 93,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-plugin-update.json",
+      "hash": "a4263e060f5f36ded6d82416af6c6be79fc5a0cb07c223c4d904d75ec80936e1",
+      "size": 215,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-wa-delete.json",
+      "hash": "3fb981d22516ed0274c5063b6f41073778dbdd575d58f8802c60eed5c3745d72",
+      "size": 85,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-wa-edit.json",
+      "hash": "4959b0e869047879140f0efc4df85c0ccb91c02660027e904b93bb8a0fde72a1",
+      "size": 205,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-config-delete.json",
+      "hash": "c13e52acfd822c7d24fc5c091ad5997e05471a436e422082ac869eaf89e3bddb",
+      "size": 86,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-config-update.json",
+      "hash": "ff34b56ba1d9bda8eda6ea487662bece875a578b8ed70e87bbc14ac49fea607d",
+      "size": 230,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-plugin-create.json",
+      "hash": "53b05baa69babc693159a50ad23b1cbb4f34f760cea2362a1f585199143444d9",
+      "size": 383,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-plugin-delete.json",
+      "hash": "84bd50820899adf1d52980e6768f6c21f8852c613ef477128f418215dd4b3f62",
+      "size": 86,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-wa-delete.json",
+      "hash": "8122fdf80de6b1bb560cf06a42974d95b60af36e38bd060b4c402ed9fdf67567",
+      "size": 82,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-wa-update.json",
+      "hash": "e6786622859d6726f1a4def98eac86c2fda4519f915b21e74a91ee705a707bd6",
+      "size": 176,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "hash": "b835416aadc8ffe22d4ad36633afb300755f1a2e8ede3c6e1f65b9f4c54a9f1f",
+      "size": 15626,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/newbee-official-cli.md",
+      "hash": "f0ddeca7415f2351ca03cdb9a9f4cb7fd9f08d87a28b13003abe800e57c7f7dd",
+      "size": 24919,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/newbee.md",
+      "hash": "e8fd9adb6c29cb4ccef64589d9a880cfc6674b5cdcd4fc0d8c6bb2ecbaf98a7e",
+      "size": 8273,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/workflow.md",
+      "hash": "1ff1bf47d27e65ec69eda6fb8a062df271015278c767820d947e1d2a477ae4a6",
+      "size": 6410,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload.py",
+      "hash": "fc8fd0d6e4c1de6e2cfb624acf0f683dde543cec1f63e77a7e482ca7d3d62389",
+      "size": 353,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/__init__.py",
+      "hash": "c5d55cca0c030e5f785c8e371e889525cdb45fbdcb3f36536b20d0b807051381",
+      "size": 52,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "hash": "ffd64f47930a634b45e25ae7b79bc6ccbf90d50592dccc04927e7454921bd71b",
+      "size": 22467,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "hash": "b908f4b96b5950ddcf05a6e65159bd8860462aa03d5ac1469215d7a4c70dd6bf",
+      "size": 106811,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_broker.py",
+      "hash": "65a86c3c3a75a22a8db4180903d9e61e6cf3abd0736c25f84bc1d5a50cacd12b",
+      "size": 25734,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_sidecar.py",
+      "hash": "73f5c6796acfdbc655fe7fe139ec09062ee686d151f3e12387b5e42d5be3bdd4",
+      "size": 27515,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/errors.py",
+      "hash": "70dc2cb98f59b7a36487408a5e7aeecbc8608a28effdef31e4c1d346b9d07df5",
+      "size": 3443,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/io.py",
+      "hash": "023cd41e513cc836a02f47c9195a859fed02f9e3e90cbcaa32c0159bd20db764",
+      "size": 3970,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/newbee.py",
+      "hash": "9b45ce084a1ef0ada6961c65d959bc2aef2f6b862cb57f6dc8e6510b93b6579e",
+      "size": 74753,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/newbee_auth.py",
+      "hash": "6ebbff764f246a6ab52a0923c6e1d2a7444430227e4e27bd03875ffad6993d38",
+      "size": 5419,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "hash": "908ba9c211b127b80b69cfd2dfe1931d25a7f24c2c4bb19db7110a9da6c5235b",
+      "size": 31505,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/transport.py",
+      "hash": "b5862129fe5eb3acfa1823c35405dc4d2f950b4c9d9216c04de845ce77fa6803",
+      "size": 4974,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/trust.py",
+      "hash": "3605da87400aeef7c1ec20b54751c0b55a4319752aba6fdaed63ec82248979ff",
+      "size": 9501,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/__init__.py",
+      "hash": "6634feb298a2be4510d94c101d7886d22be05b05d9ed77f18cec07eab19d8448",
+      "size": 22,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_builders.py",
+      "hash": "606dfcfa15eac2f633be3190ab9c46c793dccfdc3f086c1ec5af5d79476cdf22",
+      "size": 54381,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "hash": "d72fcb4152897a694030d705ac0285e81621ade41d25282b1d93bfde826513c8",
+      "size": 13111,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "hash": "fd35d39366eee45161638faa55fe6fc4abc974bd6d733fec0f080a1415534da8",
+      "size": 30628,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_schema.py",
+      "hash": "9dae1d83f0b75d5991b54784a85d7cabab59eeddfbe4d922820597c94a27eaaa",
+      "size": 17174,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_trust.py",
+      "hash": "2f0bc8de2c5554a23b5595b24983dd8573cd489e5ce2a9472a4beda9bb188d90",
+      "size": 7318,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/01-newbee-plugin-create.json",
+      "hash": "dca25b1358cc62e7069ff6c1813e0b1cf1acbf39d904e0656ea2415195e2b5e6",
+      "size": 575,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/02-newbee-plugin-update.json",
+      "hash": "793cf30117f221de8c0d050d352c5d81b9dcd19cfac9706f0d7890111e97b4e0",
+      "size": 339,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/03-newbee-plugin-edit.json",
+      "hash": "f57a31cd5dbc41e81810fca3433148f80deb4ea9287c8d6a16b6c3de4a2195a7",
+      "size": 605,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/04-newbee-plugin-delete.json",
+      "hash": "a29c9b88cf5fb4a4bcfabeec34f8c194908551c3c768092e2ba7fbfd8310bb3b",
+      "size": 88,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/05-newbee-config-create.json",
+      "hash": "c93cfbe118a7669a8c432f3c2af8423628a7541f2dcb328991f91eee4d082eb4",
+      "size": 601,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/06-newbee-config-update.json",
+      "hash": "91c575ca7523398654c7ed8ed69329a87c8df8c790927dc992a0b68b81d97339",
+      "size": 215,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/07-newbee-config-edit.json",
+      "hash": "8c3c432537602d1356ece6a7cebb3f93c7b8ac10a0e7ae1ecf066ecf6139552b",
+      "size": 519,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/08-newbee-config-delete.json",
+      "hash": "ec8eee0abb0eb829ca4837c0f0c5abe9d7050128fd2f271a1fd7e75a49a706f4",
+      "size": 88,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/09-newbee-wa-create.json",
+      "hash": "82a9010acfce5311d8e6e1e3154d28bdb80b27eede6ab67f9f406b1b970d5dd1",
+      "size": 644,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/10-newbee-wa-update.json",
+      "hash": "17018173eb45b1bfc912c0921d2acc12949e3198c06cda3a6e2146414225a0dc",
+      "size": 248,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/11-newbee-wa-edit.json",
+      "hash": "3c22e5085f9605a2b651828d478c512740835a3af81ed632643d377ae6ead483",
+      "size": 576,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/12-newbee-wa-delete.json",
+      "hash": "92222c4da663f57b6332751d2a2c1bc328b031e5ef4045b31e2fde666cc77623",
+      "size": 83,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/13-dd-plugin-create.json",
+      "hash": "bfa69385a8dea01d337df1f2266cd325c4fd4d50dfa1237ff59624f6b471412a",
+      "size": 965,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/14-dd-plugin-update.json",
+      "hash": "7f10173ab381256204012207e1c3236d9643cc998e70e8be9060febadf031739",
+      "size": 348,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/15-dd-plugin-edit.json",
+      "hash": "e72c8e55e17049dc644d0da1ff04ebc8aa0357adb12478e3044530cbb0b28378",
+      "size": 925,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/16-dd-plugin-delete.json",
+      "hash": "2c085cd7cf8cf7f917745d862036c1017290b14efa6a24255eef22ceac58187c",
+      "size": 113,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/17-dd-config-create.json",
+      "hash": "f6d6ba1b39f9b90779fd5b5934b65202291473f3596bfcd718f3944ecddfd410",
+      "size": 838,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/18-dd-config-update.json",
+      "hash": "4da5d7ee9dec90f77fcf2c3ba6f84fd027150ca098587085561a6f11b6891845",
+      "size": 633,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/19-dd-config-edit.json",
+      "hash": "1e4a89a09640b43298a062268986d8d99e866d6eadbdf514870491582d72da92",
+      "size": 745,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/20-dd-config-delete.json",
+      "hash": "06931476391c07171ed82f1eb9e1c0a35d68121af2567cbf4b8fb8ea9d1cfe26",
+      "size": 113,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/21-dd-wa-create.json",
+      "hash": "0cf8710fb6ac19a467a47191077b49816e3d5dbfd528ede83c5059d1acc1a12c",
+      "size": 720,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/22-dd-wa-update.json",
+      "hash": "cf59f56da80f7af29885ed0d2e059c43acda82cc71e9025ea55728e12e164937",
+      "size": 277,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/23-dd-wa-edit.json",
+      "hash": "00630548706b286cff472970f6fea631235fdfe85e1f0d403cf1e8568bbde164",
+      "size": 800,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/24-dd-wa-delete.json",
+      "hash": "04307d434a0eb7d0f412c5d772dd243f2de08a1c7fc59900148f3e277e689b45",
+      "size": 109,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/assets/FuploadContractTest.zip",
+      "hash": "e22b51dca38ab95e48c5d26e27e1ac1fa81e2d1eff290343bd90f6b48678916e",
+      "size": 539,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/assets/FuploadContractTest/FuploadContractTest.lua",
+      "hash": "cfb532e91491c4825a03ca1e24d2669c7e2a6e71bbf42e3ff026b4164f818c46",
+      "size": 84,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/assets/FuploadContractTest/FuploadContractTest.toc",
+      "hash": "b010725c893352d8e97afeb22642ade5fa0b5d45b0e78b9af201d554c7a6bac3",
+      "size": 153,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/01-create.json",
+      "hash": "8eb37d2fbce1c8aa91411a370a1fad0d6760c8ad46fa69280577eccefde244be",
+      "size": 846,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/02-update.json",
+      "hash": "58b8ea371c32538427f3eda12cc1aef0cf006273d24df124e58a4c533aadf966",
+      "size": 621,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/03-edit.json",
+      "hash": "9b1652f13899b25ce4a345621777783c5e72441be9d4cd96edc3fd8db16e5963",
+      "size": 721,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/04-delete.json",
+      "hash": "9839fa0c9c22874c0971cdcb3349d5dd1bf3f8cfdc8ad27df92a3b1f9fd09c50",
+      "size": 113,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/01-create.json",
+      "hash": "302b82746b03bfadabca009652f359c5c8f5441aa10d1242a9acf58651d1df64",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/02-create.json",
+      "hash": "c6f90b296ac4cac11754a325f2036415370ced6f331f9036bbf0b6e3e7a894ff",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/03-create.json",
+      "hash": "46174ce74df8462c2889103d2247f86998e03207c17fac525483cdc2d5985fd1",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/04-create.json",
+      "hash": "7f6823dcfb61af6d41a06b39f4c13892715007d0928e5f8d81ee42d6b1cb526f",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/05-create.json",
+      "hash": "5215cf4288c6a06eb495409ffda2f7fd4c5775ca3c94995eec45365bee1a1e84",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/06-create.json",
+      "hash": "2dcadfb877af0327bceeb314c6bf0067a286038b6f8f0504b31c5954cb47d3a3",
+      "size": 1069,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/01-plugin-create.json",
+      "hash": "03db331105b4a69d67d20904ad9deab89a1377bf6795d97e71cc46ee8e40bfc0",
+      "size": 1047,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/02-plugin-create.json",
+      "hash": "7cc51110dc74c4ebb3e7a36dca69b76d3e4ff919ef95fcfeab84547c56a0b038",
+      "size": 1043,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/03-plugin-create.json",
+      "hash": "ede0d37e027d258879ee870ce29e96bc6a2d42d66a98d268b152b89d778a9f77",
+      "size": 1042,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/04-plugin-create.json",
+      "hash": "4fd11d147d184b5e42ee9973e9defcfd5a455a8b1900303163311b70023a2ad8",
+      "size": 1042,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/05-plugin-create.json",
+      "hash": "26f933e270b268531126334cb449d7106770b142a42306be211d58f594413a3d",
+      "size": 1043,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/06-plugin-create.json",
+      "hash": "ad1bba1c91ff35dc7ab629d632fa26dbbf71d7aa195322e056ea5c52853ea6d7",
+      "size": 1047,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/07-config-create.json",
+      "hash": "f6cacf37928b9c446044887f3cf8d62abebe3caf3096fd049e5c014dd53e4fd1",
+      "size": 1317,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/08-config-create.json",
+      "hash": "a75f73398a60e85a284356e1c142e07c5759a39a1119fb70c88ff8d48fa685f4",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/09-config-create.json",
+      "hash": "c2c40b686be42d46378f5a146cd4c450f490b5e747eaffc82e928e945b999aa0",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/10-config-create.json",
+      "hash": "bb77fb5e40515a20db49247d1c5962441258906450ee48297db69194dd8fac8d",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/11-config-create.json",
+      "hash": "8b5121b96eee1e4fe457fe3e25733c4f715f6165b500b9d108b16ffb8c8429f8",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/12-wa-create.json",
+      "hash": "ef55f7b64d010d86e6899f9aac0d8349ab8a164abb9705460b048ebe9369d9be",
+      "size": 774,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/13-wa-create.json",
+      "hash": "aa0d830ed1e13560bdd9b798f8469f191aa8ed5ab00b57a0eb35c6cd886d7881",
+      "size": 771,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/14-wa-create.json",
+      "hash": "4598989fc0bae428d80578ad478c2ead8970dfb3bbca5ca68ed26c7ea6a6b9e1",
+      "size": 770,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/15-wa-create.json",
+      "hash": "c339051073a5c3bd993ddbfef2d8176953b9687de7360421384ef183f3e4d3da",
+      "size": 770,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/16-wa-create.json",
+      "hash": "bc28cebce690d8819cb1beb388b736a4b24715fe44788d584191ff032e1d7659",
+      "size": 771,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/17-plugin-edit.json",
+      "hash": "4f9fe8e3b93749f1492bbb1135eb4f2bed26b5176b7176a26e2f44a74656b702",
+      "size": 159,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/18-plugin-update.json",
+      "hash": "5ca42a24cf41d10cef57c098ae7a4c07785742106d4c9ecb41473c84a8f1fd0c",
+      "size": 347,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/19-plugin-edit-commercial.json",
+      "hash": "e6138d79eed6eac8c2edc8e27b74c548f1900bb2809a461eb3224e2c1508eaab",
+      "size": 130,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/20-plugin-delete.json",
+      "hash": "bfb87e5831cd51ae2a1a24f3713f12eb48d7685d6e1e9795cb9b4db18a5fe8a6",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/21-plugin-delete.json",
+      "hash": "0be955c349986409168a484a35a48e73ad89fbea1f3b1c95ea265e46eff300f2",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/22-plugin-delete.json",
+      "hash": "5b1fe9714d8eed23e52a56d51f866379152d5769812a1e265b8d72a043920b9b",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/23-plugin-delete.json",
+      "hash": "33fb7f7916a9571b14c506314d69359e1dbfd736e571c51409d6b4d36441c29e",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/24-plugin-delete.json",
+      "hash": "9112946e923871173155d731e208f21565dab98f81f1a558b895910c69c81a22",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/25-plugin-delete.json",
+      "hash": "7f9c676a079b33263d88ad8b2cfd13fd4c5afffa6080731f9f2d3c1490e2a9fe",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/01-plugin-create.json",
+      "hash": "69cff4510caf747de8d863121c94a9ee50cd6fe1ab52939aaf846c7139f65a5a",
+      "size": 1012,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/02-plugin-update.json",
+      "hash": "7ab65ace1c13471874b4fffc548608ad3d19d99652a9cceab73158856291025c",
+      "size": 345,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/04-plugin-delete.json",
+      "hash": "96d3fa8192a96e59918d285345daeec9f5f66e03642862e6f28cad9a97fca120",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/01-plugin-create.json",
+      "hash": "df7c553ef704645641898b707db232a3e7cbb9566f70473d1bebf22070e82301",
+      "size": 995,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/02-plugin-update.json",
+      "hash": "b5436dde65e8c8da93800c375f3cc1e4556245f69ed2cb5efce2a777e7d30a8d",
+      "size": 342,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/03-plugin-delete.json",
+      "hash": "c7c7f3bf4e8eb48c8e63301be0088adba82bced941e970542490b39ea41f171a",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010600-dd-plugin-update-projection/01-plugin-create.json",
+      "hash": "400ecd040c467a94f23b646b339d806b5a75ca95290fd9595997ccc5d59c5c8b",
+      "size": 978,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010600-dd-plugin-update-projection/03-plugin-delete.json",
+      "hash": "e579a3c8e539fafbddd6797d57c0a3f8dc5dc9d0e88649c791630c16c26cfc85",
+      "size": 116,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-011000-dd-plugin-edit-commercial/01-plugin-create.json",
+      "hash": "44dd39115d0276edbf3508b1d4da0969e364236f442b7bcecdb142fc686366c5",
+      "size": 976,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/01-plugin-create.json",
+      "hash": "831244f5fc45a26743714b33097403476b625baeea7c89ab72612b69c8c49137",
+      "size": 994,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/02-plugin-update.json",
+      "hash": "ecd43c93e6e812fe5085e04ee9c4452cc6eab97b3d1b9d136abebde98c19b774",
+      "size": 347,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/03-plugin-delete.json",
+      "hash": "1eddb11af587c18cf65cb9b14b7e9beb8dedda7a48ed81bb6083b0ad84b60441",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/verification.json",
+      "hash": "941c89c7a1492c5075d350156accc1a2652688b81770e26e5ad789b3218b10a3",
+      "size": 1276,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/01-plugin-create.json",
+      "hash": "c021d67b0a2b04874d2bc8cd7a6e9355b4ae4b77dc10b3d38ad62e34d910c551",
+      "size": 970,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/02-plugin-update.json",
+      "hash": "3ed5ef90482c21201ee6425875fa503d92876a25177d007d992ecf30a3905478",
+      "size": 343,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/03-plugin-delete.json",
+      "hash": "53d9ac993538c61a60430e19b6ead421c96392ef729ed186b880447569a3b527",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/verification.json",
+      "hash": "b15df0de12ab651c61bb200028e3174032821423ec0429283c79aa563e5bc980",
+      "size": 1972,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/01-plugin-create.json",
+      "hash": "d4c9cab23fe96aafb6e2a9f2f05c020fae31702b20c3c9bcff2293cb42efdccb",
+      "size": 986,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/02-plugin-update.json",
+      "hash": "9612a296425d376b77bae06fc7f26448436f68c96628f4b204b2f8fe1508cddd",
+      "size": 347,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/03-plugin-delete.json",
+      "hash": "e9f8b442f46c6c96072a70a9787a7dcbade71ba2ee9517863308db70acd40893",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/verification.json",
+      "hash": "7261d0990e6c514f068a1ff41a8f406d42ee3b6fc17c4727779ede67ed511a7d",
+      "size": 877,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/01-config-create.json",
+      "hash": "650d96d385219a2f036d0d63316c61e8c825d08933ace66dfc17a83a1a44c949",
+      "size": 906,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/02-config-update.json",
+      "hash": "428272c1a1943587f3d20247865c1d59fc688ac13dffc500d1ba4c0db588b53a",
+      "size": 662,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/03-config-edit.json",
+      "hash": "ff63c202297cf021e5842d02c1e45718612ef639dde1ccbd6703180742f91bab",
+      "size": 305,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/04-config-delete.json",
+      "hash": "2a28527f049c9cb50efca8a34da3d115f9204c832f7649308dd2d2e63d604cf3",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/05-wa-create.json",
+      "hash": "a500722757aba980286603dae746d8a0edcaf72810f62ded93b97a104a9c571b",
+      "size": 777,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/06-wa-update.json",
+      "hash": "29f60bf73152c9e90aebdd9e2629578f358fbe298180777e4024ec8e1e85a206",
+      "size": 240,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/07-wa-edit.json",
+      "hash": "d84a36ff4c96f2c720d567edcffc2d065fe2a81576fee9f9ac90b3f04cfdc3ec",
+      "size": 187,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/08-wa-delete.json",
+      "hash": "6ef4248feb52e28ed789530b60bb50ae1782e631a25c8061c0f2b8dad6df8799",
+      "size": 117,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/verification.json",
+      "hash": "fafb3af911da2e7033c74caac9cea5c88fe6bc85a9113b62ce1891440ea6f5bd",
+      "size": 1221,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-create-retry-verification.json",
+      "hash": "8204ab7c9013df27c1807be21b2809bb9ff2feb2f5459bf8abad3c51d1f975f6",
+      "size": 624,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-fixed-verification.json",
+      "hash": "64b2424530ab8998517b4c7944a6e0249b84a9aa58a8cfedddc452edbc6c5517",
+      "size": 888,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-034000-newbee-web-alignment/plan.json",
+      "hash": "92033160fc9bae87125fa20a62051a378cfdb7e9a40c7f9bad60ad2d8a68dd8d",
+      "size": 575,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-034000-newbee-web-alignment/verification.json",
+      "hash": "ab25af81aa2c67e59fb5de4049bf5dbeae1fc8cd559c3e2ac2936d5b87a4f673",
+      "size": 2381,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/01-plugin-create-output.json",
+      "hash": "a6d7de325367f6fae7ac307c48e69563a3d8a13837e9c7d1834317ec05f5b4b8",
+      "size": 1706,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/01-plugin-create.json",
+      "hash": "47927f89f6512d3ea795f33d4155dac9d7bd55a777c364cc584516743fc4062f",
+      "size": 1316,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/02-plugin-update-output.json",
+      "hash": "d7c70f123cca5245f9b62700612cbde4a99edd90eea9193bfb17793cd140ece8",
+      "size": 1706,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/02-plugin-update.json",
+      "hash": "7bb8af816669e940302696da347a6d058dbd08d332752819360b8f9e3f3ab0f8",
+      "size": 428,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/03-plugin-edit-output.json",
+      "hash": "7532e8a6214e61aa0bec2a522e4bcaa260815c16d839d421cdc1173421c32211",
+      "size": 1704,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/03-plugin-edit.json",
+      "hash": "f4f5772fdecdce7371351efec70dd160e394e817bb3e09894a604982b432bf0d",
+      "size": 147,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/04-config-create-output.json",
+      "hash": "579b341a29e858cdc5a951dd3167c0f0960af508a13b209c37488ee6bafaf7d4",
+      "size": 3099,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/04-config-create.json",
+      "hash": "61c49c619cc6b1df37008b67b12d850ab84d2fb6c6f55a269681d48c7eb266ff",
+      "size": 1364,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/05-config-update-output.json",
+      "hash": "b01a73fb823a0c29e80f2812639471d274732dd451bf7fca45a3104ef3b5fb5f",
+      "size": 3098,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/05-config-update.json",
+      "hash": "07b2839db2fe0f8c9d47624b4fe8dc56b67399053187571edea32b3f1b3fe3b1",
+      "size": 1169,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/06-config-edit-output.json",
+      "hash": "1fbbbcd6be4495e9588ab56cc01bf3857e137fde24f9f6ef679b86b0a0543a01",
+      "size": 3092,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/06-config-edit.json",
+      "hash": "d8a86686adfbbf6ad6cef64c42ea125c865db0212dd7ffe0cfbcbccbfe9837cc",
+      "size": 350,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/07-wa-create-output.json",
+      "hash": "f9adf6a4b61c2ef25feafe99ee8133ffb4b00229ea1d75fe5f11d5c8e6662dfb",
+      "size": 1504,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/07-wa-create.json",
+      "hash": "80d956fc14bfc1b313687eb13e72c9793f147c6c2850cea66c12745fb66d7677",
+      "size": 1011,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/08-wa-update-output.json",
+      "hash": "a748097e16934c9ba70b25f825155ba6099806025e10b89a129e156e914137d9",
+      "size": 1503,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/08-wa-update.json",
+      "hash": "8960dfed4084853cde0ffe4e8fc34eca145b9fec1818b0c9375770a88651dfe6",
+      "size": 263,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/09-wa-edit-output.json",
+      "hash": "b5788aa511e59e60ec9335dfeb1d1c9cd3e6743b3182bad4447376364831c68b",
+      "size": 1497,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/09-wa-edit.json",
+      "hash": "c42203b63de66364f4f8781984611d49c27a89f700e16336da22a802d44ea171",
+      "size": 197,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-config-delete-output.json",
+      "hash": "740b37631e0fa87d876ec3c3f42131f516df0e1f5816be047e6c029645a417ea",
+      "size": 3124,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-config-delete.json",
+      "hash": "f94ff8adc39051d5d8e81973d8460b68343021a38a5175e7c91f1d62e0c47c84",
+      "size": 133,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-plugin-delete-output.json",
+      "hash": "24193f9356897960e80fcfcf26ca0513d549df61c062a799f792a8abecf167fc",
+      "size": 1741,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-plugin-delete.json",
+      "hash": "2632852c747abd70ad3d6a2ad90272bdb31ae78d999464e8cdcc7c952ead1bb0",
+      "size": 133,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-wa-delete-output.json",
+      "hash": "5c936d1602ff283e81470d97f113b6287ec752dd8915a0622a7df6459f966e8c",
+      "size": 1534,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-wa-delete.json",
+      "hash": "78e7bc2d956a9e876550765e7cb2d474e75acb606c76af000d2edce4b81eedfe",
+      "size": 129,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/read-matrix.json",
+      "hash": "51db8ef1d6311c93b21d0169ec065981f64f26c41e4f1a628b32fe763d3ef0f7",
+      "size": 4336,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/verification.json",
+      "hash": "726e26ad50e6c5074acc8d6a5944da796db31593834aa4f36294d075915e6b23",
+      "size": 4746,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/01-plugin-create-output.json",
+      "hash": "46954b9f986c104b268e5d86261d25a855f33f53e43f19f9171a2eb552fd18e0",
+      "size": 1706,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/01-plugin-create.json",
+      "hash": "b9d67da692270d3ccd61d84a9af1ef87adaa3e0cb9ddbe91dfed5a77cb55d499",
+      "size": 1316,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/02-plugin-update-output.json",
+      "hash": "b469a2b34043e3e4aeaee9514d1552d7b70f57f6abbae6f467547b791a5f22a5",
+      "size": 1706,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/02-plugin-update.json",
+      "hash": "6a2acb4f4ee468099dc19b3361d4a6a737e02672544fa1705ccdacbb95db9681",
+      "size": 428,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/03-plugin-edit-output.json",
+      "hash": "9e44a9e431853e99294a4ec90be944b3ac9c46263cb49e3d450d710ad72bcf50",
+      "size": 1704,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/03-plugin-edit.json",
+      "hash": "f7e7ef628737f2c90807a59b7967a726b8d758095b422a4878eca0816b46b77b",
+      "size": 147,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/04-config-create-output.json",
+      "hash": "97c5a8c481e07caae48ddc9c8dc0b3cba55b831d91ebbe9ff045a20f3db93d07",
+      "size": 3099,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/04-config-create.json",
+      "hash": "a663a2786b9aef0b39c5b1f7bae8a46064573cc48b54afe862567f4e4f4a4a72",
+      "size": 1364,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/05-config-update-output.json",
+      "hash": "014237ca4cf68aed57a86846da8702de237a3cd49877a11cd9364680b4a348be",
+      "size": 3098,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/05-config-update.json",
+      "hash": "7f29c36612181fbff91e4a5adf6965509efe408af429544f587380b68b65c54f",
+      "size": 1169,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/06-config-edit-output.json",
+      "hash": "f85eafa9d4c11a951b598eaf6accffcb6c6edfba206342034cc028c9b1a58e69",
+      "size": 3092,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/06-config-edit.json",
+      "hash": "c024628461f321ec3013c317c9ce0dde7ac9656c98e374c40416e94bc61b6fa7",
+      "size": 350,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/07-wa-create-output.json",
+      "hash": "c90aa31fb75b7d4abaf295f5c8f190516f40a201d3b88ad0b7ecdcafca35d13a",
+      "size": 1504,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/07-wa-create.json",
+      "hash": "d8728f7a7fe9d837f3b43a27b57e1b224f29e2b93a1f9b621dc45742ff3c9e32",
+      "size": 1011,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/08-wa-update-output.json",
+      "hash": "361ab5031bf92c64156ed989719e9f0805660af8a155e21c06a94f70033454ff",
+      "size": 1503,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/08-wa-update.json",
+      "hash": "3fd7139a22e959b4a1cb6b863b36eb64f50420e4620215f2a77f55f2e1d05c47",
+      "size": 263,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/09-wa-edit-output.json",
+      "hash": "4930c096b173714122305dc387d7b455f3ad10b515de4dd5f37754d8f6933067",
+      "size": 1497,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/09-wa-edit.json",
+      "hash": "3f8d4c70dd85a33629826ea6ca762e15de2a7903147f36b23c0f8b848f834bb4",
+      "size": 197,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-config-delete-output.json",
+      "hash": "f7005f74253b1eaae0acabdb4a7765c2eaa6fed07b8b9f213359f8931a648882",
+      "size": 3129,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-config-delete.json",
+      "hash": "dfcd14969a79eafa23dc3ff14eadad68c800ac7c7b85206ba33ec40032795041",
+      "size": 133,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-plugin-delete-output.json",
+      "hash": "4e9b8193934d5f22a6379f696ef6db2a113bfe2c4a3875e6c05b9b06533bb126",
+      "size": 1741,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-plugin-delete.json",
+      "hash": "2bbc1a6803bd655feab9de8c853a07bd63ef287459b01bb6ecb1b599f2673bd5",
+      "size": 133,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-wa-delete-output.json",
+      "hash": "5101090246f14ed06158da02d24c3a9de1cf25252c95a633bb25634952e12468",
+      "size": 1534,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-wa-delete.json",
+      "hash": "17323439d22b03270f93b75428d3a5818cc6f2688f6fb972c1b6e277b27a45b8",
+      "size": 129,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/read-matrix.json",
+      "hash": "9b8e236b699da209165f30ef52b4e31a0f6bca1e4af5d64a04c6c1dab062aaf7",
+      "size": 4358,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/session-stop-output.json",
+      "hash": "90f94cfabb7bcd02c0fe5ebd72d2b9a631a6421965b117341cf4a066386082c7",
+      "size": 204,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/verification.json",
+      "hash": "d6588fda943cafcccf1e3d8e323ac978cb15bf5240a65d5cfe7aa8cc6ef52093",
+      "size": 4746,
+      "type": "file"
+    }
+  ],
+  "omitted": [],
+  "omittedCount": 0
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "14036074-d56d-49d6-9f4f-76bdd995e82d",
+  "kind": "archive",
+  "status": "committed",
+  "change": "build-fupload-newbee-cli-skill",
+  "createdAt": "2026-07-30T14:12:43.340Z",
+  "preflightHash": "085557ddbe12e112edff7708635c1dfb6f9a160ca05c5b4169d8fba516da7db1",
+  "operations": [
+    {
+      "id": "spec-1-fupload-cli",
+      "type": "write",
+      "target": "specs/fupload-cli/spec.md",
+      "staged": "runtime/transactions/14036074-d56d-49d6-9f4f-76bdd995e82d/staged/specs/fupload-cli/spec.md",
+      "expectedTargetHash": null,
+      "stagedHash": "24d385d65714a1a9716d9130f93c6c2416289b145c5f7dbfd4f93e2c71cde911"
+    },
+    {
+      "id": "spec-2-fupload-skill",
+      "type": "write",
+      "target": "specs/fupload-skill/spec.md",
+      "staged": "runtime/transactions/14036074-d56d-49d6-9f4f-76bdd995e82d/staged/specs/fupload-skill/spec.md",
+      "expectedTargetHash": null,
+      "stagedHash": "dc15bf6d9dc68dfc6f8d1d9fca74264e0f36162589f3ccb8acc463df2afcfdcc"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/build-fupload-newbee-cli-skill",
+      "target": "archive/2026-07-30-build-fupload-newbee-cli-skill",
+      "expectedSourceHash": "c2ccd95f0119232b10b7f01b6a29ecbed0736a3e462543f4903b5153bd250dcc",
+      "expectedTargetHash": null
+    }
+  ]
+}

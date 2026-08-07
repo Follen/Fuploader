@@ -1,0 +1,1877 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "2995e9f196044074c3bad83af5dd020cb6d836b85e4a7bcbcc4d22267be5a704",
+  "baselineProjectionRef": "runtime/evidence/snapshots/ac10ace49e5239e307b11676d61ea15952349fef95c489a0d6ed4e9a7f1b41c7.json",
+  "baselineProjectionHash": "ac10ace49e5239e307b11676d61ea15952349fef95c489a0d6ed4e9a7f1b41c7",
+  "currentProjectionRef": "runtime/evidence/snapshots/c9e8092451edf75afb35225e761722bf929e9c808d46a065ce8e0b1bdeb07ad5.json",
+  "currentProjectionHash": "c9e8092451edf75afb35225e761722bf929e9c808d46a065ce8e0b1bdeb07ad5",
+  "complete": false,
+  "declaredArtifacts": [
+    {
+      "path": "fupload",
+      "kind": "directory"
+    }
+  ],
+  "changes": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "ae67c9e4b0f71cb8082a96f79702a76432364ee7e9977916bcf0384ed710b323",
+        "size": 7098
+      },
+      "after": {
+        "hash": "3792617c49c59982224279d76ea11d5b1536ba3d355dcc5e303a7423e43832a9",
+        "size": 7866
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "modified",
+      "before": {
+        "hash": "3cd993f11053ae4dbcc097a20b2af4598f4c3379b6db16cb5b218a37e4778a77",
+        "size": 12712
+      },
+      "after": {
+        "hash": "1ed0b850b1ac67af25eccf6f61ffe885486cf93fd13fb2f618ca5f6e88eff55a",
+        "size": 15732
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/examples/dd-config-delete.json",
+      "kind": "modified",
+      "before": {
+        "hash": "218c14b1d6501885cf938dd47279c588bb4e9ca09ca1b52b81188d34213a4da8",
+        "size": 90
+      },
+      "after": {
+        "hash": "6710aa8fac85c5ba6ed4d017d6ffcaaf331c10e84c07ef73faecd646f9eb3d7a",
+        "size": 93
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/examples/dd-plugin-delete.json",
+      "kind": "modified",
+      "before": {
+        "hash": "bf0e189308b795628cd603709656c94ab1fc440ee83cb9d58cad76ee2df40a9d",
+        "size": 90
+      },
+      "after": {
+        "hash": "6cedf5f811852a7d0e9f02896571936f363dae14a2f596795b19d6ffc04d6376",
+        "size": 93
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/examples/dd-wa-delete.json",
+      "kind": "modified",
+      "before": {
+        "hash": "e5e5b8af4f9e30b6f435f04dccf527e262439cdc6007752be4e7d34f73fdd8bb",
+        "size": 82
+      },
+      "after": {
+        "hash": "3fb981d22516ed0274c5063b6f41073778dbdd575d58f8802c60eed5c3745d72",
+        "size": 85
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "kind": "modified",
+      "before": {
+        "hash": "6425a2eb0b9a352880356c1aa93226f94a701d9709e8adacbe2334f330883269",
+        "size": 9478
+      },
+      "after": {
+        "hash": "495965b4b50e8838a4e56a266d3101eabdfcbb02d73fe306bb330ced64ac9d93",
+        "size": 10976
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/workflow.md",
+      "kind": "modified",
+      "before": {
+        "hash": "f408a016eca81577911603628cb68bc19e9557643c8ee224ccff52dd01a24bc2",
+        "size": 5223
+      },
+      "after": {
+        "hash": "9013d1b1715b8ef3b614dda20b79a4d5d81c9308de53d539f2761d94c8511877",
+        "size": 6166
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "1eb39b2c14fe380d91292697fe22bf0365d189c25f85d9ae7ad3bb8788528020",
+        "size": 20503
+      },
+      "after": {
+        "hash": "2d23dda4e9e35555be3a30b11365c663b99ee57b49ac752470c55d669ea1dc72",
+        "size": 22101
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "kind": "modified",
+      "before": {
+        "hash": "c8b43ba35697f2367c47db78507190e728b86b070b0d8baae7946f245ab1e590",
+        "size": 79649
+      },
+      "after": {
+        "hash": "bec9d0e59b4f5d400a3678258dcbd9fab02bcc1fa75889d322671c046753ac6b",
+        "size": 92998
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_broker.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "65a86c3c3a75a22a8db4180903d9e61e6cf3abd0736c25f84bc1d5a50cacd12b",
+        "size": 25734
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_sidecar.py",
+      "kind": "modified",
+      "before": {
+        "hash": "c6f732651d45ffd06914e0dbbd58d7e99c4b94e0845530d489e7dc11be3d2838",
+        "size": 9894
+      },
+      "after": {
+        "hash": "f94cc457c22d6a4d8115d2ae2b026316f3567648add79e8ceae16c2c2e7c041a",
+        "size": 13823
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/errors.py",
+      "kind": "modified",
+      "before": {
+        "hash": "01135290d45f1d5d2a3410f64c7a335739bd2f6d4ca3f38a01d38e4dad31975c",
+        "size": 2619
+      },
+      "after": {
+        "hash": "70dc2cb98f59b7a36487408a5e7aeecbc8608a28effdef31e4c1d346b9d07df5",
+        "size": 3443
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "ca8d757df8bf6def60983d7f9b03f3160a80f00becbd3e06559cb4a7b5acdb5f",
+        "size": 30484
+      },
+      "after": {
+        "hash": "8c5519365d1f19be12e1c472d7fb61e87429ccec2ef896431a558b710960c758",
+        "size": 30566
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_builders.py",
+      "kind": "modified",
+      "before": {
+        "hash": "fd3448d43b4d1df2fdf23da71ba6abd46299abcc9dad408b00f169cca79fefce",
+        "size": 34368
+      },
+      "after": {
+        "hash": "b68522d28e9923e595b4795b476beb815ac732190fed72dcd494592f206a303d",
+        "size": 39840
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "9ada7a7d82ff383ba5c693c2a5be49e6b19470a1ea3c6bd9dd4c51db8e6bb505",
+        "size": 11410
+      },
+      "after": {
+        "hash": "749bb0cba6de0dc99b8cad50f64a30dc6cc55548a4bf2996cce7a05d0debb97e",
+        "size": 12251
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "cb9121f48d16bed420b4425f35b6accee06e1e5b19871c10f4b6bd6b4b99692c",
+        "size": 16118
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "4c3a162aa86ebaa378acb00ff8d77826d6dbdbd02a313b37657a3f19c6549b41",
+        "size": 10692
+      },
+      "after": {
+        "hash": "7ebe49eb978516416bc9c5016ec330273a6ef7c04389089dfe484d5be61f9087",
+        "size": 11283
+      },
+      "attributedTo": [
+        {
+          "path": "fupload",
+          "kind": "directory"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "03db331105b4a69d67d20904ad9deab89a1377bf6795d97e71cc46ee8e40bfc0",
+        "size": 1047
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/02-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7cc51110dc74c4ebb3e7a36dca69b76d3e4ff919ef95fcfeab84547c56a0b038",
+        "size": 1043
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/03-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ede0d37e027d258879ee870ce29e96bc6a2d42d66a98d268b152b89d778a9f77",
+        "size": 1042
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/04-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4fd11d147d184b5e42ee9973e9defcfd5a455a8b1900303163311b70023a2ad8",
+        "size": 1042
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/05-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "26f933e270b268531126334cb449d7106770b142a42306be211d58f594413a3d",
+        "size": 1043
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/06-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ad1bba1c91ff35dc7ab629d632fa26dbbf71d7aa195322e056ea5c52853ea6d7",
+        "size": 1047
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/07-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f6cacf37928b9c446044887f3cf8d62abebe3caf3096fd049e5c014dd53e4fd1",
+        "size": 1317
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/08-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a75f73398a60e85a284356e1c142e07c5759a39a1119fb70c88ff8d48fa685f4",
+        "size": 1085
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/09-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c2c40b686be42d46378f5a146cd4c450f490b5e747eaffc82e928e945b999aa0",
+        "size": 1085
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/10-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "bb77fb5e40515a20db49247d1c5962441258906450ee48297db69194dd8fac8d",
+        "size": 1085
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/11-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "8b5121b96eee1e4fe457fe3e25733c4f715f6165b500b9d108b16ffb8c8429f8",
+        "size": 1085
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/12-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ef55f7b64d010d86e6899f9aac0d8349ab8a164abb9705460b048ebe9369d9be",
+        "size": 774
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/13-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "aa0d830ed1e13560bdd9b798f8469f191aa8ed5ab00b57a0eb35c6cd886d7881",
+        "size": 771
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/14-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4598989fc0bae428d80578ad478c2ead8970dfb3bbca5ca68ed26c7ea6a6b9e1",
+        "size": 770
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/15-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c339051073a5c3bd993ddbfef2d8176953b9687de7360421384ef183f3e4d3da",
+        "size": 770
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/16-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "bc28cebce690d8819cb1beb388b736a4b24715fe44788d584191ff032e1d7659",
+        "size": 771
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/17-plugin-edit.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4f9fe8e3b93749f1492bbb1135eb4f2bed26b5176b7176a26e2f44a74656b702",
+        "size": 159
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/18-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "5ca42a24cf41d10cef57c098ae7a4c07785742106d4c9ecb41473c84a8f1fd0c",
+        "size": 347
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/19-plugin-edit-commercial.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e6138d79eed6eac8c2edc8e27b74c548f1900bb2809a461eb3224e2c1508eaab",
+        "size": 130
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/20-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "bfb87e5831cd51ae2a1a24f3713f12eb48d7685d6e1e9795cb9b4db18a5fe8a6",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/21-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0be955c349986409168a484a35a48e73ad89fbea1f3b1c95ea265e46eff300f2",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/22-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "5b1fe9714d8eed23e52a56d51f866379152d5769812a1e265b8d72a043920b9b",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/23-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "33fb7f7916a9571b14c506314d69359e1dbfd736e571c51409d6b4d36441c29e",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/24-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "9112946e923871173155d731e208f21565dab98f81f1a558b895910c69c81a22",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/25-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7f9c676a079b33263d88ad8b2cfd13fd4c5afffa6080731f9f2d3c1490e2a9fe",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "69cff4510caf747de8d863121c94a9ee50cd6fe1ab52939aaf846c7139f65a5a",
+        "size": 1012
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/02-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7ab65ace1c13471874b4fffc548608ad3d19d99652a9cceab73158856291025c",
+        "size": 345
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/04-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "96d3fa8192a96e59918d285345daeec9f5f66e03642862e6f28cad9a97fca120",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "df7c553ef704645641898b707db232a3e7cbb9566f70473d1bebf22070e82301",
+        "size": 995
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/02-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b5436dde65e8c8da93800c375f3cc1e4556245f69ed2cb5efce2a777e7d30a8d",
+        "size": 342
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/03-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c7c7f3bf4e8eb48c8e63301be0088adba82bced941e970542490b39ea41f171a",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010600-dd-plugin-update-projection/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "400ecd040c467a94f23b646b339d806b5a75ca95290fd9595997ccc5d59c5c8b",
+        "size": 978
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010600-dd-plugin-update-projection/03-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e579a3c8e539fafbddd6797d57c0a3f8dc5dc9d0e88649c791630c16c26cfc85",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-011000-dd-plugin-edit-commercial/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "44dd39115d0276edbf3508b1d4da0969e364236f442b7bcecdb142fc686366c5",
+        "size": 976
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "831244f5fc45a26743714b33097403476b625baeea7c89ab72612b69c8c49137",
+        "size": 994
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/02-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ecd43c93e6e812fe5085e04ee9c4452cc6eab97b3d1b9d136abebde98c19b774",
+        "size": 347
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/03-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1eddb11af587c18cf65cb9b14b7e9beb8dedda7a48ed81bb6083b0ad84b60441",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "941c89c7a1492c5075d350156accc1a2652688b81770e26e5ad789b3218b10a3",
+        "size": 1276
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c021d67b0a2b04874d2bc8cd7a6e9355b4ae4b77dc10b3d38ad62e34d910c551",
+        "size": 970
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/02-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "3ed5ef90482c21201ee6425875fa503d92876a25177d007d992ecf30a3905478",
+        "size": 343
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/03-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "53d9ac993538c61a60430e19b6ead421c96392ef729ed186b880447569a3b527",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b15df0de12ab651c61bb200028e3174032821423ec0429283c79aa563e5bc980",
+        "size": 1972
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d4c9cab23fe96aafb6e2a9f2f05c020fae31702b20c3c9bcff2293cb42efdccb",
+        "size": 986
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/02-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "9612a296425d376b77bae06fc7f26448436f68c96628f4b204b2f8fe1508cddd",
+        "size": 347
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/03-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e9f8b442f46c6c96072a70a9787a7dcbade71ba2ee9517863308db70acd40893",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7261d0990e6c514f068a1ff41a8f406d42ee3b6fc17c4727779ede67ed511a7d",
+        "size": 877
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/01-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "650d96d385219a2f036d0d63316c61e8c825d08933ace66dfc17a83a1a44c949",
+        "size": 906
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/02-config-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "428272c1a1943587f3d20247865c1d59fc688ac13dffc500d1ba4c0db588b53a",
+        "size": 662
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/03-config-edit.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ff63c202297cf021e5842d02c1e45718612ef639dde1ccbd6703180742f91bab",
+        "size": 305
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/04-config-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2a28527f049c9cb50efca8a34da3d115f9204c832f7649308dd2d2e63d604cf3",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/05-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a500722757aba980286603dae746d8a0edcaf72810f62ded93b97a104a9c571b",
+        "size": 777
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/06-wa-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "29f60bf73152c9e90aebdd9e2629578f358fbe298180777e4024ec8e1e85a206",
+        "size": 240
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/07-wa-edit.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d84a36ff4c96f2c720d567edcffc2d065fe2a81576fee9f9ac90b3f04cfdc3ec",
+        "size": 187
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/08-wa-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "6ef4248feb52e28ed789530b60bb50ae1782e631a25c8061c0f2b8dad6df8799",
+        "size": 117
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "fafb3af911da2e7033c74caac9cea5c88fe6bc85a9113b62ce1891440ea6f5bd",
+        "size": 1221
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-create-retry-verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "8204ab7c9013df27c1807be21b2809bb9ff2feb2f5459bf8abad3c51d1f975f6",
+        "size": 624
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-fixed-verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "64b2424530ab8998517b4c7944a6e0249b84a9aa58a8cfedddc452edbc6c5517",
+        "size": 888
+      },
+      "attributedTo": []
+    }
+  ],
+  "unattributed": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "ae67c9e4b0f71cb8082a96f79702a76432364ee7e9977916bcf0384ed710b323",
+        "size": 7098
+      },
+      "after": {
+        "hash": "3792617c49c59982224279d76ea11d5b1536ba3d355dcc5e303a7423e43832a9",
+        "size": 7866
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "03db331105b4a69d67d20904ad9deab89a1377bf6795d97e71cc46ee8e40bfc0",
+        "size": 1047
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/02-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7cc51110dc74c4ebb3e7a36dca69b76d3e4ff919ef95fcfeab84547c56a0b038",
+        "size": 1043
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/03-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ede0d37e027d258879ee870ce29e96bc6a2d42d66a98d268b152b89d778a9f77",
+        "size": 1042
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/04-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4fd11d147d184b5e42ee9973e9defcfd5a455a8b1900303163311b70023a2ad8",
+        "size": 1042
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/05-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "26f933e270b268531126334cb449d7106770b142a42306be211d58f594413a3d",
+        "size": 1043
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/06-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ad1bba1c91ff35dc7ab629d632fa26dbbf71d7aa195322e056ea5c52853ea6d7",
+        "size": 1047
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/07-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f6cacf37928b9c446044887f3cf8d62abebe3caf3096fd049e5c014dd53e4fd1",
+        "size": 1317
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/08-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a75f73398a60e85a284356e1c142e07c5759a39a1119fb70c88ff8d48fa685f4",
+        "size": 1085
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/09-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c2c40b686be42d46378f5a146cd4c450f490b5e747eaffc82e928e945b999aa0",
+        "size": 1085
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/10-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "bb77fb5e40515a20db49247d1c5962441258906450ee48297db69194dd8fac8d",
+        "size": 1085
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/11-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "8b5121b96eee1e4fe457fe3e25733c4f715f6165b500b9d108b16ffb8c8429f8",
+        "size": 1085
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/12-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ef55f7b64d010d86e6899f9aac0d8349ab8a164abb9705460b048ebe9369d9be",
+        "size": 774
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/13-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "aa0d830ed1e13560bdd9b798f8469f191aa8ed5ab00b57a0eb35c6cd886d7881",
+        "size": 771
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/14-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4598989fc0bae428d80578ad478c2ead8970dfb3bbca5ca68ed26c7ea6a6b9e1",
+        "size": 770
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/15-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c339051073a5c3bd993ddbfef2d8176953b9687de7360421384ef183f3e4d3da",
+        "size": 770
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/16-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "bc28cebce690d8819cb1beb388b736a4b24715fe44788d584191ff032e1d7659",
+        "size": 771
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/17-plugin-edit.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4f9fe8e3b93749f1492bbb1135eb4f2bed26b5176b7176a26e2f44a74656b702",
+        "size": 159
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/18-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "5ca42a24cf41d10cef57c098ae7a4c07785742106d4c9ecb41473c84a8f1fd0c",
+        "size": 347
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/19-plugin-edit-commercial.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e6138d79eed6eac8c2edc8e27b74c548f1900bb2809a461eb3224e2c1508eaab",
+        "size": 130
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/20-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "bfb87e5831cd51ae2a1a24f3713f12eb48d7685d6e1e9795cb9b4db18a5fe8a6",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/21-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0be955c349986409168a484a35a48e73ad89fbea1f3b1c95ea265e46eff300f2",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/22-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "5b1fe9714d8eed23e52a56d51f866379152d5769812a1e265b8d72a043920b9b",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/23-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "33fb7f7916a9571b14c506314d69359e1dbfd736e571c51409d6b4d36441c29e",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/24-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "9112946e923871173155d731e208f21565dab98f81f1a558b895910c69c81a22",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/25-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7f9c676a079b33263d88ad8b2cfd13fd4c5afffa6080731f9f2d3c1490e2a9fe",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "69cff4510caf747de8d863121c94a9ee50cd6fe1ab52939aaf846c7139f65a5a",
+        "size": 1012
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/02-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7ab65ace1c13471874b4fffc548608ad3d19d99652a9cceab73158856291025c",
+        "size": 345
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/04-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "96d3fa8192a96e59918d285345daeec9f5f66e03642862e6f28cad9a97fca120",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "df7c553ef704645641898b707db232a3e7cbb9566f70473d1bebf22070e82301",
+        "size": 995
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/02-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b5436dde65e8c8da93800c375f3cc1e4556245f69ed2cb5efce2a777e7d30a8d",
+        "size": 342
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/03-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c7c7f3bf4e8eb48c8e63301be0088adba82bced941e970542490b39ea41f171a",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010600-dd-plugin-update-projection/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "400ecd040c467a94f23b646b339d806b5a75ca95290fd9595997ccc5d59c5c8b",
+        "size": 978
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-010600-dd-plugin-update-projection/03-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e579a3c8e539fafbddd6797d57c0a3f8dc5dc9d0e88649c791630c16c26cfc85",
+        "size": 116
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-011000-dd-plugin-edit-commercial/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "44dd39115d0276edbf3508b1d4da0969e364236f442b7bcecdb142fc686366c5",
+        "size": 976
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "831244f5fc45a26743714b33097403476b625baeea7c89ab72612b69c8c49137",
+        "size": 994
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/02-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ecd43c93e6e812fe5085e04ee9c4452cc6eab97b3d1b9d136abebde98c19b774",
+        "size": 347
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/03-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1eddb11af587c18cf65cb9b14b7e9beb8dedda7a48ed81bb6083b0ad84b60441",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "941c89c7a1492c5075d350156accc1a2652688b81770e26e5ad789b3218b10a3",
+        "size": 1276
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c021d67b0a2b04874d2bc8cd7a6e9355b4ae4b77dc10b3d38ad62e34d910c551",
+        "size": 970
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/02-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "3ed5ef90482c21201ee6425875fa503d92876a25177d007d992ecf30a3905478",
+        "size": 343
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/03-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "53d9ac993538c61a60430e19b6ead421c96392ef729ed186b880447569a3b527",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b15df0de12ab651c61bb200028e3174032821423ec0429283c79aa563e5bc980",
+        "size": 1972
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/01-plugin-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d4c9cab23fe96aafb6e2a9f2f05c020fae31702b20c3c9bcff2293cb42efdccb",
+        "size": 986
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/02-plugin-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "9612a296425d376b77bae06fc7f26448436f68c96628f4b204b2f8fe1508cddd",
+        "size": 347
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/03-plugin-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e9f8b442f46c6c96072a70a9787a7dcbade71ba2ee9517863308db70acd40893",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7261d0990e6c514f068a1ff41a8f406d42ee3b6fc17c4727779ede67ed511a7d",
+        "size": 877
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/01-config-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "650d96d385219a2f036d0d63316c61e8c825d08933ace66dfc17a83a1a44c949",
+        "size": 906
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/02-config-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "428272c1a1943587f3d20247865c1d59fc688ac13dffc500d1ba4c0db588b53a",
+        "size": 662
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/03-config-edit.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ff63c202297cf021e5842d02c1e45718612ef639dde1ccbd6703180742f91bab",
+        "size": 305
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/04-config-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2a28527f049c9cb50efca8a34da3d115f9204c832f7649308dd2d2e63d604cf3",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/05-wa-create.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a500722757aba980286603dae746d8a0edcaf72810f62ded93b97a104a9c571b",
+        "size": 777
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/06-wa-update.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "29f60bf73152c9e90aebdd9e2629578f358fbe298180777e4024ec8e1e85a206",
+        "size": 240
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/07-wa-edit.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d84a36ff4c96f2c720d567edcffc2d065fe2a81576fee9f9ac90b3f04cfdc3ec",
+        "size": 187
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/08-wa-delete.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "6ef4248feb52e28ed789530b60bb50ae1782e631a25c8061c0f2b8dad6df8799",
+        "size": 117
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "fafb3af911da2e7033c74caac9cea5c88fe6bc85a9113b62ce1891440ea6f5bd",
+        "size": 1221
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-create-retry-verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "8204ab7c9013df27c1807be21b2809bb9ff2feb2f5459bf8abad3c51d1f975f6",
+        "size": 624
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-fixed-verification.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "64b2424530ab8998517b4c7944a6e0249b84a9aa58a8cfedddc452edbc6c5517",
+        "size": 888
+      },
+      "attributedTo": []
+    }
+  ],
+  "unresolvedScopes": [
+    {
+      "id": "scope:eff6f453474284c844dfa54591429aa3aa03cad0aac9887eca5c9fa9ddbc71ef",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "README.md",
+      "reason": "Changed path is not covered by a declared artifact: README.md"
+    },
+    {
+      "id": "scope:ba4ae0733049b4d0b2d1164fc3506feffef348ab3be0c19ac1ab8d819358660c",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/01-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/01-plugin-create.json"
+    },
+    {
+      "id": "scope:eac4da2aae704c637a8323feff3cdc40cbb2416a6193d784bece5b2206f3e832",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/02-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/02-plugin-create.json"
+    },
+    {
+      "id": "scope:11f488a52ad2aefe709656c51f2c06b4b0955182ee99801699f63cd076d2eff4",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/03-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/03-plugin-create.json"
+    },
+    {
+      "id": "scope:641d6450ea0d22ecb41e0c1a9756ec5adfbebcdd92bfca9375619c206526c891",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/04-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/04-plugin-create.json"
+    },
+    {
+      "id": "scope:931d13ec40ab27eb2c4b78b57a35e1e89b0c8e05774f76b06cd86bb416712b7d",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/05-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/05-plugin-create.json"
+    },
+    {
+      "id": "scope:561a4daeec1ff6e756e59c3a8bbf1a6e114640519374a785aca0b6c189021610",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/06-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/06-plugin-create.json"
+    },
+    {
+      "id": "scope:238fc27110650f222e7269ae7c08a02a0ab83db7a551ef983e0ad9a19819b13a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/07-config-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/07-config-create.json"
+    },
+    {
+      "id": "scope:55d73a1e7cd27455b105c650da0f9e3c2b84fcb10c5a193d8cdd12b2d30cee1e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/08-config-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/08-config-create.json"
+    },
+    {
+      "id": "scope:e4583ae862224c3f5ff6b3ebac482361dcf9a358fd5799b7c611f92008a55751",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/09-config-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/09-config-create.json"
+    },
+    {
+      "id": "scope:1f3d8ab6e57f4b05aa850cab9f2e351457f5382ff1b0e62ef37a20e12de62346",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/10-config-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/10-config-create.json"
+    },
+    {
+      "id": "scope:2e7879ac7b3967b9227f973f30bc7b0e4952f2d795f360578457ab8e939b87d2",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/11-config-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/11-config-create.json"
+    },
+    {
+      "id": "scope:872df4967387b7a420dd0fe453e3427060fc93996b24bb29be9580468ef86227",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/12-wa-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/12-wa-create.json"
+    },
+    {
+      "id": "scope:0ab295f27b840b6166e11e4b2c56088c41abe5d4534f9fe7cf024e6aa5482cc2",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/13-wa-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/13-wa-create.json"
+    },
+    {
+      "id": "scope:88baee905c4d324125643b021b9de41c173378a18f1b60ec39aae66c6599e1b8",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/14-wa-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/14-wa-create.json"
+    },
+    {
+      "id": "scope:09bfd9bf614e48e111bc0d6ff1a264d05a015fa958961a487bf012e2a01fd934",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/15-wa-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/15-wa-create.json"
+    },
+    {
+      "id": "scope:881ddf3bab6ec613516bd3c589af010d2bb67e28b452c276bda389f06fd1a39f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/16-wa-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/16-wa-create.json"
+    },
+    {
+      "id": "scope:08994d0bf324cae8e56234e62824b20ecf78e2eb96d0f78c2a2394c83e5347fe",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/17-plugin-edit.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/17-plugin-edit.json"
+    },
+    {
+      "id": "scope:3db13f4875aa0a599d8eaecd44bf5ef0997d247d2a7a8890f6e8ad37d46876ac",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/18-plugin-update.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/18-plugin-update.json"
+    },
+    {
+      "id": "scope:9aec0769a9a2303be16d8d2bf2e3d3533968df83974b36d0cb12525dc11d841e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/19-plugin-edit-commercial.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/19-plugin-edit-commercial.json"
+    },
+    {
+      "id": "scope:7986d960aebd01cf85d77f0eb5c519db3fc3c982e68582d5741437812033edf4",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/20-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/20-plugin-delete.json"
+    },
+    {
+      "id": "scope:13c5abae8fa6efba3376bfb1c736425f09612b65c2839fc90045e68928be22d2",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/21-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/21-plugin-delete.json"
+    },
+    {
+      "id": "scope:f0ee10abefb7d5223ca22f05ee70f62a304ed6732ff11e7c63fa37e2833da979",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/22-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/22-plugin-delete.json"
+    },
+    {
+      "id": "scope:4d6eb01f1800ad3701a3dc8e0433986606b9060f200cba24beab412567e27408",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/23-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/23-plugin-delete.json"
+    },
+    {
+      "id": "scope:33878b2354b870390f2b00a2225e201df9d3bb49d09f93b0e7dbd9f6a9f07253",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/24-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/24-plugin-delete.json"
+    },
+    {
+      "id": "scope:b03716d3d4a7d5418b8ab6bc172cc0fa9f30981e66045500231d63e13e13ee30",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-004600-dd-real-verification/25-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-004600-dd-real-verification/25-plugin-delete.json"
+    },
+    {
+      "id": "scope:7e2ff716560de1b5050c8aeec4b67571fba39e806dfd0ecef717b074e496d16a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-010000-dd-real-verification-retry/01-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-010000-dd-real-verification-retry/01-plugin-create.json"
+    },
+    {
+      "id": "scope:fd49bc81024ba9c2721b4bada1db68440e5d4b62069afc2186e29e3dd9e0f34d",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-010000-dd-real-verification-retry/02-plugin-update.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-010000-dd-real-verification-retry/02-plugin-update.json"
+    },
+    {
+      "id": "scope:88e36ba1d6c8b6ec76a540003be268d9263dd1c588810c7307c00c3dcfc1776f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-010000-dd-real-verification-retry/04-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-010000-dd-real-verification-retry/04-plugin-delete.json"
+    },
+    {
+      "id": "scope:3d77de00eee07c52686b7a10ac4106005cbf88998d415ad189ba1430e62b3486",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-010300-dd-plugin-version-readback/01-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-010300-dd-plugin-version-readback/01-plugin-create.json"
+    },
+    {
+      "id": "scope:4dedc15fdff6eba7e5a0539e8557c00ed992fb59ba8d0d750e9e27b3b7b6eb0a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-010300-dd-plugin-version-readback/02-plugin-update.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-010300-dd-plugin-version-readback/02-plugin-update.json"
+    },
+    {
+      "id": "scope:2c7865d699f7ce5b8510ffad006403aaf1f00d6e3746250fcba76d6d62aefa49",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-010300-dd-plugin-version-readback/03-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-010300-dd-plugin-version-readback/03-plugin-delete.json"
+    },
+    {
+      "id": "scope:9a9b3b1b783ad4e4f7295f4fab09ccf8c2adee5cc01360e92bb1e55fb83de223",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-010600-dd-plugin-update-projection/01-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-010600-dd-plugin-update-projection/01-plugin-create.json"
+    },
+    {
+      "id": "scope:47eed42e55c2a69424ed6e4b46dec7ae1c3d5e6b46678ac757b6d4183d3ee24f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-010600-dd-plugin-update-projection/03-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-010600-dd-plugin-update-projection/03-plugin-delete.json"
+    },
+    {
+      "id": "scope:320e5dee852f38b2fc19f2eb8e38a9b136b919dfad012cb125cf608d668dab8c",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-011000-dd-plugin-edit-commercial/01-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-011000-dd-plugin-edit-commercial/01-plugin-create.json"
+    },
+    {
+      "id": "scope:613c69e0e429cfbce2eac61fd27c5812db6e04bd920e8b9bc569264c4d7819d0",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/01-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013000-dd-plugin-detail-readback/01-plugin-create.json"
+    },
+    {
+      "id": "scope:867ea6b76b10383dd2391e276ba3be32872c6d8adda2181a71d119d5667c1875",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/02-plugin-update.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013000-dd-plugin-detail-readback/02-plugin-update.json"
+    },
+    {
+      "id": "scope:01e55e7751de80820e37637015fc991140cdcb7480e3a1cf3284d22fdb091ea4",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/03-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013000-dd-plugin-detail-readback/03-plugin-delete.json"
+    },
+    {
+      "id": "scope:4887a76fe7c443da0992dc356d5bc42e11a6ecc7391d56f2ba2275aff3a367d9",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/verification.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013000-dd-plugin-detail-readback/verification.json"
+    },
+    {
+      "id": "scope:1eaea7b6bf6c921b49f183b8db77beebbecf84a11227474de7bad416e5533165",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/01-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013100-dd-plugin-detail-poll/01-plugin-create.json"
+    },
+    {
+      "id": "scope:125c66fb64ac6c938c612495d1a777a9314a3a647ebf9a252458196932d3f07c",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/02-plugin-update.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013100-dd-plugin-detail-poll/02-plugin-update.json"
+    },
+    {
+      "id": "scope:701cf92741696594472cafdad2834a23c01f063ee2aa105cf7a212e228252cca",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/03-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013100-dd-plugin-detail-poll/03-plugin-delete.json"
+    },
+    {
+      "id": "scope:15eb56d340247b0e387f067f9cbb1c6672768e8c6f29f74435aad0ac20cb54e6",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/verification.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013100-dd-plugin-detail-poll/verification.json"
+    },
+    {
+      "id": "scope:8389474b50abb3dc1f91c120ffdcd271125b71c321a72c57c3325dc50a253658",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013200-dd-plugin-author-readback/01-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013200-dd-plugin-author-readback/01-plugin-create.json"
+    },
+    {
+      "id": "scope:2dfa2ed00df4d513a78f3d86474a02ad31d2a55a19365367493ed8524df10d15",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013200-dd-plugin-author-readback/02-plugin-update.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013200-dd-plugin-author-readback/02-plugin-update.json"
+    },
+    {
+      "id": "scope:33070ec04182659896b1827e8649ad1188e541964a69cbda5b63d561882bba75",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013200-dd-plugin-author-readback/03-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013200-dd-plugin-author-readback/03-plugin-delete.json"
+    },
+    {
+      "id": "scope:106f6185b5aeb5f7676fc1cf7027cc23715326332f2babe321a005d04a054b81",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013200-dd-plugin-author-readback/verification.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013200-dd-plugin-author-readback/verification.json"
+    },
+    {
+      "id": "scope:a815893ac87a4bc798422a4e95af2a8ffc34a5feac0a426d041a9f127e4fcb32",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/01-config-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013400-dd-config-wa-real-matrix/01-config-create.json"
+    },
+    {
+      "id": "scope:f8e4dd02489b479f124331c65bcf1261675c000e0259af134ab6dd61459954b3",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/02-config-update.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013400-dd-config-wa-real-matrix/02-config-update.json"
+    },
+    {
+      "id": "scope:318372b00fba929b8f87d92979db49341c057d5ed0e65ebd2d53e5e1d7f3d5cc",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/03-config-edit.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013400-dd-config-wa-real-matrix/03-config-edit.json"
+    },
+    {
+      "id": "scope:3b10e579112a2bd6606233fabb36bf080ce4672921558666ba8e55e01285b177",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/04-config-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013400-dd-config-wa-real-matrix/04-config-delete.json"
+    },
+    {
+      "id": "scope:aa115708badfbc4ed1b4b91146bf5bd3af03012e0d317b19abf2d480e8cd3fd5",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/05-wa-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013400-dd-config-wa-real-matrix/05-wa-create.json"
+    },
+    {
+      "id": "scope:6d5486704d4e171b59cce02b0bddc0d4396844d9585d340633c5c5e178d51409",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/06-wa-update.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013400-dd-config-wa-real-matrix/06-wa-update.json"
+    },
+    {
+      "id": "scope:68d445858c1e6e6471f2d373f922ce0e174ba86fc8e5dd2fcf552e2db3b69c73",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/07-wa-edit.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013400-dd-config-wa-real-matrix/07-wa-edit.json"
+    },
+    {
+      "id": "scope:951ab7ee69cc480355cd73a79f1b58b5b984daab554383440417062b9397081c",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/08-wa-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013400-dd-config-wa-real-matrix/08-wa-delete.json"
+    },
+    {
+      "id": "scope:0e88521d8b6ee81b888d8b866b2d7837ad1148b8fa08295231d968989c4e8fb2",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/verification.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013400-dd-config-wa-real-matrix/verification.json"
+    },
+    {
+      "id": "scope:2df7f49f3145b5d13b0c31849d7cf43290a4e1b2fae6148a35353e4332c884e0",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-create-retry-verification.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013400-dd-config-wa-real-matrix/wa-create-retry-verification.json"
+    },
+    {
+      "id": "scope:2bc11ce1a0a11417e20f7ec18af70cc910dd04d699879d65a59fd259243f0222",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-fixed-verification.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-013400-dd-config-wa-real-matrix/wa-fixed-verification.json"
+    }
+  ],
+  "noCodeReason": null,
+  "scopeHash": "7b69d1ef8ed0060b98201b6fbcc5dc49c2c8264f4548aeccc977167c90f74d6d"
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "3662fb4f-cbbe-43d5-8c6f-4e2cad68349d",
+  "kind": "archive",
+  "status": "committed",
+  "change": "add-newbee-plugin-changelog-and-wa-workflows",
+  "createdAt": "2026-07-30T15:02:18.035Z",
+  "preflightHash": "6337f0ce36b8be2adeb0abe608fe99649bf91a2b8201db61b17fd38f9046b165",
+  "operations": [
+    {
+      "id": "spec-1-newbee-plugin-changelog",
+      "type": "write",
+      "target": "specs/newbee-plugin-changelog/spec.md",
+      "staged": "runtime/transactions/3662fb4f-cbbe-43d5-8c6f-4e2cad68349d/staged/specs/newbee-plugin-changelog/spec.md",
+      "expectedTargetHash": null,
+      "stagedHash": "430dce78a36ae0d6f36b9cf194309e41e978e7fac6433a8b0c3748a37fab7ff6"
+    },
+    {
+      "id": "spec-2-newbee-wa-workflows",
+      "type": "write",
+      "target": "specs/newbee-wa-workflows/spec.md",
+      "staged": "runtime/transactions/3662fb4f-cbbe-43d5-8c6f-4e2cad68349d/staged/specs/newbee-wa-workflows/spec.md",
+      "expectedTargetHash": null,
+      "stagedHash": "e0a073edc8be8418eaf1f038c95a48d6a2d77c6d4d410c83d38813ef2246be9b"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/add-newbee-plugin-changelog-and-wa-workflows",
+      "target": "archive/2026-07-30-add-newbee-plugin-changelog-and-wa-workflows",
+      "expectedSourceHash": "17508a0da5fe6bd671fe8df2dfda964a2d2a3dc65476691cf67e60ed7152bca1",
+      "expectedTargetHash": null
+    }
+  ]
+}

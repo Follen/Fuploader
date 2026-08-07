@@ -1,0 +1,560 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "36cc4ea1459629324a9727631eecb24acac6e82c74754775554e360c18deae58",
+  "baselineProjectionRef": "runtime/evidence/snapshots/ac10ace49e5239e307b11676d61ea15952349fef95c489a0d6ed4e9a7f1b41c7.json",
+  "baselineProjectionHash": "ac10ace49e5239e307b11676d61ea15952349fef95c489a0d6ed4e9a7f1b41c7",
+  "currentProjectionRef": "runtime/evidence/snapshots/1e906771e09de52e55c8e461152fc92e333fe5d88ee331e4603a70dad6ca03ce.json",
+  "currentProjectionHash": "1e906771e09de52e55c8e461152fc92e333fe5d88ee331e4603a70dad6ca03ce",
+  "complete": false,
+  "declaredArtifacts": [
+    {
+      "path": "fupload/scripts/fupload_cli/dd_broker.py",
+      "kind": "file"
+    }
+  ],
+  "changes": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "ae67c9e4b0f71cb8082a96f79702a76432364ee7e9977916bcf0384ed710b323",
+        "size": 7098
+      },
+      "after": {
+        "hash": "3792617c49c59982224279d76ea11d5b1536ba3d355dcc5e303a7423e43832a9",
+        "size": 7866
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "modified",
+      "before": {
+        "hash": "3cd993f11053ae4dbcc097a20b2af4598f4c3379b6db16cb5b218a37e4778a77",
+        "size": 12712
+      },
+      "after": {
+        "hash": "6d6c0e6165d64976e610ebbb731f0e70502465000f1aec9306ab0217e4a25050",
+        "size": 14687
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/examples/dd-config-delete.json",
+      "kind": "modified",
+      "before": {
+        "hash": "218c14b1d6501885cf938dd47279c588bb4e9ca09ca1b52b81188d34213a4da8",
+        "size": 90
+      },
+      "after": {
+        "hash": "6710aa8fac85c5ba6ed4d017d6ffcaaf331c10e84c07ef73faecd646f9eb3d7a",
+        "size": 93
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/examples/dd-plugin-delete.json",
+      "kind": "modified",
+      "before": {
+        "hash": "bf0e189308b795628cd603709656c94ab1fc440ee83cb9d58cad76ee2df40a9d",
+        "size": 90
+      },
+      "after": {
+        "hash": "6cedf5f811852a7d0e9f02896571936f363dae14a2f596795b19d6ffc04d6376",
+        "size": 93
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/examples/dd-wa-delete.json",
+      "kind": "modified",
+      "before": {
+        "hash": "e5e5b8af4f9e30b6f435f04dccf527e262439cdc6007752be4e7d34f73fdd8bb",
+        "size": 82
+      },
+      "after": {
+        "hash": "3fb981d22516ed0274c5063b6f41073778dbdd575d58f8802c60eed5c3745d72",
+        "size": 85
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "kind": "modified",
+      "before": {
+        "hash": "6425a2eb0b9a352880356c1aa93226f94a701d9709e8adacbe2334f330883269",
+        "size": 9478
+      },
+      "after": {
+        "hash": "5febdd57184532794fa70724b743fc28431083497344bf7ab3c536389e480d2c",
+        "size": 9224
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/references/workflow.md",
+      "kind": "modified",
+      "before": {
+        "hash": "f408a016eca81577911603628cb68bc19e9557643c8ee224ccff52dd01a24bc2",
+        "size": 5223
+      },
+      "after": {
+        "hash": "9013d1b1715b8ef3b614dda20b79a4d5d81c9308de53d539f2761d94c8511877",
+        "size": 6166
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "1eb39b2c14fe380d91292697fe22bf0365d189c25f85d9ae7ad3bb8788528020",
+        "size": 20503
+      },
+      "after": {
+        "hash": "605f555f8d17d598f0170de84343c24a5673ab2c40372114dfdd2b3f68efa2fe",
+        "size": 22057
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "kind": "modified",
+      "before": {
+        "hash": "c8b43ba35697f2367c47db78507190e728b86b070b0d8baae7946f245ab1e590",
+        "size": 79649
+      },
+      "after": {
+        "hash": "14ef2baeedba89163cae2f9f4865d1bb5f75fa28851c1305bc37187be0344d02",
+        "size": 91612
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_broker.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "8dff6cdca057dd357392ac18c746c09d84d24b39b4888000c4087f6e20178792",
+        "size": 25011
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/dd_broker.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_sidecar.py",
+      "kind": "modified",
+      "before": {
+        "hash": "c6f732651d45ffd06914e0dbbd58d7e99c4b94e0845530d489e7dc11be3d2838",
+        "size": 9894
+      },
+      "after": {
+        "hash": "051d2bdde88e219683f3b00605f10b9ac9a134c5df9fa73ed6b2e6aee1c426b6",
+        "size": 13344
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/errors.py",
+      "kind": "modified",
+      "before": {
+        "hash": "01135290d45f1d5d2a3410f64c7a335739bd2f6d4ca3f38a01d38e4dad31975c",
+        "size": 2619
+      },
+      "after": {
+        "hash": "70dc2cb98f59b7a36487408a5e7aeecbc8608a28effdef31e4c1d346b9d07df5",
+        "size": 3443
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "ca8d757df8bf6def60983d7f9b03f3160a80f00becbd3e06559cb4a7b5acdb5f",
+        "size": 30484
+      },
+      "after": {
+        "hash": "4fd8bfc7d46c1532cc307ccd7e9bbf2391b20bb25ba94d2a5498cd48dabc2ff0",
+        "size": 30479
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_builders.py",
+      "kind": "modified",
+      "before": {
+        "hash": "fd3448d43b4d1df2fdf23da71ba6abd46299abcc9dad408b00f169cca79fefce",
+        "size": 34368
+      },
+      "after": {
+        "hash": "e10666d0d82113359ce3b92987d726c4172964f115e72438ef2193b672ed3b47",
+        "size": 37092
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "9ada7a7d82ff383ba5c693c2a5be49e6b19470a1ea3c6bd9dd4c51db8e6bb505",
+        "size": 11410
+      },
+      "after": {
+        "hash": "749bb0cba6de0dc99b8cad50f64a30dc6cc55548a4bf2996cce7a05d0debb97e",
+        "size": 12251
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "15be6224f7d53986d8884cb3e4a03dbe66a9b7056c953502b9f3976baaba8ac2",
+        "size": 15212
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "4c3a162aa86ebaa378acb00ff8d77826d6dbdbd02a313b37657a3f19c6549b41",
+        "size": 10692
+      },
+      "after": {
+        "hash": "9864711f7d1ed8487ceba909c64c23a9867a2dcd04cbfe207d500674b80c20a4",
+        "size": 10983
+      },
+      "attributedTo": []
+    }
+  ],
+  "unattributed": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "ae67c9e4b0f71cb8082a96f79702a76432364ee7e9977916bcf0384ed710b323",
+        "size": 7098
+      },
+      "after": {
+        "hash": "3792617c49c59982224279d76ea11d5b1536ba3d355dcc5e303a7423e43832a9",
+        "size": 7866
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "modified",
+      "before": {
+        "hash": "3cd993f11053ae4dbcc097a20b2af4598f4c3379b6db16cb5b218a37e4778a77",
+        "size": 12712
+      },
+      "after": {
+        "hash": "6d6c0e6165d64976e610ebbb731f0e70502465000f1aec9306ab0217e4a25050",
+        "size": 14687
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/examples/dd-config-delete.json",
+      "kind": "modified",
+      "before": {
+        "hash": "218c14b1d6501885cf938dd47279c588bb4e9ca09ca1b52b81188d34213a4da8",
+        "size": 90
+      },
+      "after": {
+        "hash": "6710aa8fac85c5ba6ed4d017d6ffcaaf331c10e84c07ef73faecd646f9eb3d7a",
+        "size": 93
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/examples/dd-plugin-delete.json",
+      "kind": "modified",
+      "before": {
+        "hash": "bf0e189308b795628cd603709656c94ab1fc440ee83cb9d58cad76ee2df40a9d",
+        "size": 90
+      },
+      "after": {
+        "hash": "6cedf5f811852a7d0e9f02896571936f363dae14a2f596795b19d6ffc04d6376",
+        "size": 93
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/examples/dd-wa-delete.json",
+      "kind": "modified",
+      "before": {
+        "hash": "e5e5b8af4f9e30b6f435f04dccf527e262439cdc6007752be4e7d34f73fdd8bb",
+        "size": 82
+      },
+      "after": {
+        "hash": "3fb981d22516ed0274c5063b6f41073778dbdd575d58f8802c60eed5c3745d72",
+        "size": 85
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "kind": "modified",
+      "before": {
+        "hash": "6425a2eb0b9a352880356c1aa93226f94a701d9709e8adacbe2334f330883269",
+        "size": 9478
+      },
+      "after": {
+        "hash": "5febdd57184532794fa70724b743fc28431083497344bf7ab3c536389e480d2c",
+        "size": 9224
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/references/workflow.md",
+      "kind": "modified",
+      "before": {
+        "hash": "f408a016eca81577911603628cb68bc19e9557643c8ee224ccff52dd01a24bc2",
+        "size": 5223
+      },
+      "after": {
+        "hash": "9013d1b1715b8ef3b614dda20b79a4d5d81c9308de53d539f2761d94c8511877",
+        "size": 6166
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "1eb39b2c14fe380d91292697fe22bf0365d189c25f85d9ae7ad3bb8788528020",
+        "size": 20503
+      },
+      "after": {
+        "hash": "605f555f8d17d598f0170de84343c24a5673ab2c40372114dfdd2b3f68efa2fe",
+        "size": 22057
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "kind": "modified",
+      "before": {
+        "hash": "c8b43ba35697f2367c47db78507190e728b86b070b0d8baae7946f245ab1e590",
+        "size": 79649
+      },
+      "after": {
+        "hash": "14ef2baeedba89163cae2f9f4865d1bb5f75fa28851c1305bc37187be0344d02",
+        "size": 91612
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_sidecar.py",
+      "kind": "modified",
+      "before": {
+        "hash": "c6f732651d45ffd06914e0dbbd58d7e99c4b94e0845530d489e7dc11be3d2838",
+        "size": 9894
+      },
+      "after": {
+        "hash": "051d2bdde88e219683f3b00605f10b9ac9a134c5df9fa73ed6b2e6aee1c426b6",
+        "size": 13344
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/errors.py",
+      "kind": "modified",
+      "before": {
+        "hash": "01135290d45f1d5d2a3410f64c7a335739bd2f6d4ca3f38a01d38e4dad31975c",
+        "size": 2619
+      },
+      "after": {
+        "hash": "70dc2cb98f59b7a36487408a5e7aeecbc8608a28effdef31e4c1d346b9d07df5",
+        "size": 3443
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "ca8d757df8bf6def60983d7f9b03f3160a80f00becbd3e06559cb4a7b5acdb5f",
+        "size": 30484
+      },
+      "after": {
+        "hash": "4fd8bfc7d46c1532cc307ccd7e9bbf2391b20bb25ba94d2a5498cd48dabc2ff0",
+        "size": 30479
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_builders.py",
+      "kind": "modified",
+      "before": {
+        "hash": "fd3448d43b4d1df2fdf23da71ba6abd46299abcc9dad408b00f169cca79fefce",
+        "size": 34368
+      },
+      "after": {
+        "hash": "e10666d0d82113359ce3b92987d726c4172964f115e72438ef2193b672ed3b47",
+        "size": 37092
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "9ada7a7d82ff383ba5c693c2a5be49e6b19470a1ea3c6bd9dd4c51db8e6bb505",
+        "size": 11410
+      },
+      "after": {
+        "hash": "749bb0cba6de0dc99b8cad50f64a30dc6cc55548a4bf2996cce7a05d0debb97e",
+        "size": 12251
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "15be6224f7d53986d8884cb3e4a03dbe66a9b7056c953502b9f3976baaba8ac2",
+        "size": 15212
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "4c3a162aa86ebaa378acb00ff8d77826d6dbdbd02a313b37657a3f19c6549b41",
+        "size": 10692
+      },
+      "after": {
+        "hash": "9864711f7d1ed8487ceba909c64c23a9867a2dcd04cbfe207d500674b80c20a4",
+        "size": 10983
+      },
+      "attributedTo": []
+    }
+  ],
+  "unresolvedScopes": [
+    {
+      "id": "scope:eff6f453474284c844dfa54591429aa3aa03cad0aac9887eca5c9fa9ddbc71ef",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "README.md",
+      "reason": "Changed path is not covered by a declared artifact: README.md"
+    },
+    {
+      "id": "scope:1b15fb3ebf95ec02a06261197f8df160370affe8f91cc9d3eb37feaa31496120",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/SKILL.md",
+      "reason": "Changed path is not covered by a declared artifact: fupload/SKILL.md"
+    },
+    {
+      "id": "scope:2030d296733142cba53b45a623d1f1be6a061e250800489358f83957f1659604",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/examples/dd-config-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: fupload/examples/dd-config-delete.json"
+    },
+    {
+      "id": "scope:59cabd3b2dce0964a2ec3a28fdff458189f34ba27872b72d38239eb38247a63a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/examples/dd-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: fupload/examples/dd-plugin-delete.json"
+    },
+    {
+      "id": "scope:98316c852f37b6d9807d7c94f10958b18d1a1c86a20a34289339a16f7c10b27f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/examples/dd-wa-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: fupload/examples/dd-wa-delete.json"
+    },
+    {
+      "id": "scope:a3c2318a183ea7bee2096ae7ae25eaf178f76f20a007efd8f54d8fd1c36f3d04",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/references/dd.md",
+      "reason": "Changed path is not covered by a declared artifact: fupload/references/dd.md"
+    },
+    {
+      "id": "scope:a0d84c51d51354fe5e6c5534b6c076eeecf1c8650cf5663b0b00d55b3d51ccf4",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/references/workflow.md",
+      "reason": "Changed path is not covered by a declared artifact: fupload/references/workflow.md"
+    },
+    {
+      "id": "scope:0901231b35a68d2c906b45b208d3190ff17ffcabe117673742f4e3f982690209",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/fupload_cli/cli.py"
+    },
+    {
+      "id": "scope:d18c95fcdcac160c27c6e6d8d0b7643cf355c900eb7f2e6a471a30560bd3158c",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/fupload_cli/dd.py"
+    },
+    {
+      "id": "scope:55f9a607b367a0e5a6c58c4b4d3febc4de7c34c1f86d3ffa928dcb744c6868cf",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/fupload_cli/dd_sidecar.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/fupload_cli/dd_sidecar.py"
+    },
+    {
+      "id": "scope:5996b801712a5f8b257d14f38890308df1fc77b2cde4705ae23ce51b75cdce03",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/fupload_cli/errors.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/fupload_cli/errors.py"
+    },
+    {
+      "id": "scope:cb4b3509d36d1fe026759af9ff8f78cc7c582d5c45d3177c0e855e81188d2e39",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/fupload_cli/schema.py"
+    },
+    {
+      "id": "scope:974dacb1088ed15090e65f8e4358e20f1596f2928fdd3cf1782cd228dbfa27c6",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/tests/test_builders.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/tests/test_builders.py"
+    },
+    {
+      "id": "scope:1f2a716d3623144e696e92f8da531c9a5f9c802bfc2a0bb919b1533d547aaac1",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/tests/test_cli.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/tests/test_cli.py"
+    },
+    {
+      "id": "scope:15ed3c3155aea531dd7309ce022cfea27196452e0b72f189918e45404813cde9",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/tests/test_dd_session.py"
+    },
+    {
+      "id": "scope:2dd68d04113dfe38d2412acf8f080b243b820dcb11a60fe61b0bb012218e9ece",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/tests/test_schema.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/tests/test_schema.py"
+    }
+  ],
+  "noCodeReason": null,
+  "scopeHash": "04b882d64b8caecd2e82415cb1535904cb1d735766c6114317d6aa3952b1a790"
+}

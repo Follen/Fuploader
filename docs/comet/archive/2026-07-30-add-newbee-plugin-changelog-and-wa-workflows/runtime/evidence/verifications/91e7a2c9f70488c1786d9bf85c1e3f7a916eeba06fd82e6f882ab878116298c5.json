@@ -1,0 +1,113 @@
+{
+  "schema": "comet.native.verification-evidence.v1",
+  "change": "add-newbee-plugin-changelog-and-wa-workflows",
+  "sourceRevision": 3,
+  "result": "pass",
+  "freshness": "partial",
+  "contractHash": "4f70ed29655657e6f0508aeabbda42b25664129302cd452bc320478b5618ef70",
+  "acceptanceCriteriaHash": "7182c307ebb8759cd2771d332c52e950f487332019792d9f79ef2d68327d05d5",
+  "implementationScopeRef": "runtime/evidence/scopes/95ddb8c397b4ef2992d26711e2a7140cca308806edec762fbc289b0ae2667a9b.json",
+  "implementationScopeHash": "95ddb8c397b4ef2992d26711e2a7140cca308806edec762fbc289b0ae2667a9b",
+  "reportRef": "verification.md",
+  "reportHash": "29791256c68bfc67fb23cc25186623d58acfdd44c15385f053ae21204bda8b04",
+  "acceptanceTrace": {
+    "schema": "comet.native.acceptance-trace.v1",
+    "nativeRootRef": "docs/comet",
+    "criteriaHash": "7182c307ebb8759cd2771d332c52e950f487332019792d9f79ef2d68327d05d5",
+    "total": 8,
+    "evidenced": 8,
+    "skipped": 0,
+    "entries": [
+      {
+        "acceptanceId": "acceptance-0333b05c8de70b5b58d437e28885d13193297d61925b8a4c2e871e52ce11718c",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "Release/fupload/references/wa.md",
+          "internal/cli/wa_relations.go",
+          "internal/newbee/wa.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-375e63f5df23e83e17ceb9111e22999dd824dcbe9eeddeb6d4fcaeef29569aef",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "examples/newbee/wa-create.yaml",
+          "internal/newbee/service_test.go",
+          "internal/newbee/wa.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-3d0702329798bd2b99cef58eabf8322d7ee6e321abcb43f7948c3f6b9d0d8e00",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/newbee/changelog.go",
+          "newbee.md"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-4af8e60e150ef52949323bf510c5f5c7fb01adaa7b08ad9c3a3810e1a938a026",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/newbee/service_test.go",
+          "internal/newbee/wa.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-86e983b130c0af0894f3ccf5a1147e090c737c250be256ce02534e678a8780f8",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/cli/wa.go",
+          "internal/newbee/service_test.go",
+          "internal/newbee/wa.go"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-87bbf15eec2e6d6180db6a936a4c20366dbb999c3bc5e0410eae34de8b4d3999",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/cli/root_test.go",
+          "internal/input/input_test.go",
+          "newbee.md"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-88d2ac28f7739c56760872fc5d24d10f42bd28730e248e5da7175a82e163b355",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/newbee/wa.go",
+          "newbee.md"
+        ],
+        "skippedReason": null
+      },
+      {
+        "acceptanceId": "acceptance-f44f334709d04690db5b5c4979e640828c98d00ba72294d56696e4fb36ad79d8",
+        "kind": "brief-example",
+        "source": "brief.md",
+        "evidenceRefs": [
+          "internal/newbee/changelog.go",
+          "newbee.md"
+        ],
+        "skippedReason": null
+      }
+    ],
+    "traceHash": "3afaba42a8b440dda363c7ab32430f0919193b02dee898dbb10fdcfdad833986"
+  },
+  "partialAllowanceRef": "runtime/evidence/allowances/33e8037fe36f365b7f17adc8ae17ea7e1fe1244329a0c37670edc8845ef456ed.json",
+  "partialAllowanceHash": "33e8037fe36f365b7f17adc8ae17ea7e1fe1244329a0c37670edc8845ef456ed",
+  "receiptRef": null,
+  "createdAt": "2026-07-30T15:01:46.869Z",
+  "envelopeHash": "91e7a2c9f70488c1786d9bf85c1e3f7a916eeba06fd82e6f882ab878116298c5"
+}

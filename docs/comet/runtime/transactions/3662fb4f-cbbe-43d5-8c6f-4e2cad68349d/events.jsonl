@@ -1,0 +1,10 @@
+{"sequence":1,"timestamp":"2026-07-30T15:02:22.437Z","type":"prepared"}
+{"sequence":2,"timestamp":"2026-07-30T15:02:26.054Z","type":"operation-started","operationId":"spec-1-newbee-plugin-changelog"}
+{"sequence":3,"timestamp":"2026-07-30T15:02:26.185Z","type":"operation-completed","operationId":"spec-1-newbee-plugin-changelog"}
+{"sequence":4,"timestamp":"2026-07-30T15:02:26.207Z","type":"operation-started","operationId":"spec-2-newbee-wa-workflows"}
+{"sequence":5,"timestamp":"2026-07-30T15:02:26.340Z","type":"operation-completed","operationId":"spec-2-newbee-wa-workflows"}
+{"sequence":6,"timestamp":"2026-07-30T15:02:26.362Z","type":"operation-started","operationId":"archive-change"}
+{"sequence":7,"timestamp":"2026-07-30T15:02:26.723Z","type":"operation-completed","operationId":"archive-change"}
+{"sequence":8,"timestamp":"2026-07-30T15:02:26.924Z","type":"archive-finalization-started"}
+{"sequence":9,"timestamp":"2026-07-30T15:02:26.995Z","type":"archive-finalized"}
+{"sequence":10,"timestamp":"2026-07-30T15:02:27.069Z","type":"commit"}

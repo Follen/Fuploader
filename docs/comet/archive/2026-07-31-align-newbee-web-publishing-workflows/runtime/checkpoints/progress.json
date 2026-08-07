@@ -1,0 +1,15 @@
+{
+  "schema": "comet.native.progress-checkpoint.v1",
+  "id": "12ddf336-1d39-4132-8e15-187442928191",
+  "change": "align-newbee-web-publishing-workflows",
+  "phase": "verify",
+  "previousRevision": 3,
+  "stateRevision": 4,
+  "summary": "Refreshed implementation scope after adding the complete verification report and acceptance evidence.",
+  "nextAction": "Submit verification result and advance to archive.",
+  "inputHash": "6e7b879e9ce0c9580a54a28956218192214939c5d4f3c060472e8878005f0468",
+  "manifestHash": "221b03074fcba400d54b9173e2fa2142d868f415eccae771176cf57f15f13e16",
+  "manifestRef": "runtime/checkpoints/manifests/221b03074fcba400d54b9173e2fa2142d868f415eccae771176cf57f15f13e16.json",
+  "artifactCount": 0,
+  "createdAt": "2026-07-31T18:40:27.772Z"
+}

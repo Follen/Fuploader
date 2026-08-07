@@ -1,0 +1,11 @@
+{
+  "schema": "comet.native.archive-cas.v1",
+  "operationId": "spec-2-newbee-wa-workflows",
+  "role": "post",
+  "hash": "e0a073edc8be8418eaf1f038c95a48d6a2d77c6d4d410c83d38813ef2246be9b",
+  "identity": {
+    "dev": 2421791372,
+    "ino": 1970324838047135,
+    "birthtimeMs": 1785423746247.239
+  }
+}

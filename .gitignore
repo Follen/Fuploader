@@ -14,9 +14,3 @@ analyze/
 *.test.exe
 *.prof
 coverage.out
-
-# Comet runtime state is local, generated workflow data. Keep formal briefs,
-# specs, and verification reports under docs/comet tracked.
-docs/comet/runtime/
-docs/comet/changes/*/runtime/
-docs/comet/archive/*/runtime/

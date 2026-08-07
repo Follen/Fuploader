@@ -1,0 +1,50 @@
+{
+  "schema": "comet.native.check-receipt.v1",
+  "change": "add-newbee-plugin-changelog-and-wa-workflows",
+  "sourceRevision": 3,
+  "checker": {
+    "policy": "scoped-text-safety",
+    "version": 1,
+    "hash": "0b8e0e9570269a64123ba2794f1f5125cf454695e1d7fda8f0acddf87ec4912f",
+    "limits": {
+      "maxFiles": 256,
+      "maxFileBytes": 1048576,
+      "maxTotalBytes": 8388608,
+      "maxIssues": 128
+    }
+  },
+  "inputHash": "b2e8403f1ff1be1838e39adf8a6807df4f076a9f43a8fb4540bb3bfc1f5c9b68",
+  "status": "failed",
+  "startedAt": "2026-07-30T14:58:45.508Z",
+  "endedAt": "2026-07-30T14:58:48.647Z",
+  "contract": {
+    "expectedHash": "4f70ed29655657e6f0508aeabbda42b25664129302cd452bc320478b5618ef70",
+    "beforeHash": "4f70ed29655657e6f0508aeabbda42b25664129302cd452bc320478b5618ef70",
+    "afterHash": "4f70ed29655657e6f0508aeabbda42b25664129302cd452bc320478b5618ef70"
+  },
+  "implementation": {
+    "scopeHash": "95ddb8c397b4ef2992d26711e2a7140cca308806edec762fbc289b0ae2667a9b",
+    "expectedSnapshotHash": "6ecc461af889be98be649dac349e7fabbea56bf8f7e1d1609d773c46f60e864f",
+    "beforeSnapshotHash": "6ecc461af889be98be649dac349e7fabbea56bf8f7e1d1609d773c46f60e864f",
+    "afterSnapshotHash": "6ecc461af889be98be649dac349e7fabbea56bf8f7e1d1609d773c46f60e864f"
+  },
+  "counts": {
+    "filesSelected": 28,
+    "filesScanned": 0,
+    "binaryFilesSkipped": 0,
+    "bytesScanned": 0,
+    "issueCount": 1,
+    "recordedIssueCount": 1
+  },
+  "issues": [
+    {
+      "path": "bin/fupload.exe",
+      "line": 1,
+      "kind": "scan-limit"
+    }
+  ],
+  "issuesTruncated": false,
+  "stale": false,
+  "staleReasons": [],
+  "receiptHash": "c940140526daaa8bc326fbad76cfbf92bc98c577804dcf4b821e9618e2c8f998"
+}

@@ -1,0 +1,50 @@
+{
+  "schema": "comet.native.check-receipt.v1",
+  "change": "build-fupload-newbee-cli-skill",
+  "sourceRevision": 6,
+  "checker": {
+    "policy": "scoped-text-safety",
+    "version": 1,
+    "hash": "0b8e0e9570269a64123ba2794f1f5125cf454695e1d7fda8f0acddf87ec4912f",
+    "limits": {
+      "maxFiles": 256,
+      "maxFileBytes": 1048576,
+      "maxTotalBytes": 8388608,
+      "maxIssues": 128
+    }
+  },
+  "inputHash": "14d061a28bfd8421d22d3cbdf9e7bc0be50f2d11c304cfbcdbb55935e6dcbe11",
+  "status": "failed",
+  "startedAt": "2026-07-30T12:11:13.668Z",
+  "endedAt": "2026-07-30T12:11:17.835Z",
+  "contract": {
+    "expectedHash": "5ae8f03d2e594b4b3dcee21961e6543746e73435344dc1f6c341a0b687c4adb3",
+    "beforeHash": "5ae8f03d2e594b4b3dcee21961e6543746e73435344dc1f6c341a0b687c4adb3",
+    "afterHash": "5ae8f03d2e594b4b3dcee21961e6543746e73435344dc1f6c341a0b687c4adb3"
+  },
+  "implementation": {
+    "scopeHash": "7ba7c8ecd4c00231e43e8ce5df850dfdac43c8c5518e5f72c94c8a0730761791",
+    "expectedSnapshotHash": "82d4079bc4ea3d6dad62ceb9ea238e43c7ba9a50fa7884c1ffa869150fc03ed5",
+    "beforeSnapshotHash": "82d4079bc4ea3d6dad62ceb9ea238e43c7ba9a50fa7884c1ffa869150fc03ed5",
+    "afterSnapshotHash": "82d4079bc4ea3d6dad62ceb9ea238e43c7ba9a50fa7884c1ffa869150fc03ed5"
+  },
+  "counts": {
+    "filesSelected": 128,
+    "filesScanned": 0,
+    "binaryFilesSkipped": 0,
+    "bytesScanned": 0,
+    "issueCount": 1,
+    "recordedIssueCount": 1
+  },
+  "issues": [
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/views/__init__.pyc",
+      "line": 1,
+      "kind": "scan-limit"
+    }
+  ],
+  "issuesTruncated": false,
+  "stale": false,
+  "staleReasons": [],
+  "receiptHash": "5c8ce21f5f9f2d5fc24aeed11a3ae5cb9a5392a4bc7ca277f5bdc0cf0cd08716"
+}

@@ -1,0 +1,3490 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "09186be9a484e29f00992bda62813c474d22aa5966de59552bcc54939645ba1c",
+  "baselineProjectionRef": "runtime/evidence/snapshots/b31e80bb8720daa802e5d5655e81ce5a06592e715c1c2fb9f3f3a238e189e6be.json",
+  "baselineProjectionHash": "b31e80bb8720daa802e5d5655e81ce5a06592e715c1c2fb9f3f3a238e189e6be",
+  "currentProjectionRef": "runtime/evidence/snapshots/67fb1894e606a96cc875db791af079c7cf11ca8fd97bafae6a32f77f8f555633.json",
+  "currentProjectionHash": "67fb1894e606a96cc875db791af079c7cf11ca8fd97bafae6a32f77f8f555633",
+  "complete": false,
+  "declaredArtifacts": [
+    {
+      "path": ".agents/skills/fupload/SKILL.md",
+      "kind": "file"
+    },
+    {
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "path": "internal/cli/root.go",
+      "kind": "file"
+    },
+    {
+      "path": "internal/newbee/service.go",
+      "kind": "file"
+    },
+    {
+      "path": "newbee.md",
+      "kind": "file"
+    }
+  ],
+  "changes": [
+    {
+      "path": ".agents/skills/fupload/SKILL.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "964106d0c2419dfdd6ae1a8a1beda86bf322d666a2e5e77246e15800f83f4bf3",
+        "size": 3216
+      },
+      "attributedTo": [
+        {
+          "path": ".agents/skills/fupload/SKILL.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": ".agents/skills/fupload/agents/openai.yaml",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f2196c695e6aa2bd784cbb1f71ad98e9221be11984c54876aca8fb1f09364444",
+        "size": 272
+      },
+      "attributedTo": []
+    },
+    {
+      "path": ".agents/skills/fupload/references/cli-contract.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "44123aa830713591d2446d32198952d8cbcaee25fd332b9f7ef179f616893b60",
+        "size": 1666
+      },
+      "attributedTo": []
+    },
+    {
+      "path": ".agents/skills/fupload/references/config.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "fe1e644987293305b1861644c69cc93b6c464649e6bf86a2fe0a0ebffbfc5d2d",
+        "size": 1933
+      },
+      "attributedTo": []
+    },
+    {
+      "path": ".agents/skills/fupload/references/plugin.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "9a72272ee71cc1590f3c6d0745b63b7de5534329820a8ee857b61c024c263daa",
+        "size": 2521
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/README.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "406905b9b081e5c0cfe09b47bf258d836e216e61e46ed08c9bac27d65774c5de",
+        "size": 727
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/auth-analysis.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "50dea47c73bf0a56a75b71751d97f04b5e0c0f2f4578fdf493a1603b01c7f20a",
+        "size": 2622
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/author-api-matrix.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c0598e1285b6f3f25d2aaaa32c52e3e1d0d20cedda0933aa10ebbe3b0675e6b3",
+        "size": 4522
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client-inventory.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0e010c00c368ba4f3ae98780848c8f782b99acf44f5a7dcfdf32bde0853d64da",
+        "size": 2079
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "27cfe2783c39b6c586c8ebcf45264ca4afba0cfe7f09bfc570319f63d6d93bb0",
+        "size": 111
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/amr_player.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "18027fa664da9fc04ef8ccefad2d8aa06127f87a3f605ac1e162516c492bbd94",
+        "size": 944
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_device.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "9032ad74fe7fb77420865a1fe7abe00a8122e62408e8d5ceaa2fae35274abfff",
+        "size": 3780
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_dll.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e6988ede8d2053b556ec587880b6fe1ec96aade8facfdb518730eb77c11c5178",
+        "size": 2602
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_effect.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ddd6cc5f936eaad9224fee3f7df4da4280fc6495a733b85c3467f1a0c9a6a821",
+        "size": 2040
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_engine_module.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "05192741d6d72f3aee0e215ac0b62af434ad0cdb4979cd70da20a04f14a5159d",
+        "size": 12687
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_record.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b55a2fd75123f84bfaea27873e0b0b75b0692e9b637ef844585dc7a6ec633dd7",
+        "size": 1744
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_session.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7c9ea70857c7c6963c06ed61fb3fb20f530b3562cd410f25fa4974c47263eaac",
+        "size": 7894
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_share.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "124601064c6318fd6a321a1bccfb9dd6eb31ec9b2a292caba9f7c3f9adb8fadf",
+        "size": 3149
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_user_manager.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "14757cd5523312f23b53581655e3e4665cb22539248e971b3eedbfe105745060",
+        "size": 2055
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/constant.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7b90d46e78cffad45bf9abfbb683ae703d395c04eb2d996d6ffbc29f69833708",
+        "size": 1522
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/engine.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a55d537c2930bd2e147b2eb276761fedaff64fc509989dc01213639395ce82a2",
+        "size": 7942
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/engine_interface.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1ac973827336a98f3caeca790032c163f9212c176d03b6d171ccc9d8e0660575",
+        "size": 2946
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/engine_state_manager.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "98452965303e7bf696be5d3c668b5b7a026609fcb58f721daff8e6ea72c1c916",
+        "size": 3134
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/mic_energy.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "6b25ce946222c238c3cc4904b3c932a540c78c605e3eabca27cf35a9c2278a4d",
+        "size": 2599
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "acbd4388e063be3ba18bb7b1fd805722c1818264ace82da43bb495e5317174f3",
+        "size": 262
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "952ba0dde3025ac7297fea48822d25f77bb84c54f4ceb59c7537205a3db85280",
+        "size": 254
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/cli_list_registry.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "6cbbf1c8814390c08ca4198e35da63eb107529408c54037c02156cb2a2adb4ff",
+        "size": 2448
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2eabe46e1b6c4b5b95a7b270f12f170ab938866557b05198b96069d0f004dce7",
+        "size": 166
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/channel.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "780cf81caa2b40476740f15e4d67ef2a50fbcc424fa5d08d9dc4048a2baa42f6",
+        "size": 4487
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/cloud_backup.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b19e95ab4d321d417d3650e787aa0818bcc6bf6d7a553f84fbf0fe1157e49c9f",
+        "size": 16337
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/container.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "dc2e735d19b261c986c858e5b804ec2776a2f841a07985c8a402316c1f909f12",
+        "size": 2737
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/game.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "16a27c51f40031efff634e68640595f244c31adabc75582bf4a547f77203369e",
+        "size": 5961
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/log.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "25c4a5ab08b090b96f3dc13d217cb23dd0db4d54ba6768865f276ab36aab7bd6",
+        "size": 7397
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/plugin_installer.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "56fd6cb328bdb7bf11342cce54d5035cb05014bb3d99fda3b831a478e2c2b7ed",
+        "size": 14987
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/qt_runtime.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f5727726d29afc816003b0887025917555cc042c178cdb909b361573d53e8fc4",
+        "size": 2649
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/room.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d813bde577c73eb830fb7760a35680da51789c83992f11ecf581dd4e7b18f9ff",
+        "size": 5735
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/settings.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "89c35dbc4c15f8ba4bc5ca09991de530ce44ed535d6b946f93611319a6076654",
+        "size": 3514
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/ui_api_client.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c25a641ef17aa0c741742e02e6dbe6500cfc31f8538ab672e407172f1e70680d",
+        "size": 14955
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/update.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1b2ada0c7ef754737e3c9f7021416540876b58d6a3c24a33685f91bb49b6a12b",
+        "size": 6977
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/voice.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7727b282f0751eef49b19193f49fa5f276d6a5572d5149544264a8261b39a62e",
+        "size": 4541
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/web.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "66cca5d29464766a91cbde5f91a5f6cc5fa6c3ed8ff718c01cc347f54139f2eb",
+        "size": 4971
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/wow.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d5de638d1c5ab96c5984d926f5938ef523ef52ede5ba4a854c5f05e8f1a7b136",
+        "size": 31705
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "36a185a7a71e428d942d026103e77e82c927af4cb4dd288024bbdb2f2f6bbfa8",
+        "size": 109
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/audio_trans/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "da1df2d7b87267297bcfb087fc508d950c76290e10e265feafae8601ddb62804",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/audio_trans/audio_trans_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7bc0aacda911678e431331923dab957d1e045058934a030b1aa029a5e404923a",
+        "size": 5400
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/audio_trans/constant.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "066f68577c77e81f1390703f18ac541d8bff95d3953acccac65c9895b4c20890",
+        "size": 299
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/bi_report/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b9b201e2ea37a21d5767700bdb12a2ee2fef57948a0cfb27908b03cf4a8b27c0",
+        "size": 119
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/bi_report/bi_report_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "82d6561aed5b634e09a35ede82fe06221b6d63705d58f1c221767a7ce8feef7d",
+        "size": 8571
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/bi_report/constant.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "83badd82fcebac6669a8852150c867c1384772494222895374afc79fb7fd3b1b",
+        "size": 1061
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d70f70ab3536c8ece799e3fcd2d5eb7bf5d24f3b584456688ae2b5e2aab47935",
+        "size": 122
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/chat_property.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2b624699bc4a9b2f65430ab5a99ff3c9ddcfd334b4c1d79e93b3ca0dff69b383",
+        "size": 635
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/common.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0df6c4cd8e776f7cc427daaa68aa00fb81466da1507431d846a4d9bb1ae66ca9",
+        "size": 4873
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/confirm_upload_file_window.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "00c1d7667584ce109be3dc841af06f24325167301b54da4f781c0a221837a086",
+        "size": 2197
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/display_menu_handler.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "42e954ad8fb02c5d0b17c5a9525cd1f66fbc0ee3ed472489499ebaa7e5e987a5",
+        "size": 8583
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/display_msg_handler.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "53c2087ba9e80aca39a8380835e69f1ac64d7198ffbdf878f3151d2668a681cf",
+        "size": 15764
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/im_constants.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "8366a1ca792b0a3636a670531250a26e66dd69f616ba79ef2ffac5085e132e4a",
+        "size": 688
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/inputQuoteWidget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "621f5d1204a7862e1d94249d2699839fd6df3548576ea2600432cc8331ca4bde",
+        "size": 3409
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/input_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e36d9797686bb0b4967dacb93db51b638b4647dafc0cccd5243906075b89cb2f",
+        "size": 14081
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/message_hover_btn_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "3efdf70fbac4e32468038ecbd42e8c9b6d0d4c38f40444c592f3df46d171b2f4",
+        "size": 5213
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/message_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ccc5445ce8d66d992c8b116e516f34774572ffdf260b46c89b087228bdc0d371",
+        "size": 16202
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/msg_format_helper.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "901111b7ef3a58605d1af955e18a8009e44305e6a25bf613b5a8808a774dae23",
+        "size": 12165
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/send_more_menu.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a7bdb227ad55fed1dd72fbe3a4d73e0227fe53f85ea713aee4a9219aba8a5f52",
+        "size": 8033
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/text_constants.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2311f7eda6ad2fa52563896b0aefe5a3fee720d8e45c74e6561916278c79f423",
+        "size": 1270
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/text_file_uploader.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4e62739066804fb4d04c574acfa77672e2af4037fd2401e3d960c8e23d172d8f",
+        "size": 2952
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/text_image_uploader.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7b36774e0cae5da374d87debdc4260dcff7473b6cb2d1bac01bd1d55f5f53539",
+        "size": 3741
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "821c76c392d5c2da729b7980bf609a330a6d4a653724667511df50e639476e40",
+        "size": 123
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/check_playing_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c6a309a8a4a7b9ba1c4722134a870b2b386543104893180ee653eb27b003dc2e",
+        "size": 14276
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/check_playing_thread.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d8a413bdd789f22e7c587c4ca78bb6c43c5661353775ede4c436eacc9f601389",
+        "size": 9969
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/protocols.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "417ac1d8f2cb7fbd8ee9d573a564dba99f4d4c530351b8bc06de3bf3c0e55523",
+        "size": 445
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1437df7e19b3f3b638f4c1aaac734914a78c6181d8527df1c95d2e9a97c44d43",
+        "size": 122
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/cc_di_manager.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "5414a10e9580c31461f31125f7ac1d593e86a85292c2f98c2fb06036f1da9cc2",
+        "size": 13612
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/cc_module_container.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f61b84085be9f0f9acaaa4df858a2b0a6e8ef78a9d8e2a1be509502bb030287e",
+        "size": 4739
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/factory.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2cef311aec72ef87f61dadf8ad58b82b9b805f1d1a91674a9299890d1c1a62fb",
+        "size": 756
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/module_load.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b7db35cc5d6694166ba55520b13cf520f33a33f1a78eed48e2595dd90d47a675",
+        "size": 3347
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_layout_helper.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "870e8e30a29af504286574f4fe1379bb891f835c472d1ae467349fa86c0cb896",
+        "size": 3728
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_live_interface.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b7c0ba5bbc7e3a7b6a22cdb6f11f4dd371d11cbc480b29afd2eb9d60b5da4c49",
+        "size": 18871
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_load_helper.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1d1af61599614ee39d824afe12c0ad6740db660192b18c7eaf4939c10a693580",
+        "size": 23343
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_window_helper.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7ec67edb052a7b314c1a069e6495a38ccb8eef011253877be149752dc2283f22",
+        "size": 7583
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d3c62e76fbfec320384aeef5cb8b73570afcf63f4f366acb60c8ce096e8900ea",
+        "size": 120
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/common_jump/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "244765e955f5c47e9c0114bd08e9c7917e700e394c9153215999144dba64a8ba",
+        "size": 132
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/common_jump/common_jump_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a34ce793ec07832d8fb751922f8f20365bcf57224476ec2c1ebaa6d081589d33",
+        "size": 3351
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/common_jump/protocols.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "adb017ac10e4649be721c384e160a7a4fa82fe00638b4a409b48c3aede01567a",
+        "size": 310
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/toast_pop/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7a2c2d108604804684348371034a0163e00ef098e8eda76ad43491d9cb516bbf",
+        "size": 130
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/toast_pop/common_pop_toast_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b6104e522594b0f12e3c34e909c7d1178ac1f95e9d733b71942bc47ff2df66ac",
+        "size": 1787
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/toast_pop/protocols.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "dbbd7aff7866ca5d6f10fc30234d4bb0508b8e6f89debd8a955cc361311f2558",
+        "size": 308
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/web_pop/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "07dc85f382c5eb0b9f3d2a19255f59564b840d9fd58462f8da997460ef2d8387",
+        "size": 128
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/web_pop/common_pop_web_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "67b39fc7cde332ad276b7014dca80e60a56a3b538235596079e63c9b3e934e4a",
+        "size": 1859
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/web_pop/protocols.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "228c43881ae857bbd70fa2aee72125a002248a212ac056dd33a95d6f19f200d1",
+        "size": 306
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "cefaabc5bd39507bd71e1e39597cfe11dbe511c0e3d8885a91e59832af7cb894",
+        "size": 120
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/constant_defined.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "3bdcc69723754079ae32f30d487367c6213c6e026aa7417cdd60d6dfa3e910fd",
+        "size": 746
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/cover_game_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "addd986ba5dafb1b8f61ec54b10f6f65cdc9c8c5675fbc599cf37c8014550613",
+        "size": 10418
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "8b2bb9859aaa071cf43a5524a1ead9890e8aea165e4c99e03fadba367632df6d",
+        "size": 125
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/cover_audio_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4fe34a6833360611743cf53d851c2483b6bf710281d33e9ee98195954a169bd3",
+        "size": 1629
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/cover_audio_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "929712ffcc86a4022b0ac12a0184868ee390923f014cf780825f5ec60060c484",
+        "size": 9337
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/cover_setting_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "25ad5f739443ee152f52b3e4a74522c25c22233785e8773e88975e6165bf5573",
+        "size": 6145
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f55b053c6205785df20577cb79796b52378c9e79dff5de6edbfddce13ae9e360",
+        "size": 117
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_config.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0d8e620932fa07f51ef7a53a2966c591c27c7501722622bd7adfd8dde1389c40",
+        "size": 3909
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_config_data.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f816228f8d16c2d1f164f4596e1a2fd203e379260f34a61de3577015e9d386b8",
+        "size": 137452
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_constants.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e8c989b66e4fd1500f7f18fd086f28d35fe2ba20ba2db75159d7a608d1039f1f",
+        "size": 1024
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "bfa9fd3524d3ad66c14f15b76c5e7edbf25f186dff6ae6c57b38943b7c29465c",
+        "size": 2490
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_css.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c0c9d36d2a6e148eb5820d62ce082ff7b75677773ad7fa3a93eb79b826b5c98e",
+        "size": 980
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_gridwidget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ad4073bc3eaf59bf73b83305851711fd0e82d6adabccb6738d507321ee540f8c",
+        "size": 8000
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_recent_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e25c1db3d2ed31cb787d9f8f3167deceb9bde0b23589beb9b2b122d84a08a8da",
+        "size": 1973
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_tab_config.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "65bca03e3b5f0c992b8a32c0a9f7049085ff156c58f56cc763d860165f9b5e64",
+        "size": 2173
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_tabwidget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "412f82b1968c257e4a6341778a7868af2aced00344b5c31090432e0add7d958e",
+        "size": 9013
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d56487fbae5d02b373ec28b0a63d09cc2a31a61bf3901290019cba633abb365a",
+        "size": 3812
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "6c6780999e6f1e78c110892211d62821ce51eb08b25add39aa5dcdf6be9236cf",
+        "size": 117
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0f04d7c7343cead5adf082a00d0021c4af4a63e1dd2640340c1aec13220c5853",
+        "size": 122
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/chat_info_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7a6ecaa02b2ce86224cc1e1764b6c98afba142a46a4fb9a6d3958f29f72872e7",
+        "size": 11856
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/chat_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7472360324b21ef338222c4b6b4686ff166ca368b02d9ac402fd32d45c729b32",
+        "size": 2946
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/chat_window.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "287ea05285dfede0d7b4f613c6cce8f1a5130eb30ce5d5d0853770f7c4d08c14",
+        "size": 9126
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/constants.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "68e03f6b2738e3953755b0f1382af7d7d2a08b966379d94a1a5a8fb35d48f95c",
+        "size": 361
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/display_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1be4d68ab9134f3dbab8a6f4d6bfedb11119c3f0d69051fc8a190e0a132cd1f1",
+        "size": 5463
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/empty_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d6cefa82ba2f29a3b92fcc36ff66f575d9b268e0b1b0bc0c2b938e842d4b2630",
+        "size": 3052
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/friends_chat_area_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f9bd6ae3f6b26369ebff26e912906eead650943c1a9ef357d8ffd803c53eced5",
+        "size": 9003
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/friends_chat_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "94b7775d4430b8d220c4d95871749313c8971ae968ac3d9b8a4017abb253d7cb",
+        "size": 32738
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/style_sheets.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b87de57189519f7b33eeff32ddbc7f55c25b328dfe5bcebcafb45db438e17d77",
+        "size": 4478
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/constant_defined.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "3bd7736038d353a9e96863d608d31256df5b89a49a47eb45b559249858adc5ee",
+        "size": 696
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/friends_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ce27441c44dd7de8f6708dded693f9b61974da318fc01e6f65b9a2841cc45179",
+        "size": 30525
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/friends_datacenter.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "07375991cbe2a0a19d812d826c22b7a869a44c488b6ab9c7db9fea2d3dfbc7cb",
+        "size": 18167
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/protocols.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "08c5abf5851a443a689658fa28fcf169355abf8d0dd67a6918082705c51ca098",
+        "size": 973
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "222ac993b214aa27489caf4974909b6ff8e5948fbf1b070437579d4caf2b091b",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/chat_info_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "74960f8a61f2fa64c36b934f4dbc52ae1b2b0ce0ee2e401d187b8b32e9123f61",
+        "size": 1290
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/chat_list_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4784f1403e2a08020433b17554e1afe7627b98ca88170cbd3cc729d63c149809",
+        "size": 413
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/chat_widget_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d0f9bccd67d4854b7f5e2e518c6f18a4d66499b78eeeac6bcfcf9d9cb0aad600",
+        "size": 756
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/friends_group_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a9aa9be7c3a603bbddf9736dfaa52a4538aa943912f9d292d89a64a099b2fcf3",
+        "size": 2667
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/friends_main_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "925ff876b4bb13fffbfb1242ef8c7313bc9233dfa7539df368249e6b22074466",
+        "size": 264
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/group_detail_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "692e0071721f78045582f071d2f4ef382dbfe1f3762179fb98953a0c279bc15d",
+        "size": 837
+      },
+      "attributedTo": []
+    }
+  ],
+  "unattributed": [
+    {
+      "path": ".agents/skills/fupload/agents/openai.yaml",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f2196c695e6aa2bd784cbb1f71ad98e9221be11984c54876aca8fb1f09364444",
+        "size": 272
+      },
+      "attributedTo": []
+    },
+    {
+      "path": ".agents/skills/fupload/references/cli-contract.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "44123aa830713591d2446d32198952d8cbcaee25fd332b9f7ef179f616893b60",
+        "size": 1666
+      },
+      "attributedTo": []
+    },
+    {
+      "path": ".agents/skills/fupload/references/config.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "fe1e644987293305b1861644c69cc93b6c464649e6bf86a2fe0a0ebffbfc5d2d",
+        "size": 1933
+      },
+      "attributedTo": []
+    },
+    {
+      "path": ".agents/skills/fupload/references/plugin.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "9a72272ee71cc1590f3c6d0745b63b7de5534329820a8ee857b61c024c263daa",
+        "size": 2521
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/README.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "406905b9b081e5c0cfe09b47bf258d836e216e61e46ed08c9bac27d65774c5de",
+        "size": 727
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/auth-analysis.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "50dea47c73bf0a56a75b71751d97f04b5e0c0f2f4578fdf493a1603b01c7f20a",
+        "size": 2622
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/author-api-matrix.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c0598e1285b6f3f25d2aaaa32c52e3e1d0d20cedda0933aa10ebbe3b0675e6b3",
+        "size": 4522
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client-inventory.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0e010c00c368ba4f3ae98780848c8f782b99acf44f5a7dcfdf32bde0853d64da",
+        "size": 2079
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "27cfe2783c39b6c586c8ebcf45264ca4afba0cfe7f09bfc570319f63d6d93bb0",
+        "size": 111
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/amr_player.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "18027fa664da9fc04ef8ccefad2d8aa06127f87a3f605ac1e162516c492bbd94",
+        "size": 944
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_device.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "9032ad74fe7fb77420865a1fe7abe00a8122e62408e8d5ceaa2fae35274abfff",
+        "size": 3780
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_dll.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e6988ede8d2053b556ec587880b6fe1ec96aade8facfdb518730eb77c11c5178",
+        "size": 2602
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_effect.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ddd6cc5f936eaad9224fee3f7df4da4280fc6495a733b85c3467f1a0c9a6a821",
+        "size": 2040
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_engine_module.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "05192741d6d72f3aee0e215ac0b62af434ad0cdb4979cd70da20a04f14a5159d",
+        "size": 12687
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_record.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b55a2fd75123f84bfaea27873e0b0b75b0692e9b637ef844585dc7a6ec633dd7",
+        "size": 1744
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_session.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7c9ea70857c7c6963c06ed61fb3fb20f530b3562cd410f25fa4974c47263eaac",
+        "size": 7894
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_share.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "124601064c6318fd6a321a1bccfb9dd6eb31ec9b2a292caba9f7c3f9adb8fadf",
+        "size": 3149
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_user_manager.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "14757cd5523312f23b53581655e3e4665cb22539248e971b3eedbfe105745060",
+        "size": 2055
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/constant.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7b90d46e78cffad45bf9abfbb683ae703d395c04eb2d996d6ffbc29f69833708",
+        "size": 1522
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/engine.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a55d537c2930bd2e147b2eb276761fedaff64fc509989dc01213639395ce82a2",
+        "size": 7942
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/engine_interface.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1ac973827336a98f3caeca790032c163f9212c176d03b6d171ccc9d8e0660575",
+        "size": 2946
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/engine_state_manager.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "98452965303e7bf696be5d3c668b5b7a026609fcb58f721daff8e6ea72c1c916",
+        "size": 3134
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/audio_engine/mic_energy.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "6b25ce946222c238c3cc4904b3c932a540c78c605e3eabca27cf35a9c2278a4d",
+        "size": 2599
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "acbd4388e063be3ba18bb7b1fd805722c1818264ace82da43bb495e5317174f3",
+        "size": 262
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "952ba0dde3025ac7297fea48822d25f77bb84c54f4ceb59c7537205a3db85280",
+        "size": 254
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/cli_list_registry.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "6cbbf1c8814390c08ca4198e35da63eb107529408c54037c02156cb2a2adb4ff",
+        "size": 2448
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2eabe46e1b6c4b5b95a7b270f12f170ab938866557b05198b96069d0f004dce7",
+        "size": 166
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/channel.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "780cf81caa2b40476740f15e4d67ef2a50fbcc424fa5d08d9dc4048a2baa42f6",
+        "size": 4487
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/cloud_backup.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b19e95ab4d321d417d3650e787aa0818bcc6bf6d7a553f84fbf0fe1157e49c9f",
+        "size": 16337
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/container.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "dc2e735d19b261c986c858e5b804ec2776a2f841a07985c8a402316c1f909f12",
+        "size": 2737
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/game.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "16a27c51f40031efff634e68640595f244c31adabc75582bf4a547f77203369e",
+        "size": 5961
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/log.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "25c4a5ab08b090b96f3dc13d217cb23dd0db4d54ba6768865f276ab36aab7bd6",
+        "size": 7397
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/plugin_installer.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "56fd6cb328bdb7bf11342cce54d5035cb05014bb3d99fda3b831a478e2c2b7ed",
+        "size": 14987
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/qt_runtime.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f5727726d29afc816003b0887025917555cc042c178cdb909b361573d53e8fc4",
+        "size": 2649
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/room.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d813bde577c73eb830fb7760a35680da51789c83992f11ecf581dd4e7b18f9ff",
+        "size": 5735
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/settings.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "89c35dbc4c15f8ba4bc5ca09991de530ce44ed535d6b946f93611319a6076654",
+        "size": 3514
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/ui_api_client.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c25a641ef17aa0c741742e02e6dbe6500cfc31f8538ab672e407172f1e70680d",
+        "size": 14955
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/update.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1b2ada0c7ef754737e3c9f7021416540876b58d6a3c24a33685f91bb49b6a12b",
+        "size": 6977
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/voice.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7727b282f0751eef49b19193f49fa5f276d6a5572d5149544264a8261b39a62e",
+        "size": 4541
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/web.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "66cca5d29464766a91cbde5f91a5f6cc5fa6c3ed8ff718c01cc347f54139f2eb",
+        "size": 4971
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/wow.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d5de638d1c5ab96c5984d926f5938ef523ef52ede5ba4a854c5f05e8f1a7b136",
+        "size": 31705
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "36a185a7a71e428d942d026103e77e82c927af4cb4dd288024bbdb2f2f6bbfa8",
+        "size": 109
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/audio_trans/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "da1df2d7b87267297bcfb087fc508d950c76290e10e265feafae8601ddb62804",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/audio_trans/audio_trans_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7bc0aacda911678e431331923dab957d1e045058934a030b1aa029a5e404923a",
+        "size": 5400
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/audio_trans/constant.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "066f68577c77e81f1390703f18ac541d8bff95d3953acccac65c9895b4c20890",
+        "size": 299
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/bi_report/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b9b201e2ea37a21d5767700bdb12a2ee2fef57948a0cfb27908b03cf4a8b27c0",
+        "size": 119
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/bi_report/bi_report_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "82d6561aed5b634e09a35ede82fe06221b6d63705d58f1c221767a7ce8feef7d",
+        "size": 8571
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/bi_report/constant.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "83badd82fcebac6669a8852150c867c1384772494222895374afc79fb7fd3b1b",
+        "size": 1061
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d70f70ab3536c8ece799e3fcd2d5eb7bf5d24f3b584456688ae2b5e2aab47935",
+        "size": 122
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/chat_property.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2b624699bc4a9b2f65430ab5a99ff3c9ddcfd334b4c1d79e93b3ca0dff69b383",
+        "size": 635
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/common.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0df6c4cd8e776f7cc427daaa68aa00fb81466da1507431d846a4d9bb1ae66ca9",
+        "size": 4873
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/confirm_upload_file_window.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "00c1d7667584ce109be3dc841af06f24325167301b54da4f781c0a221837a086",
+        "size": 2197
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/display_menu_handler.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "42e954ad8fb02c5d0b17c5a9525cd1f66fbc0ee3ed472489499ebaa7e5e987a5",
+        "size": 8583
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/display_msg_handler.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "53c2087ba9e80aca39a8380835e69f1ac64d7198ffbdf878f3151d2668a681cf",
+        "size": 15764
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/im_constants.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "8366a1ca792b0a3636a670531250a26e66dd69f616ba79ef2ffac5085e132e4a",
+        "size": 688
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/inputQuoteWidget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "621f5d1204a7862e1d94249d2699839fd6df3548576ea2600432cc8331ca4bde",
+        "size": 3409
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/input_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e36d9797686bb0b4967dacb93db51b638b4647dafc0cccd5243906075b89cb2f",
+        "size": 14081
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/message_hover_btn_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "3efdf70fbac4e32468038ecbd42e8c9b6d0d4c38f40444c592f3df46d171b2f4",
+        "size": 5213
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/message_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ccc5445ce8d66d992c8b116e516f34774572ffdf260b46c89b087228bdc0d371",
+        "size": 16202
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/msg_format_helper.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "901111b7ef3a58605d1af955e18a8009e44305e6a25bf613b5a8808a774dae23",
+        "size": 12165
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/send_more_menu.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a7bdb227ad55fed1dd72fbe3a4d73e0227fe53f85ea713aee4a9219aba8a5f52",
+        "size": 8033
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/text_constants.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2311f7eda6ad2fa52563896b0aefe5a3fee720d8e45c74e6561916278c79f423",
+        "size": 1270
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/text_file_uploader.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4e62739066804fb4d04c574acfa77672e2af4037fd2401e3d960c8e23d172d8f",
+        "size": 2952
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/text_image_uploader.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7b36774e0cae5da374d87debdc4260dcff7473b6cb2d1bac01bd1d55f5f53539",
+        "size": 3741
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "821c76c392d5c2da729b7980bf609a330a6d4a653724667511df50e639476e40",
+        "size": 123
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/check_playing_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c6a309a8a4a7b9ba1c4722134a870b2b386543104893180ee653eb27b003dc2e",
+        "size": 14276
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/check_playing_thread.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d8a413bdd789f22e7c587c4ca78bb6c43c5661353775ede4c436eacc9f601389",
+        "size": 9969
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/protocols.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "417ac1d8f2cb7fbd8ee9d573a564dba99f4d4c530351b8bc06de3bf3c0e55523",
+        "size": 445
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1437df7e19b3f3b638f4c1aaac734914a78c6181d8527df1c95d2e9a97c44d43",
+        "size": 122
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/cc_di_manager.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "5414a10e9580c31461f31125f7ac1d593e86a85292c2f98c2fb06036f1da9cc2",
+        "size": 13612
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/cc_module_container.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f61b84085be9f0f9acaaa4df858a2b0a6e8ef78a9d8e2a1be509502bb030287e",
+        "size": 4739
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/factory.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2cef311aec72ef87f61dadf8ad58b82b9b805f1d1a91674a9299890d1c1a62fb",
+        "size": 756
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/module_load.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b7db35cc5d6694166ba55520b13cf520f33a33f1a78eed48e2595dd90d47a675",
+        "size": 3347
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_layout_helper.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "870e8e30a29af504286574f4fe1379bb891f835c472d1ae467349fa86c0cb896",
+        "size": 3728
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_live_interface.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b7c0ba5bbc7e3a7b6a22cdb6f11f4dd371d11cbc480b29afd2eb9d60b5da4c49",
+        "size": 18871
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_load_helper.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1d1af61599614ee39d824afe12c0ad6740db660192b18c7eaf4939c10a693580",
+        "size": 23343
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_window_helper.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7ec67edb052a7b314c1a069e6495a38ccb8eef011253877be149752dc2283f22",
+        "size": 7583
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d3c62e76fbfec320384aeef5cb8b73570afcf63f4f366acb60c8ce096e8900ea",
+        "size": 120
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/common_jump/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "244765e955f5c47e9c0114bd08e9c7917e700e394c9153215999144dba64a8ba",
+        "size": 132
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/common_jump/common_jump_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a34ce793ec07832d8fb751922f8f20365bcf57224476ec2c1ebaa6d081589d33",
+        "size": 3351
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/common_jump/protocols.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "adb017ac10e4649be721c384e160a7a4fa82fe00638b4a409b48c3aede01567a",
+        "size": 310
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/toast_pop/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7a2c2d108604804684348371034a0163e00ef098e8eda76ad43491d9cb516bbf",
+        "size": 130
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/toast_pop/common_pop_toast_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b6104e522594b0f12e3c34e909c7d1178ac1f95e9d733b71942bc47ff2df66ac",
+        "size": 1787
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/toast_pop/protocols.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "dbbd7aff7866ca5d6f10fc30234d4bb0508b8e6f89debd8a955cc361311f2558",
+        "size": 308
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/web_pop/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "07dc85f382c5eb0b9f3d2a19255f59564b840d9fd58462f8da997460ef2d8387",
+        "size": 128
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/web_pop/common_pop_web_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "67b39fc7cde332ad276b7014dca80e60a56a3b538235596079e63c9b3e934e4a",
+        "size": 1859
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/web_pop/protocols.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "228c43881ae857bbd70fa2aee72125a002248a212ac056dd33a95d6f19f200d1",
+        "size": 306
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "cefaabc5bd39507bd71e1e39597cfe11dbe511c0e3d8885a91e59832af7cb894",
+        "size": 120
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/constant_defined.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "3bdcc69723754079ae32f30d487367c6213c6e026aa7417cdd60d6dfa3e910fd",
+        "size": 746
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/cover_game_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "addd986ba5dafb1b8f61ec54b10f6f65cdc9c8c5675fbc599cf37c8014550613",
+        "size": 10418
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "8b2bb9859aaa071cf43a5524a1ead9890e8aea165e4c99e03fadba367632df6d",
+        "size": 125
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/cover_audio_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4fe34a6833360611743cf53d851c2483b6bf710281d33e9ee98195954a169bd3",
+        "size": 1629
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/cover_audio_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "929712ffcc86a4022b0ac12a0184868ee390923f014cf780825f5ec60060c484",
+        "size": 9337
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/cover_setting_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "25ad5f739443ee152f52b3e4a74522c25c22233785e8773e88975e6165bf5573",
+        "size": 6145
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f55b053c6205785df20577cb79796b52378c9e79dff5de6edbfddce13ae9e360",
+        "size": 117
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_config.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0d8e620932fa07f51ef7a53a2966c591c27c7501722622bd7adfd8dde1389c40",
+        "size": 3909
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_config_data.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f816228f8d16c2d1f164f4596e1a2fd203e379260f34a61de3577015e9d386b8",
+        "size": 137452
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_constants.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e8c989b66e4fd1500f7f18fd086f28d35fe2ba20ba2db75159d7a608d1039f1f",
+        "size": 1024
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "bfa9fd3524d3ad66c14f15b76c5e7edbf25f186dff6ae6c57b38943b7c29465c",
+        "size": 2490
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_css.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c0c9d36d2a6e148eb5820d62ce082ff7b75677773ad7fa3a93eb79b826b5c98e",
+        "size": 980
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_gridwidget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ad4073bc3eaf59bf73b83305851711fd0e82d6adabccb6738d507321ee540f8c",
+        "size": 8000
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_recent_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e25c1db3d2ed31cb787d9f8f3167deceb9bde0b23589beb9b2b122d84a08a8da",
+        "size": 1973
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_tab_config.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "65bca03e3b5f0c992b8a32c0a9f7049085ff156c58f56cc763d860165f9b5e64",
+        "size": 2173
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_tabwidget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "412f82b1968c257e4a6341778a7868af2aced00344b5c31090432e0add7d958e",
+        "size": 9013
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d56487fbae5d02b373ec28b0a63d09cc2a31a61bf3901290019cba633abb365a",
+        "size": 3812
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "6c6780999e6f1e78c110892211d62821ce51eb08b25add39aa5dcdf6be9236cf",
+        "size": 117
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0f04d7c7343cead5adf082a00d0021c4af4a63e1dd2640340c1aec13220c5853",
+        "size": 122
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/chat_info_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7a6ecaa02b2ce86224cc1e1764b6c98afba142a46a4fb9a6d3958f29f72872e7",
+        "size": 11856
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/chat_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7472360324b21ef338222c4b6b4686ff166ca368b02d9ac402fd32d45c729b32",
+        "size": 2946
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/chat_window.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "287ea05285dfede0d7b4f613c6cce8f1a5130eb30ce5d5d0853770f7c4d08c14",
+        "size": 9126
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/constants.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "68e03f6b2738e3953755b0f1382af7d7d2a08b966379d94a1a5a8fb35d48f95c",
+        "size": 361
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/display_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "1be4d68ab9134f3dbab8a6f4d6bfedb11119c3f0d69051fc8a190e0a132cd1f1",
+        "size": 5463
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/empty_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d6cefa82ba2f29a3b92fcc36ff66f575d9b268e0b1b0bc0c2b938e842d4b2630",
+        "size": 3052
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/friends_chat_area_widget.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "f9bd6ae3f6b26369ebff26e912906eead650943c1a9ef357d8ffd803c53eced5",
+        "size": 9003
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/friends_chat_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "94b7775d4430b8d220c4d95871749313c8971ae968ac3d9b8a4017abb253d7cb",
+        "size": 32738
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/style_sheets.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b87de57189519f7b33eeff32ddbc7f55c25b328dfe5bcebcafb45db438e17d77",
+        "size": 4478
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/constant_defined.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "3bd7736038d353a9e96863d608d31256df5b89a49a47eb45b559249858adc5ee",
+        "size": 696
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/friends_controller.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "ce27441c44dd7de8f6708dded693f9b61974da318fc01e6f65b9a2841cc45179",
+        "size": 30525
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/friends_datacenter.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "07375991cbe2a0a19d812d826c22b7a869a44c488b6ab9c7db9fea2d3dfbc7cb",
+        "size": 18167
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/protocols.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "08c5abf5851a443a689658fa28fcf169355abf8d0dd67a6918082705c51ca098",
+        "size": 973
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/__init__.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "222ac993b214aa27489caf4974909b6ff8e5948fbf1b070437579d4caf2b091b",
+        "size": 121
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/chat_info_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "74960f8a61f2fa64c36b934f4dbc52ae1b2b0ce0ee2e401d187b8b32e9123f61",
+        "size": 1290
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/chat_list_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "4784f1403e2a08020433b17554e1afe7627b98ca88170cbd3cc729d63c149809",
+        "size": 413
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/chat_widget_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "d0f9bccd67d4854b7f5e2e518c6f18a4d66499b78eeeac6bcfcf9d9cb0aad600",
+        "size": 756
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/friends_group_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "a9aa9be7c3a603bbddf9736dfaa52a4538aa943912f9d292d89a64a099b2fcf3",
+        "size": 2667
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/friends_main_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "925ff876b4bb13fffbfb1242ef8c7313bc9233dfa7539df368249e6b22074466",
+        "size": 264
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/group_detail_qss.pyc",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "692e0071721f78045582f071d2f4ef382dbfe1f3762179fb98953a0c279bc15d",
+        "size": 837
+      },
+      "attributedTo": []
+    }
+  ],
+  "unresolvedScopes": [
+    {
+      "id": "scope:e93883f3e3a63e421fee4875b31bf4bd9bec37d17a7a2b7646054994cdca1620",
+      "kind": "scope-detail-overflow",
+      "source": "implementation-scope",
+      "path": null,
+      "reason": "Implementation scope summarized 3232 additional change details and 3228 unresolved details (3228 unattributed); overflow hash a80aedf54b68a2569390c6d5c22bfbc79e5836a56944daaa611d127bad908525"
+    },
+    {
+      "id": "scope:664c77f0958419633266011029264eda6f4c62fef874de2f3862dea3838c93ca",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".agents/skills/fupload/agents/openai.yaml",
+      "reason": "Changed path is not covered by a declared artifact: .agents/skills/fupload/agents/openai.yaml"
+    },
+    {
+      "id": "scope:071a1de4d0271a659de24919cf5796af1fae17fc7cd7d090c3094717f85857fa",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".agents/skills/fupload/references/cli-contract.md",
+      "reason": "Changed path is not covered by a declared artifact: .agents/skills/fupload/references/cli-contract.md"
+    },
+    {
+      "id": "scope:b1f1d732a4d189b302231393d54c33fc71ed33ef358390f5043368703b6d5f10",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".agents/skills/fupload/references/config.md",
+      "reason": "Changed path is not covered by a declared artifact: .agents/skills/fupload/references/config.md"
+    },
+    {
+      "id": "scope:4c60af4659650787229982930728850fc103e2722d6361259a7cb8037c8ca6e4",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".agents/skills/fupload/references/plugin.md",
+      "reason": "Changed path is not covered by a declared artifact: .agents/skills/fupload/references/plugin.md"
+    },
+    {
+      "id": "scope:e7ea7e6223d290f59f14840b3639b6cb112ccaf42e5a7076198cef249531b4b5",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/README.md",
+      "reason": "Changed path is not covered by a declared artifact: DD/README.md"
+    },
+    {
+      "id": "scope:5264891818a02542e7ca7ece68570c845131d2191854cfad690a8bbd9da8caa3",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/auth-analysis.md",
+      "reason": "Changed path is not covered by a declared artifact: DD/auth-analysis.md"
+    },
+    {
+      "id": "scope:dcd2383d875997fc583e5ea66654f6e0d0199848d5279144a648835d058e9f58",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/author-api-matrix.md",
+      "reason": "Changed path is not covered by a declared artifact: DD/author-api-matrix.md"
+    },
+    {
+      "id": "scope:0022d93803a449ac5afefad3224f90da739e7be29ef828149dc2fa737b1fca32",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client-inventory.md",
+      "reason": "Changed path is not covered by a declared artifact: DD/client-inventory.md"
+    },
+    {
+      "id": "scope:3467b7db7bdee0ae4f4964af9086d3996e2155fac76475154ecbba148a8b15e9",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/__init__.pyc"
+    },
+    {
+      "id": "scope:0f7e002a609302f7b8de50184e710c239f565f1f707fbe1daf41d5d60aab06f8",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/amr_player.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/amr_player.pyc"
+    },
+    {
+      "id": "scope:e2738b448ce5f2f9ce01127575d4400afd867d9419856f1cc766b3c7f54de88e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_device.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/audio_device.pyc"
+    },
+    {
+      "id": "scope:15fd392966053bf49b94ba7c7961a4c18d3b52c1eea9318fb19994ad6e2b0405",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_dll.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/audio_dll.pyc"
+    },
+    {
+      "id": "scope:f91e3b63ddd1820ba98e21283b1235079bd568c96fb88c70c64aa46308ff587f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_effect.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/audio_effect.pyc"
+    },
+    {
+      "id": "scope:ac58b67b241a7b03ef889a2626850b2dc7aa4952acfdd0673646086f171272f3",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_engine_module.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/audio_engine_module.pyc"
+    },
+    {
+      "id": "scope:2d2fbeeeb89c1b62807941d3f8023603eaf2cd8c73112316274a4b5b95e914c5",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_record.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/audio_record.pyc"
+    },
+    {
+      "id": "scope:e772a8f9770113f7ca613fe5e2c9d8968da0e175475d06046d59ee7b0e70bc29",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_session.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/audio_session.pyc"
+    },
+    {
+      "id": "scope:9caa6be350f86a85d9cb4c34d4b94e76bc0d463b336348e7fbf42543550dc8c5",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_share.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/audio_share.pyc"
+    },
+    {
+      "id": "scope:6674c2a281321456bb08938539ced8446425ed759679f1bbacd1d53940e82d0d",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/audio_user_manager.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/audio_user_manager.pyc"
+    },
+    {
+      "id": "scope:79e2cbb5078ec2be1d849c1e247aa3785bd5ef44703fc03f7e0d3c21966d4e3f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/constant.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/constant.pyc"
+    },
+    {
+      "id": "scope:8fcccc5abcdf55a33a9a3bcb22e787e0a08690474011f0df3325b82e8ac5a0e6",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/engine.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/engine.pyc"
+    },
+    {
+      "id": "scope:f67180f1f5e7564532e55405fefe34bc50f0f923c727dec5533541b8915e2c86",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/engine_interface.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/engine_interface.pyc"
+    },
+    {
+      "id": "scope:49daab6e72e515c9a463c95a51233ed71a3d5063f88e38dbfde77b897496cf4b",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/engine_state_manager.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/engine_state_manager.pyc"
+    },
+    {
+      "id": "scope:b67c1714738b6b27b2cdd2af217c246b2ecb02a7a19079762e3b09b56957a3c1",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/audio_engine/mic_energy.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/audio_engine/mic_energy.pyc"
+    },
+    {
+      "id": "scope:318949da6cd3ab7f8f43a26fc1738107edf902e37faceceb0935ad86ae200165",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/__init__.pyc"
+    },
+    {
+      "id": "scope:543fd806a3d91661efb62669339a65465bc49a5e3bd1ac0af7def62bfa4bdc6a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/__init__.pyc"
+    },
+    {
+      "id": "scope:62567e848679ed24c3f815f08d602e92d6c8bd56a47a9fdec44f39f34a5794c0",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/cli_list_registry.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/cli_list_registry.pyc"
+    },
+    {
+      "id": "scope:c3495b7d354058a7dfbc8698862d0bb903a6e3585fd38f406ea88642b8c89fc9",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/__init__.pyc"
+    },
+    {
+      "id": "scope:215646c6f8d9aadeaf128e676a7c9e23f17521195d40fcbc3b67c59e16a73731",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/channel.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/channel.pyc"
+    },
+    {
+      "id": "scope:d1069df6fb97a4c20a9959368b3b7248dd5714a7dff673cf7f27f37ece43c5c7",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/cloud_backup.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/cloud_backup.pyc"
+    },
+    {
+      "id": "scope:50f16cd882ce0bb19e89b16cc8b635d13c627e934b497bc765b07bf7c63a30bd",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/container.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/container.pyc"
+    },
+    {
+      "id": "scope:4d05c365d806195e20c8ddbdcd243bf2a4f10aab40a905c94a486f84a18548e3",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/game.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/game.pyc"
+    },
+    {
+      "id": "scope:cdb43a6b4527b7743be5f73187b20a232fb9c53dfe58ad4abd23a0e1a6fedada",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/log.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/log.pyc"
+    },
+    {
+      "id": "scope:8cc5dae404fc33c6c78be873eb6ef0c5a9126b4866cc15774ffea1f4d0701e4d",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/plugin_installer.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/plugin_installer.pyc"
+    },
+    {
+      "id": "scope:2c6e9ba5044b26359cb62458ca8b05ffbe831f778d7b68a24f9fe2bc084fd724",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/qt_runtime.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/qt_runtime.pyc"
+    },
+    {
+      "id": "scope:6dec47ba3caaec4958cc6628a7815748df0adbbcce086fa8bf6e3d851d38ea50",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/room.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/room.pyc"
+    },
+    {
+      "id": "scope:056ea4f2220f5d5991eafe32fc74c393e69d20d64bbf855c0900e8790b78ce0c",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/settings.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/settings.pyc"
+    },
+    {
+      "id": "scope:69bd9e8a85f1d581301b11a68b2f9dfd1d76354e30b19ca5490eb13804528663",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/ui_api_client.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/ui_api_client.pyc"
+    },
+    {
+      "id": "scope:892b81ab6eba438cef0398c42c08cb81d99f669f72c1d1f9e1c7dc999452aa77",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/update.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/update.pyc"
+    },
+    {
+      "id": "scope:baca7aed94ae83aa4bfcb84f1a323f6bcc60bb121414fa847094696de1e60126",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/voice.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/voice.pyc"
+    },
+    {
+      "id": "scope:06a67127c8b767de6bd959e67b3ac1573ef4249454f7029937ca83e166f252d7",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/web.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/web.pyc"
+    },
+    {
+      "id": "scope:c7340d1409edd4c0bb0237d072dd216e825dab6a7867333552d9b56ddd1cbe6b",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/wow.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/cli_anything/ccvoicehub/core/wow.pyc"
+    },
+    {
+      "id": "scope:fbb0be7feedd1db5c695345eecbdd67fc482a3798444efa8920ebe364125a172",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/__init__.pyc"
+    },
+    {
+      "id": "scope:70f94c9e95e01fd1bc9aeb57d3083823b0b2cc9e2f83d6ad94d6f62cdff9abb6",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/audio_trans/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/audio_trans/__init__.pyc"
+    },
+    {
+      "id": "scope:fb0dbcaa84ed1bb4a4c6c3c375d49c11064d4e3eb4f099172b9f5394506c2835",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/audio_trans/audio_trans_controller.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/audio_trans/audio_trans_controller.pyc"
+    },
+    {
+      "id": "scope:2b7615838038628eb5c0c5da6b6ff13af92ec0bebc7dcae3dd5aa985fb5e874c",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/audio_trans/constant.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/audio_trans/constant.pyc"
+    },
+    {
+      "id": "scope:992ddce9c6413dc95a730745161799e96008d602508bbeb921735a06dd93f143",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/bi_report/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/bi_report/__init__.pyc"
+    },
+    {
+      "id": "scope:99e993372bdbb09e9584292dfbad6a8aecda19a8beea263ad177b903a615d44a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/bi_report/bi_report_controller.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/bi_report/bi_report_controller.pyc"
+    },
+    {
+      "id": "scope:46e6e45b59009239703bbf0dad61ce09969b21a666ffd9f02e00c6c38a6b21db",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/bi_report/constant.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/bi_report/constant.pyc"
+    },
+    {
+      "id": "scope:4e491175de185c7c97aa66c69af4421a37ef93fa308b58f6ef3f81296ffbf318",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/__init__.pyc"
+    },
+    {
+      "id": "scope:6cc97bc84bd75c09630b8261d6df140a87b7d5cdb8ee3ba7be45b90ddd4380a9",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/chat_property.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/chat_property.pyc"
+    },
+    {
+      "id": "scope:baf44430017928cb17b1f98b62e5756a5eafbd08d1b203beb1bb346a6061306a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/common.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/common.pyc"
+    },
+    {
+      "id": "scope:fa99ae3a344567ba6024ba887d2f1f2a2ad16fdf9b4558354594ed5bcc9bea57",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/confirm_upload_file_window.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/confirm_upload_file_window.pyc"
+    },
+    {
+      "id": "scope:a2cb80a02a28030ad61aa2b8c443890d3284fbb98d5874a93149ad67cc2bc37a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/display_menu_handler.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/display_menu_handler.pyc"
+    },
+    {
+      "id": "scope:203b957f374babaca015d315a6809cba3316dd66427adb1fd1cea13436299136",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/display_msg_handler.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/display_msg_handler.pyc"
+    },
+    {
+      "id": "scope:193747ec7f34c1a2ba60b38e966d024d9f118210ff37042ffd9f1bd79e4392ae",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/im_constants.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/im_constants.pyc"
+    },
+    {
+      "id": "scope:f86a0ddfdbcff7d0f114e2bc1eaa7d285ab8920574302f8265711983b00029fd",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/inputQuoteWidget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/inputQuoteWidget.pyc"
+    },
+    {
+      "id": "scope:9bb309b394176c49b3d821c58bfaaad916edc59426582786621025b8ca83c3d8",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/input_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/input_widget.pyc"
+    },
+    {
+      "id": "scope:550ab3ee979e4fa56ece2e2e4c8670e6e6636aff93cc884f50494893b359d61d",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/message_hover_btn_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/message_hover_btn_widget.pyc"
+    },
+    {
+      "id": "scope:6bd948f7c2f540f595dc193258b72e1f25d91b79ab7d26d16c9144c7cbb41341",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/message_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/message_widget.pyc"
+    },
+    {
+      "id": "scope:2c5543e7d1d4160b75546f2c63678af7c6c0b8dafb0ff63d489f18d917d17646",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/msg_format_helper.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/msg_format_helper.pyc"
+    },
+    {
+      "id": "scope:5b5547ce0ee35393b6a50840100b01738f316d3453d49233c0a9239c3f8e8088",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/send_more_menu.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/send_more_menu.pyc"
+    },
+    {
+      "id": "scope:be99e5af93da7e7fa6d18b36aee7360378428034d639e6c606d6e7fc5814736f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/text_constants.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/text_constants.pyc"
+    },
+    {
+      "id": "scope:6e2c4a893fea3b95fa5f78f22fce39292ff77454affb5a18f43315c8434be6c1",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/text_file_uploader.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/text_file_uploader.pyc"
+    },
+    {
+      "id": "scope:d9275aad346dfbc00a5df3fecef0fe2485e9f6218b42090f2f25d4fefac1d824",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/chat_base_ui/text_image_uploader.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/chat_base_ui/text_image_uploader.pyc"
+    },
+    {
+      "id": "scope:ef9acb63426d7b55e28c2e7d1fb510c102888c065b8b2541839913be5a5cdb50",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/check_playing/__init__.pyc"
+    },
+    {
+      "id": "scope:2ac2571c843a607058f66b2ef73a36b766374238673b2d63a8389b6ec8c4da63",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/check_playing_controller.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/check_playing/check_playing_controller.pyc"
+    },
+    {
+      "id": "scope:99bad5784a7864ed5cdb8d791070819417c87d384cf54735c53837e752b4871a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/check_playing_thread.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/check_playing/check_playing_thread.pyc"
+    },
+    {
+      "id": "scope:ad523a97019419e8db5e4f0c99f294180da70f579d93657c6e8bf2655e8fbdc6",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/check_playing/protocols.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/check_playing/protocols.pyc"
+    },
+    {
+      "id": "scope:3e79e82be59bad73efea19599027aa69ad0fd8eac5f35a38ce17c6eb6da4635b",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/class_helper/__init__.pyc"
+    },
+    {
+      "id": "scope:e50496148a0944f761065733959a621bc1c6ad3c4c3d3f033454b05d201713f4",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/cc_di_manager.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/class_helper/cc_di_manager.pyc"
+    },
+    {
+      "id": "scope:c4fccb6d521a351c93de0c701bbf54e4f832d7b1b48eb382a6c1fb69d9df22e3",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/cc_module_container.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/class_helper/cc_module_container.pyc"
+    },
+    {
+      "id": "scope:2efab0eb748cc6eba0deefb08aa40174e1cc134619858d519ba02ffc62253050",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/factory.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/class_helper/factory.pyc"
+    },
+    {
+      "id": "scope:81ae85d935f194bff9ffaa8e64f7e828d1af4e9c3cde0647d9dfe0d4fc2090ce",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/module_load.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/class_helper/module_load.pyc"
+    },
+    {
+      "id": "scope:bd203f01425c01463f03aec8f37e1d295eaa472bd38afbf5110f90195b88fd6a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_layout_helper.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/class_helper/voice_layout_helper.pyc"
+    },
+    {
+      "id": "scope:e50fd798c59632bb4c5df357b256ba3a9e293ee43e5e8c14e9518111c83bda40",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_live_interface.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/class_helper/voice_live_interface.pyc"
+    },
+    {
+      "id": "scope:0b86cdd4e11a8856ad8714ef925b11d36b7bad778a5cac06ce23d36d7bbe1b6e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_load_helper.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/class_helper/voice_load_helper.pyc"
+    },
+    {
+      "id": "scope:0f847e1bf2b9baaf8f91941a091c2e4ad301606f692b072b1fde1527601905e7",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/class_helper/voice_window_helper.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/class_helper/voice_window_helper.pyc"
+    },
+    {
+      "id": "scope:676db2b17d74b8493b5eb53cb083b4fa2552ec632def06fe44265125fbb1d108",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/common_pop/__init__.pyc"
+    },
+    {
+      "id": "scope:24f1d657483a7e545b9329fe7d517fe938b1373d9e7699abe29e340a669a9d0f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/common_jump/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/common_pop/common_jump/__init__.pyc"
+    },
+    {
+      "id": "scope:b00bdd034d48475b394afe02825379d954b953f47991d7f7b26839394ec39636",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/common_jump/common_jump_controller.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/common_pop/common_jump/common_jump_controller.pyc"
+    },
+    {
+      "id": "scope:4a4b94f73a32875458b62cf81e7cb59137492cb4de4a4072fd9554c0b025194e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/common_jump/protocols.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/common_pop/common_jump/protocols.pyc"
+    },
+    {
+      "id": "scope:8aa9a50828aa5cc8d80f7fb01a32cfaa019c79c7d0b783245eecbac2dce16a6d",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/toast_pop/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/common_pop/toast_pop/__init__.pyc"
+    },
+    {
+      "id": "scope:31141ef87924b54ec2c36536efba3b69dc5dcc86f2cb7091e77b17f673e7f878",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/toast_pop/common_pop_toast_controller.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/common_pop/toast_pop/common_pop_toast_controller.pyc"
+    },
+    {
+      "id": "scope:fcbe1b953587e0a0f427619ae30ef852617d96cf7d432744090bd0c7bf8707f1",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/toast_pop/protocols.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/common_pop/toast_pop/protocols.pyc"
+    },
+    {
+      "id": "scope:1c122b7018467a5004e2b46a3896d3fde84c853e42fdcc7f77aeeb23f7c4f0ec",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/web_pop/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/common_pop/web_pop/__init__.pyc"
+    },
+    {
+      "id": "scope:34bb0e5a1222fd3e97b2dd5767a7743071b18ef3f958b1af16c8168fcd26a6b8",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/web_pop/common_pop_web_controller.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/common_pop/web_pop/common_pop_web_controller.pyc"
+    },
+    {
+      "id": "scope:f2317aedd4e59f909f1dd5de1710836af349ae6b5396c96e6ff65856e33b657c",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/common_pop/web_pop/protocols.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/common_pop/web_pop/protocols.pyc"
+    },
+    {
+      "id": "scope:9a1a3d0072f23734d9e15f4b735e9b9ddbfeb2ab610e23c337d070d483e79d8a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/cover_game/__init__.pyc"
+    },
+    {
+      "id": "scope:441d285bf4fee0d99ecf189f34d9fc70aafb4654744fd60f936fd74e38bfc710",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/constant_defined.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/cover_game/constant_defined.pyc"
+    },
+    {
+      "id": "scope:f1522f5c666342e4c15044500854710a2093e1704ab6a5f80a899af807cc3ad7",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/cover_game_controller.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/cover_game/cover_game_controller.pyc"
+    },
+    {
+      "id": "scope:f60701305ac0592581685c6e84307da99a4be51672efc7156e0395245acaefa4",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/cover_game/view/__init__.pyc"
+    },
+    {
+      "id": "scope:dbf13b57338099a1e24513f87f3c57c84abcb8566d203ef860c0dc761a62d356",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/cover_audio_qss.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/cover_game/view/cover_audio_qss.pyc"
+    },
+    {
+      "id": "scope:d940850fb45c95fa3d1a89fa8711132e0efb2f1f0a91e5417b446f5e663b1e9d",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/cover_audio_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/cover_game/view/cover_audio_widget.pyc"
+    },
+    {
+      "id": "scope:eca7e2776093a6e012c3c163cfe43aeac140b151140e3b13f3be58e70b6fb2bf",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/cover_game/view/cover_setting_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/cover_game/view/cover_setting_widget.pyc"
+    },
+    {
+      "id": "scope:5f1052fd19085eb030073d8885d3b63f5a2c5785d476820741a586cbf4c59fa1",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/emotion/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/emotion/__init__.pyc"
+    },
+    {
+      "id": "scope:3267b6987247f09c357f909d89bf04c7a9827a02f20d632a4bc37de19475b866",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_config.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/emotion/emotion_config.pyc"
+    },
+    {
+      "id": "scope:19c8fe15128bf144457cb085da9b01299d7997d266471f22b4786865af1f16bd",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_config_data.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/emotion/emotion_config_data.pyc"
+    },
+    {
+      "id": "scope:f2bda92c19ceffc4627c53d9ffa84ff34dbef933af696894d312a064d1cc762b",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_constants.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/emotion/emotion_constants.pyc"
+    },
+    {
+      "id": "scope:0263a639d8a6cec755cdab46383f6ce318e77d3e570441d5bf9d52fafc7f7168",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_controller.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/emotion/emotion_controller.pyc"
+    },
+    {
+      "id": "scope:f49c306ffd62ea5f9123349a0ffb0c98cb6092b5b2f925c05f1a48b9df833a39",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_css.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/emotion/emotion_css.pyc"
+    },
+    {
+      "id": "scope:e124c8d11e1adffc642c380595c5e9815a27e1545ae65ea4b1e7fbfc0cd0386d",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_gridwidget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/emotion/emotion_gridwidget.pyc"
+    },
+    {
+      "id": "scope:5b0aba8b5bf2eac0318856f95a7dd3b52c789b56ac8de92615342fc2ac09aa97",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_recent_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/emotion/emotion_recent_widget.pyc"
+    },
+    {
+      "id": "scope:7147bc36c704e2212b03fbe3f48dc27f12e3b8888bdecddf61084ab7f7aecd44",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_tab_config.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/emotion/emotion_tab_config.pyc"
+    },
+    {
+      "id": "scope:31d036e05d9795e025d250451c16892cf6188c6ec557795d712a0c69a6287904",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_tabwidget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/emotion/emotion_tabwidget.pyc"
+    },
+    {
+      "id": "scope:200932413f687a4b959e0e19101a61e0612b165d1953ce2462fe98a61f831311",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/emotion/emotion_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/emotion/emotion_widget.pyc"
+    },
+    {
+      "id": "scope:876f614a26111490ef4be7b1063baa9e3311c1e73b5afa0dd9217586805ccf63",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/__init__.pyc"
+    },
+    {
+      "id": "scope:6dcd48cef915769319beda4e540f5e54fef79a0e509c60fa161cee365ad91756",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/chat/__init__.pyc"
+    },
+    {
+      "id": "scope:264b8e1d883e7391cce5cb3e59a6d82287e3cbcfd1c89e5ac05af6530f068b17",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/chat_info_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/chat/chat_info_widget.pyc"
+    },
+    {
+      "id": "scope:b1452a4486ea2b6a6a3dc24f15c2900c2491a259dc9f9de841eccdf3ad038a8f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/chat_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/chat/chat_widget.pyc"
+    },
+    {
+      "id": "scope:3e41accc07695fea4bb223a30657e8bfc9a30ed5273d90907ba5e756ca87f812",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/chat_window.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/chat/chat_window.pyc"
+    },
+    {
+      "id": "scope:8d1639f77f781e69ab070887614e033d10e851416b72560ec343931ad14d094a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/constants.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/chat/constants.pyc"
+    },
+    {
+      "id": "scope:d469ef99ca7a7c0a2567416d4cd9969f85dc3b99df56feb8b19431ed1f83b140",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/display_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/chat/display_widget.pyc"
+    },
+    {
+      "id": "scope:3001c13eedfd3265da1ff5aca9cd77cc2002567eab089898cddb47a41c98c9c6",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/empty_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/chat/empty_widget.pyc"
+    },
+    {
+      "id": "scope:a86c9b8090dfd5f772c2380d597b20bd484adcf0d7a9563231c668f3500a8849",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/friends_chat_area_widget.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/chat/friends_chat_area_widget.pyc"
+    },
+    {
+      "id": "scope:023297cc6bfd9d84cb1d8053997001d3e29e8e6c57b5486955533ffce55e458c",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/friends_chat_controller.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/chat/friends_chat_controller.pyc"
+    },
+    {
+      "id": "scope:7a1f507e62ed4a79d991a5a513d11212d75fccf13c9fbb388848c28a247dafd9",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/chat/style_sheets.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/chat/style_sheets.pyc"
+    },
+    {
+      "id": "scope:5245bbe367b088e4af6e403b71475c9d00bfbddaaaaa2c3abb2dbafc75057afc",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/constant_defined.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/constant_defined.pyc"
+    },
+    {
+      "id": "scope:8e37eb3f2cbf21e0001e222e8a3c16a814ba9d3afba32eaa9711864ade3547d0",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/friends_controller.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/friends_controller.pyc"
+    },
+    {
+      "id": "scope:b1e5f09df6064a8a7c460465cf5d97afa2559aa6ca6fc6fb1f1b651e6030ef4f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/friends_datacenter.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/friends_datacenter.pyc"
+    },
+    {
+      "id": "scope:6c9a9c00d073c477f18a7b4917cffd2856765f6468da9d842a2227f5e0ab201e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/protocols.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/protocols.pyc"
+    },
+    {
+      "id": "scope:0e7192ae6122c2bfeebb4d64e52ee9347cc7bef60e470d241f23fa2f3bc92c32",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/__init__.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/qss/__init__.pyc"
+    },
+    {
+      "id": "scope:dc9d010369d41f5bae84d17038da9442c08cdc9d3295500e494c00d3dd0e6049",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/chat_info_qss.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/qss/chat_info_qss.pyc"
+    },
+    {
+      "id": "scope:dcc381b0bcebdb7cc3b937a041c882e7544e4aab844b762bf3fdc0bca987563f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/chat_list_qss.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/qss/chat_list_qss.pyc"
+    },
+    {
+      "id": "scope:7111b825587ef7fdd92bc2d4f39874379762c97ae1b64fd4dbacf8c4798f9c8d",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/chat_widget_qss.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/qss/chat_widget_qss.pyc"
+    },
+    {
+      "id": "scope:b94a5e51439f64e77a67f7920af57940fe3c06cb3439d89cc2f6cd04d986a7d5",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/friends_group_qss.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/qss/friends_group_qss.pyc"
+    },
+    {
+      "id": "scope:b6adc3488eb037fc72654ca3ad1ea42945e2e38a713bd3dfc7d8226ac81c1e24",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/friends_main_qss.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/qss/friends_main_qss.pyc"
+    },
+    {
+      "id": "scope:f571c3aa0f9c695d58776f318cf9606185f48f58387ceff4267063c5a908304d",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "DD/client/ccvoicehub-100128/components/friends/qss/group_detail_qss.pyc",
+      "reason": "Changed path is not covered by a declared artifact: DD/client/ccvoicehub-100128/components/friends/qss/group_detail_qss.pyc"
+    }
+  ],
+  "noCodeReason": null,
+  "scopeHash": "32521813ccb8d387840cafb945db0a5ba3d33308ad2664074df25d740a7fa094"
+}

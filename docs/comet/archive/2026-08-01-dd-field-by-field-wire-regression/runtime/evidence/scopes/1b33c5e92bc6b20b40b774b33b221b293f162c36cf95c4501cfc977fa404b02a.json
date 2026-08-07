@@ -1,0 +1,896 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "e6fc4a27856913080615b45a104bd32e0f1a4817c29eb9b853f2c4e61cb8145c",
+  "baselineProjectionRef": "runtime/evidence/snapshots/90a78603f460a47f0f82b4dfe0b414d44fff9b24d5a3fed1c67c3fea841d40b1.json",
+  "baselineProjectionHash": "90a78603f460a47f0f82b4dfe0b414d44fff9b24d5a3fed1c67c3fea841d40b1",
+  "currentProjectionRef": "runtime/evidence/snapshots/ce5bed12d5540edcb9886ef34efd90f75708d4c3c59a67df2acb334851d9a8e1.json",
+  "currentProjectionHash": "ce5bed12d5540edcb9886ef34efd90f75708d4c3c59a67df2acb334851d9a8e1",
+  "complete": false,
+  "declaredArtifacts": [
+    {
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/generate_dd_wire_matrix_report.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_wire_matrix.py",
+      "kind": "file"
+    }
+  ],
+  "changes": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "231439ff3ce45a59d5d6b05883755a712af78d180c082431f12a4f51bae4a6a1",
+        "size": 8347
+      },
+      "after": {
+        "hash": "a7509a8b5260cbf291845f89f5ae9ab138579d96b061f5b5f2c833c187f89660",
+        "size": 8959
+      },
+      "attributedTo": [
+        {
+          "path": "README.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "kind": "modified",
+      "before": {
+        "hash": "b835416aadc8ffe22d4ad36633afb300755f1a2e8ede3c6e1f65b9f4c54a9f1f",
+        "size": 15626
+      },
+      "after": {
+        "hash": "a3e03f536002166516f789748d3607bc6e8813c8fed2d1fb3dfe2b1c8c53f9d8",
+        "size": 16292
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/references/dd.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "kind": "modified",
+      "before": {
+        "hash": "30723a96533b0f418f86c1b9c629160c948daabc9e721cb7df155544905127d5",
+        "size": 106954
+      },
+      "after": {
+        "hash": "a94a3565dd1a7056f1062ce4188315010cc3d6a24ac72410546a9ca1c24ccffe",
+        "size": 107750
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/dd.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "908ba9c211b127b80b69cfd2dfe1931d25a7f24c2c4bb19db7110a9da6c5235b",
+        "size": 31505
+      },
+      "after": {
+        "hash": "d7c5a2711a6a209fde44c1e7b006990d33d81a877049ae49dcc91f5c52b5f00a",
+        "size": 31898
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/schema.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/generate_dd_wire_matrix_report.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e185220367757232efe2b0d0b21092305972c27d747b76a5af3cf56e8cf3daf0",
+        "size": 7478
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/generate_dd_wire_matrix_report.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "kind": "modified",
+      "before": {
+        "hash": "60955be6e70375d44f225febf529489dd993da12e1a978a8c76b0d7bcf66a87b",
+        "size": 37815
+      },
+      "after": {
+        "hash": "b32ac2933770e203cc2ae1d29f49e24164148f482961a500cc0ac087249fbc9a",
+        "size": 38891
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/test_dd_session.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_wire_matrix.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "b8fb8c7878e95b7355a6471da3a7a8c9368f9e791cbff44259decd7815930ad4",
+        "size": 43134
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/test_dd_wire_matrix.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/01-plugin-create-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "7309ef6496a5f115ec7c8453ee903a589c044fb83ca69e14e3ce416778018434",
+        "size": 1706
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/01-plugin-create.json",
+      "kind": "removed",
+      "before": {
+        "hash": "7b6d6f0ccd857b7a43c0e778145f2bd046c96d33a3b191cd78461c209ebfdb84",
+        "size": 1316
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/02-plugin-update-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "ffbe25747a56e1b692026dc160e3fe0125692c7fce5a5f4a3b6aadafdc410a3c",
+        "size": 1706
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/02-plugin-update.json",
+      "kind": "removed",
+      "before": {
+        "hash": "ec371a998e3686fdaccd8fe3815c42b81d83a03065479b3061c9f028a4650f60",
+        "size": 428
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/03-plugin-edit-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "48bdc5dbeb33b3ee61e4fac25281e1133ed64f6cd6bb5ba475cc29ad9d5537f6",
+        "size": 1704
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/03-plugin-edit.json",
+      "kind": "removed",
+      "before": {
+        "hash": "6bc988c9dfedab166b13dc90a47e56415ca8055c98ca71a797a3a950a146082d",
+        "size": 147
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/04-config-create-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "c9e050c822b066a7f2ebed75ea357294402776ebeab5b3e1d8ba3efe9d5bc975",
+        "size": 3099
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/04-config-create.json",
+      "kind": "removed",
+      "before": {
+        "hash": "2e8199363f79d1cdcab8fa53518fbb31b9c5311ece49d50bfd5c20545862f8f6",
+        "size": 1364
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/05-config-update-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "6a3c51ed77d08b404e85a0ccd0a32586ec2c03e8c2dc85547c7577fbfc6b7e70",
+        "size": 3098
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/05-config-update.json",
+      "kind": "removed",
+      "before": {
+        "hash": "7da26761217286e8ce98fed6f6ce5ff89d63c10577146d1ec724dfd833bd7825",
+        "size": 1169
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/06-config-edit-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "54c4e0bdbd1c29e63a732808d9d368b30b846889f148023bbd0107abb6325130",
+        "size": 3092
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/06-config-edit.json",
+      "kind": "removed",
+      "before": {
+        "hash": "8f00d5efa3e14cb351d74bd31fb94395edac21b5e347a79c42c5e2b059d926b0",
+        "size": 350
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/07-wa-create-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "93cf71aa8edf28aefbccd24755ca3a7fd8546fedfc790e848be95d7475d589a3",
+        "size": 1504
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/07-wa-create.json",
+      "kind": "removed",
+      "before": {
+        "hash": "4025a8d4fc363ee5fec3f8c37b5f7f057a5d5190375d7495ed797da0b5c7abf0",
+        "size": 1011
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/08-wa-update-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "0db79a652f62db1d1006b49f255379d9ac26dbbe9513a0edba847786d466adc6",
+        "size": 1503
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/08-wa-update.json",
+      "kind": "removed",
+      "before": {
+        "hash": "f48256aba3c5649f349ba4e9578481baa9c6bdd470ec79aec07d8cc670c636c3",
+        "size": 263
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/09-wa-edit-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "636a0270e9cf58c368e464468890a591d12fad8d3794ec451f489cde3e6f9c2f",
+        "size": 1497
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/09-wa-edit.json",
+      "kind": "removed",
+      "before": {
+        "hash": "2afbdcfa51f25af4e3a27af5c995e8131a1c9b4e3d0a24092940a837b4325838",
+        "size": 197
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-config-delete-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "cf3b2488f5b37730922e35f1800efe8b246d7c3bb098ac36d29c5362371bd7ec",
+        "size": 3124
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-config-delete.json",
+      "kind": "removed",
+      "before": {
+        "hash": "f76d4eca34acc225f3d1de8def081f5c15896e71fdb3190174d75507caed2ab0",
+        "size": 133
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-plugin-delete-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "cda162ac4dd1188fe92f80a99dc7638cb905d82cd24b5fc81d8ed506727fa818",
+        "size": 1741
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-plugin-delete.json",
+      "kind": "removed",
+      "before": {
+        "hash": "39e67a16d0131b00cdeba1c5338599876b8904b0b6456654cb5ce87afc085f5f",
+        "size": 133
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-wa-delete-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "29702aa3d296e5f4af52a14db79fb6a155fe71a8f40841cea800988c91403953",
+        "size": 1534
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-wa-delete.json",
+      "kind": "removed",
+      "before": {
+        "hash": "ea414b71eced83bd8bfb6dbb44b2f4fbdeada8c46ae9effd4b81de3c8f300931",
+        "size": 129
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/read-matrix.json",
+      "kind": "removed",
+      "before": {
+        "hash": "5e16e105a367926cd8b7121d74cd396d85b7e3a3d91a3c9dd003ff51538bdffc",
+        "size": 678791
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/session-stop-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "e47adab73c291a55e0f6d1d5da0f28f2fbf435c342e9c84b64079588f15237f2",
+        "size": 230
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/verification.json",
+      "kind": "removed",
+      "before": {
+        "hash": "f1a77818ca002bbe7bffccc813ed80faf40e5b7c05f6ee60cd57de4892086535",
+        "size": 4746
+      },
+      "after": null,
+      "attributedTo": []
+    }
+  ],
+  "unattributed": [
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/01-plugin-create-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "7309ef6496a5f115ec7c8453ee903a589c044fb83ca69e14e3ce416778018434",
+        "size": 1706
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/01-plugin-create.json",
+      "kind": "removed",
+      "before": {
+        "hash": "7b6d6f0ccd857b7a43c0e778145f2bd046c96d33a3b191cd78461c209ebfdb84",
+        "size": 1316
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/02-plugin-update-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "ffbe25747a56e1b692026dc160e3fe0125692c7fce5a5f4a3b6aadafdc410a3c",
+        "size": 1706
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/02-plugin-update.json",
+      "kind": "removed",
+      "before": {
+        "hash": "ec371a998e3686fdaccd8fe3815c42b81d83a03065479b3061c9f028a4650f60",
+        "size": 428
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/03-plugin-edit-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "48bdc5dbeb33b3ee61e4fac25281e1133ed64f6cd6bb5ba475cc29ad9d5537f6",
+        "size": 1704
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/03-plugin-edit.json",
+      "kind": "removed",
+      "before": {
+        "hash": "6bc988c9dfedab166b13dc90a47e56415ca8055c98ca71a797a3a950a146082d",
+        "size": 147
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/04-config-create-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "c9e050c822b066a7f2ebed75ea357294402776ebeab5b3e1d8ba3efe9d5bc975",
+        "size": 3099
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/04-config-create.json",
+      "kind": "removed",
+      "before": {
+        "hash": "2e8199363f79d1cdcab8fa53518fbb31b9c5311ece49d50bfd5c20545862f8f6",
+        "size": 1364
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/05-config-update-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "6a3c51ed77d08b404e85a0ccd0a32586ec2c03e8c2dc85547c7577fbfc6b7e70",
+        "size": 3098
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/05-config-update.json",
+      "kind": "removed",
+      "before": {
+        "hash": "7da26761217286e8ce98fed6f6ce5ff89d63c10577146d1ec724dfd833bd7825",
+        "size": 1169
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/06-config-edit-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "54c4e0bdbd1c29e63a732808d9d368b30b846889f148023bbd0107abb6325130",
+        "size": 3092
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/06-config-edit.json",
+      "kind": "removed",
+      "before": {
+        "hash": "8f00d5efa3e14cb351d74bd31fb94395edac21b5e347a79c42c5e2b059d926b0",
+        "size": 350
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/07-wa-create-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "93cf71aa8edf28aefbccd24755ca3a7fd8546fedfc790e848be95d7475d589a3",
+        "size": 1504
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/07-wa-create.json",
+      "kind": "removed",
+      "before": {
+        "hash": "4025a8d4fc363ee5fec3f8c37b5f7f057a5d5190375d7495ed797da0b5c7abf0",
+        "size": 1011
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/08-wa-update-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "0db79a652f62db1d1006b49f255379d9ac26dbbe9513a0edba847786d466adc6",
+        "size": 1503
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/08-wa-update.json",
+      "kind": "removed",
+      "before": {
+        "hash": "f48256aba3c5649f349ba4e9578481baa9c6bdd470ec79aec07d8cc670c636c3",
+        "size": 263
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/09-wa-edit-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "636a0270e9cf58c368e464468890a591d12fad8d3794ec451f489cde3e6f9c2f",
+        "size": 1497
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/09-wa-edit.json",
+      "kind": "removed",
+      "before": {
+        "hash": "2afbdcfa51f25af4e3a27af5c995e8131a1c9b4e3d0a24092940a837b4325838",
+        "size": 197
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-config-delete-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "cf3b2488f5b37730922e35f1800efe8b246d7c3bb098ac36d29c5362371bd7ec",
+        "size": 3124
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-config-delete.json",
+      "kind": "removed",
+      "before": {
+        "hash": "f76d4eca34acc225f3d1de8def081f5c15896e71fdb3190174d75507caed2ab0",
+        "size": 133
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-plugin-delete-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "cda162ac4dd1188fe92f80a99dc7638cb905d82cd24b5fc81d8ed506727fa818",
+        "size": 1741
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-plugin-delete.json",
+      "kind": "removed",
+      "before": {
+        "hash": "39e67a16d0131b00cdeba1c5338599876b8904b0b6456654cb5ce87afc085f5f",
+        "size": 133
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-wa-delete-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "29702aa3d296e5f4af52a14db79fb6a155fe71a8f40841cea800988c91403953",
+        "size": 1534
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-wa-delete.json",
+      "kind": "removed",
+      "before": {
+        "hash": "ea414b71eced83bd8bfb6dbb44b2f4fbdeada8c46ae9effd4b81de3c8f300931",
+        "size": 129
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/read-matrix.json",
+      "kind": "removed",
+      "before": {
+        "hash": "5e16e105a367926cd8b7121d74cd396d85b7e3a3d91a3c9dd003ff51538bdffc",
+        "size": 678791
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/session-stop-output.json",
+      "kind": "removed",
+      "before": {
+        "hash": "e47adab73c291a55e0f6d1d5da0f28f2fbf435c342e9c84b64079588f15237f2",
+        "size": 230
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/verification.json",
+      "kind": "removed",
+      "before": {
+        "hash": "f1a77818ca002bbe7bffccc813ed80faf40e5b7c05f6ee60cd57de4892086535",
+        "size": 4746
+      },
+      "after": null,
+      "attributedTo": []
+    }
+  ],
+  "unresolvedScopes": [
+    {
+      "id": "scope:54b7cf24f96334caa7716573029ee8ea0283bd8a664621680f827e3bb9783cb5",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/01-plugin-create-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/01-plugin-create-output.json"
+    },
+    {
+      "id": "scope:cd2f3bba6c7cc364cb0684b1b92a2e13df23184525677f403a9e28e7f3e6661e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/01-plugin-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/01-plugin-create.json"
+    },
+    {
+      "id": "scope:deadef80837a463c9177b8852dff32933bce580115f77d7dd9a1472960544508",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/02-plugin-update-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/02-plugin-update-output.json"
+    },
+    {
+      "id": "scope:1086722729ee01a1cfc3f267e9a521bb22aa7ec95b067af7d9ad3f8a29ff38a2",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/02-plugin-update.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/02-plugin-update.json"
+    },
+    {
+      "id": "scope:631c59e57b6daafcec125692a21cd80664915747445a7e06012418dd8d7c041a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/03-plugin-edit-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/03-plugin-edit-output.json"
+    },
+    {
+      "id": "scope:91dfef1d55ec8e6feca6db639fc52d370ad305cb0b5db206c8ac1b278c902457",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/03-plugin-edit.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/03-plugin-edit.json"
+    },
+    {
+      "id": "scope:7da65522823730baf985377c112b5f54ef8bd0788ebdf2f58442eb8c4fb04876",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/04-config-create-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/04-config-create-output.json"
+    },
+    {
+      "id": "scope:21ef9059a9ce2e1affcddd398d1f1c91bc96929b7bf317ca9dc90f6677a90720",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/04-config-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/04-config-create.json"
+    },
+    {
+      "id": "scope:e6622cfd83fa610289daffc6dcc6ab178e417747e145092eb7095e7b3d6333cb",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/05-config-update-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/05-config-update-output.json"
+    },
+    {
+      "id": "scope:5fcb867818aff471df5ad67d98aec5f1c50a44503de0f383fbd43a1e1c3119ee",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/05-config-update.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/05-config-update.json"
+    },
+    {
+      "id": "scope:8c9f8c926e6494bf1230c0068a2e2c961973de85509b3e9394e37a0929672081",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/06-config-edit-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/06-config-edit-output.json"
+    },
+    {
+      "id": "scope:3ac7088bd63fe87698da75cacd64583a0e8530085ea191bcd96dc8ab0095cd91",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/06-config-edit.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/06-config-edit.json"
+    },
+    {
+      "id": "scope:09e2936445ba0e7341b2a75dd41ce45fe7737a35205085c84e9171943ff74d7e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/07-wa-create-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/07-wa-create-output.json"
+    },
+    {
+      "id": "scope:cfbe52cff67b6f93fd1c2243299d0adb23ae575b8d70d058a204463327f37160",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/07-wa-create.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/07-wa-create.json"
+    },
+    {
+      "id": "scope:6c930d1f0d9ec9dca8e3a97e69eea67de11573df05aea1b254bc144b6d43b8b2",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/08-wa-update-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/08-wa-update-output.json"
+    },
+    {
+      "id": "scope:39ce1a5fca4b0874dc608e361bea21ab7a1f8d3b3a58574192f93763830f244f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/08-wa-update.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/08-wa-update.json"
+    },
+    {
+      "id": "scope:5ba89afaad6e46be8e7f46069aa6b2efa8fd7ab8f44da6865fa4a9e90435913c",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/09-wa-edit-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/09-wa-edit-output.json"
+    },
+    {
+      "id": "scope:2810d685ae03b26c99017f41e66b0c7f680d2408625e7836f09b25e8fb7cee1e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/09-wa-edit.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/09-wa-edit.json"
+    },
+    {
+      "id": "scope:5b933a250e87c62539107bf3181801db151735ffc31106e09798fb00d5c89c7f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-config-delete-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/cleanup-config-delete-output.json"
+    },
+    {
+      "id": "scope:33fe86f54b4e631d513e3144180d1351f6b622feeceed9c6b223afd024ff23d4",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-config-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/cleanup-config-delete.json"
+    },
+    {
+      "id": "scope:7e415eb5951318591442c7918cf309eaf92b215f44533c04c5485375f541ce65",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-plugin-delete-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/cleanup-plugin-delete-output.json"
+    },
+    {
+      "id": "scope:7b77d66bf25c31a1530253fb48eb4741a3ad96d83b2620e08d1cf23a4484f9da",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-plugin-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/cleanup-plugin-delete.json"
+    },
+    {
+      "id": "scope:3b098bb2626a7abf78ef940476880156d16339fcbe9ec07499e49acd3b1f32d3",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-wa-delete-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/cleanup-wa-delete-output.json"
+    },
+    {
+      "id": "scope:30bb6a09e6fba06c43d221d0fc47c3327a57bf65595fc87cecfc8240aa88b34f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/cleanup-wa-delete.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/cleanup-wa-delete.json"
+    },
+    {
+      "id": "scope:029dd940dc387df5e76332c5cced3312a254175f7d74df3c84c6f724e8885dca",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/read-matrix.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/read-matrix.json"
+    },
+    {
+      "id": "scope:b070b9463a9d6b097bcbecf1218c5b02af4cf6db9078c5ca4e0e2236fb01119f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/session-stop-output.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/session-stop-output.json"
+    },
+    {
+      "id": "scope:a8c5122a3084276684a6ceae43ab9e5089240ea935ba5cd0f53a9ee02037ab46",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "publish/20260801-091500-dd-request-body-full-reaudit/verification.json",
+      "reason": "Changed path is not covered by a declared artifact: publish/20260801-091500-dd-request-body-full-reaudit/verification.json"
+    }
+  ],
+  "noCodeReason": null,
+  "scopeHash": "1b33c5e92bc6b20b40b774b33b221b293f162c36cf95c4501cfc977fa404b02a"
+}
