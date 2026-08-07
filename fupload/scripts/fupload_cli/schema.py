@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import zipfile
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple
 
@@ -306,6 +307,39 @@ class Schema:
                         raise ValidationError("expected nonempty string or null", path="$.retail_ui_config.default_edit_mode_selector")
                 if "enable_dd_setup_wizard" in retail and not isinstance(retail["enable_dd_setup_wizard"], bool):
                     raise ValidationError("expected boolean", path="$.retail_ui_config.enable_dd_setup_wizard")
+        if self.name == "fupload.v1.curseforge.plugin.upload":
+            if not zipfile.is_zipfile(value["file"]):
+                raise ValidationError("file must be a valid ZIP archive", path="$.file")
+            if "game_versions" in value and any(isinstance(item, bool) or not isinstance(item, int) or item <= 0 for item in value["game_versions"]):
+                raise ValidationError("array must contain positive integer IDs", path="$.game_versions")
+            if "game_version_names" in value and any(not isinstance(item, str) or not item.strip() for item in value["game_version_names"]):
+                raise ValidationError("array must contain nonempty strings", path="$.game_version_names")
+            relations = value.get("relations")
+            if relations is not None:
+                if set(relations) != {"projects"}:
+                    unknown = sorted(set(relations) - {"projects"})
+                    message = "unknown field(s): %s" % ", ".join(unknown) if unknown else "projects is required"
+                    raise ValidationError(message, path="$.relations")
+                if not isinstance(relations["projects"], list):
+                    raise ValidationError("expected array", path="$.relations.projects")
+            for index, relation in enumerate((relations or {}).get("projects") or []):
+                if not isinstance(relation, dict):
+                    raise ValidationError("expected object", path="$.relations.projects[%d]" % index)
+                unknown = sorted(set(relation) - {"slug", "type", "project_id"})
+                if unknown:
+                    raise ValidationError("unknown field(s): %s" % ", ".join(unknown), path="$.relations.projects[%d].%s" % (index, unknown[0]))
+                if not {"slug", "type"}.issubset(relation):
+                    raise ValidationError("slug and type are required", path="$.relations.projects[%d]" % index)
+                if not isinstance(relation["slug"], str) or not relation["slug"].strip():
+                    raise ValidationError("expected nonempty string", path="$.relations.projects[%d].slug" % index)
+                if relation["type"] not in ("embeddedLibrary", "incompatible", "optionalDependency", "requiredDependency", "tool"):
+                    raise ValidationError("unsupported relation type", path="$.relations.projects[%d].type" % index)
+                if "project_id" in relation and (isinstance(relation["project_id"], bool) or not isinstance(relation["project_id"], int) or relation["project_id"] <= 0):
+                    raise ValidationError("must be a positive integer", path="$.relations.projects[%d].project_id" % index)
+            if "parent_file_id" in value:
+                for field_name in ("game_versions", "game_version_names"):
+                    if field_name in value:
+                        raise ValidationError("must be omitted when parent_file_id is set", path="$.%s" % field_name)
 
 
 def f(type_name: str, **kwargs: Any) -> Field:
@@ -503,6 +537,20 @@ for _resource in ("plugin", "config", "wa"):
         "sn": f("string", nonempty=True),
         "confirm_delete": f("boolean", choices=(True,)),
     }, ("sn", "confirm_delete")))
+
+register("curseforge", "plugin", "upload", required({
+    "project_id": f("integer", minimum=1),
+    "file": f("string", local_file=True),
+    "changelog": f("string"),
+    "changelog_type": f("string", choices=("text", "html", "markdown")),
+    "display_name": f("string", nonempty=True),
+    "game_versions": f("array", nonempty=True),
+    "game_version_names": f("array"),
+    "release_type": f("string", choices=("alpha", "beta", "release")),
+    "parent_file_id": f("integer", minimum=1),
+    "relations": f("object"),
+    "is_marked_for_manual_release": f("boolean"),
+}, ("project_id", "file", "changelog", "release_type")))
 
 
 def get_schema(platform: str, resource: str, action: str) -> Schema:

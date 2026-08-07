@@ -1,0 +1,27 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "b702a450-fd19-4727-925c-31e22055065b",
+  "kind": "archive",
+  "status": "committed",
+  "change": "curseforge-upload",
+  "createdAt": "2026-08-07T14:38:02.311Z",
+  "preflightHash": "09aea12b3db9375122b718ac645985d79bccff7233968bee196a8b5001e779fa",
+  "operations": [
+    {
+      "id": "spec-1-curseforge-publishing",
+      "type": "write",
+      "target": "specs/curseforge-publishing/spec.md",
+      "staged": "runtime/transactions/b702a450-fd19-4727-925c-31e22055065b/staged/specs/curseforge-publishing/spec.md",
+      "expectedTargetHash": null,
+      "stagedHash": "a390b36e3386d50d9c2daaa454b98698f88a27e70732ac4a7112c184d3b034b2"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/curseforge-upload",
+      "target": "archive/2026-08-07-curseforge-upload",
+      "expectedSourceHash": "b62aff27c0e7a0c76031946cfdbaabeff618d2303ad7421e7410d432eb652252",
+      "expectedTargetHash": null
+    }
+  ]
+}

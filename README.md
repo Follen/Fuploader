@@ -1,12 +1,13 @@
 # Fuploader
 
-Fuploader 是一个面向 Agent 的《魔兽世界》作者发布 Skill 和 CLI。npm 安装后统一使用 `fupload` 命令；命令内部运行随 Skill 分发的纯 Python 实现。新手盒子（NewBeeBox）默认优先使用官方 `ncc` CLI，用户显式要求第三方管理工具时才使用 Fuploader 通道；网易 DD 使用 Fuploader 调用官方无头客户端。
+Fuploader 是一个面向 Agent 的《魔兽世界》作者发布 Skill 和 CLI。npm 安装后统一使用 `fupload` 命令；命令内部运行随 Skill 分发的纯 Python 实现。新手盒子（NewBeeBox）默认优先使用官方 `ncc` CLI，用户显式要求第三方管理工具时才使用 Fuploader 通道；网易 DD 使用 Fuploader 调用官方无头客户端；CurseForge 使用 Core API 查询作者公开项目，并使用 Authors Upload API 上传插件 ZIP。
 
 项目强调显式调用、完整字段收集、写入前确认和写入后读回验证。CLI 只负责单次原子读写，业务选择、执行计划和异常恢复由 Agent 在对话中完成。
 
 ## 功能
 
-- 支持新手盒子官方 `ncc`、第三方 Python 管理通道和网易 DD。
+- 支持新手盒子官方 `ncc`、第三方 Python 管理通道、网易 DD 和 CurseForge。
+- CurseForge 支持按作者 ID 查询 WoW 公开项目、读取上传用游戏版本，以及向已有项目上传插件 ZIP；不创建 Project，也不枚举私有、草稿或待审 Project。
 - 支持插件、配置分享、WA/字符串的创建、内容更新与元数据编辑。
 - 官方通道严格采用已安装 `ncc` 暴露的能力；第三方 Python 通道覆盖版本、游戏分支、分类、媒体、可见性、审核、商业设置、频道、关联内容和配置备份选择等页面字段。
 - 第三方 Python 以 Creator Center 网页的请求和表单状态为基准，编辑和更新采用 `GET -> 动态选项查询 -> presence-aware patch -> 写入 -> 读回`；关联作者/内容在主记录读回后替换并再次读回。官方通道采用 `ncc` 文档规定的只读查询、写入和读回命令。
@@ -54,6 +55,16 @@ fupload --help
 
 全局安装会同时创建 `fupload` 命令，并把版本匹配的 Skill 原子安装到 `~/.agents/skills/fupload/`。可用 `FUPLOAD_AGENT_HOME` 把默认位置改为 `<home>/skills/fupload`，或在单次命令中使用 `--skill-dir <完整路径>`；所有成功管理过的 Skill 路径都会登记，供完整卸载使用。
 
+安装和 `fupload update` 还会幂等创建缺失的 `~/.fupload/curseforge.env`；已有文件逐字节保留，不覆盖或补写其中的值：
+
+```dotenv
+CURSEFORGE_AUTHOR_ID=
+CURSEFORGE_API_KEY=
+CURSEFORGE_UPLOAD_TOKEN=
+```
+
+`CURSEFORGE_AUTHOR_ID` 是可在对话中提供的非秘密数字 ID；Core API Key 与 Upload Token 是两套不同秘密。请只在本机 env 文件或进程环境中填写秘密，不要粘贴到 Agent 对话、命令参数、项目文件或 Git。
+
 ## 作为 Skill 使用
 
 安装后显式调用：
@@ -62,7 +73,7 @@ fupload --help
 $fupload
 ```
 
-该 Skill 不会因普通提及“发布”“新手盒子”或“DD”而自动触发。Agent 会先询问平台、资源和动作。新手盒子会自动检测 `ncc`：已安装即默认使用官方通道；未安装时先询问是否安装；只有用户显式选择第三方 Python 管理工具才进入项目内 CLI。Agent 在被发布项目中创建 `publish/<时间>-<平台>-<资源>-<动作>/`，同一次发布的脱敏 JSON 按原子步骤保存为 `01-<动作>.json`、`02-<动作>.json`。展示完整写入计划并得到确认后才会真实写入。
+该 Skill 不会因普通提及“发布”“新手盒子”“DD”或“CurseForge”而自动触发。Agent 会先询问平台、资源和动作。新手盒子会自动检测 `ncc`：已安装即默认使用官方通道；未安装时先询问是否安装；只有用户显式选择第三方 Python 管理工具才进入项目内 CLI。CurseForge 上传缺少作者 ID 时，Agent 会主动询问；缺少 API Key 或 Upload Token 时，只会引导用户在本机填写 `~/.fupload/curseforge.env`，不会要求在对话中提供秘密。Agent 在被发布项目中创建 `publish/<时间>-<平台>-<资源>-<动作>/`，同一次发布的脱敏 JSON 按原子步骤保存为 `01-<动作>.json`、`02-<动作>.json`。展示完整写入计划并得到确认后才会真实写入。
 
 ## CLI 使用
 
@@ -77,12 +88,28 @@ ncc whoami -o json
 
 创建令牌和本机登录说明见[官方 CLI 文档](https://creator.newbeebox.com/cli-docs)。不要把令牌粘贴到 Agent 对话；在自己的终端完成 `ncc login`。
 
-以下为 Fuploader 第三方 NewBeeBox 与 DD 执行层。
+以下为 Fuploader 第三方 NewBeeBox、DD 与 CurseForge 执行层。
 
 查看总帮助：
 
 ```powershell
 fupload --help
+```
+
+检查 CurseForge 配置、查询作者公开项目和读取游戏版本：
+
+```powershell
+fupload curseforge session doctor
+fupload curseforge project list
+fupload curseforge project list --author-id 138844367
+fupload curseforge plugin game-versions
+```
+
+上传前先执行本地 dry-run；确认完整计划后再移除 `--dry-run`：
+
+```powershell
+fupload curseforge plugin upload --input fupload\examples\curseforge-plugin-upload.json --dry-run
+fupload curseforge plugin upload --input publish\20260807-120000-curseforge-plugin-upload\01-upload.json
 ```
 
 查看具体操作的可执行字段契约：
@@ -134,7 +161,7 @@ fupload uninstall
 
 `fupload update` 固定安装 `@follenfang/fupload@latest`，随后把默认位置和所有登记有效的自定义 Skill 同步到同一版本。未知目录不会被覆盖。
 
-`fupload uninstall` 先删除所有仍有有效 npm 管理标记的 Fuploader Skill，再调用 npm 删除 `@follenfang/fupload` 和 `fupload` 命令。Skill 清理失败时 npm 包保持可用，处理占用或权限问题后可重试。项目中的 `publish/`、新手盒子/DD 登录数据和 DD 日志始终保留。
+`fupload uninstall` 先删除所有仍有有效 npm 管理标记的 Fuploader Skill，再调用 npm 删除 `@follenfang/fupload` 和 `fupload` 命令。Skill 清理失败时 npm 包保持可用，处理占用或权限问题后可重试。项目中的 `publish/`、新手盒子/DD 登录数据、DD 日志和 `~/.fupload/curseforge.env` 始终保留。
 
 npm 7 及以上不执行卸载 lifecycle，因此直接运行 `npm uninstall -g @follenfang/fupload` 只删除 npm 包和 CLI，可能留下 Skill；它不属于完整卸载流程。
 
@@ -154,6 +181,7 @@ npm 7 及以上不执行卸载 lifecycle，因此直接运行 `npm uninstall -g 
 - [新手盒子官方 CLI 完整参考](fupload/references/newbee-official-cli.md)
 - [新手盒子第三方 Python 字段参考](fupload/references/newbee.md)
 - [网易 DD 字段参考](fupload/references/dd.md)
+- [CurseForge API、字段与上传参考](fupload/references/curseforge.md)
 
 ## 测试
 
@@ -166,7 +194,7 @@ python -m unittest discover -s fupload\scripts\tests
 python -m compileall -q fupload\scripts
 ```
 
-当前回归测试覆盖 CLI 路由、严格 JSON、字段 Schema、双平台 builder、动态选项校验、字段保留与清空语义，以及所有内置示例的 dry-run。
+当前回归测试覆盖 CLI 路由、严格 JSON、字段 Schema、平台 builder、动态选项校验、字段保留与清空语义，以及所有内置示例的 dry-run。
 
 DD 逐字段 wire 矩阵可单独运行并生成本地审计报告：
 

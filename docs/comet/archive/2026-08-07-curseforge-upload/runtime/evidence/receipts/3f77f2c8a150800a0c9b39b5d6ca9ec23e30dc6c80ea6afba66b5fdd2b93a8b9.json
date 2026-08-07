@@ -1,0 +1,50 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "automated-check",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "curseforge-upload",
+    "sourceRevision": 3,
+    "contractHash": "b5e6c20a1a4bf963071ee0e714bc353dfe9b0c5a71feac162b92a60591ac0f0b",
+    "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+    "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+    "artifactHash": "4aa010c17a253344bce4ac6f69bf04dde070ef6e9c3e9b7146591387e46b42d6"
+  },
+  "acceptanceIds": [
+    "acceptance-3511cd9a6370e866531fd4b6cc3af74dbeabf4999b38f9dd27d79c206519dde9"
+  ],
+  "actor": "native-runtime:command:python",
+  "issuedAt": "2026-08-07T14:30:18.284Z",
+  "evidence": {
+    "executable": "python",
+    "args": [
+      "-m",
+      "compileall",
+      "-q",
+      "fupload/scripts"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "timeoutMs": 60000,
+    "startedAt": "2026-08-07T14:30:18.233Z",
+    "endedAt": "2026-08-07T14:30:18.284Z",
+    "worktree": {
+      "provider": "git",
+      "root": ".",
+      "beforeCommit": "571975a63598d93fa8639ccb3a176145c3a4b373",
+      "afterCommit": "571975a63598d93fa8639ccb3a176145c3a4b373"
+    },
+    "afterFence": {
+      "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+      "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+      "matched": true
+    },
+    "outputHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputSummary": "(exit 0)",
+    "outputTruncated": false
+  },
+  "receiptHash": "3f77f2c8a150800a0c9b39b5d6ca9ec23e30dc6c80ea6afba66b5fdd2b93a8b9"
+}

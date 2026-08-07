@@ -10,6 +10,7 @@ from typing import Any, Callable, Dict, Optional, Sequence, Tuple
 
 from . import __version__
 from .dd import DD
+from .curseforge import CurseForge
 from .errors import FuploadError, ValidationError
 from .io import read_json, write_error, write_output
 from .newbee import NewBee
@@ -186,16 +187,30 @@ def _dd_tree(platforms: argparse._SubParsersAction) -> None:
     leaf = _read_leaf(wa, "categories", "List DD WA category choices for a game type.", platform="dd", resource="wa", action="categories"); leaf.add_argument("--game-type", type=_positive, required=True)
 
 
+def _curseforge_tree(platforms: argparse._SubParsersAction) -> None:
+    root = platforms.add_parser("curseforge", help="CurseForge public project lookup and author uploads")
+    groups = root.add_subparsers(dest="resource_command", required=True)
+    session = groups.add_parser("session", help="Configuration diagnostics").add_subparsers(dest="action_command", required=True)
+    _read_leaf(session, "doctor", "Check whether the fixed CurseForge configuration fields exist without revealing their values.", platform="curseforge", resource="session", action="doctor")
+    project = groups.add_parser("project", help="Public project lookup").add_subparsers(dest="action_command", required=True)
+    leaf = _read_leaf(project, "list", "List public WoW projects for one CurseForge author ID.", platform="curseforge", resource="project", action="list")
+    leaf.add_argument("--author-id", type=_positive, help="Override CURSEFORGE_AUTHOR_ID for this lookup.")
+    plugin = groups.add_parser("plugin", help="WoW plugin versions and uploads").add_subparsers(dest="action_command", required=True)
+    _read_leaf(plugin, "game-versions", "List CurseForge Upload API game-version choices.", platform="curseforge", resource="plugin", action="game-versions")
+    _write_leaf(plugin, "curseforge", "plugin", "upload", "Upload one plugin archive to an existing CurseForge project.")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = _parser(
         prog="fupload",
-        description="Atomic World of Warcraft author publishing CLI for NewBeeBox and NetEase DD.",
+        description="Atomic World of Warcraft author publishing CLI for NewBeeBox, NetEase DD, and CurseForge.",
         epilog="All output is JSON. Write commands require versioned JSON through --input and never prompt.",
     )
     parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
     platforms = parser.add_subparsers(dest="platform_command", required=True)
     _newbee_tree(platforms)
     _dd_tree(platforms)
+    _curseforge_tree(platforms)
     return parser
 
 
@@ -243,14 +258,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if args.dry_run:
                 write_output(platform, operation, _dry_run_data(doc, schema.name), dry_run=True)
                 return 0
-            provider = NewBee() if platform == "newbee" else DD()
+            provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else CurseForge())
             if platform == "dd":
                 data = provider.execute_write(resource, action, doc, getattr(args, "session", None))
             else:
                 data = provider.execute_write(resource, action, doc)
             write_output(platform, operation, data)
             return 0
-        provider = NewBee() if platform == "newbee" else DD()
+        provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else CurseForge())
         if platform == "dd":
             data = provider.execute_read(resource, action, args, getattr(args, "session", None))
         else:

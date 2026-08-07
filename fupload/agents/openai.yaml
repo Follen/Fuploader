@@ -1,4 +1,4 @@
 interface:
   display_name: "Fupload"
-  short_description: "整理并发布新手盒子与网易DD的插件、配置分享及WA字符串"
-  default_prompt: "使用 $fupload 检查当前项目和远端状态；新手盒子优先检测并使用官方 ncc，显式要求第三方时使用 fupload CLI；整理全部业务选项并在确认后完成发布或更新。"
+  short_description: "发布新手盒子、网易DD与CurseForge的魔兽世界作者内容"
+  default_prompt: "使用 $fupload 检查当前项目和远端状态；新手盒子优先使用官方 ncc，DD 与 CurseForge 使用 fupload CLI；整理全部业务选项并在确认后完成发布或更新。"

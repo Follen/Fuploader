@@ -1,0 +1,1121 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "b5e6c20a1a4bf963071ee0e714bc353dfe9b0c5a71feac162b92a60591ac0f0b",
+  "baselineProjectionRef": "runtime/evidence/snapshots/6965a02f84d1ef6a5e0677f190eb51cb50883320cb031dc06622bdc724a09cb6.json",
+  "baselineProjectionHash": "6965a02f84d1ef6a5e0677f190eb51cb50883320cb031dc06622bdc724a09cb6",
+  "currentProjectionRef": "runtime/evidence/snapshots/575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc.json",
+  "currentProjectionHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+  "complete": false,
+  "declaredArtifacts": [
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/references/curseforge.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/curseforge.py",
+      "kind": "file"
+    },
+    {
+      "path": "npm/lib/curseforge-config.mjs",
+      "kind": "file"
+    }
+  ],
+  "changes": [
+    {
+      "path": ".agents/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".amazonq/settings.local.json",
+      "kind": "removed",
+      "before": {
+        "hash": "216c176e1a57fdfab2603b05e5d835b56e82ed33ce19aa4313944457d61fa0fe",
+        "size": 403
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".amazonq/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".claude/settings.local.json",
+      "kind": "removed",
+      "before": {
+        "hash": "045d62d886081a0491ee35fad8c0e95ba4d3c4db9eeb9ec4da3f34e8b1c20881",
+        "size": 400
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".claude/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".codebuddy/settings.json",
+      "kind": "removed",
+      "before": {
+        "hash": "c330ab251d6815c35d5181583830d251748bb708aed6f748755a93da8f69aec3",
+        "size": 505
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".codebuddy/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".codex/hooks.json",
+      "kind": "modified",
+      "before": {
+        "hash": "170d25c5c0d27f74a487853e39d4b108356323df711f5c9646447157598009f6",
+        "size": 399
+      },
+      "after": {
+        "hash": "a68d8ae9c874122c1ec8e404737647f0e78f5425099459b2d64ddc4b9c7a16bc",
+        "size": 341
+      },
+      "attributedTo": []
+    },
+    {
+      "path": ".gemini/settings.json",
+      "kind": "removed",
+      "before": {
+        "hash": "dec9d31aa21365c6510d6cbe1779b177c100c27818c5dc1394e79169db672bb0",
+        "size": 502
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".gemini/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".github/hooks/comet-guard.json",
+      "kind": "removed",
+      "before": {
+        "hash": "1c61eecac1616f78f3f2b2e33f3e1b558a0e8a6f2d8db6b4bb5865c2dac8358e",
+        "size": 593
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".github/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".kiro/hooks/comet-hook-router.kiro.hook",
+      "kind": "removed",
+      "before": {
+        "hash": "0161ae7765ab323e61c53cbdf617af8641ab6fc5f42a6ddd716e2d6165d1a1db",
+        "size": 529
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".kiro/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".qoder/settings.json",
+      "kind": "removed",
+      "before": {
+        "hash": "c3e0f4afeccbd0a41ff3266c1236f9f0b98b639b6130db2fb7d767b57e025455",
+        "size": 497
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".qoder/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".qwen/settings.json",
+      "kind": "removed",
+      "before": {
+        "hash": "c01dacd1241ad3b50fc58f3da1e61f835b213d8d29e67a8a5b42091ed201b949",
+        "size": 495
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".qwen/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".windsurf/hooks.json",
+      "kind": "removed",
+      "before": {
+        "hash": "4990cf66be363b462ea26b7fefc576b33421ce1f4e2a980fe0d669162eaa9e09",
+        "size": 316
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".windsurf/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "fb7afb03c9d9cdb75764d94dd2cd5375898929b5f3a2a074841214a1fe880800",
+        "size": 11534
+      },
+      "after": {
+        "hash": "7d8fabc95242b7b3486827c00d591faa3e0c3d2e1b2050884ec6749e4c673722",
+        "size": 13221
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "modified",
+      "before": {
+        "hash": "2e59eb79b48a9ef96676a6c7282dbebf997b543bf25a745b5dec71db990bf82b",
+        "size": 18828
+      },
+      "after": {
+        "hash": "1565c00bc4c9e078b3625307b5dd522aee9ecdff7cd1dcb2d0cd41073d9b53ed",
+        "size": 21879
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/SKILL.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/agents/openai.yaml",
+      "kind": "modified",
+      "before": {
+        "hash": "e133b8a01d89bf7ff5e2d60dab11e5b605112cc89b57b2b548412d1bb22780ec",
+        "size": 368
+      },
+      "after": {
+        "hash": "2b69f0a324f5cfbf3dffbfeec05a74272c6f67935240011976a68ad48730470e",
+        "size": 344
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/examples/curseforge-plugin-upload.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "624cc03b0d6debd842270d129817904aadff67b6d462f8d1481fc95e999c053e",
+        "size": 515
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/references/curseforge.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "2dd0a2429a37af30c4f85a884c2e8ea6fcdb1691c34ccc0c34925890e4e60d92",
+        "size": 11917
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/references/curseforge.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "43eb1f19167ed86c4511fd7b1c32c9eefd6595696eaa5dbc598696a645e59f55",
+        "size": 22526
+      },
+      "after": {
+        "hash": "b87c8734de671ac830e0f16627cdc734e7a9c8d31160e7573f760012a1ba4d28",
+        "size": 24052
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/curseforge.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "c607c6caba5c551a7e3970bd152de94ab1e96350ee73969048f5aea5bf42c75d",
+        "size": 7959
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/curseforge.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "aae92c17f62b332c501abca381134cd357e8bea8429dceb4d243d9b661999b8c",
+        "size": 32061
+      },
+      "after": {
+        "hash": "f511d9ebaff3870f126faaec74756dbcc4a23ac9ef3460006e8829766c991834",
+        "size": 35644
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "6738a3c81719f11fb3f6c98335c0e410bfdd688b747df2c5f1e6ab7da5e63600",
+        "size": 15401
+      },
+      "after": {
+        "hash": "03af11fb550785fa4dcd1833fd9a197719c49368218a4abef8b77cf02193f27a",
+        "size": 15474
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_curseforge.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0055ea2501c76aff6caefea0b4c391ae3bbc58804879f5a83a3059eb6dfa10d9",
+        "size": 13947
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_full_schema_state_matrix.py",
+      "kind": "modified",
+      "before": {
+        "hash": "4a3280adf6badf901dcaf437cde77fb9c3f00423a79fb3afff65d6ce4f328bd4",
+        "size": 12609
+      },
+      "after": {
+        "hash": "1ef722e8bcb258604315cdf92d0ee2d726f915785b06b19605fa8f973ad46f5b",
+        "size": 13377
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/bin/fupload.mjs",
+      "kind": "modified",
+      "before": {
+        "hash": "663f3e111c8bd37c66aec2c98d472e318a252811a1c35226c14356807a1f9892",
+        "size": 3098
+      },
+      "after": {
+        "hash": "2099b6fecf61a4153cc9189849c99f74eaae5e9595276327fdc53b8f0bcb5429",
+        "size": 3184
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/lib/curseforge-config.mjs",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "88006a3074054aaa44bf82a5fcac88948e0b47a5782309aaae083852ad108655",
+        "size": 971
+      },
+      "attributedTo": [
+        {
+          "path": "npm/lib/curseforge-config.mjs",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "npm/lib/update.mjs",
+      "kind": "modified",
+      "before": {
+        "hash": "a07e26f33d6eae7cbfbe9195bee830745a1e5af106539a056afdd86930f213ce",
+        "size": 3531
+      },
+      "after": {
+        "hash": "5afcaed0cd940ddeff4d8c599050759419326a7f88229c6c7e9abc978be10526",
+        "size": 3694
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/postinstall.mjs",
+      "kind": "modified",
+      "before": {
+        "hash": "d73cf8a62627d7d69530ac8e610c131194f3341c82dfd5ff63c44a80e5626ca9",
+        "size": 696
+      },
+      "after": {
+        "hash": "1d51f9695853731477c27be1f58522dfead1d38f2f139968e32a291f8939bca0",
+        "size": 882
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/scripts/test-install.mjs",
+      "kind": "modified",
+      "before": {
+        "hash": "f8fbd84858ba942feb54239cb2870d2561871a18119eedbdc50651124758aa71",
+        "size": 5416
+      },
+      "after": {
+        "hash": "28691156d33db24668de176d5932582b27fde980013534442f8d19f44ff4b198",
+        "size": 6050
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/skill-manifest.json",
+      "kind": "modified",
+      "before": {
+        "hash": "7794f673e09ce739da2a777ce86d844a2e991168c64cc963b21ff52c7dd96c7f",
+        "size": 5440
+      },
+      "after": {
+        "hash": "4a8fab48f102f2809b2b2a036d63f2cb29453be86af50f4698cff2d74ea9a699",
+        "size": 5776
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/test/curseforge-config.test.mjs",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "aad2f730aa5fae251a6b51f98fbd40f05ef40e31e8afca0682b0b708fc3838d6",
+        "size": 2967
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/test/uninstall.test.mjs",
+      "kind": "modified",
+      "before": {
+        "hash": "f1fc8ea49cf1e3eaa67d31f27f2e74f8ec4f0139b337f2b67690a8d7a4200c4c",
+        "size": 7128
+      },
+      "after": {
+        "hash": "658e4eabf1035bcc32f385eb1229f2e62238b558aa2df79959348042320c57df",
+        "size": 7649
+      },
+      "attributedTo": []
+    }
+  ],
+  "unattributed": [
+    {
+      "path": ".agents/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".amazonq/settings.local.json",
+      "kind": "removed",
+      "before": {
+        "hash": "216c176e1a57fdfab2603b05e5d835b56e82ed33ce19aa4313944457d61fa0fe",
+        "size": 403
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".amazonq/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".claude/settings.local.json",
+      "kind": "removed",
+      "before": {
+        "hash": "045d62d886081a0491ee35fad8c0e95ba4d3c4db9eeb9ec4da3f34e8b1c20881",
+        "size": 400
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".claude/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".codebuddy/settings.json",
+      "kind": "removed",
+      "before": {
+        "hash": "c330ab251d6815c35d5181583830d251748bb708aed6f748755a93da8f69aec3",
+        "size": 505
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".codebuddy/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".codex/hooks.json",
+      "kind": "modified",
+      "before": {
+        "hash": "170d25c5c0d27f74a487853e39d4b108356323df711f5c9646447157598009f6",
+        "size": 399
+      },
+      "after": {
+        "hash": "a68d8ae9c874122c1ec8e404737647f0e78f5425099459b2d64ddc4b9c7a16bc",
+        "size": 341
+      },
+      "attributedTo": []
+    },
+    {
+      "path": ".gemini/settings.json",
+      "kind": "removed",
+      "before": {
+        "hash": "dec9d31aa21365c6510d6cbe1779b177c100c27818c5dc1394e79169db672bb0",
+        "size": 502
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".gemini/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".github/hooks/comet-guard.json",
+      "kind": "removed",
+      "before": {
+        "hash": "1c61eecac1616f78f3f2b2e33f3e1b558a0e8a6f2d8db6b4bb5865c2dac8358e",
+        "size": 593
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".github/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".kiro/hooks/comet-hook-router.kiro.hook",
+      "kind": "removed",
+      "before": {
+        "hash": "0161ae7765ab323e61c53cbdf617af8641ab6fc5f42a6ddd716e2d6165d1a1db",
+        "size": 529
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".kiro/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".qoder/settings.json",
+      "kind": "removed",
+      "before": {
+        "hash": "c3e0f4afeccbd0a41ff3266c1236f9f0b98b639b6130db2fb7d767b57e025455",
+        "size": 497
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".qoder/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".qwen/settings.json",
+      "kind": "removed",
+      "before": {
+        "hash": "c01dacd1241ad3b50fc58f3da1e61f835b213d8d29e67a8a5b42091ed201b949",
+        "size": 495
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".qwen/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".windsurf/hooks.json",
+      "kind": "removed",
+      "before": {
+        "hash": "4990cf66be363b462ea26b7fefc576b33421ce1f4e2a980fe0d669162eaa9e09",
+        "size": 316
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": ".windsurf/skills/comet/scripts/comet-hook-router.mjs",
+      "kind": "removed",
+      "before": {
+        "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+        "size": 227362
+      },
+      "after": null,
+      "attributedTo": []
+    },
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "fb7afb03c9d9cdb75764d94dd2cd5375898929b5f3a2a074841214a1fe880800",
+        "size": 11534
+      },
+      "after": {
+        "hash": "7d8fabc95242b7b3486827c00d591faa3e0c3d2e1b2050884ec6749e4c673722",
+        "size": 13221
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/agents/openai.yaml",
+      "kind": "modified",
+      "before": {
+        "hash": "e133b8a01d89bf7ff5e2d60dab11e5b605112cc89b57b2b548412d1bb22780ec",
+        "size": 368
+      },
+      "after": {
+        "hash": "2b69f0a324f5cfbf3dffbfeec05a74272c6f67935240011976a68ad48730470e",
+        "size": 344
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/examples/curseforge-plugin-upload.json",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "624cc03b0d6debd842270d129817904aadff67b6d462f8d1481fc95e999c053e",
+        "size": 515
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "43eb1f19167ed86c4511fd7b1c32c9eefd6595696eaa5dbc598696a645e59f55",
+        "size": 22526
+      },
+      "after": {
+        "hash": "b87c8734de671ac830e0f16627cdc734e7a9c8d31160e7573f760012a1ba4d28",
+        "size": 24052
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "aae92c17f62b332c501abca381134cd357e8bea8429dceb4d243d9b661999b8c",
+        "size": 32061
+      },
+      "after": {
+        "hash": "f511d9ebaff3870f126faaec74756dbcc4a23ac9ef3460006e8829766c991834",
+        "size": 35644
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "6738a3c81719f11fb3f6c98335c0e410bfdd688b747df2c5f1e6ab7da5e63600",
+        "size": 15401
+      },
+      "after": {
+        "hash": "03af11fb550785fa4dcd1833fd9a197719c49368218a4abef8b77cf02193f27a",
+        "size": 15474
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_curseforge.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "0055ea2501c76aff6caefea0b4c391ae3bbc58804879f5a83a3059eb6dfa10d9",
+        "size": 13947
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "fupload/scripts/tests/test_full_schema_state_matrix.py",
+      "kind": "modified",
+      "before": {
+        "hash": "4a3280adf6badf901dcaf437cde77fb9c3f00423a79fb3afff65d6ce4f328bd4",
+        "size": 12609
+      },
+      "after": {
+        "hash": "1ef722e8bcb258604315cdf92d0ee2d726f915785b06b19605fa8f973ad46f5b",
+        "size": 13377
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/bin/fupload.mjs",
+      "kind": "modified",
+      "before": {
+        "hash": "663f3e111c8bd37c66aec2c98d472e318a252811a1c35226c14356807a1f9892",
+        "size": 3098
+      },
+      "after": {
+        "hash": "2099b6fecf61a4153cc9189849c99f74eaae5e9595276327fdc53b8f0bcb5429",
+        "size": 3184
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/lib/update.mjs",
+      "kind": "modified",
+      "before": {
+        "hash": "a07e26f33d6eae7cbfbe9195bee830745a1e5af106539a056afdd86930f213ce",
+        "size": 3531
+      },
+      "after": {
+        "hash": "5afcaed0cd940ddeff4d8c599050759419326a7f88229c6c7e9abc978be10526",
+        "size": 3694
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/postinstall.mjs",
+      "kind": "modified",
+      "before": {
+        "hash": "d73cf8a62627d7d69530ac8e610c131194f3341c82dfd5ff63c44a80e5626ca9",
+        "size": 696
+      },
+      "after": {
+        "hash": "1d51f9695853731477c27be1f58522dfead1d38f2f139968e32a291f8939bca0",
+        "size": 882
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/scripts/test-install.mjs",
+      "kind": "modified",
+      "before": {
+        "hash": "f8fbd84858ba942feb54239cb2870d2561871a18119eedbdc50651124758aa71",
+        "size": 5416
+      },
+      "after": {
+        "hash": "28691156d33db24668de176d5932582b27fde980013534442f8d19f44ff4b198",
+        "size": 6050
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/skill-manifest.json",
+      "kind": "modified",
+      "before": {
+        "hash": "7794f673e09ce739da2a777ce86d844a2e991168c64cc963b21ff52c7dd96c7f",
+        "size": 5440
+      },
+      "after": {
+        "hash": "4a8fab48f102f2809b2b2a036d63f2cb29453be86af50f4698cff2d74ea9a699",
+        "size": 5776
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/test/curseforge-config.test.mjs",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "aad2f730aa5fae251a6b51f98fbd40f05ef40e31e8afca0682b0b708fc3838d6",
+        "size": 2967
+      },
+      "attributedTo": []
+    },
+    {
+      "path": "npm/test/uninstall.test.mjs",
+      "kind": "modified",
+      "before": {
+        "hash": "f1fc8ea49cf1e3eaa67d31f27f2e74f8ec4f0139b337f2b67690a8d7a4200c4c",
+        "size": 7128
+      },
+      "after": {
+        "hash": "658e4eabf1035bcc32f385eb1229f2e62238b558aa2df79959348042320c57df",
+        "size": 7649
+      },
+      "attributedTo": []
+    }
+  ],
+  "unresolvedScopes": [
+    {
+      "id": "scope:f4b2707fff4d5da6365371c76091a9563c59e155ba67a4de74d791721984349e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".agents/skills/comet/scripts/comet-hook-router.mjs",
+      "reason": "Changed path is not covered by a declared artifact: .agents/skills/comet/scripts/comet-hook-router.mjs"
+    },
+    {
+      "id": "scope:67ce853ab56f0c3a4b5466ead5548cc47edb71ad208875d3952145bfc79437ce",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".amazonq/settings.local.json",
+      "reason": "Changed path is not covered by a declared artifact: .amazonq/settings.local.json"
+    },
+    {
+      "id": "scope:7e641590c49c2f3f2d9e829c16971fed60b980ff232b4713c388b91f850b40f4",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".amazonq/skills/comet/scripts/comet-hook-router.mjs",
+      "reason": "Changed path is not covered by a declared artifact: .amazonq/skills/comet/scripts/comet-hook-router.mjs"
+    },
+    {
+      "id": "scope:36efcf19542471d19b00bb4f49beab083ea604a05e8410fa2aa9dd42a08a3435",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".claude/settings.local.json",
+      "reason": "Changed path is not covered by a declared artifact: .claude/settings.local.json"
+    },
+    {
+      "id": "scope:bbc17b7fa99cb017fc616ba2f41107bcf03d05754f0b57a4c19a023c0b399bfc",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".claude/skills/comet/scripts/comet-hook-router.mjs",
+      "reason": "Changed path is not covered by a declared artifact: .claude/skills/comet/scripts/comet-hook-router.mjs"
+    },
+    {
+      "id": "scope:e5d1801d3f98b1ed909971f2df8ad1f537780b72401c87e773de0a9cbf727f6f",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".codebuddy/settings.json",
+      "reason": "Changed path is not covered by a declared artifact: .codebuddy/settings.json"
+    },
+    {
+      "id": "scope:036188da429459d73dd5b5cee2d4ed387d57cb8f0653785c9252f1652bbd284d",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".codebuddy/skills/comet/scripts/comet-hook-router.mjs",
+      "reason": "Changed path is not covered by a declared artifact: .codebuddy/skills/comet/scripts/comet-hook-router.mjs"
+    },
+    {
+      "id": "scope:328174b3faa5963a08695eed61b3fe417eced9b28cade52209e76228fd73ba42",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".codex/hooks.json",
+      "reason": "Changed path is not covered by a declared artifact: .codex/hooks.json"
+    },
+    {
+      "id": "scope:8b81fc4d5907e2078c76a1af36315ac312e7647de6e111f66eeb310530920295",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".gemini/settings.json",
+      "reason": "Changed path is not covered by a declared artifact: .gemini/settings.json"
+    },
+    {
+      "id": "scope:d7e7a727c34ea6ed1483c651888e89405e128800ee7b5ec7d0bc36288dfd4951",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".gemini/skills/comet/scripts/comet-hook-router.mjs",
+      "reason": "Changed path is not covered by a declared artifact: .gemini/skills/comet/scripts/comet-hook-router.mjs"
+    },
+    {
+      "id": "scope:cb83b3ba11b0a9f706516b62bb4cbc12c4b5d47498b7f4b8f5ba141a82be0ad7",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".github/hooks/comet-guard.json",
+      "reason": "Changed path is not covered by a declared artifact: .github/hooks/comet-guard.json"
+    },
+    {
+      "id": "scope:7ddc7998276f9a7132e9039ed9f11ed67d4c4698a6d1a204f992d6a193ad6bbb",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".github/skills/comet/scripts/comet-hook-router.mjs",
+      "reason": "Changed path is not covered by a declared artifact: .github/skills/comet/scripts/comet-hook-router.mjs"
+    },
+    {
+      "id": "scope:bf9fc3ab931a467585e4afd2e0973c27cf2573e323866fe9d814d4813cdfcfe2",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".kiro/hooks/comet-hook-router.kiro.hook",
+      "reason": "Changed path is not covered by a declared artifact: .kiro/hooks/comet-hook-router.kiro.hook"
+    },
+    {
+      "id": "scope:2b9cfdd6a6a9f46d56846764d9962c7673a5fbfe59b13486039b2288db8284b4",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".kiro/skills/comet/scripts/comet-hook-router.mjs",
+      "reason": "Changed path is not covered by a declared artifact: .kiro/skills/comet/scripts/comet-hook-router.mjs"
+    },
+    {
+      "id": "scope:cfa465b6bf47b0cdd5386f3af5372acc2cb5e638036e277139524b1c0c2918a9",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".qoder/settings.json",
+      "reason": "Changed path is not covered by a declared artifact: .qoder/settings.json"
+    },
+    {
+      "id": "scope:d7fbae096e8036b538671acbe9543159299c826ef66301a98e6ad6cb1d6b7b4b",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".qoder/skills/comet/scripts/comet-hook-router.mjs",
+      "reason": "Changed path is not covered by a declared artifact: .qoder/skills/comet/scripts/comet-hook-router.mjs"
+    },
+    {
+      "id": "scope:13ff2e9aa5eb91d19032268f918eef707354d17959352ab0d33a707e8c5b1cb4",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".qwen/settings.json",
+      "reason": "Changed path is not covered by a declared artifact: .qwen/settings.json"
+    },
+    {
+      "id": "scope:4fa1ce014bcb4c1c592679bf4bfafa845d68bc192e817983b336db5459f47590",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".qwen/skills/comet/scripts/comet-hook-router.mjs",
+      "reason": "Changed path is not covered by a declared artifact: .qwen/skills/comet/scripts/comet-hook-router.mjs"
+    },
+    {
+      "id": "scope:83ff7e2e99423b204030f61ccfefb66f549f96af4c767abf54cb768c5411367e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".windsurf/hooks.json",
+      "reason": "Changed path is not covered by a declared artifact: .windsurf/hooks.json"
+    },
+    {
+      "id": "scope:e8eadd229f38e2a3820e47baba9dba5a16104d1b88f6e661139fdb929435aa29",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": ".windsurf/skills/comet/scripts/comet-hook-router.mjs",
+      "reason": "Changed path is not covered by a declared artifact: .windsurf/skills/comet/scripts/comet-hook-router.mjs"
+    },
+    {
+      "id": "scope:7e350f147be0d22cf9ad1fd60aac861d41ab947a13e2c6160c06a3e4b6ef2d0a",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "README.md",
+      "reason": "Changed path is not covered by a declared artifact: README.md"
+    },
+    {
+      "id": "scope:6a42034e14a34099c809fdd58048ff204124feed22fb6439344a7a7b1613f717",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/agents/openai.yaml",
+      "reason": "Changed path is not covered by a declared artifact: fupload/agents/openai.yaml"
+    },
+    {
+      "id": "scope:ed22f2097309a753ca6c12571fbc3bec351ddaba8ab5d86228ea020554fdb3fb",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/examples/curseforge-plugin-upload.json",
+      "reason": "Changed path is not covered by a declared artifact: fupload/examples/curseforge-plugin-upload.json"
+    },
+    {
+      "id": "scope:db4ed05e2bcb945f61f8f1b8b88fdb25d1a21eaae63dc69a749b6ca684c7b58c",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/fupload_cli/cli.py"
+    },
+    {
+      "id": "scope:e2113ff5d7536be3873f33065e4b8df84c7bbd5831451d10b243f223ad945b86",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/fupload_cli/schema.py"
+    },
+    {
+      "id": "scope:f079faf54d8b4e1a06a99f2b9ba86a2b81e85f530b4ec82a693c74d2a698bfad",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/tests/test_cli.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/tests/test_cli.py"
+    },
+    {
+      "id": "scope:d37321102ff5e445a751a476a69563438a901358baab08696389f1d072c123c1",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/tests/test_curseforge.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/tests/test_curseforge.py"
+    },
+    {
+      "id": "scope:81b67017e3ffb8a791894a276230a1c72aeacaaaf56c2eade240b5824e41ed78",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "fupload/scripts/tests/test_full_schema_state_matrix.py",
+      "reason": "Changed path is not covered by a declared artifact: fupload/scripts/tests/test_full_schema_state_matrix.py"
+    },
+    {
+      "id": "scope:40d05e2609fb31b2e0d2abff935e70ac6a46cc55917c6eef50ffe0adc5f0630e",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "npm/bin/fupload.mjs",
+      "reason": "Changed path is not covered by a declared artifact: npm/bin/fupload.mjs"
+    },
+    {
+      "id": "scope:2cceb6dcdb48528fa36f88087c5ad4a490b7129dfe81cd06a06fdf2918426544",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "npm/lib/update.mjs",
+      "reason": "Changed path is not covered by a declared artifact: npm/lib/update.mjs"
+    },
+    {
+      "id": "scope:9a13c0883ed563fd0a1f652cae792341903709e21d1d6972ef80ef8931959401",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "npm/postinstall.mjs",
+      "reason": "Changed path is not covered by a declared artifact: npm/postinstall.mjs"
+    },
+    {
+      "id": "scope:5de7a7e6caf82bcfd51462afc4f93367523f6a283371d0d2e573340272239fd7",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "npm/scripts/test-install.mjs",
+      "reason": "Changed path is not covered by a declared artifact: npm/scripts/test-install.mjs"
+    },
+    {
+      "id": "scope:905a557a8a8e1c04687b4f4e57cf6e0933e50bdffde2e6594a0769513de05b13",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "npm/skill-manifest.json",
+      "reason": "Changed path is not covered by a declared artifact: npm/skill-manifest.json"
+    },
+    {
+      "id": "scope:2471200251ad8b75bb498e453279aba11cbcf03c12979dd26034b078855a4302",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "npm/test/curseforge-config.test.mjs",
+      "reason": "Changed path is not covered by a declared artifact: npm/test/curseforge-config.test.mjs"
+    },
+    {
+      "id": "scope:cd8290e4564246d3061e50af73e060863fa6a1db5170cfa75825329a125fbfe5",
+      "kind": "unattributed-change",
+      "source": "implementation-scope",
+      "path": "npm/test/uninstall.test.mjs",
+      "reason": "Changed path is not covered by a declared artifact: npm/test/uninstall.test.mjs"
+    }
+  ],
+  "noCodeReason": null,
+  "scopeHash": "b7debbc2a5dd15761875099156d6e099155bdcf325f8d322496af996181039a7"
+}

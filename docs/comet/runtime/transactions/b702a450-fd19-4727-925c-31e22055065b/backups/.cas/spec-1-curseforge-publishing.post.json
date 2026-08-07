@@ -1,0 +1,11 @@
+{
+  "schema": "comet.native.archive-cas.v1",
+  "operationId": "spec-1-curseforge-publishing",
+  "role": "post",
+  "hash": "a390b36e3386d50d9c2daaa454b98698f88a27e70732ac4a7112c184d3b034b2",
+  "identity": {
+    "dev": 2421791372,
+    "ino": 5629499534725078,
+    "birthtimeMs": 1786113484642.1516
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "automated-check",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "curseforge-upload",
+    "sourceRevision": 3,
+    "contractHash": "b5e6c20a1a4bf963071ee0e714bc353dfe9b0c5a71feac162b92a60591ac0f0b",
+    "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+    "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+    "artifactHash": "4aa010c17a253344bce4ac6f69bf04dde070ef6e9c3e9b7146591387e46b42d6"
+  },
+  "acceptanceIds": [
+    "acceptance-3511cd9a6370e866531fd4b6cc3af74dbeabf4999b38f9dd27d79c206519dde9",
+    "acceptance-6fdda4dd592c26835656dbd7ab974b7e98cbfff6ad179c3e7ee0b25f79f5085d",
+    "acceptance-acfa9fbec106b62c11599a6ebad397cf9951d0edda85286a14eb5bea4fa3d306",
+    "acceptance-b3c33c2e74b1bc63a920e712b72fe6d3a6c851817ce32e16df56c1651600d9bc",
+    "acceptance-c81248ddd14c3e9abdb9053a0de56de1f812b67bffeadc730efe47c719458b90"
+  ],
+  "actor": "native-runtime:command:python",
+  "issuedAt": "2026-08-07T14:29:23.566Z",
+  "evidence": {
+    "executable": "python",
+    "args": [
+      "C:\\Users\\follen\\.codex\\skills\\.system\\skill-creator\\scripts\\quick_validate.py",
+      "fupload"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "timeoutMs": 60000,
+    "startedAt": "2026-08-07T14:29:23.514Z",
+    "endedAt": "2026-08-07T14:29:23.566Z",
+    "worktree": {
+      "provider": "git",
+      "root": ".",
+      "beforeCommit": "571975a63598d93fa8639ccb3a176145c3a4b373",
+      "afterCommit": "571975a63598d93fa8639ccb3a176145c3a4b373"
+    },
+    "afterFence": {
+      "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+      "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+      "matched": true
+    },
+    "outputHash": "6cf9e7f0d34ccd36dbd28f270cd28dd04277b2e1516bd4333ce7bb501d7b18d4",
+    "outputSummary": "Skill is valid!",
+    "outputTruncated": false
+  },
+  "receiptHash": "57825a1e6062a9968af16c748faf7f59ad748d5b458649c778634e5badd14c76"
+}

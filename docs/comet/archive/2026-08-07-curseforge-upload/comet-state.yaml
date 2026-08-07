@@ -1,0 +1,23 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 5
+verification_protocol: legacy-v1
+name: curseforge-upload
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: b5e6c20a1a4bf963071ee0e714bc353dfe9b0c5a71feac162b92a60591ac0f0b
+spec_changes:
+  - capability: curseforge-publishing
+    operation: create
+    source: specs/curseforge-publishing/spec.md
+    base_hash: null
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474.json
+verification_evidence: runtime/evidence/verifications/8095629cdb203b042fb7e58c6a1be7917b7504523595aa08720f59ea168ccf1c.json
+partial_allowance: null
+archived: true
+created_at: 2026-08-07
+run_id: 051ef637-7499-4345-94be-c330c9116101

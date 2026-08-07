@@ -1,0 +1,50 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "automated-check",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "curseforge-upload",
+    "sourceRevision": 3,
+    "contractHash": "b5e6c20a1a4bf963071ee0e714bc353dfe9b0c5a71feac162b92a60591ac0f0b",
+    "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+    "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+    "artifactHash": "4aa010c17a253344bce4ac6f69bf04dde070ef6e9c3e9b7146591387e46b42d6"
+  },
+  "acceptanceIds": [
+    "acceptance-1fdf9418565bdf375198610111632afd643af100fec2d158ea50a1467d6843ea",
+    "acceptance-3321c932e50f7c2b1be2d6db6465accf1a67888dfbd3f3e1612d6a1290023c64",
+    "acceptance-c2ead6aa8fc9e5175217967616a5ff6f0b682bce69e27d39220abfb0ab2bcc00",
+    "acceptance-fbafc2eb41216fec36939bdf3ed0af83acfe128b99e282e9cf6aa2d58443cce2"
+  ],
+  "actor": "native-runtime:command:npm.cmd",
+  "issuedAt": "2026-08-07T14:28:34.180Z",
+  "evidence": {
+    "executable": "npm.cmd",
+    "args": [
+      "test"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "timeoutMs": 180000,
+    "startedAt": "2026-08-07T14:28:32.794Z",
+    "endedAt": "2026-08-07T14:28:34.180Z",
+    "worktree": {
+      "provider": "git",
+      "root": ".",
+      "beforeCommit": "571975a63598d93fa8639ccb3a176145c3a4b373",
+      "afterCommit": "571975a63598d93fa8639ccb3a176145c3a4b373"
+    },
+    "afterFence": {
+      "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+      "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+      "matched": true
+    },
+    "outputHash": "c6a71e39b1766291b6691efe1832018ca1061ea5029a57d5e15c0288f2b6a8c1",
+    "outputSummary": "> @follenfang/fupload@0.0.1 test\n> node npm/scripts/run-node-tests.mjs\n\n✔ creates the fixed CurseForge environment template with private POSIX permissions (3.5459ms)\n✔ preserves an existing CurseForge environment file byte for byte (2.878ms)\n✔ postinstall and first launcher use initialize the same home configuration (371.6436ms)\n✔ launcher options are removed before Python forwarding (0.8057ms)\n✔ explicit Skill directory wins over the Agent home (0.0969ms)\n✔ Agent home resolves to skills/fupload (0.0703ms)\n✔ missing --skill-dir value is rejected (0.7019ms)\n✔ discovers a supported local Python interpreter (40.5927ms)\n✔ installs, validates, and reuses the current Skill (121.2082ms)\n✔ text validation is stable across LF and CRLF (128.4179ms)\n✔ repairs a changed managed Skill through a transactional upgrade (209.4908ms)\n✔ fails closed for an unrelated existing target (7.0525ms)\n✔ distribution manifest matches package metadata (0.2763ms)\n✔ records all managed Skill targets without duplicates (16.3905ms)\n✔ cleanup removes every stamped Skill and preserves unknown directories (227.8404ms)\n✔ cleanup failure leaves the registry for a retry (100.3237ms)\n✔ global installation prefix is resolved from the package location (3.5197ms)\n✔ an injected npm exec path is used without shell lookup (1.4822ms)\n✔ self uninstall cleans the Skill before asking npm to remove the package (113.4023ms)\n✔ self update installs latest and synchronizes managed Skills (217.1223ms)\n✔ branch refs are not treated as release tags (0.4987ms)\n✔ release tags are selected from GitHub or explicit arguments (0.1174ms)\nℹ tests 22\nℹ suites 0\nℹ pass 22\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 837.8654",
+    "outputTruncated": false
+  },
+  "receiptHash": "d09154c9552b34906310177f8dec3bea57a7ca0302c047d3866b3e5f333b176e"
+}

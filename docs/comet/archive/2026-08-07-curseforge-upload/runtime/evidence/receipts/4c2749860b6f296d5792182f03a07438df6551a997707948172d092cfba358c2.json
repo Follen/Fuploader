@@ -1,0 +1,50 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "automated-check",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "curseforge-upload",
+    "sourceRevision": 3,
+    "contractHash": "b5e6c20a1a4bf963071ee0e714bc353dfe9b0c5a71feac162b92a60591ac0f0b",
+    "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+    "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+    "artifactHash": "4aa010c17a253344bce4ac6f69bf04dde070ef6e9c3e9b7146591387e46b42d6"
+  },
+  "acceptanceIds": [
+    "acceptance-f34c70b3848947b177a83776441bbdd88e28233cf6ef7cbb9a50d28bcd4e1fd8"
+  ],
+  "actor": "native-runtime:command:python",
+  "issuedAt": "2026-08-07T14:29:43.152Z",
+  "evidence": {
+    "executable": "python",
+    "args": [
+      "-m",
+      "unittest",
+      "fupload.scripts.tests.test_curseforge.CurseForgeTests.test_project_list_uses_default_author_and_core_key",
+      "fupload.scripts.tests.test_curseforge.CurseForgeTests.test_project_list_override_does_not_require_configured_author"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "timeoutMs": 60000,
+    "startedAt": "2026-08-07T14:29:43.033Z",
+    "endedAt": "2026-08-07T14:29:43.152Z",
+    "worktree": {
+      "provider": "git",
+      "root": ".",
+      "beforeCommit": "571975a63598d93fa8639ccb3a176145c3a4b373",
+      "afterCommit": "571975a63598d93fa8639ccb3a176145c3a4b373"
+    },
+    "afterFence": {
+      "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+      "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+      "matched": true
+    },
+    "outputHash": "4cd49ad0c73a8aa832fab522c6a78b7c7920d0020aa82b81b4234fa118a1a5f0",
+    "outputSummary": "..\r\n----------------------------------------------------------------------\r\nRan 2 tests in 0.000s\r\n\r\nOK",
+    "outputTruncated": false
+  },
+  "receiptHash": "4c2749860b6f296d5792182f03a07438df6551a997707948172d092cfba358c2"
+}

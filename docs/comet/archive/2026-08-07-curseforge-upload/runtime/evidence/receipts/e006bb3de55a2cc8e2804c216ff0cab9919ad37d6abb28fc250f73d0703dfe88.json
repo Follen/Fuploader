@@ -1,0 +1,51 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "automated-check",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "curseforge-upload",
+    "sourceRevision": 3,
+    "contractHash": "b5e6c20a1a4bf963071ee0e714bc353dfe9b0c5a71feac162b92a60591ac0f0b",
+    "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+    "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+    "artifactHash": "4aa010c17a253344bce4ac6f69bf04dde070ef6e9c3e9b7146591387e46b42d6"
+  },
+  "acceptanceIds": [
+    "acceptance-3321c932e50f7c2b1be2d6db6465accf1a67888dfbd3f3e1612d6a1290023c64",
+    "acceptance-3511cd9a6370e866531fd4b6cc3af74dbeabf4999b38f9dd27d79c206519dde9",
+    "acceptance-c2ead6aa8fc9e5175217967616a5ff6f0b682bce69e27d39220abfb0ab2bcc00",
+    "acceptance-fbafc2eb41216fec36939bdf3ed0af83acfe128b99e282e9cf6aa2d58443cce2"
+  ],
+  "actor": "native-runtime:command:npm.cmd",
+  "issuedAt": "2026-08-07T14:29:06.157Z",
+  "evidence": {
+    "executable": "npm.cmd",
+    "args": [
+      "run",
+      "test:install"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "timeoutMs": 240000,
+    "startedAt": "2026-08-07T14:29:02.266Z",
+    "endedAt": "2026-08-07T14:29:06.157Z",
+    "worktree": {
+      "provider": "git",
+      "root": ".",
+      "beforeCommit": "571975a63598d93fa8639ccb3a176145c3a4b373",
+      "afterCommit": "571975a63598d93fa8639ccb3a176145c3a4b373"
+    },
+    "afterFence": {
+      "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+      "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+      "matched": true
+    },
+    "outputHash": "46816c45681dc82540bbd1ef010f917ab2b10084ae7532fe19280f41fba80e96",
+    "outputSummary": "> @follenfang/fupload@0.0.1 test:install\n> node npm/scripts/test-install.mjs\n\nGlobal install, Python launch, managed Skill, and self-uninstall checks passed.",
+    "outputTruncated": false
+  },
+  "receiptHash": "e006bb3de55a2cc8e2804c216ff0cab9919ad37d6abb28fc250f73d0703dfe88"
+}

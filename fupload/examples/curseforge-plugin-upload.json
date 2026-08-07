@@ -1,0 +1,21 @@
+{
+  "schema": "fupload.v1.curseforge.plugin.upload",
+  "project_id": 123456,
+  "file": "./addon.zip",
+  "changelog": "Release notes for 1.0.0",
+  "changelog_type": "markdown",
+  "display_name": "Example AddOn 1.0.0",
+  "game_versions": [12345],
+  "game_version_names": ["Retail"],
+  "release_type": "release",
+  "relations": {
+    "projects": [
+      {
+        "slug": "example-library",
+        "project_id": 74924,
+        "type": "requiredDependency"
+      }
+    ]
+  },
+  "is_marked_for_manual_release": false
+}

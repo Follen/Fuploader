@@ -3,12 +3,17 @@
   "package_name": "@follenfang/fupload",
   "package_version": "0.0.1",
   "skill_version": "0.0.1",
-  "tree_sha256": "310b805667d90a590f5e1ac9f8833224e5b6a6050e4d2e3c412f712993e362a7",
+  "tree_sha256": "84b84003d53255b5966205e0510db50fe3b10eedc71d75d764cbecf0f7fd2cd8",
   "files": [
     {
       "path": "agents/openai.yaml",
-      "bytes": 364,
-      "sha256": "8316fb299d1e77fbbca1cfc6ec80b2078372dff96940d154af425e692ea9bd58"
+      "bytes": 342,
+      "sha256": "473872fbc6fcecb2030fd2ac66589afd72f813ad47b2e6e968ee2bca4b7e6ab3"
+    },
+    {
+      "path": "examples/curseforge-plugin-upload.json",
+      "bytes": 515,
+      "sha256": "624cc03b0d6debd842270d129817904aadff67b6d462f8d1481fc95e999c053e"
     },
     {
       "path": "examples/dd-config-delete.json",
@@ -71,6 +76,11 @@
       "sha256": "40491e9aeddc71a4e9578264e5c42b40613e0ea5f0321da29e170b84ff9f1905"
     },
     {
+      "path": "references/curseforge.md",
+      "bytes": 11917,
+      "sha256": "2dd0a2429a37af30c4f85a884c2e8ea6fcdb1691c34ccc0c34925890e4e60d92"
+    },
+    {
       "path": "references/dd.md",
       "bytes": 16543,
       "sha256": "782d7c89d865df545fb6ffe4d7ee4492e6e5b192a3f71e4aef6424183a6a4f24"
@@ -97,8 +107,13 @@
     },
     {
       "path": "scripts/fupload_cli/cli.py",
-      "bytes": 22260,
-      "sha256": "4ab353e8c322dfaea76bce52d39fb777bcf0296a515d4065e52afe62f38ed92c"
+      "bytes": 23794,
+      "sha256": "3c01585b50e1db308444d094e60751491667ea05a98e5a51f284f098b7a8f376"
+    },
+    {
+      "path": "scripts/fupload_cli/curseforge.py",
+      "bytes": 7959,
+      "sha256": "c607c6caba5c551a7e3970bd152de94ab1e96350ee73969048f5aea5bf42c75d"
     },
     {
       "path": "scripts/fupload_cli/dd_broker.py",
@@ -137,8 +152,8 @@
     },
     {
       "path": "scripts/fupload_cli/schema.py",
-      "bytes": 31522,
-      "sha256": "8256229fd2b82db42628bc7c61ba7881035b37640483f3398bb771aa327fea21"
+      "bytes": 35113,
+      "sha256": "388c89131bf032428d2ed6c047b52c54adf2fa9d1db91833caefe7a1296acf58"
     },
     {
       "path": "scripts/fupload_cli/transport.py",
@@ -157,8 +172,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 18699,
-      "sha256": "ff3b6e220ffbe94361f59e9cbcc925c9ddb3568c655ce908ad4117b75f0a89fc"
+      "bytes": 21764,
+      "sha256": "853f3997e51da24ebe68c55b2a0bcf454eca50f6ecb1694e12e8250653b8c58b"
     }
   ]
 }

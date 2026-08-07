@@ -1,0 +1,48 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "automated-check",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "curseforge-upload",
+    "sourceRevision": 3,
+    "contractHash": "b5e6c20a1a4bf963071ee0e714bc353dfe9b0c5a71feac162b92a60591ac0f0b",
+    "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+    "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+    "artifactHash": "4aa010c17a253344bce4ac6f69bf04dde070ef6e9c3e9b7146591387e46b42d6"
+  },
+  "acceptanceIds": [
+    "acceptance-3511cd9a6370e866531fd4b6cc3af74dbeabf4999b38f9dd27d79c206519dde9"
+  ],
+  "actor": "native-runtime:command:git",
+  "issuedAt": "2026-08-07T14:30:29.312Z",
+  "evidence": {
+    "executable": "git",
+    "args": [
+      "diff",
+      "--check"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "timeoutMs": 60000,
+    "startedAt": "2026-08-07T14:30:29.254Z",
+    "endedAt": "2026-08-07T14:30:29.312Z",
+    "worktree": {
+      "provider": "git",
+      "root": ".",
+      "beforeCommit": "571975a63598d93fa8639ccb3a176145c3a4b373",
+      "afterCommit": "571975a63598d93fa8639ccb3a176145c3a4b373"
+    },
+    "afterFence": {
+      "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+      "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+      "matched": true
+    },
+    "outputHash": "a03b3953ae3efad75d86118736178bd395f7f73cd335780615f88ceeb81340a9",
+    "outputSummary": "warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'fupload/SKILL.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'fupload/agents/openai.yaml', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'fupload/scripts/fupload_cli/cli.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'fupload/scripts/fupload_cli/schema.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'fupload/scripts/tests/test_cli.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'fupload/scripts/tests/test_full_schema_state_matrix.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'npm/bin/fupload.mjs', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'npm/lib/update.mjs', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'npm/postinstall.mjs', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'npm/scripts/test-install.mjs', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'npm/skill-manifest.json', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'npm/test/uninstall.test.mjs', LF will be replaced by CRLF the next time Git touches it",
+    "outputTruncated": false
+  },
+  "receiptHash": "1acb53c3d76c6843f05c93e4d1439315c7aeb2a61bde69c412229664b0c3f2ed"
+}

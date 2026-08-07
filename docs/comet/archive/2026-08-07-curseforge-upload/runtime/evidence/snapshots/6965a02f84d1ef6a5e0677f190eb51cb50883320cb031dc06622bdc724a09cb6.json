@@ -1,0 +1,1464 @@
+{
+  "schema": "comet.native.content-snapshot-projection.v1",
+  "origin": "change-created",
+  "capture": {
+    "provider": "git"
+  },
+  "complete": true,
+  "limits": {
+    "maxFiles": 10000,
+    "maxFileBytes": 268435456,
+    "maxTotalBytes": 268435456,
+    "maxManifestBytes": 1048576,
+    "maxDurationMs": 60000
+  },
+  "policy": {
+    "schema": "comet.native.snapshot-policy.v1",
+    "include": [
+      "**/*"
+    ],
+    "exclude": [
+      "newbee/app/**",
+      "newbee/source/**"
+    ],
+    "hash": "b9f39b331a5422e3b89551642379411ce6533ae1c4cc7973ae873ae9c1e82b25"
+  },
+  "entries": [
+    {
+      "path": ".agents/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+      "size": 227362,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/settings.local.json",
+      "hash": "216c176e1a57fdfab2603b05e5d835b56e82ed33ce19aa4313944457d61fa0fe",
+      "size": 403,
+      "type": "file"
+    },
+    {
+      "path": ".amazonq/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+      "size": 227362,
+      "type": "file"
+    },
+    {
+      "path": ".claude/settings.local.json",
+      "hash": "045d62d886081a0491ee35fad8c0e95ba4d3c4db9eeb9ec4da3f34e8b1c20881",
+      "size": 400,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+      "size": 227362,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/settings.json",
+      "hash": "c330ab251d6815c35d5181583830d251748bb708aed6f748755a93da8f69aec3",
+      "size": 505,
+      "type": "file"
+    },
+    {
+      "path": ".codebuddy/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+      "size": 227362,
+      "type": "file"
+    },
+    {
+      "path": ".codex/hooks.json",
+      "hash": "170d25c5c0d27f74a487853e39d4b108356323df711f5c9646447157598009f6",
+      "size": 399,
+      "type": "file"
+    },
+    {
+      "path": ".codex/rules/comet-workflow-guard.md",
+      "hash": "837a4a47d4c37ecfd9d0f7a0b78f75ff047792e957d5387004c38623ae3ab2b4",
+      "size": 2228,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/settings.json",
+      "hash": "dec9d31aa21365c6510d6cbe1779b177c100c27818c5dc1394e79169db672bb0",
+      "size": 502,
+      "type": "file"
+    },
+    {
+      "path": ".gemini/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+      "size": 227362,
+      "type": "file"
+    },
+    {
+      "path": ".github/hooks/comet-guard.json",
+      "hash": "1c61eecac1616f78f3f2b2e33f3e1b558a0e8a6f2d8db6b4bb5865c2dac8358e",
+      "size": 593,
+      "type": "file"
+    },
+    {
+      "path": ".github/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+      "size": 227362,
+      "type": "file"
+    },
+    {
+      "path": ".github/workflows/publish-npm.yml",
+      "hash": "f8182525e07ae6e34a0ef2ed4c1f1379821ca92a3d7e01dcc332306237a96567",
+      "size": 2434,
+      "type": "file"
+    },
+    {
+      "path": ".gitignore",
+      "hash": "985e1f77261d9c2b21e613f1dd41450600b9af6dd20eaed81740dd621bd9c1fe",
+      "size": 285,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/hooks/comet-hook-router.kiro.hook",
+      "hash": "0161ae7765ab323e61c53cbdf617af8641ab6fc5f42a6ddd716e2d6165d1a1db",
+      "size": 529,
+      "type": "file"
+    },
+    {
+      "path": ".kiro/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+      "size": 227362,
+      "type": "file"
+    },
+    {
+      "path": ".npmignore",
+      "hash": "abb0b268dab6176c64132d1c5d97c7278cf5556b31062a8dd26188247541a3be",
+      "size": 132,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/settings.json",
+      "hash": "c3e0f4afeccbd0a41ff3266c1236f9f0b98b639b6130db2fb7d767b57e025455",
+      "size": 497,
+      "type": "file"
+    },
+    {
+      "path": ".qoder/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+      "size": 227362,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/settings.json",
+      "hash": "c01dacd1241ad3b50fc58f3da1e61f835b213d8d29e67a8a5b42091ed201b949",
+      "size": 495,
+      "type": "file"
+    },
+    {
+      "path": ".qwen/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+      "size": 227362,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/hooks.json",
+      "hash": "4990cf66be363b462ea26b7fefc576b33421ce1f4e2a980fe0d669162eaa9e09",
+      "size": 316,
+      "type": "file"
+    },
+    {
+      "path": ".windsurf/skills/comet/scripts/comet-hook-router.mjs",
+      "hash": "aefc42c15e16409ab930249118c4efe2a86480e7032bcfb72eebca5f7e4ac53e",
+      "size": 227362,
+      "type": "file"
+    },
+    {
+      "path": "AGENTS.md",
+      "hash": "eb6c8bbaac996b72248e1961183d429c51349ccf3bacae17a1ba7ff77860b3dd",
+      "size": 1462,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "hash": "fb7afb03c9d9cdb75764d94dd2cd5375898929b5f3a2a074841214a1fe880800",
+      "size": 11534,
+      "type": "file"
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "hash": "2e59eb79b48a9ef96676a6c7282dbebf997b543bf25a745b5dec71db990bf82b",
+      "size": 18828,
+      "type": "file"
+    },
+    {
+      "path": "fupload/agents/openai.yaml",
+      "hash": "e133b8a01d89bf7ff5e2d60dab11e5b605112cc89b57b2b548412d1bb22780ec",
+      "size": 368,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-config-delete.json",
+      "hash": "c852da149f05902557e3b58b5e6e623b2013d53d74a8ca398bc681b690687193",
+      "size": 98,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-config-update.json",
+      "hash": "42522607a5e3553413010c9f238019fd52530b429dfa178797bc0f12e60b1be8",
+      "size": 744,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-plugin-delete.json",
+      "hash": "2ec3002e2eeb3ba424f301f37a35cdec1e6c9e06069a2729af42a5249cd03ceb",
+      "size": 98,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-plugin-update.json",
+      "hash": "a4263e060f5f36ded6d82416af6c6be79fc5a0cb07c223c4d904d75ec80936e1",
+      "size": 215,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-wa-delete.json",
+      "hash": "09b8e8e244f84a7167662f0854f1678cecfcd750e30e37710b71f8abf04e2b7d",
+      "size": 90,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/dd-wa-edit.json",
+      "hash": "4959b0e869047879140f0efc4df85c0ccb91c02660027e904b93bb8a0fde72a1",
+      "size": 205,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-config-delete.json",
+      "hash": "0ad8bc47fb5ef79396c0d811b350f164d1ca96964cabd23308f8f9ab9896042b",
+      "size": 91,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-config-update.json",
+      "hash": "ff34b56ba1d9bda8eda6ea487662bece875a578b8ed70e87bbc14ac49fea607d",
+      "size": 230,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-plugin-create.json",
+      "hash": "53b05baa69babc693159a50ad23b1cbb4f34f760cea2362a1f585199143444d9",
+      "size": 383,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-plugin-delete.json",
+      "hash": "4d5626653c8a5c4ff2f93b51f18fd68806f871137b602df6e64c5d8c7d85a990",
+      "size": 91,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-wa-delete.json",
+      "hash": "adb51a16b31b97640fd89401c9302ab52bdc267cde2700c22dc592d424c4faef",
+      "size": 87,
+      "type": "file"
+    },
+    {
+      "path": "fupload/examples/newbee-wa-update.json",
+      "hash": "e6786622859d6726f1a4def98eac86c2fda4519f915b21e74a91ee705a707bd6",
+      "size": 176,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/dd.md",
+      "hash": "1b3c8db8da3b222c25db204eba034eb508363c43f159f87bc50882f580fe3a3e",
+      "size": 16648,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/newbee-official-cli.md",
+      "hash": "99bfa8387930368a943d9da3be4d402b5b0099bd5f8b18d0cf707ef23f0930e2",
+      "size": 25207,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/newbee.md",
+      "hash": "683851b3c9c5f40bab5fc6ad529033c7fd84bc65e0ff8c48e8e474b57bca93d1",
+      "size": 8298,
+      "type": "file"
+    },
+    {
+      "path": "fupload/references/workflow.md",
+      "hash": "cde4f91999fe41b22e4617b6bef0e095086aca6b5aa5bc381c99025bfde07641",
+      "size": 6607,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload.py",
+      "hash": "fc8fd0d6e4c1de6e2cfb624acf0f683dde543cec1f63e77a7e482ca7d3d62389",
+      "size": 353,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/__init__.py",
+      "hash": "47fcd98f9ce39a9b6c6231697504b4c62737767d9df4a222e6efff2f9deaa7b3",
+      "size": 52,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "hash": "43eb1f19167ed86c4511fd7b1c32c9eefd6595696eaa5dbc598696a645e59f55",
+      "size": 22526,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd.py",
+      "hash": "323f974968debc69f2dac4923a0868dca7015e557d0b717b4cea9739d37469bc",
+      "size": 115541,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_broker.py",
+      "hash": "9108c63ab8069bf77bc9296afee4dc022081dbcaef62969b37bdbf1174fc3ba6",
+      "size": 26384,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/dd_sidecar.py",
+      "hash": "1888b6dfd24eed448abe5d5bfdb70b149e2e2c0aacef77378d81d0feccb7263d",
+      "size": 36139,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/errors.py",
+      "hash": "fac65211bbde19b1f3ec0157b97c0ba43da934cd3f3fd3cb90671bd0c3d86f83",
+      "size": 3948,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/io.py",
+      "hash": "288e35cbefa782a1f309620b91f49a86e9eb3aebae8c85d0d59a149259db8aa8",
+      "size": 4478,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/newbee.py",
+      "hash": "1082ba1b7d61848a6054091688330cab1d909df9553a8e19ff313d0d435ddd1e",
+      "size": 81130,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/newbee_auth.py",
+      "hash": "551b058da61247d091df3af0903e62b70afa625c2308a01bd7b8e59acb6d4394",
+      "size": 5449,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "hash": "aae92c17f62b332c501abca381134cd357e8bea8429dceb4d243d9b661999b8c",
+      "size": 32061,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/transport.py",
+      "hash": "4f63bdd6eff5dd8b85209c7f3f56e62015404320057a31bd18c4c9937b05445a",
+      "size": 5020,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/trust.py",
+      "hash": "bfb5ee56408eb180d2904c3c023008ad813b0a1f1ce659357ca18aefaf269567",
+      "size": 9599,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/__init__.py",
+      "hash": "6634feb298a2be4510d94c101d7886d22be05b05d9ed77f18cec07eab19d8448",
+      "size": 22,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/generate_dd_wire_matrix_report.py",
+      "hash": "ab1974b782b9bc33a0daba07d803d0dfc3c0d69a2f4f86bac7d9c9cbc85dff30",
+      "size": 7820,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/generate_full_wire_audit.py",
+      "hash": "559142158bee5a75c33e34ce78aedd51ab4f3f01e6b514c7d6cdd0df52448dfa",
+      "size": 18460,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_builders.py",
+      "hash": "2f21949a84f9f29c8ec87aed55213a12b09e0e07fdfba3d1a7be31b4b8c74293",
+      "size": 64917,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "hash": "6738a3c81719f11fb3f6c98335c0e410bfdd688b747df2c5f1e6ab7da5e63600",
+      "size": 15401,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_session.py",
+      "hash": "f95b1e496772ab0c4a06d9e2a22b0ba1377306e3537e3ae69aae9046f55c866d",
+      "size": 47172,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_dd_wire_matrix.py",
+      "hash": "7993ca2d0ed747ed5111aa89846bc13a8e686842e81dd5b1b1549e20ad6ade08",
+      "size": 49678,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_full_schema_state_matrix.py",
+      "hash": "4a3280adf6badf901dcaf437cde77fb9c3f00423a79fb3afff65d6ce4f328bd4",
+      "size": 12609,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_newbee_wire_matrix.py",
+      "hash": "ba9a3ec8cc6ecc084d7feaa1f0309032ec2e00d3bfd69f9f072e8c34dffebd30",
+      "size": 38157,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_schema.py",
+      "hash": "11f5dd1ffb8c18b38a6ab340c05ba6c07a006219775b83278e5b213a0574c04a",
+      "size": 19126,
+      "type": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_trust.py",
+      "hash": "67a6e9d6c24cba2e52d55e60e92ff43763e24e9c725495c0741b9cb69e92d16e",
+      "size": 7966,
+      "type": "file"
+    },
+    {
+      "path": "npm/bin/fupload.mjs",
+      "hash": "663f3e111c8bd37c66aec2c98d472e318a252811a1c35226c14356807a1f9892",
+      "size": 3098,
+      "type": "file"
+    },
+    {
+      "path": "npm/lib/managed-install.mjs",
+      "hash": "c1819e513bd378e4d9284f369b76af93c167b4f56f97dd5a0ca5deffd8668cde",
+      "size": 3235,
+      "type": "file"
+    },
+    {
+      "path": "npm/lib/options.mjs",
+      "hash": "b405b621942eb026e47fd7b4c9f6f7a286616b4b340f0db07d2c818cd461458d",
+      "size": 1179,
+      "type": "file"
+    },
+    {
+      "path": "npm/lib/python.mjs",
+      "hash": "58dd65099cebfbad884de857a635c1459fb8e3188e8c43ac3ae03885720306f3",
+      "size": 1363,
+      "type": "file"
+    },
+    {
+      "path": "npm/lib/skill-installer.mjs",
+      "hash": "9f77e199f7b09a659a62077029d0f0d1b926da49a79c701dbade52c4e769f862",
+      "size": 8069,
+      "type": "file"
+    },
+    {
+      "path": "npm/lib/uninstall.mjs",
+      "hash": "920e925c26995c35e751152ef559df4758448026a65604c197dd59e77d8c5a39",
+      "size": 7073,
+      "type": "file"
+    },
+    {
+      "path": "npm/lib/update.mjs",
+      "hash": "a07e26f33d6eae7cbfbe9195bee830745a1e5af106539a056afdd86930f213ce",
+      "size": 3531,
+      "type": "file"
+    },
+    {
+      "path": "npm/lib/versions.mjs",
+      "hash": "511c65de9a0692d05f5d31757af043a727ea52816ddd0ab628460a4e2d006b34",
+      "size": 2403,
+      "type": "file"
+    },
+    {
+      "path": "npm/postinstall.mjs",
+      "hash": "d73cf8a62627d7d69530ac8e610c131194f3341c82dfd5ff63c44a80e5626ca9",
+      "size": 696,
+      "type": "file"
+    },
+    {
+      "path": "npm/scripts/build-skill-manifest.mjs",
+      "hash": "11a41a4165a89410a862b8f60f54c4d2c1375d459f2e0bd80cbb2216f9f0e640",
+      "size": 3373,
+      "type": "file"
+    },
+    {
+      "path": "npm/scripts/check-release-version.mjs",
+      "hash": "bbc8f2beb8217284aa4e08e5192d288759d7f0da97746aaf0f813ca852f1873d",
+      "size": 682,
+      "type": "file"
+    },
+    {
+      "path": "npm/scripts/run-node-tests.mjs",
+      "hash": "297c4d42c954107c8019962c581c51ac13d8503db84bd8b34c6a384d53800bdd",
+      "size": 751,
+      "type": "file"
+    },
+    {
+      "path": "npm/scripts/test-install.mjs",
+      "hash": "f8fbd84858ba942feb54239cb2870d2561871a18119eedbdc50651124758aa71",
+      "size": 5416,
+      "type": "file"
+    },
+    {
+      "path": "npm/scripts/verify-package.mjs",
+      "hash": "ff8bf75a857d4e13268819347e2cf2fc8ec7a16701f246817052525d17494f8f",
+      "size": 2630,
+      "type": "file"
+    },
+    {
+      "path": "npm/skill-manifest.json",
+      "hash": "7794f673e09ce739da2a777ce86d844a2e991168c64cc963b21ff52c7dd96c7f",
+      "size": 5440,
+      "type": "file"
+    },
+    {
+      "path": "npm/test/options.test.mjs",
+      "hash": "ca9b7b0aa95989d610d4380d6bd41dc920a6fd8e9df869e1e3ef8d3a8e08a28a",
+      "size": 1130,
+      "type": "file"
+    },
+    {
+      "path": "npm/test/python.test.mjs",
+      "hash": "5e4208eed720a11b2b197c46c5fc58b4297e288ef2d216cc9c4c8bbd829a03a6",
+      "size": 334,
+      "type": "file"
+    },
+    {
+      "path": "npm/test/skill-installer.test.mjs",
+      "hash": "66d9af11931de4ed41245ac91fda9c72ed6626246c2762d02ce06beb7e5aa5b3",
+      "size": 2672,
+      "type": "file"
+    },
+    {
+      "path": "npm/test/uninstall.test.mjs",
+      "hash": "f1fc8ea49cf1e3eaa67d31f27f2e74f8ec4f0139b337f2b67690a8d7a4200c4c",
+      "size": 7128,
+      "type": "file"
+    },
+    {
+      "path": "npm/test/versions.test.mjs",
+      "hash": "6d8e45b98f2ca5c40941c542abae05f1e9a85bff372a4c4993667e970cd1487e",
+      "size": 670,
+      "type": "file"
+    },
+    {
+      "path": "package-lock.json",
+      "hash": "9116135cfd574aacc89cd606370d8ebf474935e5b78d19cca526d40b4e411842",
+      "size": 403,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "hash": "fddc17ef732128a7edf5fdc0373e4eec6cb39fb343eeeb2930d124c12b788f07",
+      "size": 1573,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/01-newbee-plugin-create.json",
+      "hash": "1ad0a786f1862c626ade2c944bf3d9b513c889e2667a6bbcde8fa3676a2f3da0",
+      "size": 589,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/02-newbee-plugin-update.json",
+      "hash": "1f48c1edb19bff4089ac280b395e381964df47d52087dc8329ca77c25feb0de1",
+      "size": 348,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/03-newbee-plugin-edit.json",
+      "hash": "3be251aa6ef9e812240c8c54784a42f68a9813db6e15a4bdb4b4fdd13dcbcec5",
+      "size": 621,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/04-newbee-plugin-delete.json",
+      "hash": "7083e199cc207311bdffbd5c2cd97618691e9e93bdcf97d24f5ecf2ad5ccd458",
+      "size": 93,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/05-newbee-config-create.json",
+      "hash": "4842d8a0cf316b86d2b179f109c109d5b4c5ae965bc1b6772a3efddd7c10157f",
+      "size": 621,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/06-newbee-config-update.json",
+      "hash": "0723d8ea1a2cde476c60d985237d165fcaa93e88c4eb2660a2fe43abf7a5d2f8",
+      "size": 225,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/07-newbee-config-edit.json",
+      "hash": "0bf721a5ecce7c3c5d08e968487a3731300cbd359d69e8d76d46ea3888f96c7f",
+      "size": 535,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/08-newbee-config-delete.json",
+      "hash": "647d9bb2a8b70c4d1994e919e733d3ddfd2f8b9f0ff6247dce9bc762e2bdca82",
+      "size": 93,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/09-newbee-wa-create.json",
+      "hash": "8923f6f0d051b1968f630d7fa03f1a2bb23a258ab308331cc68c42333674684f",
+      "size": 665,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/10-newbee-wa-update.json",
+      "hash": "bf89aa55fdafba3a7625350616ec91efd820cb918712d96f262d3ed0157c19cb",
+      "size": 257,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/11-newbee-wa-edit.json",
+      "hash": "80dc4795468736ac4d2852aea1d804eab1b6b11d82c41518c5f5cd390bd5f8e0",
+      "size": 596,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/12-newbee-wa-delete.json",
+      "hash": "ce45e4560a859265882d99a85b741e1dacf58597046a94136b59ceb6fe0db3bb",
+      "size": 88,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/13-dd-plugin-create.json",
+      "hash": "418480a44d40ae07923f5230c70a485c8e05f123893f263f667386f4bb225f20",
+      "size": 989,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/14-dd-plugin-update.json",
+      "hash": "c82bb91c51c303a99ab033a370907591f8e13bb962df959efeb0da4232d92ec6",
+      "size": 357,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/15-dd-plugin-edit.json",
+      "hash": "955b2b9b34e5987c2c83913b82922aa94897c2a0781cfe77a8a19ec0ec69fa23",
+      "size": 953,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/16-dd-plugin-delete.json",
+      "hash": "9c013bdb3a5426f3a7ea231c3999e5e7090e629d106201ee980261c36c387beb",
+      "size": 118,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/17-dd-config-create.json",
+      "hash": "f8df1411e7c8a17e2d5f8edec976acc510d0434c4ff98ad8e8e9371dcf446902",
+      "size": 862,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/18-dd-config-update.json",
+      "hash": "b1f29a5965f0255c46b5b14ebb00f2eeeb2cf90e74064c500f51fd98e4d3efc6",
+      "size": 653,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/19-dd-config-edit.json",
+      "hash": "feea895e4a02937e87757c1ea12d0fe6e47fefb64571e467e0ab878524ef0096",
+      "size": 768,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/20-dd-config-delete.json",
+      "hash": "597620c0ad7f5c7bc4a4a454f7b02edd5e4c2440f59f1063e81d6091ecf91dda",
+      "size": 118,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/21-dd-wa-create.json",
+      "hash": "ac07eade7faf3a1c803cd7b99b6bfbda53190848aac31faaef7f14ee71d4df75",
+      "size": 741,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/22-dd-wa-update.json",
+      "hash": "c0b3f46037a51d0042ced5a1bbda0390f97e8ddc09c4a2415b6e14652f4cf2b0",
+      "size": 286,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/23-dd-wa-edit.json",
+      "hash": "40d4f962f604aaae6b8b08a8b221ec3f4bf1f23d4ec257c4a180a227e9b71cfb",
+      "size": 826,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/24-dd-wa-delete.json",
+      "hash": "987d242bac816fedaad958783fef54613ec5b26c6a70dae7fe793ebd5604396e",
+      "size": 114,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/assets/FuploadContractTest.zip",
+      "hash": "e22b51dca38ab95e48c5d26e27e1ac1fa81e2d1eff290343bd90f6b48678916e",
+      "size": 539,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/assets/FuploadContractTest/FuploadContractTest.lua",
+      "hash": "c37fc393d254c9ce4e5d939355aba1bba2b646cfdb8a556240aa3c57752dc7de",
+      "size": 88,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-191228-cross-platform-contract-test/assets/FuploadContractTest/FuploadContractTest.toc",
+      "hash": "00e8f482f3912c91200eb13f767905918d2908f8f711a1f3a134fde2463c9e89",
+      "size": 159,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/01-create.json",
+      "hash": "2bad72995a3a5d4192750a7098c5f0828f9effaf4cef63fc159fc410dc147f75",
+      "size": 870,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/02-update.json",
+      "hash": "a16e86f8bd0a30d5420f8a1d2bfe9ba7143f8e5184c1d204bfb2312b92fe3903",
+      "size": 641,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/03-edit.json",
+      "hash": "047203ccf90fc262311009d8d1fd2ca090384438fe28a7a5d293e7cdc5a99fa0",
+      "size": 744,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-195033-dd-config-retest/04-delete.json",
+      "hash": "bbc48b042d6f9c0e842f405dd4ae015432964ef2d920f1809083872d6283d97f",
+      "size": 118,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/01-create.json",
+      "hash": "25c8e9341a46b0e9364ee79243cf50dcd4970d41c11b89f1f7d58eda034cf3d8",
+      "size": 1100,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/02-create.json",
+      "hash": "164e47db263e6bf413f6cd900ad4a5ba75987a81fde79aa9a253dd143f3f39e4",
+      "size": 1100,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/03-create.json",
+      "hash": "c5eabf8f70c229a4257d97de83d3df84fb21810453d99230799db482ed69eee5",
+      "size": 1100,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/04-create.json",
+      "hash": "7b5667fa2e85228491527f685711ad6f1fe09b1d18754f85208ebfee4419924d",
+      "size": 1100,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/05-create.json",
+      "hash": "e5dc7baa1608a4f996a74c19597659e8890ddebcba5553f04244b88ee839adca",
+      "size": 1100,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260731-215431-dd-plugin-create-six-clientno-test/06-create.json",
+      "hash": "d8751933505edab9e8f3c0922eafd6fee506afdae09101ca5867048fa572c733",
+      "size": 1100,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/01-plugin-create.json",
+      "hash": "03db331105b4a69d67d20904ad9deab89a1377bf6795d97e71cc46ee8e40bfc0",
+      "size": 1047,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/02-plugin-create.json",
+      "hash": "7cc51110dc74c4ebb3e7a36dca69b76d3e4ff919ef95fcfeab84547c56a0b038",
+      "size": 1043,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/03-plugin-create.json",
+      "hash": "ede0d37e027d258879ee870ce29e96bc6a2d42d66a98d268b152b89d778a9f77",
+      "size": 1042,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/04-plugin-create.json",
+      "hash": "4fd11d147d184b5e42ee9973e9defcfd5a455a8b1900303163311b70023a2ad8",
+      "size": 1042,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/05-plugin-create.json",
+      "hash": "26f933e270b268531126334cb449d7106770b142a42306be211d58f594413a3d",
+      "size": 1043,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/06-plugin-create.json",
+      "hash": "ad1bba1c91ff35dc7ab629d632fa26dbbf71d7aa195322e056ea5c52853ea6d7",
+      "size": 1047,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/07-config-create.json",
+      "hash": "f6cacf37928b9c446044887f3cf8d62abebe3caf3096fd049e5c014dd53e4fd1",
+      "size": 1317,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/08-config-create.json",
+      "hash": "a75f73398a60e85a284356e1c142e07c5759a39a1119fb70c88ff8d48fa685f4",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/09-config-create.json",
+      "hash": "c2c40b686be42d46378f5a146cd4c450f490b5e747eaffc82e928e945b999aa0",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/10-config-create.json",
+      "hash": "bb77fb5e40515a20db49247d1c5962441258906450ee48297db69194dd8fac8d",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/11-config-create.json",
+      "hash": "8b5121b96eee1e4fe457fe3e25733c4f715f6165b500b9d108b16ffb8c8429f8",
+      "size": 1085,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/12-wa-create.json",
+      "hash": "ef55f7b64d010d86e6899f9aac0d8349ab8a164abb9705460b048ebe9369d9be",
+      "size": 774,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/13-wa-create.json",
+      "hash": "aa0d830ed1e13560bdd9b798f8469f191aa8ed5ab00b57a0eb35c6cd886d7881",
+      "size": 771,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/14-wa-create.json",
+      "hash": "4598989fc0bae428d80578ad478c2ead8970dfb3bbca5ca68ed26c7ea6a6b9e1",
+      "size": 770,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/15-wa-create.json",
+      "hash": "c339051073a5c3bd993ddbfef2d8176953b9687de7360421384ef183f3e4d3da",
+      "size": 770,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/16-wa-create.json",
+      "hash": "bc28cebce690d8819cb1beb388b736a4b24715fe44788d584191ff032e1d7659",
+      "size": 771,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/17-plugin-edit.json",
+      "hash": "4f9fe8e3b93749f1492bbb1135eb4f2bed26b5176b7176a26e2f44a74656b702",
+      "size": 159,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/18-plugin-update.json",
+      "hash": "5ca42a24cf41d10cef57c098ae7a4c07785742106d4c9ecb41473c84a8f1fd0c",
+      "size": 347,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/19-plugin-edit-commercial.json",
+      "hash": "d398fc7a9f09115065bc2eee4c81fd6f7c55a50e269ad3bb31b60b2253c236b0",
+      "size": 135,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/20-plugin-delete.json",
+      "hash": "0aaa7b0eba4358cccf0373df3b6d3f7431d2acdad67a548707aef81e605e5b29",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/21-plugin-delete.json",
+      "hash": "7fe2c001eb0d15b6a89aed08af790676f7433ca53ad1773b8b4b9a43b8b8e451",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/22-plugin-delete.json",
+      "hash": "b51c0f81e76e0534c341d827c523519d46f8032bbf3e76ea7e969f3ddc610834",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/23-plugin-delete.json",
+      "hash": "0317f5eeab206e28fea656ff94bbf6e252996abbea6de7439251707458166062",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/24-plugin-delete.json",
+      "hash": "bae7f7dceb51286a0ed4fdc875732245d9c85d21a50c47d671622027faee20a4",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-004600-dd-real-verification/25-plugin-delete.json",
+      "hash": "ba8f38c89b2193269510db769fbc4f50611461a9ced162e27ecc0017ffe88d9d",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/01-plugin-create.json",
+      "hash": "25e98f0cb28ba7736657f4e05034e93af00f8431f06c0763a9f846b1324365c3",
+      "size": 1043,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/02-plugin-update.json",
+      "hash": "7ab65ace1c13471874b4fffc548608ad3d19d99652a9cceab73158856291025c",
+      "size": 345,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010000-dd-real-verification-retry/04-plugin-delete.json",
+      "hash": "96d3fa8192a96e59918d285345daeec9f5f66e03642862e6f28cad9a97fca120",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/01-plugin-create.json",
+      "hash": "574716cc35256a896956dacd1dc8a96fcb2f01f1a7fa38ab3c64315500dfdbcc",
+      "size": 1026,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/02-plugin-update.json",
+      "hash": "b5436dde65e8c8da93800c375f3cc1e4556245f69ed2cb5efce2a777e7d30a8d",
+      "size": 342,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010300-dd-plugin-version-readback/03-plugin-delete.json",
+      "hash": "c7c7f3bf4e8eb48c8e63301be0088adba82bced941e970542490b39ea41f171a",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010600-dd-plugin-update-projection/01-plugin-create.json",
+      "hash": "6f14e66521494fad9bc1a4f40adaaba9b6109097c279abc6ff0b3246e81e48c3",
+      "size": 1009,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-010600-dd-plugin-update-projection/03-plugin-delete.json",
+      "hash": "dd3dde929c5a08db44fdeeacce9c8039e7c0fa44c3496c08a1e872bdafd186c4",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-011000-dd-plugin-edit-commercial/01-plugin-create.json",
+      "hash": "79c17d05b59c71474d38816d8898fb5a6d5163efbdc72744537777b292f55f6c",
+      "size": 1003,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/01-plugin-create.json",
+      "hash": "e76f0d4829b80b9e4b2f6ddc0052ec8427244b46ac6b86cae55ef9ef44f2743c",
+      "size": 1023,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/02-plugin-update.json",
+      "hash": "ecd43c93e6e812fe5085e04ee9c4452cc6eab97b3d1b9d136abebde98c19b774",
+      "size": 347,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/03-plugin-delete.json",
+      "hash": "1eddb11af587c18cf65cb9b14b7e9beb8dedda7a48ed81bb6083b0ad84b60441",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013000-dd-plugin-detail-readback/verification.json",
+      "hash": "941c89c7a1492c5075d350156accc1a2652688b81770e26e5ad789b3218b10a3",
+      "size": 1276,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/01-plugin-create.json",
+      "hash": "d530bc87d6792770bd650795954ad539a5e9074b9056377ffb75802e57acb8e4",
+      "size": 997,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/02-plugin-update.json",
+      "hash": "3ed5ef90482c21201ee6425875fa503d92876a25177d007d992ecf30a3905478",
+      "size": 343,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/03-plugin-delete.json",
+      "hash": "53d9ac993538c61a60430e19b6ead421c96392ef729ed186b880447569a3b527",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013100-dd-plugin-detail-poll/verification.json",
+      "hash": "b15df0de12ab651c61bb200028e3174032821423ec0429283c79aa563e5bc980",
+      "size": 1972,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/01-plugin-create.json",
+      "hash": "1ff4a6e83478c4e28dfd9b9d2160b62eeea3c7aa1e5b9d79ca19f1ef3d49dd4e",
+      "size": 1013,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/02-plugin-update.json",
+      "hash": "9612a296425d376b77bae06fc7f26448436f68c96628f4b204b2f8fe1508cddd",
+      "size": 347,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/03-plugin-delete.json",
+      "hash": "e9f8b442f46c6c96072a70a9787a7dcbade71ba2ee9517863308db70acd40893",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013200-dd-plugin-author-readback/verification.json",
+      "hash": "7261d0990e6c514f068a1ff41a8f406d42ee3b6fc17c4727779ede67ed511a7d",
+      "size": 877,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/01-config-create.json",
+      "hash": "8ea867f5e72ce36451f4c2bed216ff536d5118dc6ed3e115fbd7c84c0ee76d01",
+      "size": 933,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/02-config-update.json",
+      "hash": "428272c1a1943587f3d20247865c1d59fc688ac13dffc500d1ba4c0db588b53a",
+      "size": 662,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/03-config-edit.json",
+      "hash": "ff63c202297cf021e5842d02c1e45718612ef639dde1ccbd6703180742f91bab",
+      "size": 305,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/04-config-delete.json",
+      "hash": "2a28527f049c9cb50efca8a34da3d115f9204c832f7649308dd2d2e63d604cf3",
+      "size": 121,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/05-wa-create.json",
+      "hash": "ae38fe2bee7715799f772e5a8e77cca7a1930f82a460d7f11c4fae216370fe8a",
+      "size": 801,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/06-wa-update.json",
+      "hash": "29f60bf73152c9e90aebdd9e2629578f358fbe298180777e4024ec8e1e85a206",
+      "size": 240,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/07-wa-edit.json",
+      "hash": "d84a36ff4c96f2c720d567edcffc2d065fe2a81576fee9f9ac90b3f04cfdc3ec",
+      "size": 187,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/08-wa-delete.json",
+      "hash": "6ef4248feb52e28ed789530b60bb50ae1782e631a25c8061c0f2b8dad6df8799",
+      "size": 117,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/verification.json",
+      "hash": "fafb3af911da2e7033c74caac9cea5c88fe6bc85a9113b62ce1891440ea6f5bd",
+      "size": 1221,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-create-retry-verification.json",
+      "hash": "8204ab7c9013df27c1807be21b2809bb9ff2feb2f5459bf8abad3c51d1f975f6",
+      "size": 624,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-013400-dd-config-wa-real-matrix/wa-fixed-verification.json",
+      "hash": "64b2424530ab8998517b4c7944a6e0249b84a9aa58a8cfedddc452edbc6c5517",
+      "size": 888,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-034000-newbee-web-alignment/plan.json",
+      "hash": "7241323681e20c59945c8dd5e350b351b9aa37b639e2b2f79bb4ebeb7ca9e7f5",
+      "size": 587,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-034000-newbee-web-alignment/verification.json",
+      "hash": "b39507cc6b8382a476a6a833d9d0eec3bf60bee140b2387478bbdb22f0829c62",
+      "size": 2418,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/01-plugin-create-output.json",
+      "hash": "a6d7de325367f6fae7ac307c48e69563a3d8a13837e9c7d1834317ec05f5b4b8",
+      "size": 1706,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/01-plugin-create.json",
+      "hash": "47927f89f6512d3ea795f33d4155dac9d7bd55a777c364cc584516743fc4062f",
+      "size": 1316,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/02-plugin-update-output.json",
+      "hash": "d7c70f123cca5245f9b62700612cbde4a99edd90eea9193bfb17793cd140ece8",
+      "size": 1706,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/02-plugin-update.json",
+      "hash": "7bb8af816669e940302696da347a6d058dbd08d332752819360b8f9e3f3ab0f8",
+      "size": 428,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/03-plugin-edit-output.json",
+      "hash": "7532e8a6214e61aa0bec2a522e4bcaa260815c16d839d421cdc1173421c32211",
+      "size": 1704,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/03-plugin-edit.json",
+      "hash": "f4f5772fdecdce7371351efec70dd160e394e817bb3e09894a604982b432bf0d",
+      "size": 147,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/04-config-create-output.json",
+      "hash": "579b341a29e858cdc5a951dd3167c0f0960af508a13b209c37488ee6bafaf7d4",
+      "size": 3099,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/04-config-create.json",
+      "hash": "61c49c619cc6b1df37008b67b12d850ab84d2fb6c6f55a269681d48c7eb266ff",
+      "size": 1364,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/05-config-update-output.json",
+      "hash": "b01a73fb823a0c29e80f2812639471d274732dd451bf7fca45a3104ef3b5fb5f",
+      "size": 3098,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/05-config-update.json",
+      "hash": "07b2839db2fe0f8c9d47624b4fe8dc56b67399053187571edea32b3f1b3fe3b1",
+      "size": 1169,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/06-config-edit-output.json",
+      "hash": "1fbbbcd6be4495e9588ab56cc01bf3857e137fde24f9f6ef679b86b0a0543a01",
+      "size": 3092,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/06-config-edit.json",
+      "hash": "d8a86686adfbbf6ad6cef64c42ea125c865db0212dd7ffe0cfbcbccbfe9837cc",
+      "size": 350,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/07-wa-create-output.json",
+      "hash": "f9adf6a4b61c2ef25feafe99ee8133ffb4b00229ea1d75fe5f11d5c8e6662dfb",
+      "size": 1504,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/07-wa-create.json",
+      "hash": "80d956fc14bfc1b313687eb13e72c9793f147c6c2850cea66c12745fb66d7677",
+      "size": 1011,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/08-wa-update-output.json",
+      "hash": "a748097e16934c9ba70b25f825155ba6099806025e10b89a129e156e914137d9",
+      "size": 1503,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/08-wa-update.json",
+      "hash": "8960dfed4084853cde0ffe4e8fc34eca145b9fec1818b0c9375770a88651dfe6",
+      "size": 263,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/09-wa-edit-output.json",
+      "hash": "b5788aa511e59e60ec9335dfeb1d1c9cd3e6743b3182bad4447376364831c68b",
+      "size": 1497,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/09-wa-edit.json",
+      "hash": "c42203b63de66364f4f8781984611d49c27a89f700e16336da22a802d44ea171",
+      "size": 197,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-config-delete-output.json",
+      "hash": "740b37631e0fa87d876ec3c3f42131f516df0e1f5816be047e6c029645a417ea",
+      "size": 3124,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-config-delete.json",
+      "hash": "f94ff8adc39051d5d8e81973d8460b68343021a38a5175e7c91f1d62e0c47c84",
+      "size": 133,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-plugin-delete-output.json",
+      "hash": "24193f9356897960e80fcfcf26ca0513d549df61c062a799f792a8abecf167fc",
+      "size": 1741,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-plugin-delete.json",
+      "hash": "2632852c747abd70ad3d6a2ad90272bdb31ae78d999464e8cdcc7c952ead1bb0",
+      "size": 133,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-wa-delete-output.json",
+      "hash": "5c936d1602ff283e81470d97f113b6287ec752dd8915a0622a7df6459f966e8c",
+      "size": 1534,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/cleanup-wa-delete.json",
+      "hash": "78e7bc2d956a9e876550765e7cb2d474e75acb606c76af000d2edce4b81eedfe",
+      "size": 129,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/read-matrix.json",
+      "hash": "51db8ef1d6311c93b21d0169ec065981f64f26c41e4f1a628b32fe763d3ef0f7",
+      "size": 4336,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-064532-dd-web-mutation-alignment/verification.json",
+      "hash": "726e26ad50e6c5074acc8d6a5944da796db31593834aa4f36294d075915e6b23",
+      "size": 4746,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/01-plugin-create-output.json",
+      "hash": "46954b9f986c104b268e5d86261d25a855f33f53e43f19f9171a2eb552fd18e0",
+      "size": 1706,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/01-plugin-create.json",
+      "hash": "b9d67da692270d3ccd61d84a9af1ef87adaa3e0cb9ddbe91dfed5a77cb55d499",
+      "size": 1316,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/02-plugin-update-output.json",
+      "hash": "b469a2b34043e3e4aeaee9514d1552d7b70f57f6abbae6f467547b791a5f22a5",
+      "size": 1706,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/02-plugin-update.json",
+      "hash": "6a2acb4f4ee468099dc19b3361d4a6a737e02672544fa1705ccdacbb95db9681",
+      "size": 428,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/03-plugin-edit-output.json",
+      "hash": "9e44a9e431853e99294a4ec90be944b3ac9c46263cb49e3d450d710ad72bcf50",
+      "size": 1704,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/03-plugin-edit.json",
+      "hash": "f7e7ef628737f2c90807a59b7967a726b8d758095b422a4878eca0816b46b77b",
+      "size": 147,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/04-config-create-output.json",
+      "hash": "97c5a8c481e07caae48ddc9c8dc0b3cba55b831d91ebbe9ff045a20f3db93d07",
+      "size": 3099,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/04-config-create.json",
+      "hash": "a663a2786b9aef0b39c5b1f7bae8a46064573cc48b54afe862567f4e4f4a4a72",
+      "size": 1364,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/05-config-update-output.json",
+      "hash": "014237ca4cf68aed57a86846da8702de237a3cd49877a11cd9364680b4a348be",
+      "size": 3098,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/05-config-update.json",
+      "hash": "7f29c36612181fbff91e4a5adf6965509efe408af429544f587380b68b65c54f",
+      "size": 1169,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/06-config-edit-output.json",
+      "hash": "f85eafa9d4c11a951b598eaf6accffcb6c6edfba206342034cc028c9b1a58e69",
+      "size": 3092,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/06-config-edit.json",
+      "hash": "c024628461f321ec3013c317c9ce0dde7ac9656c98e374c40416e94bc61b6fa7",
+      "size": 350,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/07-wa-create-output.json",
+      "hash": "c90aa31fb75b7d4abaf295f5c8f190516f40a201d3b88ad0b7ecdcafca35d13a",
+      "size": 1504,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/07-wa-create.json",
+      "hash": "d8728f7a7fe9d837f3b43a27b57e1b224f29e2b93a1f9b621dc45742ff3c9e32",
+      "size": 1011,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/08-wa-update-output.json",
+      "hash": "361ab5031bf92c64156ed989719e9f0805660af8a155e21c06a94f70033454ff",
+      "size": 1503,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/08-wa-update.json",
+      "hash": "3fd7139a22e959b4a1cb6b863b36eb64f50420e4620215f2a77f55f2e1d05c47",
+      "size": 263,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/09-wa-edit-output.json",
+      "hash": "4930c096b173714122305dc387d7b455f3ad10b515de4dd5f37754d8f6933067",
+      "size": 1497,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/09-wa-edit.json",
+      "hash": "3f8d4c70dd85a33629826ea6ca762e15de2a7903147f36b23c0f8b848f834bb4",
+      "size": 197,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-config-delete-output.json",
+      "hash": "f7005f74253b1eaae0acabdb4a7765c2eaa6fed07b8b9f213359f8931a648882",
+      "size": 3129,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-config-delete.json",
+      "hash": "dfcd14969a79eafa23dc3ff14eadad68c800ac7c7b85206ba33ec40032795041",
+      "size": 133,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-plugin-delete-output.json",
+      "hash": "4e9b8193934d5f22a6379f696ef6db2a113bfe2c4a3875e6c05b9b06533bb126",
+      "size": 1741,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-plugin-delete.json",
+      "hash": "2bbc1a6803bd655feab9de8c853a07bd63ef287459b01bb6ecb1b599f2673bd5",
+      "size": 133,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-wa-delete-output.json",
+      "hash": "5101090246f14ed06158da02d24c3a9de1cf25252c95a633bb25634952e12468",
+      "size": 1534,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/cleanup-wa-delete.json",
+      "hash": "17323439d22b03270f93b75428d3a5818cc6f2688f6fb972c1b6e277b27a45b8",
+      "size": 129,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/read-matrix.json",
+      "hash": "9b8e236b699da209165f30ef52b4e31a0f6bca1e4af5d64a04c6c1dab062aaf7",
+      "size": 4358,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/session-stop-output.json",
+      "hash": "a78f9c2f9a5f720b0649da3abce3f6ab72ce621dbb5989e4b127f565cb4f95d7",
+      "size": 205,
+      "type": "file"
+    },
+    {
+      "path": "publish/20260801-073918-dd-full-alignment-reaudit/verification.json",
+      "hash": "d6588fda943cafcccf1e3d8e323ac978cb15bf5240a65d5cfe7aa8cc6ef52093",
+      "size": 4746,
+      "type": "file"
+    }
+  ],
+  "omitted": [],
+  "omittedCount": 0
+}

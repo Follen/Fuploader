@@ -1,6 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 
+import { ensureCurseForgeEnv } from "./curseforge-config.mjs";
 import { readManagedInstall, recordManagedSkill } from "./managed-install.mjs";
 import { resolveSkillDirectory } from "./options.mjs";
 import { ensureSkill, loadDistribution } from "./skill-installer.mjs";
@@ -27,6 +28,7 @@ export async function updateSelf({
   home = os.homedir(),
   runNpm = runNpmCli,
 } = {}) {
+  const curseforgeConfig = ensureCurseForgeEnv({ home, platform });
   const installation = resolveGlobalInstall(packageRoot, platform);
   const current = loadDistribution(packageRoot);
   const primary = target || resolveSkillDirectory({ env, home });
@@ -94,6 +96,7 @@ export async function updateSelf({
     from_version: current.packageRecord.version,
     to_version: updated.packageRecord.version,
     npm_exit_status: npmResult.status,
+    curseforge_config: curseforgeConfig,
     skills,
   };
 }

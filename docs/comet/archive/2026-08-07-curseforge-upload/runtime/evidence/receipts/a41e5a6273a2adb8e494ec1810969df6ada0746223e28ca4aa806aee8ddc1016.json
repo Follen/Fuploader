@@ -1,0 +1,61 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "automated-check",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "curseforge-upload",
+    "sourceRevision": 3,
+    "contractHash": "b5e6c20a1a4bf963071ee0e714bc353dfe9b0c5a71feac162b92a60591ac0f0b",
+    "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+    "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+    "artifactHash": "4aa010c17a253344bce4ac6f69bf04dde070ef6e9c3e9b7146591387e46b42d6"
+  },
+  "acceptanceIds": [
+    "acceptance-0c324fb5467da1b2cecd169036f21ce81551581fa22b63545ef31bb42d249ebe",
+    "acceptance-0e4dd2478869675dc95b8eabc80ba879cd16d71bdd2d9c8c28614c343270b0f2",
+    "acceptance-187bf9d587ccde33f80f5593d4bb7aa5cc622818f9e8aa05d52047cebd96733b",
+    "acceptance-1fdf9418565bdf375198610111632afd643af100fec2d158ea50a1467d6843ea",
+    "acceptance-41571e42c8bef24ec2723bc4d635f6f7a20be40b2a6e54d31d9c7405018c2c12",
+    "acceptance-49a33098ebdb767feba16a9483421cd36b9094e18fc1aaee76624ba4f311c324",
+    "acceptance-7327b6b291177f30caa30f210fdd122160177cfd6d53b963f9782ae3814698a9",
+    "acceptance-c4fa81ef487953010c2a87819f94b1f26e3a94ab96922dd7f1e569e045a2de4a",
+    "acceptance-daa8797208e29ca730090b2f95dab0dca569f73da6a1cec45b04cfef818404ae"
+  ],
+  "actor": "native-runtime:command:python",
+  "issuedAt": "2026-08-07T14:28:02.193Z",
+  "evidence": {
+    "executable": "python",
+    "args": [
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "fupload/scripts/tests",
+      "-p",
+      "test_*.py"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "timeoutMs": 180000,
+    "startedAt": "2026-08-07T14:27:50.956Z",
+    "endedAt": "2026-08-07T14:28:02.193Z",
+    "worktree": {
+      "provider": "git",
+      "root": ".",
+      "beforeCommit": "571975a63598d93fa8639ccb3a176145c3a4b373",
+      "afterCommit": "571975a63598d93fa8639ccb3a176145c3a4b373"
+    },
+    "afterFence": {
+      "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+      "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+      "matched": true
+    },
+    "outputHash": "50a6663e1817106df2a1f5b819c6f8a309fdfbe541cef91c8fd4458ff1240190",
+    "outputSummary": ".....................................................................................................................................................................................................................................\r\n----------------------------------------------------------------------\r\nRan 229 tests in 11.104s\r\n\r\nOK",
+    "outputTruncated": false
+  },
+  "receiptHash": "a41e5a6273a2adb8e494ec1810969df6ada0746223e28ca4aa806aee8ddc1016"
+}

@@ -59,6 +59,7 @@ async function exercise({ name, ignoreScripts }) {
   const prefix = path.join(temporary, `${name}-prefix`);
   const agentHome = path.join(temporary, `${name}-agent`);
   const stateRoot = path.join(temporary, `${name}-state`);
+  const home = path.join(temporary, `${name}-home`);
   const customSkill = path.join(temporary, `${name}-custom-skill`);
   const project = path.join(temporary, `${name}-project`);
   const releaseRecord = path.join(project, "publish", "record", "01-plan.json");
@@ -68,6 +69,8 @@ async function exercise({ name, ignoreScripts }) {
   const env = {
     ...process.env,
     FUPLOAD_AGENT_HOME: agentHome,
+    HOME: home,
+    USERPROFILE: home,
     LOCALAPPDATA: stateRoot,
     XDG_STATE_HOME: stateRoot,
   };
@@ -89,6 +92,12 @@ async function exercise({ name, ignoreScripts }) {
   if (!ignoreScripts && !fs.existsSync(path.join(defaultSkill, ".fupload-npm-install.json"))) {
     throw new Error("postinstall did not install the default Skill.");
   }
+  const curseforgeConfig = path.join(home, ".fupload", "curseforge.env");
+  if (!fs.existsSync(curseforgeConfig)) {
+    throw new Error("The install/launcher flow did not create curseforge.env in the isolated home.");
+  }
+  const preservedConfig = "CURSEFORGE_AUTHOR_ID=42\nCURSEFORGE_API_KEY=keep\nCURSEFORGE_UPLOAD_TOKEN=keep\n";
+  fs.writeFileSync(curseforgeConfig, preservedConfig, "utf8");
   const help = runInstalled(prefix, ["--skill-dir", customSkill, "--help"], { env, cwd: project });
   if (
     !help.stdout.includes("usage:") ||
@@ -117,6 +126,9 @@ async function exercise({ name, ignoreScripts }) {
   }
   if (hash(releaseRecord) !== beforeHash) {
     throw new Error("Self uninstall changed the project publish record.");
+  }
+  if (fs.readFileSync(curseforgeConfig, "utf8") !== preservedConfig) {
+    throw new Error("Self uninstall did not preserve the CurseForge configuration.");
   }
 }
 

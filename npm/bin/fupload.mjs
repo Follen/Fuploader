@@ -3,6 +3,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { ensureCurseForgeEnv } from "../lib/curseforge-config.mjs";
 import { recordManagedSkill } from "../lib/managed-install.mjs";
 import { parseLauncherOptions, resolveSkillDirectory } from "../lib/options.mjs";
 import { discoverPython, runPython } from "../lib/python.mjs";
@@ -52,6 +53,7 @@ async function main() {
 
   let ensured;
   try {
+    ensureCurseForgeEnv();
     ensured = await ensureSkill({ packageRoot, target });
     recordManagedSkill(target);
   } catch (error) {

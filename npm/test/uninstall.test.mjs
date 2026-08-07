@@ -6,6 +6,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { managedInstallFile, readManagedInstall, recordManagedSkill } from "../lib/managed-install.mjs";
+import { CURSEFORGE_ENV_TEMPLATE, curseForgeEnvPath, ensureCurseForgeEnv } from "../lib/curseforge-config.mjs";
 import { ensureSkill } from "../lib/skill-installer.mjs";
 import { cleanupManagedSkills, resolveGlobalInstall, resolveNpmCli, uninstallSelf } from "../lib/uninstall.mjs";
 import { updateSelf } from "../lib/update.mjs";
@@ -109,6 +110,8 @@ test("self uninstall cleans the Skill before asking npm to remove the package", 
   const target = path.join(root, "skill");
   await ensureSkill({ packageRoot, target });
   recordManagedSkill(target, options);
+  const curseforgeConfig = ensureCurseForgeEnv(options).path;
+  fs.writeFileSync(curseforgeConfig, "CURSEFORGE_UPLOAD_TOKEN=keep\n", "utf8");
   let npmArgs;
   const result = await uninstallSelf({
     packageRoot: fakePackage,
@@ -123,6 +126,7 @@ test("self uninstall cleans the Skill before asking npm to remove the package", 
     },
   });
   assert.equal(result.success, true);
+  assert.equal(fs.readFileSync(curseForgeEnvPath(options), "utf8"), "CURSEFORGE_UPLOAD_TOKEN=keep\n");
   assert.deepEqual(npmArgs, ["uninstall", "-g", "--ignore-scripts", "--prefix", path.resolve(prefix), "@follenfang/fupload"]);
 });
 
@@ -160,4 +164,6 @@ test("self update installs latest and synchronizes managed Skills", async (t) =>
   assert.equal(result.to_version, "0.0.1");
   assert.deepEqual(npmArgs, ["install", "-g", "--ignore-scripts", "--prefix", path.resolve(prefix), "@follenfang/fupload@latest"]);
   assert.ok(fs.existsSync(path.join(target, ".fupload-npm-install.json")));
+  assert.equal(result.curseforge_config.path, curseForgeEnvPath(options));
+  assert.equal(fs.readFileSync(result.curseforge_config.path, "utf8"), CURSEFORGE_ENV_TEMPLATE);
 });

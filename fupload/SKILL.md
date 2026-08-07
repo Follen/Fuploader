@@ -1,13 +1,13 @@
 ---
 name: fupload
-description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox and NetEase DD. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, plugins, configurations, or WA.
+description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, and CurseForge, including CurseForge author project lookup and plugin ZIP upload. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, plugins, configurations, or WA.
 metadata:
   version: "0.0.1"
 ---
 
 # Fupload
 
-Act as the publishing operator. For NewBeeBox, prefer the official `ncc` CLI whenever it is installed unless the user explicitly requests the third-party Python management tool. For DD, and for an explicitly selected third-party NewBeeBox workflow, use the bundled Python CLI. Keep investigation, choices, planning, confirmation, and recovery in the conversation.
+Act as the publishing operator. For NewBeeBox, prefer the official `ncc` CLI whenever it is installed unless the user explicitly requests the third-party Python management tool. For DD, CurseForge, and an explicitly selected third-party NewBeeBox workflow, use the bundled Python CLI. Keep investigation, choices, planning, confirmation, and recovery in the conversation.
 
 When installed from npm, interpret `<fupload-cli>` as `fupload`. Only while maintaining the source repository, directly installing this Skill, or when `fupload` is absent from PATH, use `python <skill-root>/scripts/fupload.py`. Keep the user's current project as the working directory in either mode.
 
@@ -15,8 +15,8 @@ When installed from npm, interpret `<fupload-cli>` as `fupload`. Only while main
 
 When the user has not already stated both dimensions, ask in one short message:
 
-1. Platform: NewBeeBox or DD.
-2. Resource and action: plugin/configuration/WA, then create/content update/metadata edit/delete.
+1. Platform: NewBeeBox, DD, or CurseForge.
+2. Resource and action: plugin/configuration/WA, then create/content update/metadata edit/delete. CurseForge supports public project listing and uploading a plugin ZIP to an existing project only.
 
 Map natural language consistently:
 
@@ -27,9 +27,13 @@ Map natural language consistently:
 
 Never offer bulk delete, version-file delete, drafts, guides, messages, or GUI control automation. The DD task-session command may close verified official GUI processes only after the consent flow below.
 
+CurseForge cannot create a project or enumerate private, draft, or pending-review projects. Direct project creation to the Authors website; use the Core API list only as the public-project view for one numeric author ID.
+
 ## Select the execution channel
 
 For DD, use the bundled Python CLI.
+
+For CurseForge, use the bundled Python CLI. Do not substitute direct HTTP calls or the CurseForge for Studios API for uploads: public project lookup uses the Core API, while game-version lookup and upload use the separate Upload API and credential.
 
 For NewBeeBox, apply this order exactly:
 
@@ -44,9 +48,11 @@ Never switch channels silently. Before changing channels, re-read remote state a
 
 ## Protect credentials
 
-Prefer an existing official `ncc login`, then a caller-provided `NCC_TOKEN`, then user-performed local login. Never ask the user to paste a token into the conversation. Never place a real token in `--token`, shell history, command output, JSON, `.env`, `publish/`, `analyze/`, tests, Skill files, references, or Git. Do not inspect or copy the official CLI credential store.
+For NewBeeBox, prefer an existing official `ncc login`, then a caller-provided `NCC_TOKEN`, then user-performed local login. Never ask the user to paste a token into the conversation. Never place a real NewBeeBox token in `--token`, shell history, command output, JSON, `.env`, `publish/`, `analyze/`, tests, Skill files, references, or Git. Do not inspect or copy the official CLI credential store.
 
-If a token is pasted into the conversation, do not repeat or use it. Tell the user to revoke it from the official CLI token page and create a replacement through local login or pre-launch environment injection. Check only whether `NCC_TOKEN` is present, never its length, prefix, hash, or value.
+For CurseForge, use `~/.fupload/curseforge.env`, created idempotently by npm install/update, with `CURSEFORGE_AUTHOR_ID`, `CURSEFORGE_API_KEY`, and `CURSEFORGE_UPLOAD_TOKEN`. The author ID is non-secret: if absent, proactively ask for its numeric value or offer `--author-id`. The API key and upload token are secrets: never ask the user to paste either into the conversation; direct them to fill the local env file in their own editor or terminal, then run `curseforge session doctor`. Never print file contents or secret values. Process environment values may override the file without being shown.
+
+If a token is pasted into the conversation, do not repeat or use it. Tell the user to revoke or regenerate it at its provider and configure the replacement locally. Check only whether the expected field is present, never its length, prefix, hash, or value.
 
 ## Locate the Fuploader CLI
 
@@ -62,6 +68,7 @@ For npm package maintenance, use `fupload update` to update the CLI and every re
 - For official NewBeeBox, read [references/newbee-official-cli.md](references/newbee-official-cli.md), then run the installed `ncc docs` and exact leaf `--help`. The bundled reference is a complete official snapshot, but runtime docs win when versions differ.
 - Read [references/newbee.md](references/newbee.md) only when the user explicitly selected the third-party Python NewBeeBox channel.
 - Read [references/dd.md](references/dd.md) only for DD.
+- Read [references/curseforge.md](references/curseforge.md) for every CurseForge lookup or upload.
 - For Python, run the exact leaf command with `--help` before creating its input. Treat help as the executable schema contract.
 
 ## Investigate
@@ -69,6 +76,8 @@ For npm package maintenance, use `fupload update` to update the CLI and every re
 Inspect the user-provided project or current workspace for `.toc`, README, changelog, Git changes, archives, screenshots, logos, and WA material files. Do not modify or package the user's project until that is part of the agreed plan.
 
 Use read-only commands from the selected channel to discover the current account's records, target detail, versions, backups, categories, game branches/builds, installation paths, life types, VIP levels, channels, and association candidates. Never ask the user to copy an ID that the selected CLI can query.
+
+For CurseForge, run `curseforge session doctor`, then `curseforge project list` using `CURSEFORGE_AUTHOR_ID` or the user-provided non-secret `--author-id`. Select a public project by name plus `project_id`. Before a version-tagged upload, run `curseforge plugin game-versions` and select returned IDs or names; do not guess IDs from display names. A parent-file upload instead uses `parent_file_id` and omits both game-version fields. Inspect the ZIP and local release notes. An empty public list does not prove the account has no private, draft, or pending-review projects.
 
 For official NewBeeBox, use the documented `ncc wow addons list|info|categories|versions`, `wa list|info|categories`, `uipack list|info`, `cloudbackup list|info`, and related commands needed by the action. Use the exact options returned by the installed help. `addons push` compatibility uses explicit build strings or documented `auto`; never substitute a parent branch ID. An empty required option list blocks the write.
 
@@ -96,13 +105,13 @@ For a configuration, require a cloud backup already uploaded by the matching des
 
 Expose every business field writable through the selected channel. Do not silently accept a webpage preselection or invent a business default. This includes applicable game type/build, categories, origin, format, visibility, review submission, payment, lifetime, price, room/channel, synchronization, membership, associations, backup content, WTF roles, incremental selections, retail UI data, WA material mode, and install path. When official `ncc` does not expose a webpage field or action, state that capability boundary; do not guess a hidden flag or silently switch to Python.
 
-Use existing remote values only for omitted fields in `edit` or `update`, where omission means preserve. Show candidates by human name plus ID/SN and relevant status. Ask only choices that cannot be determined from the user's explicit request, local artifacts, or remote reads. For DD, do not draft the executable JSON incrementally: close the full dependency graph first, then generate one final JSON containing parent fields and stable child IDs/selectors. Python repeats the live GETs before upload or mutation and rejects missing or cross-parent selections; detail is authoritative when DD list and detail timestamps differ. When an existing plugin or WA has `assign_user_sn`, only public scope is selectable and the final rebuilt form must remain public.
+Use existing remote values only for omitted fields in `edit` or `update`, where omission means preserve. Show candidates by human name plus ID/SN and relevant status. Ask only choices that cannot be determined from the user's explicit request, local artifacts, or remote reads. For CurseForge upload, collect project ID, ZIP path, changelog, release type, version IDs/names or parent file choice, and each requested optional metadata field; do not infer visibility or approval from upload acceptance. For DD, do not draft the executable JSON incrementally: close the full dependency graph first, then generate one final JSON containing parent fields and stable child IDs/selectors. Python repeats the live GETs before upload or mutation and rejects missing or cross-parent selections; detail is authoritative when DD list and detail timestamps differ. When an existing plugin or WA has `assign_user_sn`, only public scope is selectable and the final rebuilt form must remain public.
 
 ## Prepare and confirm
 
 Create a durable release directory under the target project's root, never under or beside the installed Skill. Use `publish/<YYYYMMDD-HHmmss>-<platform>-<resource>-<action>/`; if that name already exists, append `-2`, `-3`, and so on instead of reusing it. Put every atomic step in a versioned JSON file ordered as `01-<action>.json`, `02-<action>.json`, and so on. A retry or readback for the same plan reuses its directory; a new independent publishing plan gets a new directory. Use JSON, not YAML. Keep the directory after execution as the target project's publishing record, and do not change its ignore rules unless the user asks.
 
-For Python, these are executable `--input` documents using the leaf schema. For official `ncc`, these are redacted plan records containing the channel, working directory, argument vector, non-secret business inputs, local file references, and expected readback; `ncc` does not consume them. Never store a token, raw WA string, raw configuration content, or signed URL in a plan record. Use `@file` or local path references for content. Run `--dry-run` where the selected leaf documents it, especially `ncc wow addons push --dry-run`; do not invent dry-run support for other official commands.
+For Python, these are executable `--input` documents using the leaf schema. For official `ncc`, these are redacted plan records containing the channel, working directory, argument vector, non-secret business inputs, local file references, and expected readback; `ncc` does not consume them. Never store a token, API key, raw WA string, raw configuration content, or signed URL in a plan record. Use `@file` or local path references for content. Run `--dry-run` where the selected leaf documents it, especially `ncc wow addons push --dry-run` and every CurseForge upload; do not invent dry-run support for other official commands.
 
 Before the first write, present one complete human-readable plan containing:
 
@@ -116,11 +125,15 @@ Before the first write, present one complete human-readable plan containing:
 
 Obtain one explicit confirmation for that exact plan. If the plan changes materially, confirm the changed plan once.
 
+For CurseForge, confirmation must name the public project and numeric ID, ZIP path, selected game-version IDs/names or parent file ID, changelog, release type, optional metadata and relations, and whether manual release is requested. After confirmation, execute exactly one upload attempt. A dry-run performs local validation only and is not remote permission or ID validation.
+
 For a Python delete, first run the resource `get` command, show the exact name and ID/SN, and obtain confirmation for that single record. NewBeeBox delete input contains only the schema, `id`, and `confirm: "DELETE"`; DD delete input contains only the schema, `sn`, and `confirm_delete: true`. Do not reuse confirmation for another record and do not retry an uncertain delete. Official `ncc` currently documents plugin, WA, and configuration main-record deletion as web-only; state that boundary and wait for an explicit third-party selection before offering the Python delete command.
 
 ## Execute and verify
 
 Run writes serially. For official `ncc`, always request `-o json`, parse stdout as JSON, and treat stderr only as progress diagnostics. For Python, parse its stable JSON output. Never scrape human text. After each successful step, immediately run the corresponding info/get/list/versions/history command and compare the intended fields in the same DD session when applicable. DD performs a bounded GET-only readback poll and never resends a mutation during verification. For DD plugin update, use a nonempty `/addon/addon_versions` result only as a pre-upload duplicate guard; the matching author-list item's `latest_version` is the primary success confirmation and `detail_v2` is supplementary. Plugin edit also uses the same-SN author projection when detail remains stale. An empty history is diagnostic-only. Treat “submitted for review” and “under review” as distinct from “approved” or “publicly visible.”
+
+For CurseForge, treat the Upload API's returned file ID as upload acceptance only. Record the ID and command result, then report that moderation, processing, manual release, and public visibility are separate states. On an interrupted or ambiguous upload, do not resend automatically because that can create a duplicate file; inspect the Authors project page or public file list before deciding on a new attempt. Follow the HTTP/error handling table in the CurseForge reference.
 
 In the third-party Python NewBeeBox channel, public plugin publication is three atomic writes: create privately, upload and verify the first version, then edit to public with explicit review intent. Never send a public `share_state` during Python create. In the official channel, follow the installed `ncc docs` sequence for create, init, push, and visibility instead of applying Python wire rules.
 

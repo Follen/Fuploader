@@ -4,6 +4,7 @@ import copy
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 from typing import Any, Dict, Tuple
 
@@ -27,6 +28,7 @@ WRONG_TYPES = {
 POSITIVE_IDS = {
     "id", "mod_id", "file_id", "content_id", "source_id", "module_id",
     "game_version_id", "cloud_id", "game_type", "primary_category_id",
+    "project_id", "parent_file_id",
 }
 
 NESTED_OBJECT_FIELDS = {
@@ -47,6 +49,7 @@ SCALAR_ARRAY_FIELDS = {
     "unknown_addon_update_ids", "wtf_role_ids", "material_names",
     "material_update_names", "font_names", "font_update_names", "known_wa_ids",
     "known_wa_update_ids", "unknown_wa_ids", "unknown_wa_update_ids",
+    "game_version_names",
 }
 
 
@@ -57,8 +60,12 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
         root = Path(cls.temp.name)
         (root / "dd").mkdir()
         (root / "newbee").mkdir()
+        (root / "curseforge").mkdir()
         cls.dd = WireFixtures(root / "dd")
         cls.newbee = NewBeeFixtures(root / "newbee")
+        cls.curseforge_archive = root / "curseforge" / "addon.zip"
+        with zipfile.ZipFile(cls.curseforge_archive, "w") as archive:
+            archive.writestr("Addon/Addon.toc", "## Interface: 110000\n")
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -68,6 +75,15 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
         platform, resource, action = key
         if platform == "dd":
             return self.dd.document(resource, action)
+        if platform == "curseforge":
+            return {
+                "schema": "fupload.v1.curseforge.plugin.upload",
+                "project_id": 1,
+                "file": str(self.curseforge_archive),
+                "changelog": "notes",
+                "game_versions": [1],
+                "release_type": "release",
+            }
         return self.newbee.document(resource, action)
 
     @staticmethod
@@ -135,6 +151,8 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
             return not spec.choices or False in spec.choices
         if spec.type == "array":
             return not spec.nonempty
+        if schema_name == "fupload.v1.curseforge.plugin.upload" and field == "relations":
+            return False
         return True
 
     def test_every_schema_rejects_an_unknown_top_level_field(self) -> None:
@@ -147,7 +165,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                     schema.validate(doc)
                 self.assertEqual(raised.exception.details.get("path"), "$.unexpected_remote_display")
             count += 1
-        self.assertEqual(count, 34)
+        self.assertEqual(count, 35)
 
     def test_every_field_rejects_the_wrong_json_type_at_its_own_path(self) -> None:
         count = 0
@@ -160,7 +178,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                         schema.validate(doc)
                     self.assertTrue(self._path_matches(raised.exception, field), raised.exception.details)
                 count += 1
-        self.assertEqual(count, 357)
+        self.assertEqual(count, 368)
 
     def test_every_field_has_an_explicit_null_contract(self) -> None:
         count = 0
@@ -176,7 +194,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                             schema.validate(doc)
                         self.assertTrue(self._path_matches(raised.exception, field), raised.exception.details)
                 count += 1
-        self.assertEqual(count, 357)
+        self.assertEqual(count, 368)
 
     def test_every_field_has_an_explicit_omission_contract(self) -> None:
         count = 0
@@ -194,7 +212,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                     else:
                         schema.validate(doc)
                 count += 1
-        self.assertEqual(count, 357)
+        self.assertEqual(count, 368)
 
     def test_every_field_has_an_explicit_falsy_contract(self) -> None:
         count = 0
@@ -213,7 +231,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                             schema.validate(doc)
                         self.assertTrue(self._path_matches(raised.exception, field), raised.exception.details)
                 count += 1
-        self.assertEqual(count, 357)
+        self.assertEqual(count, 368)
 
     def test_every_nested_object_or_scalar_array_rejects_display_enrichment(self) -> None:
         count = 0

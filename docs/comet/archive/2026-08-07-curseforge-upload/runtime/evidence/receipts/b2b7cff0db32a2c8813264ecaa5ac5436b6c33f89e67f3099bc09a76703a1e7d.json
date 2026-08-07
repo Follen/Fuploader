@@ -1,0 +1,50 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "automated-check",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "curseforge-upload",
+    "sourceRevision": 3,
+    "contractHash": "b5e6c20a1a4bf963071ee0e714bc353dfe9b0c5a71feac162b92a60591ac0f0b",
+    "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+    "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+    "artifactHash": "4aa010c17a253344bce4ac6f69bf04dde070ef6e9c3e9b7146591387e46b42d6"
+  },
+  "acceptanceIds": [
+    "acceptance-3511cd9a6370e866531fd4b6cc3af74dbeabf4999b38f9dd27d79c206519dde9",
+    "acceptance-c81248ddd14c3e9abdb9053a0de56de1f812b67bffeadc730efe47c719458b90",
+    "acceptance-fbafc2eb41216fec36939bdf3ed0af83acfe128b99e282e9cf6aa2d58443cce2"
+  ],
+  "actor": "native-runtime:command:npm.cmd",
+  "issuedAt": "2026-08-07T14:28:51.606Z",
+  "evidence": {
+    "executable": "npm.cmd",
+    "args": [
+      "run",
+      "test:pack"
+    ],
+    "cwd": ".",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "timeoutMs": 180000,
+    "startedAt": "2026-08-07T14:28:50.756Z",
+    "endedAt": "2026-08-07T14:28:51.606Z",
+    "worktree": {
+      "provider": "git",
+      "root": ".",
+      "beforeCommit": "571975a63598d93fa8639ccb3a176145c3a4b373",
+      "afterCommit": "571975a63598d93fa8639ccb3a176145c3a4b373"
+    },
+    "afterFence": {
+      "snapshotHash": "575d0c713e1ca036d2985793253c5bdd11cabf9098f57a819d87146314f189bc",
+      "scopeHash": "884b39143ebf318cc36e89c0d94d7cb59eabbf25d6f1adf87da2a1b681360474",
+      "matched": true
+    },
+    "outputHash": "1e1a2d2a65b072339b44516780d96761687ac2c0e5fec55c22be5eb068ff9bc3",
+    "outputSummary": "> @follenfang/fupload@0.0.1 test:pack\n> node npm/scripts/verify-package.mjs\n\nPackage inventory verified: 47 files, 123351 bytes packed.",
+    "outputTruncated": false
+  },
+  "receiptHash": "b2b7cff0db32a2c8813264ecaa5ac5436b6c33f89e67f3099bc09a76703a1e7d"
+}

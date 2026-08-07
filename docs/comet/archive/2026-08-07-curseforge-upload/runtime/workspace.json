@@ -1,0 +1,14 @@
+{
+  "schema": "comet.native.workspace.v3",
+  "capturedAt": "2026-08-07T13:51:42.863Z",
+  "capturedRevision": 1,
+  "nativeRootRef": "docs/comet",
+  "projectRootId": "10ffa827dda640fe629cc594c1bccec52ba835a419c38e3612437cd3977759f1",
+  "nativeRootId": "4f1109189560fbacedce74ebec11cf4e75fbaa7a76a135a906f7b0c9c89f3f7b",
+  "projectRootPathId": "fd06f94cd6304a43910d58062182fe9ee8e28f8d4b4ca4d510f3e25631f73b16",
+  "nativeRootPathId": "eb7a348a0ad2eccbb5e701604c56c99f283274f74e3c005d43ba5ce737cd7a85",
+  "isolation": "worktree",
+  "changeBranch": "comet/curseforge-upload",
+  "targetBranch": "main",
+  "finish": "merge"
+}
