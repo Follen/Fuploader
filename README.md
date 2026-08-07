@@ -212,7 +212,7 @@ python fupload\scripts\tests\generate_dd_wire_matrix_report.py > analyze\dd-fiel
 - `fupload/scripts/fupload_cli/__init__.py` 的 `__version__`
 - `npm/skill-manifest.json` 的包版本与 Skill 版本
 
-当前初版为 `0.0.1`，对应 tag `v0.0.1`。`.github/workflows/publish-npm.yml` 在 pull request、`main` push 和 `v*` tag 上运行 Windows/Linux CI；只有 tag CI 全部通过时才通过 npm Trusted Publishing/OIDC 发布，不使用长期 `NPM_TOKEN`。
+当前版本为 `0.0.2`，对应 tag `v0.0.2`。`.github/workflows/publish-npm.yml` 在 pull request、`main` push 和 `v*` tag 上运行 Windows/Linux CI；只有 tag CI 全部通过时才通过 npm Trusted Publishing/OIDC 发布，不使用长期 `NPM_TOKEN`。
 
 发布前在 npm 包设置中绑定 Trusted Publisher：
 
@@ -225,12 +225,12 @@ python fupload\scripts\tests\generate_dd_wire_matrix_report.py > analyze\dd-fiel
 
 ```powershell
 npm run check:versions
-npm run check:release -- v0.0.1
-git tag -a v0.0.1 -m "Fuploader 0.0.1"
-git push origin v0.0.1
+npm run check:release -- v0.0.2
+git tag -a v0.0.2 -m "Fuploader 0.0.2"
+git push origin v0.0.2
 ```
 
-npm 对首次创建的包可能要求先由账号所有者完成一次 bootstrap 发布；该步骤只用于建立包身份，正式 `latest` 仍由 `v0.0.1` workflow 发布。需要人工处理时，不要把 npm token 写入仓库或 GitHub Secret。
+npm 对首次创建的包可能要求先由账号所有者完成一次 bootstrap 发布；该步骤只用于建立包身份，正式 `latest` 由版本 tag workflow 发布。需要人工处理时，不要把 npm token 写入仓库或 GitHub Secret。
 
 ## 说明
 

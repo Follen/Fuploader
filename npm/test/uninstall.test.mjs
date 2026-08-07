@@ -160,8 +160,8 @@ test("self update installs latest and synchronizes managed Skills", async (t) =>
     },
   });
   assert.equal(result.success, true);
-  assert.equal(result.from_version, "0.0.1");
-  assert.equal(result.to_version, "0.0.1");
+  assert.equal(result.from_version, "0.0.2");
+  assert.equal(result.to_version, "0.0.2");
   assert.deepEqual(npmArgs, ["install", "-g", "--ignore-scripts", "--prefix", path.resolve(prefix), "@follenfang/fupload@latest"]);
   assert.ok(fs.existsSync(path.join(target, ".fupload-npm-install.json")));
   assert.equal(result.curseforge_config.path, curseForgeEnvPath(options));
