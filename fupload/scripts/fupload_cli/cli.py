@@ -11,6 +11,7 @@ from typing import Any, Callable, Dict, Optional, Sequence, Tuple
 from . import __version__
 from .dd import DD
 from .curseforge import CurseForge
+from .blackbox import Blackbox
 from .errors import FuploadError, ValidationError
 from .io import read_json, write_error, write_output
 from .newbee import NewBee
@@ -58,9 +59,10 @@ def _list_flags(parser: argparse.ArgumentParser, *, offset: bool = False, game_t
         parser.add_argument("--game-type", type=_positive, required=True, help="DD game type selected from `dd options game-types`.")
 
 
-def _write_leaf(parent: argparse._SubParsersAction, platform: str, resource: str, action: str, summary: str) -> None:
+def _write_leaf(parent: argparse._SubParsersAction, platform: str, resource: str, action: str, summary: str, *, command: Optional[str] = None) -> None:
+    command = command or action
     leaf = parent.add_parser(
-        action, help=summary, description=summary + "\n\n" + WRITE_HELP,
+        command, help=summary, description=summary + "\n\n" + WRITE_HELP,
         epilog=schema_help(platform, resource, action),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -200,6 +202,25 @@ def _curseforge_tree(platforms: argparse._SubParsersAction) -> None:
     _write_leaf(plugin, "curseforge", "plugin", "upload", "Upload one plugin archive to an existing CurseForge project.")
 
 
+def _blackbox_tree(platforms: argparse._SubParsersAction) -> None:
+    root = platforms.add_parser(
+        "blackbox",
+        help="Heybox Workshop plugin management",
+        description="Reuse the signed-in Heybox desktop client login state; no credential input is accepted.",
+    )
+    groups = root.add_subparsers(dest="resource_command", required=True)
+    plugin = groups.add_parser("plugin", help="Heybox Workshop plugin metadata and versions").add_subparsers(dest="action_command", required=True)
+    _read_leaf(plugin, "list", "List plugins managed by the current Heybox Workshop account.", platform="blackbox", resource="plugin", action="list")
+    leaf = _read_leaf(plugin, "get", "Read one Heybox Workshop plugin and its versions.", platform="blackbox", resource="plugin", action="get")
+    leaf.add_argument("--module-id", type=_positive, required=True)
+    leaf = _read_leaf(plugin, "versions", "List versions for one Heybox Workshop plugin.", platform="blackbox", resource="plugin", action="versions")
+    leaf.add_argument("--module-id", type=_positive, required=True)
+    _write_leaf(plugin, "blackbox", "plugin", "edit", "Edit Heybox Workshop plugin metadata and verify the module readback.")
+    _write_leaf(plugin, "blackbox", "plugin", "update", "Upload a ZIP and create a new Heybox Workshop plugin version.")
+    _write_leaf(plugin, "blackbox", "version", "edit", "Edit an existing Heybox Workshop plugin version and verify its readback.", command="version-edit")
+    _write_leaf(plugin, "blackbox", "version", "delete", "Soft-delete one Heybox Workshop plugin version and verify its deleted state.", command="version-delete")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = _parser(
         prog="fupload",
@@ -211,6 +232,7 @@ def build_parser() -> argparse.ArgumentParser:
     _newbee_tree(platforms)
     _dd_tree(platforms)
     _curseforge_tree(platforms)
+    _blackbox_tree(platforms)
     return parser
 
 
@@ -258,14 +280,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if args.dry_run:
                 write_output(platform, operation, _dry_run_data(doc, schema.name), dry_run=True)
                 return 0
-            provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else CurseForge())
+            provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else CurseForge()))
             if platform == "dd":
                 data = provider.execute_write(resource, action, doc, getattr(args, "session", None))
             else:
                 data = provider.execute_write(resource, action, doc)
             write_output(platform, operation, data)
             return 0
-        provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else CurseForge())
+        provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else CurseForge()))
         if platform == "dd":
             data = provider.execute_read(resource, action, args, getattr(args, "session", None))
         else:

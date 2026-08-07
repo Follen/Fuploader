@@ -1,0 +1,28 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "manual-evidence",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "plugin-update-integration",
+    "sourceRevision": 3,
+    "contractHash": "c1ae41df94d07ada2aafb7c1acf1223e519d685c8d2dcefedc99548c480d9616",
+    "scopeHash": "ac1416cb9f60cb82b7fb945a3ab7203b5fbb64b7a752ee08ba3ffea5815cc38d",
+    "snapshotHash": "5f6ba529a842d5e3569a205702cc34c8ec71b3c6ed41075b383fe091efc2b1e5",
+    "artifactHash": "33577d192d21b03e8aa807ce109cf9f47c0f176436b5a8befd5571e958cc5be6"
+  },
+  "acceptanceIds": [
+    "acceptance-09497c176f0b20e54760c5e8a0f32b7a26fdc244f26275f53b81fd2f32333a7d"
+  ],
+  "actor": "native-runtime:manual-evidence",
+  "issuedAt": "2026-08-07T18:19:58.416Z",
+  "evidence": {
+    "steps": [
+      "通过集成 CLI 删除真实 smoke 版本 201550106 并等待异步读回"
+    ],
+    "observations": [
+      "命令退出 0；accepted=true、verified=true、audit_state=4、retry=false；最终 plugin get 中该版本 auditState=4，模块本身未删除。"
+    ]
+  },
+  "receiptHash": "6fb92e3dca131d3a7b8f009fe317fa3d6da2a124f54475e37d2848efe72879da"
+}

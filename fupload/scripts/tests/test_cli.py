@@ -36,6 +36,7 @@ class CLITests(unittest.TestCase):
         self.assertIn("newbee", text)
         self.assertIn("dd", text)
         self.assertIn("curseforge", text)
+        self.assertIn("blackbox", text)
 
     def test_dd_life_types_does_not_require_unused_game_type(self) -> None:
         args = build_parser().parse_args(["dd", "options", "life-types"])
@@ -43,7 +44,7 @@ class CLITests(unittest.TestCase):
 
     def test_every_cli_leaf_has_complete_help_and_dispatch(self) -> None:
         leaves = parser_leaves(build_parser())
-        self.assertEqual(len(leaves), 92)
+        self.assertEqual(len(leaves), 99)
         for path, parser in leaves:
             with self.subTest(path=" ".join(path)):
                 handler = parser.get_default("handler")
@@ -51,7 +52,7 @@ class CLITests(unittest.TestCase):
                 resource = parser.get_default("resource")
                 action = parser.get_default("action")
                 self.assertIn(handler, ("read", "write"))
-                self.assertIn(platform, ("newbee", "dd", "curseforge"))
+                self.assertIn(platform, ("newbee", "dd", "curseforge", "blackbox"))
                 self.assertTrue(resource)
                 self.assertTrue(action)
                 help_text = parser.format_help()
@@ -69,7 +70,7 @@ class CLITests(unittest.TestCase):
         root = Path(__file__).resolve().parents[2]
         references = {
             platform: (root / "references" / (platform + ".md")).read_text(encoding="utf-8")
-            for platform in ("newbee", "dd", "curseforge")
+            for platform in ("newbee", "dd", "curseforge", "blackbox")
         }
         for (platform, resource, action), schema in sorted(SCHEMAS.items()):
             with self.subTest(platform=platform, resource=resource, action=action):

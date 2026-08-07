@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "0.0.2",
   "skill_version": "0.0.2",
-  "tree_sha256": "4ea99f3fb2dee23792450b0d890dcd4520aa8ed827edddf6c6353a8cd753d32e",
+  "tree_sha256": "b97a93afcc2efd618ce76b03f13a9c0093aa637adae0105102d00a190718c6d6",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -76,6 +76,11 @@
       "sha256": "40491e9aeddc71a4e9578264e5c42b40613e0ea5f0321da29e170b84ff9f1905"
     },
     {
+      "path": "references/blackbox.md",
+      "bytes": 2244,
+      "sha256": "910bcd8ff334a063a3c2121bbe16d5134e5719eab80835a1d4f6d8a830b27d51"
+    },
+    {
       "path": "references/curseforge.md",
       "bytes": 11917,
       "sha256": "2dd0a2429a37af30c4f85a884c2e8ea6fcdb1691c34ccc0c34925890e4e60d92"
@@ -106,9 +111,19 @@
       "sha256": "72609f840f9864ae70d3ee5226e29dc260e132e06ea4c89b0174b3ba9313d95e"
     },
     {
+      "path": "scripts/fupload_cli/blackbox_auth.py",
+      "bytes": 2874,
+      "sha256": "e018a33dce4babd1dc739af68c58499412474c7e1f1e3c0640dc53dbe46fce29"
+    },
+    {
+      "path": "scripts/fupload_cli/blackbox.py",
+      "bytes": 12503,
+      "sha256": "e15ef8a5063c000c6d4569028acdee2d32915d8ac27f3863122e344381d071c6"
+    },
+    {
       "path": "scripts/fupload_cli/cli.py",
-      "bytes": 23794,
-      "sha256": "3c01585b50e1db308444d094e60751491667ea05a98e5a51f284f098b7a8f376"
+      "bytes": 25664,
+      "sha256": "d1327783aa0e4e27fcc1f71a80cd090f661feaf2e226688b2efa6a36b9645073"
     },
     {
       "path": "scripts/fupload_cli/curseforge.py",
@@ -152,8 +167,8 @@
     },
     {
       "path": "scripts/fupload_cli/schema.py",
-      "bytes": 35113,
-      "sha256": "388c89131bf032428d2ed6c047b52c54adf2fa9d1db91833caefe7a1296acf58"
+      "bytes": 36268,
+      "sha256": "db788d2422c0f6b50ce2795a3df75d5bf1e23934ba4211a64198de06931492a5"
     },
     {
       "path": "scripts/fupload_cli/transport.py",
@@ -172,8 +187,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 21764,
-      "sha256": "ea2019f79aca3a6420aff657fa29b75fd731fc0b3fa4941068e0cfce0921afba"
+      "bytes": 22692,
+      "sha256": "64bc8d8b5c593eed43bfac894620b44e35c81622183f511c97f5f450a291f922"
     }
   ]
 }

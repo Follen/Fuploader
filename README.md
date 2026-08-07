@@ -1,12 +1,12 @@
 # Fuploader
 
-Fuploader 是一个面向 Agent 的《魔兽世界》作者发布 Skill 和 CLI。npm 安装后统一使用 `fupload` 命令；命令内部运行随 Skill 分发的纯 Python 实现。新手盒子（NewBeeBox）默认优先使用官方 `ncc` CLI，用户显式要求第三方管理工具时才使用 Fuploader 通道；网易 DD 使用 Fuploader 调用官方无头客户端；CurseForge 使用 Core API 查询作者公开项目，并使用 Authors Upload API 上传插件 ZIP。
+Fuploader 是一个面向 Agent 的《魔兽世界》作者发布 Skill 和 CLI。npm 安装后统一使用 `fupload` 命令；命令内部运行随 Skill 分发的纯 Python 实现。新手盒子（NewBeeBox）默认优先使用官方 `ncc` CLI，用户显式要求第三方管理工具时才使用 Fuploader 通道；网易 DD 使用 Fuploader 调用官方无头客户端；CurseForge 使用 Core API 查询作者公开项目，并使用 Authors Upload API 上传插件 ZIP；Heybox Workshop 复用本机客户端登录态管理插件元数据和版本。
 
 项目强调显式调用、完整字段收集、写入前确认和写入后读回验证。CLI 只负责单次原子读写，业务选择、执行计划和异常恢复由 Agent 在对话中完成。
 
 ## 功能
 
-- 支持新手盒子官方 `ncc`、第三方 Python 管理通道、网易 DD 和 CurseForge。
+- 支持新手盒子官方 `ncc`、第三方 Python 管理通道、网易 DD、CurseForge 和 Heybox Workshop。
 - CurseForge 支持按作者 ID 查询 WoW 公开项目、读取上传用游戏版本，以及向已有项目上传插件 ZIP；不创建 Project，也不枚举私有、草稿或待审 Project。
 - 支持插件、配置分享、WA/字符串的创建、内容更新与元数据编辑。
 - 官方通道严格采用已安装 `ncc` 暴露的能力；第三方 Python 通道覆盖版本、游戏分支、分类、媒体、可见性、审核、商业设置、频道、关联内容和配置备份选择等页面字段。
@@ -40,6 +40,9 @@ fupload/
 - 新手盒子官方通道：Windows、macOS 或 Linux，Node.js >= 18、官方 `ncc` CLI 与本机登录态
 - 新手盒子第三方 Python 通道：Windows、Python 3、已安装并登录新手盒子桌面客户端
 - 网易 DD：Windows、Python 3、已安装并登录官方客户端
+- Heybox Workshop：Windows、Python 3、已安装并登录 Heybox 桌面客户端
+
+Heybox ZIP 上传还需要腾讯官方 Python SDK：`python -m pip install cos-python-sdk-v5`。只读命令和纯元数据编辑不依赖该包。
 
 官方 `ncc` 的安装命令为 `npm i -g @newbeebox/newbeebox-creator-center-cli@latest`。Fuploader 不读取其凭据文件；用户在自己的终端完成 `ncc login`，Agent 仅用 `ncc whoami -o json` 验证。自动化可在启动 Agent 前注入 `NCC_TOKEN`，令牌不得写入命令参数、项目文件或 Git。
 
@@ -73,7 +76,7 @@ CURSEFORGE_UPLOAD_TOKEN=
 $fupload
 ```
 
-该 Skill 不会因普通提及“发布”“新手盒子”“DD”或“CurseForge”而自动触发。Agent 会先询问平台、资源和动作。新手盒子会自动检测 `ncc`：已安装即默认使用官方通道；未安装时先询问是否安装；只有用户显式选择第三方 Python 管理工具才进入项目内 CLI。CurseForge 上传缺少作者 ID 时，Agent 会主动询问；缺少 API Key 或 Upload Token 时，只会引导用户在本机填写 `~/.fupload/curseforge.env`，不会要求在对话中提供秘密。Agent 在被发布项目中创建 `publish/<时间>-<平台>-<资源>-<动作>/`，同一次发布的脱敏 JSON 按原子步骤保存为 `01-<动作>.json`、`02-<动作>.json`。展示完整写入计划并得到确认后才会真实写入。
+该 Skill 不会因普通提及“发布”“新手盒子”“DD”“CurseForge”或“Heybox”而自动触发。Agent 会先询问平台、资源和动作。新手盒子会自动检测 `ncc`：已安装即默认使用官方通道；未安装时先询问是否安装；只有用户显式选择第三方 Python 管理工具才进入项目内 CLI。CurseForge 上传缺少作者 ID 时，Agent 会主动询问；缺少 API Key 或 Upload Token 时，只会引导用户在本机填写 `~/.fupload/curseforge.env`，不会要求在对话中提供秘密。Heybox 命令复用桌面客户端登录态，支持模块元数据和版本增删改，不支持整体删除模块。Agent 在被发布项目中创建 `publish/<时间>-<平台>-<资源>-<动作>/`，同一次发布的脱敏 JSON 按原子步骤保存为 `01-<动作>.json`、`02-<动作>.json`。展示完整写入计划并得到确认后才会真实写入。
 
 ## CLI 使用
 
@@ -88,7 +91,7 @@ ncc whoami -o json
 
 创建令牌和本机登录说明见[官方 CLI 文档](https://creator.newbeebox.com/cli-docs)。不要把令牌粘贴到 Agent 对话；在自己的终端完成 `ncc login`。
 
-以下为 Fuploader 第三方 NewBeeBox、DD 与 CurseForge 执行层。
+以下为 Fuploader 第三方 NewBeeBox、DD、CurseForge 与 Heybox Workshop 执行层。
 
 查看总帮助：
 
@@ -117,6 +120,9 @@ fupload curseforge plugin upload --input publish\20260807-120000-curseforge-plug
 ```powershell
 fupload newbee plugin create --help
 fupload dd config update --help
+fupload blackbox plugin edit --help
+fupload blackbox plugin update --help
+fupload blackbox plugin version-delete --help
 ```
 
 检查桌面登录与安装状态：
@@ -124,6 +130,8 @@ fupload dd config update --help
 ```powershell
 fupload newbee session doctor
 fupload dd session doctor
+fupload blackbox plugin list
+fupload blackbox plugin get --module-id 101149612
 ```
 
 DD doctor 不会登录。若输出 `gui_running=true`，需先取得用户同意，随后关闭已验证的官方 GUI 并建立一个任务会话：
@@ -182,6 +190,7 @@ npm 7 及以上不执行卸载 lifecycle，因此直接运行 `npm uninstall -g 
 - [新手盒子第三方 Python 字段参考](fupload/references/newbee.md)
 - [网易 DD 字段参考](fupload/references/dd.md)
 - [CurseForge API、字段与上传参考](fupload/references/curseforge.md)
+- [Heybox Workshop 黑盒字段与版本参考](fupload/references/blackbox.md)
 
 ## 测试
 

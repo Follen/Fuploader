@@ -1,0 +1,128 @@
+# Acceptance evidence
+
+<!-- comet-native:acceptance-evidence:start -->
+[
+  {
+    "acceptance_id": "acceptance-052b5c838d231b61085e79bc5add9ea5a4cfac87ba73950b2c5c91f1bd0036d9",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/648352ead971fc8e790a569e503de2d2640798df5639a12d1bf41a570db1b912.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-09497c176f0b20e54760c5e8a0f32b7a26fdc244f26275f53b81fd2f32333a7d",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/6fb92e3dca131d3a7b8f009fe317fa3d6da2a124f54475e37d2848efe72879da.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-1c4489717b0392de33b93e5159b98de08f864a65beac39dd53108ced8b9769b0",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/cbce12880065ef4a67d0b706d69c614d2e313dad3eac2cfd0ad01b003fe94035.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-29ba6785656751c1fb5b886c22b2fe10174dca388d32f8f3919539c9d5f96220",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/03016f4661d8bffad6a004c4735bf51d7181134313be21b12479681566400243.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-2ab7d8f062843a5dd26e60ddf6881315857b081b744089ef90061fbe60351cf2",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/81518865ba42a82f1b5dffb9c18bd1e0b903143d1caee226de6d728f17f2ca6d.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-4ec45fffc18d91d13f0f4a49b9db018943fa60a1085b1cb0d82d49875cf414c0",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/7c3847e7b190be8343e3541bf5cac1897f91fe601a4b93135e946d28ee4d5055.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-5a71590571d9eaf319b0183ff75d4d8893ed0e51b836b9c6e90d22b59370b7a3",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/cbce12880065ef4a67d0b706d69c614d2e313dad3eac2cfd0ad01b003fe94035.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-6fa7c549e267485238e34f31ab4485a6636c673ae41ea25a4f547cd05ab0d9f3",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/81518865ba42a82f1b5dffb9c18bd1e0b903143d1caee226de6d728f17f2ca6d.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-73c80f22ad68e9ad13207481be2916a8111d268c92aa4b23ab53244a182d02a5",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/648352ead971fc8e790a569e503de2d2640798df5639a12d1bf41a570db1b912.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-8ccccfce9c8cdffb63154839487ac9a1c22486357922b4be398a165a6686d4a5",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/648352ead971fc8e790a569e503de2d2640798df5639a12d1bf41a570db1b912.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-b41fbc31dd065efd7d6ba6c7950b207477b500fb1b6b254fa9240c208d90c8b9",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/7c3847e7b190be8343e3541bf5cac1897f91fe601a4b93135e946d28ee4d5055.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-b881252946437bab8376576ae33367162b7967ef3e02d110d020cb4fa58bd6e2",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/81518865ba42a82f1b5dffb9c18bd1e0b903143d1caee226de6d728f17f2ca6d.json"
+    ]
+  },
+  {
+    "acceptance_id": "acceptance-d28f081dd3d43f9391ab807fceeef9370b6d38f2bfdf2acba4ba9cb6534d0f1a",
+    "status": "passed",
+    "evidence_refs": [
+      "runtime/evidence/receipts/03016f4661d8bffad6a004c4735bf51d7181134313be21b12479681566400243.json"
+    ]
+  }
+]
+<!-- comet-native:acceptance-evidence:end -->
+
+# Commands and results
+
+- `python -m unittest discover -s fupload/scripts/tests`: exit 0, 230 tests passed.
+- `python -m compileall -q fupload/scripts`: exit 0.
+- `npm run build:manifest && npm run check:manifest`: exit 0, manifest contains 37 Skill files.
+- `npm test`: exit 0, 22 tests passed.
+- `python fupload/scripts/fupload.py blackbox plugin update --help`: exit 0; schema and `--dry-run` shown.
+- Real TapTool ZIP dry-runs for plugin update, version edit, and version delete: all exit 0 with `schema_valid=true`.
+- Live `plugin list/get/versions`: exit 0; account returned three modules and module `101149612` with its versions.
+- Live module metadata edit and restore: both `verified=true`; final description equals baseline.
+- Live version create/edit/delete: version `201550106` uploaded and edited with `verified=true`; deletion returned `audit_state=4`, `retry=false`; final module description remained unchanged.
+- A prior live delete retry path was separately validated during blackbox research; the product handles one retry when the row returns to a non-deleted audit state.
+
+# Skipped checks
+
+No required checks were skipped. `npm run test:pack` and `npm run test:install` were not run separately because the change does not alter npm installer logic; Node unit coverage, manifest validation, and the direct source CLI were run.
+
+# Spec consistency
+
+The implementation matches the `blackbox-workshop` full capability specification: fixed official Workshop API origin, local Heybox client authentication, stable JSON schemas, complete module read-modify-write, COS ZIP upload, version create/edit polling, version soft-delete polling, and no module-level deletion.
+
+# Known limitations and risks
+
+- ZIP upload requires the separately installed official `cos-python-sdk-v5` Python package; missing dependency is reported with an installation command.
+- The Workshop service retains soft-deleted test version rows with `auditState=4`; versions `201549955` and `201550106` are verified deleted but remain visible in historical lists.
+- Version and delete readback are eventually consistent; polling is bounded and reports `verification_required` if the expected state does not appear.
+
+# Conclusion
+
+PASS. All 13 acceptance items have current revision receipts, automated regression suites pass, and the real TapTool metadata/version lifecycle completed with final cleanup readback.

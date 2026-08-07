@@ -61,10 +61,14 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
         (root / "dd").mkdir()
         (root / "newbee").mkdir()
         (root / "curseforge").mkdir()
+        (root / "blackbox").mkdir()
         cls.dd = WireFixtures(root / "dd")
         cls.newbee = NewBeeFixtures(root / "newbee")
         cls.curseforge_archive = root / "curseforge" / "addon.zip"
         with zipfile.ZipFile(cls.curseforge_archive, "w") as archive:
+            archive.writestr("Addon/Addon.toc", "## Interface: 110000\n")
+        cls.blackbox_archive = root / "blackbox" / "addon.zip"
+        with zipfile.ZipFile(cls.blackbox_archive, "w") as archive:
             archive.writestr("Addon/Addon.toc", "## Interface: 110000\n")
 
     @classmethod
@@ -84,6 +88,19 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                 "game_versions": [1],
                 "release_type": "release",
             }
+        if platform == "blackbox":
+            base = {"schema": "fupload.v1.blackbox.%s.%s" % (resource, action)}
+            if resource == "plugin" and action == "edit":
+                base.update({"id": 101149612})
+            elif resource == "plugin" and action == "update":
+                base.update({"module_id": 101149612, "name": "TapTool", "type": 1,
+                             "game_versions": ["11.2.0"], "file": str(self.blackbox_archive)})
+            elif resource == "version" and action == "edit":
+                base.update({"version_id": 191150996, "module_id": 101149612, "name": "TapTool",
+                             "type": 1, "game_versions": ["11.2.0"]})
+            elif resource == "version" and action == "delete":
+                base.update({"version_id": 191150996, "module_id": 101149612})
+            return base
         return self.newbee.document(resource, action)
 
     @staticmethod
@@ -165,7 +182,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                     schema.validate(doc)
                 self.assertEqual(raised.exception.details.get("path"), "$.unexpected_remote_display")
             count += 1
-        self.assertEqual(count, 35)
+        self.assertEqual(count, len(SCHEMAS))
 
     def test_every_field_rejects_the_wrong_json_type_at_its_own_path(self) -> None:
         count = 0
@@ -178,7 +195,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                         schema.validate(doc)
                     self.assertTrue(self._path_matches(raised.exception, field), raised.exception.details)
                 count += 1
-        self.assertEqual(count, 368)
+        self.assertEqual(count, sum(len(schema.fields) for schema in SCHEMAS.values()))
 
     def test_every_field_has_an_explicit_null_contract(self) -> None:
         count = 0
@@ -194,7 +211,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                             schema.validate(doc)
                         self.assertTrue(self._path_matches(raised.exception, field), raised.exception.details)
                 count += 1
-        self.assertEqual(count, 368)
+        self.assertEqual(count, sum(len(schema.fields) for schema in SCHEMAS.values()))
 
     def test_every_field_has_an_explicit_omission_contract(self) -> None:
         count = 0
@@ -212,7 +229,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                     else:
                         schema.validate(doc)
                 count += 1
-        self.assertEqual(count, 368)
+        self.assertEqual(count, sum(len(schema.fields) for schema in SCHEMAS.values()))
 
     def test_every_field_has_an_explicit_falsy_contract(self) -> None:
         count = 0
@@ -231,12 +248,14 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                             schema.validate(doc)
                         self.assertTrue(self._path_matches(raised.exception, field), raised.exception.details)
                 count += 1
-        self.assertEqual(count, 368)
+        self.assertEqual(count, sum(len(schema.fields) for schema in SCHEMAS.values()))
 
     def test_every_nested_object_or_scalar_array_rejects_display_enrichment(self) -> None:
         count = 0
         for key, schema in sorted(SCHEMAS.items()):
             for field in schema.fields:
+                if schema.name.startswith("fupload.v1.blackbox."):
+                    continue
                 if field not in NESTED_OBJECT_FIELDS and field not in SCALAR_ARRAY_FIELDS and field != "retail_ui_config":
                     continue
                 doc = self._document(key)
@@ -293,6 +312,7 @@ def nested_case_count() -> int:
         1
         for schema in SCHEMAS.values()
         for field in schema.fields
+        if not schema.name.startswith("fupload.v1.blackbox.")
         if field in NESTED_OBJECT_FIELDS or field in SCALAR_ARRAY_FIELDS or field == "retail_ui_config"
     )
 

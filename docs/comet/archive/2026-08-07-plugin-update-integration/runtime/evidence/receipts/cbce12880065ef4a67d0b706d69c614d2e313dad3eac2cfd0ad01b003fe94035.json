@@ -1,0 +1,29 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "manual-evidence",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "plugin-update-integration",
+    "sourceRevision": 3,
+    "contractHash": "c1ae41df94d07ada2aafb7c1acf1223e519d685c8d2dcefedc99548c480d9616",
+    "scopeHash": "ac1416cb9f60cb82b7fb945a3ab7203b5fbb64b7a752ee08ba3ffea5815cc38d",
+    "snapshotHash": "5f6ba529a842d5e3569a205702cc34c8ec71b3c6ed41075b383fe091efc2b1e5",
+    "artifactHash": "33577d192d21b03e8aa807ce109cf9f47c0f176436b5a8befd5571e958cc5be6"
+  },
+  "acceptanceIds": [
+    "acceptance-1c4489717b0392de33b93e5159b98de08f864a65beac39dd53108ced8b9769b0",
+    "acceptance-5a71590571d9eaf319b0183ff75d4d8893ed0e51b836b9c6e90d22b59370b7a3"
+  ],
+  "actor": "native-runtime:manual-evidence",
+  "issuedAt": "2026-08-07T18:24:53.102Z",
+  "evidence": {
+    "steps": [
+      "运行完整 Python、Node 和 manifest 回归"
+    ],
+    "observations": [
+      "python unittest discover：230 tests passed；npm test：22 tests passed；compileall 退出 0；npm run check:manifest 退出 0。NewBeeBox、DD、CurseForge 既有路由和 schema 回归均通过。"
+    ]
+  },
+  "receiptHash": "cbce12880065ef4a67d0b706d69c614d2e313dad3eac2cfd0ad01b003fe94035"
+}

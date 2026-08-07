@@ -1,0 +1,27 @@
+{
+  "schema": "comet.native.transaction.v2",
+  "id": "a22ce8af-ab63-4411-9f8b-d8223bf66c2a",
+  "kind": "archive",
+  "status": "committed",
+  "change": "plugin-update-integration",
+  "createdAt": "2026-08-07T18:34:05.005Z",
+  "preflightHash": "c707610bdeb7dbf1f4810f77bf613efad920140d161b36f16a6b0177fdfc8fdc",
+  "operations": [
+    {
+      "id": "spec-1-blackbox-workshop",
+      "type": "write",
+      "target": "specs/blackbox-workshop/spec.md",
+      "staged": "runtime/transactions/a22ce8af-ab63-4411-9f8b-d8223bf66c2a/staged/specs/blackbox-workshop/spec.md",
+      "expectedTargetHash": null,
+      "stagedHash": "837c471fe0d9fac07dacc553cc7206c37e0a90b1d0c19eaed7dab1df30a61604"
+    },
+    {
+      "id": "archive-change",
+      "type": "move",
+      "source": "changes/plugin-update-integration",
+      "target": "archive/2026-08-07-plugin-update-integration",
+      "expectedSourceHash": "3a8b985161e507166710784c2e6c9270f878b9b87b3000e818d1e2f55c75cb9c",
+      "expectedTargetHash": null
+    }
+  ]
+}

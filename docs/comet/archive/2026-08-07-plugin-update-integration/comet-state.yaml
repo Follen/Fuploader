@@ -1,0 +1,23 @@
+schema: comet.native.v3
+minimum_runtime_version: 3
+revision: 5
+verification_protocol: legacy-v1
+name: plugin-update-integration
+language: zh-CN
+phase: archive
+brief: brief.md
+approval: confirmed
+approved_contract_hash: c1ae41df94d07ada2aafb7c1acf1223e519d685c8d2dcefedc99548c480d9616
+spec_changes:
+  - capability: blackbox-workshop
+    operation: create
+    source: specs/blackbox-workshop/spec.md
+    base_hash: null
+verification_result: pass
+verification_report: verification.md
+implementation_scope: runtime/evidence/scopes/ac1416cb9f60cb82b7fb945a3ab7203b5fbb64b7a752ee08ba3ffea5815cc38d.json
+verification_evidence: runtime/evidence/verifications/fdceaca6e878cfaef1897ae9546c30f1a5a2c6ffd85707ad6ac41ffb20495f65.json
+partial_allowance: null
+archived: true
+created_at: 2026-08-07
+run_id: 06aa4873-040d-446d-93cf-a018e714aba8

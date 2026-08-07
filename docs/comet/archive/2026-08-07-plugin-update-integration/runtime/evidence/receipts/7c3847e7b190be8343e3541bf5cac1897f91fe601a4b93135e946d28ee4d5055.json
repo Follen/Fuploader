@@ -1,0 +1,29 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "manual-evidence",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "plugin-update-integration",
+    "sourceRevision": 3,
+    "contractHash": "c1ae41df94d07ada2aafb7c1acf1223e519d685c8d2dcefedc99548c480d9616",
+    "scopeHash": "ac1416cb9f60cb82b7fb945a3ab7203b5fbb64b7a752ee08ba3ffea5815cc38d",
+    "snapshotHash": "5f6ba529a842d5e3569a205702cc34c8ec71b3c6ed41075b383fe091efc2b1e5",
+    "artifactHash": "33577d192d21b03e8aa807ce109cf9f47c0f176436b5a8befd5571e958cc5be6"
+  },
+  "acceptanceIds": [
+    "acceptance-4ec45fffc18d91d13f0f4a49b9db018943fa60a1085b1cb0d82d49875cf414c0",
+    "acceptance-b41fbc31dd065efd7d6ba6c7950b207477b500fb1b6b254fa9240c208d90c8b9"
+  ],
+  "actor": "native-runtime:manual-evidence",
+  "issuedAt": "2026-08-07T18:25:18.437Z",
+  "evidence": {
+    "steps": [
+      "真实编辑模块元数据并通过官方 COS SDK 上传 ZIP"
+    ],
+    "observations": [
+      "模块 edit 先读回完整对象，仅修改 desc 后恢复原值，两次 verified=true，最终模块描述与基线一致；安装官方 cos-python-sdk-v5 后 TapTool.zip 上传成功，version upsert 读回非空 fileUrlHeybox，未修改源目录或原 ZIP。"
+    ]
+  },
+  "receiptHash": "7c3847e7b190be8343e3541bf5cac1897f91fe601a4b93135e946d28ee4d5055"
+}

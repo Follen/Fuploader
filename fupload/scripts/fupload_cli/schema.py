@@ -552,6 +552,24 @@ register("curseforge", "plugin", "upload", required({
     "is_marked_for_manual_release": f("boolean"),
 }, ("project_id", "file", "changelog", "release_type")))
 
+register("blackbox", "plugin", "edit", required({
+    "id": f("integer"), "name": f("string"), "logo_url": f("string"), "category_ids": f("array"),
+    "type": f("integer", choices=(1, 9)), "desc": f("string"), "official": f("string"),
+    "official_url": f("string"), "core_folders": f("array"),
+}, ("id",)))
+register("blackbox", "plugin", "update", required({
+    "module_id": f("integer"), "name": f("string", nonempty=True), "type": f("integer", choices=(1, 2, 3)),
+    "game_versions": f("array", nonempty=True), "file": f("string", local_file=True), "file_url": f("string"),
+}, ("module_id", "name", "type", "game_versions", "file")))
+register("blackbox", "version", "edit", required({
+    "version_id": f("integer"), "module_id": f("integer"), "name": f("string", nonempty=True),
+    "type": f("integer", choices=(1, 2, 3)), "game_versions": f("array", nonempty=True),
+    "file": f("string", local_file=True), "file_url": f("string"),
+}, ("version_id", "module_id", "name", "type", "game_versions")))
+register("blackbox", "version", "delete", required({
+    "version_id": f("integer"), "module_id": f("integer"),
+}, ("version_id", "module_id")))
+
 
 def get_schema(platform: str, resource: str, action: str) -> Schema:
     try:

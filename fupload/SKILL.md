@@ -1,13 +1,13 @@
 ---
 name: fupload
-description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, and CurseForge, including CurseForge author project lookup and plugin ZIP upload. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, plugins, configurations, or WA.
+description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, and Heybox Workshop, including CurseForge author project lookup, plugin ZIP upload, and Heybox client-session version management. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, plugins, configurations, or WA.
 metadata:
   version: "0.0.2"
 ---
 
 # Fupload
 
-Act as the publishing operator. For NewBeeBox, prefer the official `ncc` CLI whenever it is installed unless the user explicitly requests the third-party Python management tool. For DD, CurseForge, and an explicitly selected third-party NewBeeBox workflow, use the bundled Python CLI. Keep investigation, choices, planning, confirmation, and recovery in the conversation.
+Act as the publishing operator. For NewBeeBox, prefer the official `ncc` CLI whenever it is installed unless the user explicitly requests the third-party Python management tool. For DD, CurseForge, Heybox Workshop, and an explicitly selected third-party NewBeeBox workflow, use the bundled Python CLI. Keep investigation, choices, planning, confirmation, and recovery in the conversation.
 
 When installed from npm, interpret `<fupload-cli>` as `fupload`. Only while maintaining the source repository, directly installing this Skill, or when `fupload` is absent from PATH, use `python <skill-root>/scripts/fupload.py`. Keep the user's current project as the working directory in either mode.
 
@@ -15,7 +15,7 @@ When installed from npm, interpret `<fupload-cli>` as `fupload`. Only while main
 
 When the user has not already stated both dimensions, ask in one short message:
 
-1. Platform: NewBeeBox, DD, or CurseForge.
+1. Platform: NewBeeBox, DD, CurseForge, or Heybox Workshop.
 2. Resource and action: plugin/configuration/WA, then create/content update/metadata edit/delete. CurseForge supports public project listing and uploading a plugin ZIP to an existing project only.
 
 Map natural language consistently:
@@ -25,7 +25,7 @@ Map natural language consistently:
 - `edit`: change fields allowed by the target platform's action allowlist. For DD plugins, this is existing-record commercial, association, room/channel, and creation-statement settings; first-publication metadata, categories, media, and version fields are create/update-only.
 - `delete`: delete one main record only. It never deletes an individual version, media object, or associated record.
 
-Never offer bulk delete, version-file delete, drafts, guides, messages, or GUI control automation. The DD task-session command may close verified official GUI processes only after the consent flow below.
+Never offer bulk delete, drafts, guides, messages, or GUI control automation. Heybox supports individual version deletion with asynchronous readback; whole-module deletion is not supported. The DD task-session command may close verified official GUI processes only after the consent flow below.
 
 CurseForge cannot create a project or enumerate private, draft, or pending-review projects. Direct project creation to the Authors website; use the Core API list only as the public-project view for one numeric author ID.
 
@@ -69,6 +69,7 @@ For npm package maintenance, use `fupload update` to update the CLI and every re
 - Read [references/newbee.md](references/newbee.md) only when the user explicitly selected the third-party Python NewBeeBox channel.
 - Read [references/dd.md](references/dd.md) only for DD.
 - Read [references/curseforge.md](references/curseforge.md) for every CurseForge lookup or upload.
+- Read [references/blackbox.md](references/blackbox.md) for Heybox Workshop plugin list/detail, metadata edit, version upload/edit/delete, and client-session authentication.
 - For Python, run the exact leaf command with `--help` before creating its input. Treat help as the executable schema contract.
 
 ## Investigate
@@ -86,6 +87,8 @@ For third-party Python NewBeeBox, use Creator Center webpage requests and form b
 For DD, use the one active task session to read game types/builds and the resource-specific category tree. Resolve parent/child choices in dependency order, display only children returned for the selected parent, and invalidate all descendants when a parent changes. A plugin primary category is a top-level item and secondary IDs are children of that item. Validate associations as `(act_type,sn)`. A room-only selection has `room_id` with empty `channel_id` and `channel_type`; a channel selection requires both channel fields. Query VIP levels only when anchor VIP is enabled and query room/channel data only when room linkage is enabled; disabled optional features do not depend on those endpoints.
 
 For every existing DD update or edit, GET the detail first and rebuild the official full form before preparing the write. If a legacy record lacks a field now required by the official submit validator, such as `creation_statement`, stop before upload and collect that value. When the missing field belongs to a different action allowlist, plan and confirm the prerequisite edit first, read it back, then run the content update. Do not send `null`, create defaults, or guessed values to bypass the missing field.
+
+For Heybox Workshop, use the signed-in desktop client's local session automatically. `blackbox plugin list`, `get`, and `versions` are read-only; `plugin edit` preserves omitted module fields by reading the complete module first; `plugin update` and `version-edit` upload or reuse a ZIP URL and verify the version readback; `version-delete` waits for asynchronous soft deletion and retries once when the audit state temporarily returns active. Do not accept or print cookies, tokens, signatures, or temporary COS credentials, and do not delete a whole module.
 
 For DD WA create, collect user choices before generating JSON, then let the Python CLI supply only the official create defaults for omitted form values: seven-day share and purchase lifetimes, `need_buy=false`, category `ui_original`, `Interface/Addons`, empty VIP levels, and version `0`. Submit category IDs as strings even when a discovery response represents them numerically. WA create/update versions contain digits only; update must be numerically greater than the current remote value. Every `!WA:2!` create/update/edit is reparsed by the installed official `WowUIInterface.parseWa` chain, including unchanged edit content. Do not carry create defaults into WA update/edit; omitted existing fields preserve their remote value.
 

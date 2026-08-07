@@ -1,0 +1,30 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "manual-evidence",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "plugin-update-integration",
+    "sourceRevision": 3,
+    "contractHash": "c1ae41df94d07ada2aafb7c1acf1223e519d685c8d2dcefedc99548c480d9616",
+    "scopeHash": "ac1416cb9f60cb82b7fb945a3ab7203b5fbb64b7a752ee08ba3ffea5815cc38d",
+    "snapshotHash": "5f6ba529a842d5e3569a205702cc34c8ec71b3c6ed41075b383fe091efc2b1e5",
+    "artifactHash": "33577d192d21b03e8aa807ce109cf9f47c0f176436b5a8befd5571e958cc5be6"
+  },
+  "acceptanceIds": [
+    "acceptance-2ab7d8f062843a5dd26e60ddf6881315857b081b744089ef90061fbe60351cf2",
+    "acceptance-6fa7c549e267485238e34f31ab4485a6636c673ae41ea25a4f547cd05ab0d9f3",
+    "acceptance-b881252946437bab8376576ae33367162b7967ef3e02d110d020cb4fa58bd6e2"
+  ],
+  "actor": "native-runtime:manual-evidence",
+  "issuedAt": "2026-08-07T18:24:21.223Z",
+  "evidence": {
+    "steps": [
+      "使用 Heybox 客户端登录态对真实 TapTool.zip 执行版本新增和编辑"
+    ],
+    "observations": [
+      "版本 201550106 真实上传成功；读回 name/type/gameVersions/moduleId 与非空 fileUrlHeybox 均匹配；随后 version-edit 读回 verified=true，最终 version-delete 返回 audit_state=4。未输出凭据或临时 URL。"
+    ]
+  },
+  "receiptHash": "81518865ba42a82f1b5dffb9c18bd1e0b903143d1caee226de6d728f17f2ca6d"
+}

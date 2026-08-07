@@ -1,0 +1,37 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "static-inspection",
+  "role": "required-check",
+  "status": "passed",
+  "bindings": {
+    "change": "plugin-update-integration",
+    "sourceRevision": 3,
+    "contractHash": "c1ae41df94d07ada2aafb7c1acf1223e519d685c8d2dcefedc99548c480d9616",
+    "scopeHash": "ac1416cb9f60cb82b7fb945a3ab7203b5fbb64b7a752ee08ba3ffea5815cc38d",
+    "snapshotHash": "5f6ba529a842d5e3569a205702cc34c8ec71b3c6ed41075b383fe091efc2b1e5",
+    "artifactHash": "33577d192d21b03e8aa807ce109cf9f47c0f176436b5a8befd5571e958cc5be6"
+  },
+  "acceptanceIds": [],
+  "actor": "native-runtime:scoped-text-safety",
+  "issuedAt": "2026-08-07T18:32:51.296Z",
+  "evidence": {
+    "subjects": [
+      "README.md",
+      "fupload/SKILL.md",
+      "fupload/references/blackbox.md",
+      "fupload/scripts/fupload_cli/blackbox.py",
+      "fupload/scripts/fupload_cli/blackbox_auth.py",
+      "fupload/scripts/fupload_cli/cli.py",
+      "fupload/scripts/fupload_cli/schema.py",
+      "fupload/scripts/tests/test_blackbox_provider.py",
+      "fupload/scripts/tests/test_cli.py",
+      "fupload/scripts/tests/test_full_schema_state_matrix.py",
+      "npm/skill-manifest.json"
+    ],
+    "rule": "scoped-text-safety",
+    "resultSummary": "The built-in scoped inspection passed without skipped or blocking input.",
+    "checkReceiptRef": "runtime/evidence/check-receipts/eff45e36d5597d7fb71a298a3fa16d67c15499d0038716c78868f4b09759825a.json",
+    "checkReceiptHash": "eff45e36d5597d7fb71a298a3fa16d67c15499d0038716c78868f4b09759825a"
+  },
+  "receiptHash": "fa31b634e108644b2ee386b2a2a539b74c0c82ac57ba7ad12c5bb18c4a3af711"
+}

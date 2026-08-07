@@ -1,0 +1,11 @@
+{
+  "schema": "comet.native.archive-cas.v1",
+  "operationId": "spec-1-blackbox-workshop",
+  "role": "post",
+  "hash": "837c471fe0d9fac07dacc553cc7206c37e0a90b1d0c19eaed7dab1df30a61604",
+  "identity": {
+    "dev": 2421791372,
+    "ino": 3659174697940267,
+    "birthtimeMs": 1786127647364.6504
+  }
+}

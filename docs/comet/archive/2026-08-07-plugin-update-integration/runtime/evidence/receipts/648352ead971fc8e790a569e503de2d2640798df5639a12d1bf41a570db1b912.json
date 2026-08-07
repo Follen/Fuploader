@@ -1,0 +1,30 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "manual-evidence",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "plugin-update-integration",
+    "sourceRevision": 3,
+    "contractHash": "c1ae41df94d07ada2aafb7c1acf1223e519d685c8d2dcefedc99548c480d9616",
+    "scopeHash": "ac1416cb9f60cb82b7fb945a3ab7203b5fbb64b7a752ee08ba3ffea5815cc38d",
+    "snapshotHash": "5f6ba529a842d5e3569a205702cc34c8ec71b3c6ed41075b383fe091efc2b1e5",
+    "artifactHash": "33577d192d21b03e8aa807ce109cf9f47c0f176436b5a8befd5571e958cc5be6"
+  },
+  "acceptanceIds": [
+    "acceptance-052b5c838d231b61085e79bc5add9ea5a4cfac87ba73950b2c5c91f1bd0036d9",
+    "acceptance-73c80f22ad68e9ad13207481be2916a8111d268c92aa4b23ab53244a182d02a5",
+    "acceptance-8ccccfce9c8cdffb63154839487ac9a1c22486357922b4be398a165a6686d4a5"
+  ],
+  "actor": "native-runtime:manual-evidence",
+  "issuedAt": "2026-08-07T18:24:37.235Z",
+  "evidence": {
+    "steps": [
+      "运行黑盒 CLI help 和 TapTool.zip dry-run"
+    ],
+    "observations": [
+      "help 退出 0，显示 fupload.v1.blackbox.plugin.update 与 --dry-run；真实 D:\\Code\\TAP Tool\\TapTool.zip dry-run 退出 0，schema_valid=true、remote_validation_performed=false，未认证且未产生网络写入。"
+    ]
+  },
+  "receiptHash": "648352ead971fc8e790a569e503de2d2640798df5639a12d1bf41a570db1b912"
+}

@@ -1,0 +1,247 @@
+{
+  "schema": "comet.native.implementation-scope.v2",
+  "contractHash": "c1ae41df94d07ada2aafb7c1acf1223e519d685c8d2dcefedc99548c480d9616",
+  "baselineProjectionRef": "runtime/evidence/snapshots/b7b3ba1fd22b9fdff2ff96367b85d068e32e65ba1b8580c966ae77f5c08a5e00.json",
+  "baselineProjectionHash": "b7b3ba1fd22b9fdff2ff96367b85d068e32e65ba1b8580c966ae77f5c08a5e00",
+  "currentProjectionRef": "runtime/evidence/snapshots/5f6ba529a842d5e3569a205702cc34c8ec71b3c6ed41075b383fe091efc2b1e5.json",
+  "currentProjectionHash": "5f6ba529a842d5e3569a205702cc34c8ec71b3c6ed41075b383fe091efc2b1e5",
+  "complete": true,
+  "declaredArtifacts": [
+    {
+      "path": "README.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/references/blackbox.md",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/blackbox.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/blackbox_auth.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_blackbox_provider.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "kind": "file"
+    },
+    {
+      "path": "fupload/scripts/tests/test_full_schema_state_matrix.py",
+      "kind": "file"
+    },
+    {
+      "path": "npm/skill-manifest.json",
+      "kind": "file"
+    }
+  ],
+  "changes": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "before": {
+        "hash": "761b7ecbaf55214c1ee892be218b9d6598c8b03ef09d618ec5196f66444d6193",
+        "size": 13257
+      },
+      "after": {
+        "hash": "515cc9df22d0d2e2d04698cc45e0ff4aaee992931275b8d0c38e87587c8ccb4b",
+        "size": 14003
+      },
+      "attributedTo": [
+        {
+          "path": "README.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/SKILL.md",
+      "kind": "modified",
+      "before": {
+        "hash": "881d1a9968d03659de8ff938036fe998962281644eefee6d072e250b4438a588",
+        "size": 21906
+      },
+      "after": {
+        "hash": "f4126b42ee308de111d75ce6ab328c14a3de46fcf71ae34b83cb211d5e2b6720",
+        "size": 22828
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/SKILL.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/references/blackbox.md",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "910bcd8ff334a063a3c2121bbe16d5134e5719eab80835a1d4f6d8a830b27d51",
+        "size": 2244
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/references/blackbox.md",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/blackbox.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e15ef8a5063c000c6d4569028acdee2d32915d8ac27f3863122e344381d071c6",
+        "size": 12503
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/blackbox.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/blackbox_auth.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "e018a33dce4babd1dc739af68c58499412474c7e1f1e3c0640dc53dbe46fce29",
+        "size": 2874
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/blackbox_auth.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "86bcc33c8ec7802970f424f61e254a4ec46dc42c6958efdad5da8375ca28bbf1",
+        "size": 24075
+      },
+      "after": {
+        "hash": "78426250647d82fb568606b51d58a2e0d1a80b3b3ca4bf32de15ce82969038d7",
+        "size": 25933
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/cli.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "kind": "modified",
+      "before": {
+        "hash": "8f40bdfb54d1666164dd65e3ad0c0b7cf59aabfc65f0778ff44ae61c8c258232",
+        "size": 35700
+      },
+      "after": {
+        "hash": "3d7ce6b3a7838751207975cc4827bc246e4b53acca3ebc31cab3b1fd1fbd7f70",
+        "size": 36853
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/fupload_cli/schema.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_blackbox_provider.py",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "hash": "7983bff083bbb1262cb813c64b8194f74b982ec6e4d8baf5df6acd66321edecc",
+        "size": 1703
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/test_blackbox_provider.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_cli.py",
+      "kind": "modified",
+      "before": {
+        "hash": "04c9be3bf37dd127b1f9fc6e34d0eec32b5d22e526bb12675b03428016ba6e78",
+        "size": 15481
+      },
+      "after": {
+        "hash": "580ab0b0b7838cb6d8ac3cd78f61232f0efab152da8f9face1a253c2e5e745ed",
+        "size": 15536
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/test_cli.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "fupload/scripts/tests/test_full_schema_state_matrix.py",
+      "kind": "modified",
+      "before": {
+        "hash": "92428418627c5ac5856ba82853ef7fa8a3cdac065408b79f7d1b4a6e5312e614",
+        "size": 13411
+      },
+      "after": {
+        "hash": "8f7292dbd8c07dbc85119cd6947a6f4663be106f43a0d85180af60244c170f3a",
+        "size": 14854
+      },
+      "attributedTo": [
+        {
+          "path": "fupload/scripts/tests/test_full_schema_state_matrix.py",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "path": "npm/skill-manifest.json",
+      "kind": "modified",
+      "before": {
+        "hash": "3530d43552e53d8575cb42877c48b320d06d156ff589f3b313fed0afd362c343",
+        "size": 5955
+      },
+      "after": {
+        "hash": "c309a543e74f54fde48db910012ce03ea3a2272d303749cb966dc56f8560ec72",
+        "size": 6271
+      },
+      "attributedTo": [
+        {
+          "path": "npm/skill-manifest.json",
+          "kind": "file"
+        }
+      ]
+    }
+  ],
+  "unattributed": [],
+  "unresolvedScopes": [],
+  "noCodeReason": null,
+  "scopeHash": "ac1416cb9f60cb82b7fb945a3ab7203b5fbb64b7a752ee08ba3ffea5815cc38d"
+}

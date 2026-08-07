@@ -1,0 +1,29 @@
+{
+  "schema": "comet.native.verification-receipt.v3",
+  "kind": "manual-evidence",
+  "role": "acceptance-evidence",
+  "status": "passed",
+  "bindings": {
+    "change": "plugin-update-integration",
+    "sourceRevision": 3,
+    "contractHash": "c1ae41df94d07ada2aafb7c1acf1223e519d685c8d2dcefedc99548c480d9616",
+    "scopeHash": "ac1416cb9f60cb82b7fb945a3ab7203b5fbb64b7a752ee08ba3ffea5815cc38d",
+    "snapshotHash": "5f6ba529a842d5e3569a205702cc34c8ec71b3c6ed41075b383fe091efc2b1e5",
+    "artifactHash": "33577d192d21b03e8aa807ce109cf9f47c0f176436b5a8befd5571e958cc5be6"
+  },
+  "acceptanceIds": [
+    "acceptance-29ba6785656751c1fb5b886c22b2fe10174dca388d32f8f3919539c9d5f96220",
+    "acceptance-d28f081dd3d43f9391ab807fceeef9370b6d38f2bfdf2acba4ba9cb6534d0f1a"
+  ],
+  "actor": "native-runtime:manual-evidence",
+  "issuedAt": "2026-08-07T18:25:05.720Z",
+  "evidence": {
+    "steps": [
+      "使用 Heybox 客户端本机登录态运行 plugin list/get/versions"
+    ],
+    "observations": [
+      "真实命令退出 0；list 返回 3 个模块，get 返回 taptool 模块 ID 101149612 及版本列表，versions 投影一致；认证来自本机客户端 Cookie DB 和 identity，输出未包含 cookie、token、hkey、nonce 或临时凭据。"
+    ]
+  },
+  "receiptHash": "03016f4661d8bffad6a004c4735bf51d7181134313be21b12479681566400243"
+}
