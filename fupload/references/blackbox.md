@@ -2,7 +2,7 @@
 
 The blackbox provider reuses the signed-in Heybox desktop client's local login state. It never accepts credentials, cookies, tokens, signatures, or COS temporary credentials as input.
 
-ZIP uploads require Tencent's official Python SDK: `python -m pip install cos-python-sdk-v5`. Read-only commands and metadata-only edits do not require that package.
+The npm installer manages Tencent's official COS SDK in a Fuploader-only Python venv. `fupload update` synchronizes it, the launcher repairs a missing or stale runtime before executing the Python CLI, and `fupload uninstall` removes it. No system-wide `pip install` is required.
 
 ## `blackbox plugin edit`
 

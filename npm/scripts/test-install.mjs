@@ -108,6 +108,14 @@ async function exercise({ name, ignoreScripts }) {
   ) {
     throw new Error("The npm launcher did not invoke the Python CLI help.");
   }
+  const runtimeRoot = path.join(
+    stateRoot,
+    process.platform === "win32" ? "Fupload" : "fupload",
+    "python",
+  );
+  if (!fs.existsSync(runtimeRoot)) {
+    throw new Error("The install/launcher flow did not create the managed Python runtime.");
+  }
 
   const uninstall = runInstalled(prefix, ["--skill-dir", customSkill, "uninstall"], { env, cwd: project });
   const lines = uninstall.stdout.trim().split(/\r?\n/).filter(Boolean);
@@ -140,7 +148,7 @@ try {
   tarball = path.join(packDirectory, JSON.parse(pack.stdout)[0].filename);
   await exercise({ name: "normal", ignoreScripts: false });
   await exercise({ name: "ignore-scripts", ignoreScripts: true });
-  process.stdout.write("Global install, Python launch, managed Skill, and self-uninstall checks passed.\n");
+  process.stdout.write("Global install, managed Python runtime, Python launch, Skill, and self-uninstall checks passed.\n");
 } finally {
   fs.rmSync(temporary, { recursive: true, force: true });
 }

@@ -8,7 +8,7 @@ Fuploader exposes the `blackbox plugin` resource with read leaves `list`, `get`,
 
 The provider reads the signed-in Heybox desktop profile from the current Windows user's roaming application data. It accepts no caller-supplied cookie, token, signature, profile path, API endpoint, or COS credential. Workshop requests use the fixed official HTTPS API origin, the client identity fields available in the profile, and the client-compatible request signature. Outputs and errors redact credential and signature fields.
 
-ZIP upload uses the official `cos-python-sdk-v5` package and temporary credentials returned by the Workshop COS token endpoint. The provider uploads the existing archive as read-only input, returns its byte count and SHA-256 internally, and submits the resulting object URL to the version API. A missing COS SDK is reported as an environment error with the installation command.
+ZIP upload uses the official `cos-python-sdk-v5` package from the npm-managed Fuploader Python runtime and temporary credentials returned by the Workshop COS token endpoint. The provider uploads the existing archive as read-only input, returns its byte count and SHA-256 internally, and submits the resulting object URL to the version API. A missing COS SDK is reported as an environment error with `fupload update` as the repair command; users are never directed to install it into the system Python.
 
 ## Read behavior
 

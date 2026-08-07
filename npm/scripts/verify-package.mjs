@@ -43,6 +43,7 @@ for (const required of [
   "package.json",
   "npm/bin/fupload.mjs",
   "npm/lib/uninstall.mjs",
+  "npm/lib/python-requirements.txt",
   "npm/skill-manifest.json",
   "fupload/SKILL.md",
   "fupload/scripts/fupload.py",

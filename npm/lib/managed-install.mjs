@@ -6,11 +6,15 @@ export const MANAGED_INSTALL_SCHEMA = "fupload.npm-managed-install.v1";
 export const MANAGED_INSTALL_FILE = "managed-install.json";
 const PACKAGE_NAME = "@follenfang/fupload";
 
-function stateRoot({ platform = process.platform, env = process.env, home = os.homedir() } = {}) {
+export function productStateRoot({ platform = process.platform, env = process.env, home = os.homedir() } = {}) {
   if (platform === "win32") {
-    return path.join(env.LOCALAPPDATA || path.join(home, "AppData", "Local"), "Fupload", "npm");
+    return path.join(env.LOCALAPPDATA || path.join(home, "AppData", "Local"), "Fupload");
   }
-  return path.join(env.XDG_STATE_HOME || path.join(home, ".local", "state"), "fupload", "npm");
+  return path.join(env.XDG_STATE_HOME || path.join(home, ".local", "state"), "fupload");
+}
+
+function stateRoot(options = {}) {
+  return path.join(productStateRoot(options), "npm");
 }
 
 function atomicWriteJson(filename, value) {

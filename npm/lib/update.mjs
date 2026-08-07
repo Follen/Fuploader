@@ -4,6 +4,7 @@ import path from "node:path";
 import { ensureCurseForgeEnv } from "./curseforge-config.mjs";
 import { readManagedInstall, recordManagedSkill } from "./managed-install.mjs";
 import { resolveSkillDirectory } from "./options.mjs";
+import { ensurePythonRuntime } from "./python.mjs";
 import { ensureSkill, loadDistribution } from "./skill-installer.mjs";
 import { PACKAGE_NAME, inspectManagedSkill, resolveGlobalInstall, runNpmCli } from "./uninstall.mjs";
 
@@ -27,6 +28,7 @@ export async function updateSelf({
   env = process.env,
   home = os.homedir(),
   runNpm = runNpmCli,
+  ensureRuntime = ensurePythonRuntime,
 } = {}) {
   const curseforgeConfig = ensureCurseForgeEnv({ home, platform });
   const installation = resolveGlobalInstall(packageRoot, platform);
@@ -54,6 +56,16 @@ export async function updateSelf({
     throw new ManagedUpdateError("The updated Fuploader package failed distribution validation.", {
       from_version: current.packageRecord.version,
       prefix: installation.prefix,
+      reason: error.message,
+    });
+  }
+  let runtime;
+  try {
+    runtime = ensureRuntime({ packageRoot, platform, env, home });
+  } catch (error) {
+    throw new ManagedUpdateError("The npm CLI updated but its Python runtime could not be synchronized.", {
+      from_version: current.packageRecord.version,
+      to_version: updated.packageRecord.version,
       reason: error.message,
     });
   }
@@ -97,6 +109,7 @@ export async function updateSelf({
     to_version: updated.packageRecord.version,
     npm_exit_status: npmResult.status,
     curseforge_config: curseforgeConfig,
+    python_runtime: { status: runtime.status, root: runtime.root },
     skills,
   };
 }

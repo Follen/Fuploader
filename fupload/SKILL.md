@@ -2,7 +2,7 @@
 name: fupload
 description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, and Heybox Workshop, including CurseForge author project lookup, plugin ZIP upload, and Heybox client-session version management. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, plugins, configurations, or WA.
 metadata:
-  version: "0.0.4"
+  version: "0.0.5"
 ---
 
 # Fupload
@@ -60,7 +60,7 @@ Run `<fupload-cli> --help` from the user's project. The npm launcher resolves an
 
 When the npm command is absent and the source/direct-Skill fallback is required, resolve `<skill-root>` from this `SKILL.md` and use `python <skill-root>/scripts/fupload.py`. On Windows, prefer `py -3` only if `python` is unavailable. Do not use a binary, Go source, repository-relative fallback, browser automation, Computer Use, or direct handcrafted HTTP calls. NewBeeBox's official `ncc` is not this bundled CLI and must not be wrapped as a Python `--input` command.
 
-For npm package maintenance, use `fupload update` to update the CLI and every registered managed Skill to `@follenfang/fupload@latest`. For a complete removal, use `fupload uninstall`; it removes every registered Skill that still has a valid Fuploader npm ownership marker, then removes the npm package and command. Do not use direct `npm install -g` or `npm uninstall -g` as the normal Agent-managed update/removal workflow.
+For npm package maintenance, use `fupload update` to update the CLI, managed Python runtime, and every registered managed Skill to `@follenfang/fupload@latest`. The npm installer and launcher create a Fuploader-only venv and install the pinned Python dependencies there; never ask for a system-wide `pip install`. For a complete removal, use `fupload uninstall`; it removes every registered Skill that still has a valid Fuploader npm ownership marker, the managed Python runtime, then the npm package and command. Do not use direct `npm install -g` or `npm uninstall -g` as the normal Agent-managed update/removal workflow.
 
 ## Load only the needed contract
 

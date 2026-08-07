@@ -5,6 +5,7 @@ import path from "node:path";
 
 import { clearManagedInstall, readManagedInstall } from "./managed-install.mjs";
 import { resolveSkillDirectory } from "./options.mjs";
+import { removePythonRuntime } from "./python.mjs";
 import { INSTALL_STAMP, INSTALL_STAMP_SCHEMA, readInstallStamp } from "./skill-installer.mjs";
 
 export const PACKAGE_NAME = "@follenfang/fupload";
@@ -173,6 +174,7 @@ export async function uninstallSelf({
   env = process.env,
   home = os.homedir(),
   runNpm = runNpmCli,
+  removeRuntime = removePythonRuntime,
 } = {}) {
   const installation = resolveGlobalInstall(packageRoot, platform);
   const cleanup = await cleanupManagedSkills({
@@ -181,6 +183,15 @@ export async function uninstallSelf({
     home,
     extraTargets: target ? [target] : [],
   });
+  let runtime;
+  try {
+    runtime = removeRuntime({ platform, env, home });
+  } catch (error) {
+    throw new ManagedUninstallError("The managed Fuploader Python runtime could not be removed.", {
+      cleanup,
+      reason: error.message,
+    });
+  }
   const args = ["uninstall", "-g", "--ignore-scripts", "--prefix", installation.prefix, PACKAGE_NAME];
   const npmResult = runNpm(args, { platform, env });
   if (npmResult.error || npmResult.status !== 0) {
@@ -206,6 +217,7 @@ export async function uninstallSelf({
     package: PACKAGE_NAME,
     prefix: installation.prefix,
     cleanup,
+    python_runtime: runtime,
     npm_exit_status: npmResult.status,
   };
 }

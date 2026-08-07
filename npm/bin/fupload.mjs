@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { ensureCurseForgeEnv } from "../lib/curseforge-config.mjs";
 import { recordManagedSkill } from "../lib/managed-install.mjs";
 import { parseLauncherOptions, resolveSkillDirectory } from "../lib/options.mjs";
-import { discoverPython, runPython } from "../lib/python.mjs";
+import { ensurePythonRuntime, runPython } from "../lib/python.mjs";
 import { ensureSkill } from "../lib/skill-installer.mjs";
 import { uninstallSelf } from "../lib/uninstall.mjs";
 import { updateSelf } from "../lib/update.mjs";
@@ -65,16 +65,18 @@ async function main() {
     return 0;
   }
 
-  const python = discoverPython();
-  if (!python) {
+  let runtime;
+  try {
+    runtime = ensurePythonRuntime({ packageRoot });
+  } catch (error) {
     emitError(
-      "PYTHON_VERSION_UNSUPPORTED",
-      "Fuploader requires Python >=3.9,<4.0. Install Python and run the command again.",
+      "PYTHON_RUNTIME_SETUP_FAILED",
+      error.message,
     );
     return 1;
   }
   const script = path.join(target, "scripts", "fupload.py");
-  const result = runPython(python, script, options.forwarded);
+  const result = runPython(runtime.python, script, options.forwarded);
   if (result.error) {
     emitError("PYTHON_LAUNCH_FAILED", result.error.message);
     return 1;

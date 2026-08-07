@@ -42,7 +42,7 @@ fupload/
 - 网易 DD：Windows、Python 3、已安装并登录官方客户端
 - Heybox Workshop：Windows、Python 3、已安装并登录 Heybox 桌面客户端
 
-Heybox ZIP 上传还需要腾讯官方 Python SDK：`python -m pip install cos-python-sdk-v5`。只读命令和纯元数据编辑不依赖该包。
+npm 安装和 `fupload update` 会在用户状态目录中创建 Fuploader 专用 Python venv，并自动安装 Heybox ZIP 上传所需的腾讯官方 COS SDK；不会修改系统 Python。使用 `npm --ignore-scripts` 安装时，首次运行实际 CLI 命令会校验并补齐该 runtime。
 
 官方 `ncc` 的安装命令为 `npm i -g @newbeebox/newbeebox-creator-center-cli@latest`。Fuploader 不读取其凭据文件；用户在自己的终端完成 `ncc login`，Agent 仅用 `ncc whoami -o json` 验证。自动化可在启动 Agent 前注入 `NCC_TOKEN`，令牌不得写入命令参数、项目文件或 Git。
 
@@ -169,7 +169,7 @@ fupload uninstall
 
 `fupload update` 固定安装 `@follenfang/fupload@latest`，随后把默认位置和所有登记有效的自定义 Skill 同步到同一版本。未知目录不会被覆盖。
 
-`fupload uninstall` 先删除所有仍有有效 npm 管理标记的 Fuploader Skill，再调用 npm 删除 `@follenfang/fupload` 和 `fupload` 命令。Skill 清理失败时 npm 包保持可用，处理占用或权限问题后可重试。项目中的 `publish/`、新手盒子/DD 登录数据、DD 日志和 `~/.fupload/curseforge.env` 始终保留。
+`fupload uninstall` 先删除所有仍有有效 npm 管理标记的 Fuploader Skill 和专用 Python runtime，再调用 npm 删除 `@follenfang/fupload` 和 `fupload` 命令。Skill 或 runtime 清理失败时 npm 包保持可用，处理占用或权限问题后可重试。项目中的 `publish/`、新手盒子/DD 登录数据、DD 日志和 `~/.fupload/curseforge.env` 始终保留。
 
 npm 7 及以上不执行卸载 lifecycle，因此直接运行 `npm uninstall -g @follenfang/fupload` 只删除 npm 包和 CLI，可能留下 Skill；它不属于完整卸载流程。
 

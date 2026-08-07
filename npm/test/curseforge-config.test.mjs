@@ -11,6 +11,7 @@ import {
   curseForgeEnvPath,
   ensureCurseForgeEnv,
 } from "../lib/curseforge-config.mjs";
+import { pythonRuntimeRoot } from "../lib/python.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -53,6 +54,8 @@ test("postinstall and first launcher use initialize the same home configuration"
     HOME: home,
     USERPROFILE: home,
     FUPLOAD_AGENT_HOME: path.join(root, "agent"),
+    LOCALAPPDATA: path.join(root, "local"),
+    XDG_STATE_HOME: path.join(root, "state"),
   };
   const postinstall = spawnSync(process.execPath, [path.join(packageRoot, "npm", "postinstall.mjs")], {
     cwd: packageRoot,
@@ -60,6 +63,7 @@ test("postinstall and first launcher use initialize the same home configuration"
     encoding: "utf8",
   });
   assert.equal(postinstall.status, 0, postinstall.stderr);
+  assert.ok(fs.existsSync(path.join(pythonRuntimeRoot({ env, home }), "runtime.json")));
   const filename = curseForgeEnvPath({ home });
   assert.equal(fs.readFileSync(filename, "utf8"), CURSEFORGE_ENV_TEMPLATE);
 

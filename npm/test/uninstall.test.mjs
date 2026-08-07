@@ -127,6 +127,7 @@ test("self uninstall cleans the Skill before asking npm to remove the package", 
     },
   });
   assert.equal(result.success, true);
+  assert.equal(result.python_runtime.status, "removed");
   assert.equal(fs.readFileSync(curseForgeEnvPath(options), "utf8"), "CURSEFORGE_UPLOAD_TOKEN=keep\n");
   assert.deepEqual(npmArgs, ["uninstall", "-g", "--ignore-scripts", "--prefix", path.resolve(prefix), "@follenfang/fupload"]);
 });
@@ -151,6 +152,7 @@ test("self update installs latest and synchronizes managed Skills", async (t) =>
   fs.writeFileSync(launcher, "launcher", "utf8");
   const target = path.join(root, "custom-skill");
   let npmArgs;
+  let runtimeSyncs = 0;
   const result = await updateSelf({
     packageRoot: fakePackage,
     target,
@@ -159,6 +161,10 @@ test("self update installs latest and synchronizes managed Skills", async (t) =>
       npmArgs = args;
       return { status: 0, stdout: "", stderr: "" };
     },
+    ensureRuntime() {
+      runtimeSyncs += 1;
+      return { status: "current", root: path.join(root, "python") };
+    },
   });
   assert.equal(result.success, true);
   assert.equal(result.from_version, packageVersion);
@@ -166,5 +172,7 @@ test("self update installs latest and synchronizes managed Skills", async (t) =>
   assert.deepEqual(npmArgs, ["install", "-g", "--ignore-scripts", "--prefix", path.resolve(prefix), "@follenfang/fupload@latest"]);
   assert.ok(fs.existsSync(path.join(target, ".fupload-npm-install.json")));
   assert.equal(result.curseforge_config.path, curseForgeEnvPath(options));
+  assert.equal(result.python_runtime.status, "current");
+  assert.equal(runtimeSyncs, 1);
   assert.equal(fs.readFileSync(result.curseforge_config.path, "utf8"), CURSEFORGE_ENV_TEMPLATE);
 });

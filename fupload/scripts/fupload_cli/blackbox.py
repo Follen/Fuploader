@@ -140,9 +140,9 @@ class Blackbox:
             from qcloud_cos import CosConfig, CosS3Client
         except ModuleNotFoundError as exc:
             raise FuploadError(
-                "Heybox ZIP upload requires cos-python-sdk-v5",
+                "The managed Fuploader Python runtime is missing the Heybox COS SDK",
                 kind="environment_error",
-                details={"install_command":"python -m pip install cos-python-sdk-v5"},
+                details={"repair_command":"fupload update"},
             ) from exc
         try:
             cos=CosS3Client(CosConfig(Region=info.get("region") or "ap-shanghai",SecretId=creds["TmpSecretID"],SecretKey=creds["TmpSecretKey"],Token=creds["Token"],Scheme="https"))
