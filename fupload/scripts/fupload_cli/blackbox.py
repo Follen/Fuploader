@@ -6,19 +6,35 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from typing import Any, Mapping
 from .errors import FuploadError, ValidationError
-from .blackbox_auth import API_BASE, hkey, load_session
+from .blackbox_auth import API_BASE, CLIENT_VERSION, hkey, load_session
+
+API_MISC_BASE = "https://api.xiaoheihe.cn"
 
 class Blackbox:
     def __init__(self, config: Mapping[str, Any] | None = None, transport=None):
         self.config = dict(config or {})
         self.profile = Path(self.config.get("client_profile") or Path.home() / "AppData/Roaming/heybox-pc-launcher")
         self._transport = transport
-    def _request(self, method, path, body=None, query=None):
+    def _request(self, method, path, body=None, query=None, *, base=API_BASE):
         if self._transport: return self._transport(method, path, body or {}, query or {})
         cookies, identity = load_session(self.profile); ts=int(time.time()); nonce=hashlib.md5((str(ts)+secrets.token_hex(16)).encode()).hexdigest().upper()
-        params={**identity,"version":identity.get("version","1.12.0"),"hkey":hkey(path,ts,nonce),"_time":ts,"_chat_time":int(time.time()*1000),"nonce":nonce,**(query or {})}
-        headers={"User-Agent":"HeyboxApp/1.12.0","x_xhh_tokenid":cookies["x_xhh_tokenid"],"Cookie":"; ".join(f"{k}={v}" for k,v in cookies.items()),"Content-Type":"application/x-www-form-urlencoded"}
-        url=API_BASE+path+"?"+urlencode(params); data=urlencode(body or {},doseq=True).encode() if method=="POST" else None
+        version = identity.get("version") or CLIENT_VERSION
+        params={
+            "app": "heybox",
+            "os_type": "Windows",
+            "web_version": "",
+            **identity,
+            "version": version,
+            "hkey": hkey(path,ts + 1,nonce),
+            "_time": ts,
+            "_chat_time": int(time.time()*1000),
+            "nonce": nonce,
+            **(query or {}),
+        }
+        json_body = base == API_MISC_BASE or path.startswith("/bbs/app/api/qcloud/")
+        headers={"Referer":"https://chat.xiaoheihe.cn","User-Agent":f"HeyboxApp/{identity.get('exe_version') or version}","x_xhh_tokenid":cookies["x_xhh_tokenid"],"Cookie":" ".join(f"{k}={v};" for k,v in cookies.items()),"Content-Type":("application/json;charset=utf-8" if json_body else "application/x-www-form-urlencoded;charset=utf-8")}
+        url=base.rstrip("/")+path+"?"+urlencode(params)
+        data=(json.dumps(body or {}, separators=(",", ":")).encode() if json_body else urlencode(body or {},doseq=True).encode()) if method=="POST" else None
         try:
             with urlopen(Request(url,data=data,headers=headers,method=method),timeout=60) as r: result=json.loads(r.read().decode())
         except Exception as exc: raise FuploadError("Workshop API request failed", endpoint=path, verification_required=method=="POST") from exc
@@ -72,8 +88,10 @@ class Blackbox:
     def version_upsert(self,doc):
         aliases={"module_id":"moduleId","version_id":"versionId","game_versions":"gameVersions","file_url":"fileUrl"}
         normalized={aliases.get(k,k):v for k,v in doc.items() if k not in {"schema","dry_run"}}
+        upload_result = None
         if "file" in normalized and "fileUrl" not in normalized:
-            normalized["fileUrl"]=self.upload_zip(int(normalized["moduleId"]),str(normalized["file"]))["url"]
+            upload_result=self.upload_zip(int(normalized["moduleId"]),str(normalized["file"]))
+            normalized["fileUrl"]=upload_result["url"]
         if "fileUrl" not in normalized and "versionId" in normalized:
             existing = self._find_version(int(normalized["moduleId"]), int(normalized["versionId"]))
             if existing and existing.get("fileUrlHeybox"):
@@ -91,7 +109,10 @@ class Blackbox:
         if not found.get("fileUrlHeybox"):
             mismatches.append("fileUrl")
         if mismatches: raise FuploadError("version upsert readback mismatch",kind="verification_required",verification_required=True,details={"fields":mismatches})
-        return {"accepted":True,"verified":True,"module_id":body["moduleId"],"version_id":found.get("id"),"readback":self._redact(found),"response":self._redact(response)}
+        result={"accepted":True,"verified":True,"module_id":body["moduleId"],"version_id":found.get("id"),"readback":self._redact(found),"response":self._redact(response)}
+        if upload_result:
+            result["upload"]={key:upload_result[key] for key in ("protocol","bytes","sha256") if key in upload_result}
+        return result
     def version_delete(self,doc):
         version_id=doc.get("versionId",doc.get("version_id")); module_id=doc.get("moduleId",doc.get("module_id"))
         if version_id is None or module_id is None: raise ValidationError("versionId and moduleId are required")
@@ -133,6 +154,53 @@ class Blackbox:
         path=Path(file_path)
         if not path.is_file(): raise ValidationError("file does not exist",path="$.file")
         if dry_run: return {"dry_run":True,"bytes":path.stat().st_size,"sha256":hashlib.sha256(path.read_bytes()).hexdigest()}
+        try:
+            return self._upload_zip_v2(path)
+        except FuploadError:
+            # The web creator still exposes the legacy Workshop token route.
+            # Fall back to it when the desktop generic uploader is unavailable.
+            return self._upload_zip_legacy(path)
+
+    def _upload_zip_v2(self, path: Path):
+        file_info = {"name": path.name, "mimetype": "application/zip", "fsize": path.stat().st_size}
+        info = self._result(self._request(
+            "POST", "/bbs/app/api/qcloud/cos/upload/info/v2", base=API_MISC_BASE,
+            body={"file_infos": json.dumps([file_info], separators=(",", ":")), "scope": "any", "need_cache": 0},
+        ))
+        keys = info.get("keys") or []
+        if not keys or not info.get("bucket"):
+            raise FuploadError("Current COS upload info response is incomplete", endpoint="/bbs/app/api/qcloud/cos/upload/info/v2", verification_required=True)
+        key = str(keys[0])
+        token = self._result(self._request(
+            "POST", "/bbs/app/api/qcloud/cos/upload/token/v2", base=API_MISC_BASE,
+            body={"bucket": info["bucket"], "keys": json.dumps([key], separators=(",", ":")), "mimetypes": json.dumps([file_info["mimetype"]]), "is_multipart_upload": 0},
+        ))
+        credentials = token.get("credentials") or {}
+        secret_id = credentials.get("tmpSecretId") or credentials.get("TmpSecretID")
+        secret_key = credentials.get("tmpSecretKey") or credentials.get("TmpSecretKey")
+        session_token = credentials.get("sessionToken") or credentials.get("Token")
+        if not all((secret_id, secret_key, session_token)):
+            raise FuploadError("Current COS upload credentials are incomplete", endpoint="/bbs/app/api/qcloud/cos/upload/token/v2", verification_required=True)
+        try:
+            from qcloud_cos import CosConfig, CosS3Client
+        except ModuleNotFoundError as exc:
+            raise FuploadError("The managed Fuploader Python runtime is missing the Heybox COS SDK", kind="environment_error", details={"repair_command":"fupload update"}) from exc
+        try:
+            cos=CosS3Client(CosConfig(Region=info.get("region") or "ap-shanghai",SecretId=secret_id,SecretKey=secret_key,Token=session_token,Scheme="https"))
+            with path.open("rb") as stream: cos.put_object(Bucket=info["bucket"],Key=key,Body=stream)
+        except Exception as exc:
+            raise FuploadError("COS upload failed", endpoint="/bbs/app/api/qcloud/cos/upload/token/v2", verification_required=True) from exc
+        callback = self._result(self._request(
+            "POST", "/bbs/app/api/qcloud/cos/upload/callback/v2", base=API_MISC_BASE,
+            query={"is_finished": "true"}, body={"keys": json.dumps([key], separators=(",", ":"))},
+        ))
+        urls = callback.get("preview_urls") or callback.get("previewUrls") or []
+        url = urls[0] if urls else callback.get("url")
+        if not url:
+            raise FuploadError("Current COS upload callback did not return a URL", endpoint="/bbs/app/api/qcloud/cos/upload/callback/v2", verification_required=True)
+        return {"url":url,"bytes":path.stat().st_size,"sha256":hashlib.sha256(path.read_bytes()).hexdigest(),"protocol":"v2"}
+
+    def _upload_zip_legacy(self, path: Path):
         size_mb=path.stat().st_size/1024/1024
         token=self._result(self._request("POST","/wow/cos/upload/token/",body={"jsonData":json.dumps({"upload_infos":[{"filename":path.name,"file_size":size_mb,"type":"module"}]},separators=(",",":"))}))
         info=token["info"]; f=token["files"][0]; creds=info["Credentials"].get("Credentials",info["Credentials"])
@@ -148,4 +216,4 @@ class Blackbox:
             cos=CosS3Client(CosConfig(Region=info.get("region") or "ap-shanghai",SecretId=creds["TmpSecretID"],SecretKey=creds["TmpSecretKey"],Token=creds["Token"],Scheme="https"))
             with path.open("rb") as stream: cos.put_object(Bucket=info["bucket"],Key=f["key"],Body=stream)
         except Exception as exc: raise FuploadError("COS upload failed",verification_required=True) from exc
-        return {"url":"https://%s/%s"%(info["host"],f["key"]),"bytes":path.stat().st_size,"sha256":hashlib.sha256(path.read_bytes()).hexdigest()}
+        return {"url":"https://%s/%s"%(info["host"],f["key"]),"bytes":path.stat().st_size,"sha256":hashlib.sha256(path.read_bytes()).hexdigest(),"protocol":"legacy"}
