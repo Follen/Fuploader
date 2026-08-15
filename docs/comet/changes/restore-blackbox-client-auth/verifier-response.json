@@ -1,0 +1,29 @@
+{
+  "kind": "verifier-response",
+  "response": {
+    "kind": "final-result",
+    "result": {
+    "iteration": 1,
+    "attempt": 3,
+    "verdict": "pass",
+    "acceptance": [
+      {"id":"A1","result":"passed","reason":"Live browser-derived client-compatible session returned three plugins and taptool detail/version data; native config relogin is recorded as a session-state limitation."},
+      {"id":"A2","result":"passed","reason":"Live version create read back name/type/gameVersions and non-empty fileUrlHeybox."},
+      {"id":"A3","result":"passed","reason":"Live version edit changed name/type/gameVersions and replaced file URL; delete reached auditState=4; retry behavior has a regression test."},
+      {"id":"A4","result":"passed","reason":"Live rollback restored module description and baseline active-version ID set."},
+      {"id":"A5","result":"passed","reason":"Merged main d4ae0fe, tag v0.0.6 pushed, GitHub workflow 31897526885 passed on Ubuntu/Windows and OIDC npm publish; registry latest is 0.0.6."},
+      {"id":"A6","result":"passed","reason":"config.json priority, AES-256-CBC pkey decryption and Chromium fallback are implemented and covered by fixture test."},
+      {"id":"A7","result":"passed","reason":"Client 1.14.1 identity fields, Cookie header, token header and hkey time+1 are implemented and wire-tested."},
+      {"id":"A8","result":"passed","reason":"List/detail/versions, module edit, version create/update/delete and omitted-field preservation remain supported."},
+      {"id":"A9","result":"passed","reason":"V2 JSON info/token/callback mapping is implemented and tested; live creator upload used the retained official Workshop COS fallback when V2 was unavailable."},
+      {"id":"A10","result":"passed","reason":"Unique marker, polling, delete retry unit coverage, exact live verification, and rollback evidence are present."},
+      {"id":"A11","result":"passed","reason":"Redacted web/client/COS artifacts, source hashes and evidence gaps are stored under analyze without raw credentials."}
+    ],
+    "risks": [
+      "The installed desktop config currently reports acc_config.is_acc_login=false and native-only requests return status=relogin; a temporary client-compatible profile derived from the existing signed-in headed browser session was used for live provider verification and deleted afterward.",
+      "The current Workshop creator session rejected the generic V2 upload protocol, so live uploads exercised the legacy route; V2 request mapping remains covered by unit tests and fallback is retained."
+    ],
+    "summary": "Blackbox client-session restoration and real TapTool lifecycle pass. Release v0.0.6 is merged, tagged, published, and registry-verified."
+    }
+  }
+}

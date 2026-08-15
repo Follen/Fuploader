@@ -1,0 +1,17 @@
+{
+  "kind": "builder-handoff",
+  "summary": "Implemented Heybox 1.14.1 config-session AES decryption, current PC request identity/signing, V2 JSON COS upload with legacy Workshop fallback, protocol/readback reporting, and regression coverage. Live TapTool create-edit-upload-delete rollback passed through a temporary client-compatible bridge; the installed native config itself is logged out and correctly returns relogin.",
+  "addressed_acceptance_ids": ["A1", "A2", "A3", "A4", "A6", "A7", "A8", "A9", "A10", "A11"],
+  "checks": [
+    {"name": "python-unittest", "result": "passed", "note": "234 tests passed"},
+    {"name": "npm-test", "result": "passed", "note": "23 tests passed"},
+    {"name": "npm-test-pack", "result": "passed", "note": "51 files, 133394 bytes"},
+    {"name": "manifest-and-versions", "result": "passed", "note": "0.0.6 consistent and manifest current"},
+    {"name": "taptool-live-lifecycle", "result": "passed", "note": "version 202282294 create/edit/file replacement/delete; active set restored"}
+  ],
+  "known_limits": [
+    "A5 tag and npm publication are intentionally executed after Verify/Archive merge so the tag points at merged main.",
+    "The installed desktop config currently has is_acc_login=false and returns status=relogin; live provider behavior was verified with the existing signed-in browser session converted to a temporary client-compatible profile and deleted afterward.",
+    "The generic V2 COS endpoints were unavailable for this Workshop session; both live uploads completed through the retained official creator Workshop COS fallback."
+  ]
+}

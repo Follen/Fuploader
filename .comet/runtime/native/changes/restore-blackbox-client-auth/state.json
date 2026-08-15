@@ -1,0 +1,12 @@
+{
+  "schema": "comet.native.local-execution.v4",
+  "change": "restore-blackbox-client-auth",
+  "basedOnStateVersion": 16,
+  "workspace": {
+    "projectRoot": "D:\\Code\\Fuploader\\.worktrees\\restore-blackbox-client-auth",
+    "worktreeRoot": "D:\\Code\\Fuploader\\.worktrees\\restore-blackbox-client-auth",
+    "branch": "comet/restore-blackbox-client-auth"
+  },
+  "execution": null,
+  "checks": []
+}

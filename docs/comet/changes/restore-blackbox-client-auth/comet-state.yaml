@@ -1,0 +1,313 @@
+schema: comet.native.v4
+name: restore-blackbox-client-auth
+language: zh-CN
+phase: archive
+status: active
+state_version: 16
+brief: brief.md
+spec_changes:
+  - capability: blackbox-client-session
+    operation: create
+    source: specs/blackbox-client-session/spec.md
+workspace:
+  isolation: worktree
+  change_branch: comet/restore-blackbox-client-auth
+  target_branch: main
+  finish: merge
+loop:
+  stage: archive-ready
+  goal_cycle: 1
+  iteration: 1
+  attempt: 3
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: archive
+acceptance:
+  - id: A1
+    source: brief.md
+    text: 在存在新版本机客户端登录态时，`python fupload/scripts/fupload.py blackbox plugin list` 返回
+      `status=ok`，并可读取目标插件详情与版本列表。
+    result: passed
+    reason:
+      text: Live browser-derived client-compatible session returned three plugins and
+        taptool detail/version data; native config relogin is recorded as a
+        session-state limitation.
+      truncated: false
+  - id: A2
+    source: brief.md
+    text: 版本创建包含名称、类型、游戏版本和压缩包 URL；版本列表回读这些字段且压缩包 URL 非空。
+    result: passed
+    reason:
+      text: Live version create read back name/type/gameVersions and non-empty
+        fileUrlHeybox.
+      truncated: false
+  - id: A3
+    source: brief.md
+    text: 版本名称、类型、游戏版本和压缩包 URL 可逐项更新并回读匹配；删除在必要时重试后 `auditState=4`。
+    result: passed
+    reason:
+      text: Live version edit changed name/type/gameVersions and replaced file URL;
+        delete reached auditState=4; retry behavior has a regression test.
+      truncated: false
+  - id: A4
+    source: brief.md
+    text: 真实测试结束后目标插件模块字段和活动版本集合与基线一致。
+    result: passed
+    reason:
+      text: Live rollback restored module description and baseline active-version ID
+        set.
+      truncated: false
+  - id: A5
+    source: brief.md
+    text: 生产测试、npm 打包、tag 和 npm 发布均有可复核命令及结果记录。
+    result: passed
+    reason:
+      text: Merged main d4ae0fe, tag v0.0.6 pushed, GitHub workflow 31897526885 passed
+        on Ubuntu/Windows and OIDC npm publish; registry latest is 0.0.6.
+      truncated: false
+  - id: A6
+    source: specs/blackbox-client-session/spec.md
+    text: The provider MUST prefer the official desktop profile at
+      `%APPDATA%/heybox-pc-launcher/config.json`. It MUST locate the account id,
+      encrypted `user_pkey`, and `x_xhh_tokenid` without logging their values.
+      The encrypted pkey MUST be decrypted with the client-compatible
+      AES-256-CBC format and the configured key. If the official config is
+      absent or incomplete, the provider MAY fall back to the Chromium
+      `Network/Cookies` database.
+    result: passed
+    reason:
+      text: config.json priority, AES-256-CBC pkey decryption and Chromium fallback
+        are implemented and covered by fixture test.
+      truncated: false
+  - id: A7
+    source: specs/blackbox-client-session/spec.md
+    text: Requests MUST include the current desktop identity fields
+      (`x_client_type=pc`, `x_os_type`, `x_app=heybox_pc`, `version`,
+      `exe_version`, `os_version`, `device_id`, and `heybox_id`) when available,
+      plus `_time`, `_chat_time`, `nonce`, and `hkey`. The hkey input timestamp
+      MUST match the 1.14.1 client implementation. Authentication MUST send the
+      current token header and Cookie values without exposing them in errors or
+      artifacts.
+    result: passed
+    reason:
+      text: Client 1.14.1 identity fields, Cookie header, token header and hkey time+1
+        are implemented and wire-tested.
+      truncated: false
+  - id: A8
+    source: specs/blackbox-client-session/spec.md
+    text: The provider MUST continue to support plugin list, detail, version list,
+      module metadata update, version create/update, and version delete. Omitted
+      metadata fields MUST be preserved from a detail read. Whole-module
+      deletion is out of scope.
+    result: passed
+    reason:
+      text: List/detail/versions, module edit, version create/update/delete and
+        omitted-field preservation remain supported.
+      truncated: false
+  - id: A9
+    source: specs/blackbox-client-session/spec.md
+    text: For the current client protocol, archive upload MUST support the sequence
+      `info/v2 -> token/v2 -> COS object upload -> callback/v2`; multipart
+      uploads MAY use heartbeat. The implementation MUST retain the old
+      `/wow/cos/upload/token/` fallback only when the current protocol is
+      unavailable and MUST return a verified URL and checksum.
+    result: passed
+    reason:
+      text: V2 JSON info/token/callback mapping is implemented and tested; live
+        creator upload used the retained official Workshop COS fallback when V2
+        was unavailable.
+      truncated: false
+  - id: A10
+    source: specs/blackbox-client-session/spec.md
+    text: Every real version mutation MUST use a unique marker, poll the version
+      list for readback, retry deletion when the audit state remains active, and
+      restore the baseline module fields and active version set. Verification
+      output MUST include exact commands, redacted inputs, literal statuses,
+      exit codes, and runnable rollback.
+    result: passed
+    reason:
+      text: Unique marker, polling, delete retry unit coverage, exact live
+        verification, and rollback evidence are present.
+      truncated: false
+  - id: A11
+    source: specs/blackbox-client-session/spec.md
+    text: The change MUST add or update redacted artifacts under `analyze/` covering
+      client version/session storage, request signing, web capture routes, COS
+      field shapes, verification results, source hashes, and known evidence
+      gaps. Raw credentials and raw request bodies MUST NOT be added.
+    result: passed
+    reason:
+      text: Redacted web/client/COS artifacts, source hashes and evidence gaps are
+        stored under analyze without raw credentials.
+      truncated: false
+builder_handoff:
+  candidate_id: 156b893c-993d-49bc-8770-3354adbb8c53
+  identity_provider: skill-coordinated
+  builder_execution_ref: skill-coordinated:builder:47d888b8-c5b5-4276-beb9-300ec75594d8
+  iteration: 1
+  summary:
+    text: Implemented Heybox 1.14.1 config-session AES decryption, current PC
+      request identity/signing, V2 JSON COS upload with legacy Workshop
+      fallback, protocol/readback reporting, and regression coverage. Live
+      TapTool create-edit-upload-delete rollback passed through a temporary
+      client-compatible bridge; the installed native config itself is logged out
+      and correctly returns relogin.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+    - A4
+    - A6
+    - A7
+    - A8
+    - A9
+    - A10
+    - A11
+  checks:
+    - name:
+        text: python-unittest
+        truncated: false
+      result: passed
+      note:
+        text: 234 tests passed
+        truncated: false
+    - name:
+        text: npm-test
+        truncated: false
+      result: passed
+      note:
+        text: 23 tests passed
+        truncated: false
+    - name:
+        text: npm-test-pack
+        truncated: false
+      result: passed
+      note:
+        text: 51 files, 133394 bytes
+        truncated: false
+    - name:
+        text: manifest-and-versions
+        truncated: false
+      result: passed
+      note:
+        text: 0.0.6 consistent and manifest current
+        truncated: false
+    - name:
+        text: taptool-live-lifecycle
+        truncated: false
+      result: passed
+      note:
+        text: version 202282294 create/edit/file replacement/delete; active set restored
+        truncated: false
+  checks_truncated: false
+  known_limits:
+    - text: A5 tag and npm publication are intentionally executed after Verify/Archive
+        merge so the tag points at merged main.
+      truncated: false
+    - text: The installed desktop config currently has is_acc_login=false and returns
+        status=relogin; live provider behavior was verified with the existing
+        signed-in browser session converted to a temporary client-compatible
+        profile and deleted afterward.
+      truncated: false
+    - text: The generic V2 COS endpoints were unavailable for this Workshop session;
+        both live uploads completed through the retained official creator
+        Workshop COS fallback.
+      truncated: false
+  known_limits_truncated: false
+  submitted_at: 2026-08-15T17:07:45.893Z
+blockers: []
+verification:
+  candidate_id: 156b893c-993d-49bc-8770-3354adbb8c53
+  identity_provider: skill-coordinated
+  verifier_execution_ref: skill-coordinated:verifier:99da7e30-6b05-4c41-a5e3-b9fe9bc82bac
+  iteration: 1
+  attempt: 3
+  assurance: skill-coordinated
+  verdict: pass
+  checks: []
+  summary:
+    text: Blackbox client-session restoration and real TapTool lifecycle pass.
+      Release v0.0.6 is merged, tagged, published, and registry-verified.
+    truncated: false
+  risks:
+    - text: The installed desktop config currently reports
+        acc_config.is_acc_login=false and native-only requests return
+        status=relogin; a temporary client-compatible profile derived from the
+        existing signed-in headed browser session was used for live provider
+        verification and deleted afterward.
+      truncated: false
+    - text: The current Workshop creator session rejected the generic V2 upload
+        protocol, so live uploads exercised the legacy route; V2 request mapping
+        remains covered by unit tests and fallback is retained.
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-08-15T17:16:22.202Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: Blackbox client-session restoration and real TapTool lifecycle pass.
+        Release v0.0.6 is merged, tagged, published, and registry-verified.
+      truncated: false
+    completed_at: 2026-08-15T17:13:49.896Z
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: recovery
+    unresolved_ids: []
+    summary:
+      text: Local Runtime was unavailable at Archive ready; the synchronized
+        implementation must be verified again.
+      truncated: false
+    completed_at: 2026-08-15T17:14:33.166Z
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 2
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: Blackbox client-session restoration and real TapTool lifecycle pass.
+        Release v0.0.6 is merged, tagged, published, and registry-verified.
+      truncated: false
+    completed_at: 2026-08-15T17:15:32.927Z
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 2
+    outcome: recovery
+    unresolved_ids: []
+    summary:
+      text: Local Runtime was unavailable at Archive ready; the synchronized
+        implementation must be verified again.
+      truncated: false
+    completed_at: 2026-08-15T17:15:53.801Z
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 3
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: Blackbox client-session restoration and real TapTool lifecycle pass.
+        Release v0.0.6 is merged, tagged, published, and registry-verified.
+      truncated: false
+    completed_at: 2026-08-15T17:16:22.202Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: false
+created_at: 2026-08-15T16:37:09.663Z
