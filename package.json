@@ -1,6 +1,6 @@
 {
   "name": "@follenfang/fupload",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Install and run the Fuploader Agent Skill and Python CLI.",
   "type": "module",
   "bin": {
