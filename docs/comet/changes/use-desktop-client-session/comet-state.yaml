@@ -1,0 +1,624 @@
+schema: comet.native.v4
+name: use-desktop-client-session
+language: zh-CN
+phase: archive
+status: active
+state_version: 23
+brief: brief.md
+spec_changes:
+  - capability: blackbox-client-session
+    operation: modify
+    source: specs/blackbox-client-session/spec.md
+workspace:
+  isolation: worktree
+  change_branch: comet/use-desktop-client-session
+  target_branch: main
+  finish: merge
+loop:
+  stage: archive-ready
+  goal_cycle: 4
+  iteration: 1
+  attempt: 2
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: archive
+acceptance:
+  - id: A1
+    source: brief.md
+    text: 网页 profile 不存在或已过期时，`python fupload/scripts/fupload.py blackbox plugin
+      list` 启动有头 Chromium Workshop 登录窗口；用户完成登录后，网页协议请求返回 `status=ok`，并能读取
+      TapTool 的详情和版本列表。
+    result: passed
+    reason:
+      text: Live headed login and web reads succeeded.
+      truncated: false
+  - id: A2
+    source: brief.md
+    text: 网页 Cookie 失效时，无头探活转为有头登录；登录完成前不会执行任何写操作，登录完成后继续原始读写操作。
+    result: passed
+    reason:
+      text: Expiry login gate and no pre-ready write are covered.
+      truncated: false
+  - id: A3
+    source: brief.md
+    text: 桌面客户端未安装、未启动或未登录时不影响 Blackbox；命令不会读取其配置或 Cookie 数据库。
+    result: passed
+    reason:
+      text: Desktop auth module is absent from source and package.
+      truncated: false
+  - id: A4
+    source: brief.md
+    text: 对固定 `path/_time/nonce` 回归向量，Python Web signer 与网页前端 signer 输出逐字一致；实际
+      Workshop 请求不再返回 `relogin`。
+    result: passed
+    reason:
+      text: Signer vectors and live requests pass.
+      truncated: false
+  - id: A5
+    source: brief.md
+    text: TapTool 的每个允许模块字段在真实 edit 后可读回，并在测试结束前恢复到基线；服务端未立即投影的字段必须记录为已知限制而不是误报成功。
+    result: passed
+    reason:
+      text: All module fields were verified and restored.
+      truncated: false
+  - id: A6
+    source: brief.md
+    text: 测试版本可携带 ZIP 创建；名称、类型、游戏版本和压缩包可替换并读回；删除在必要时只重试一次，最终测试版本不存在或 `auditState=4`。
+    result: passed
+    reason:
+      text: Live ZIP version lifecycle and deletion pass.
+      truncated: false
+  - id: A7
+    source: brief.md
+    text: 真实测试结束后 TapTool 的模块字段与活动版本集合等于测试前基线，仓库中只保留脱敏证据。
+    result: passed
+    reason:
+      text: Final module and active versions equal baseline.
+      truncated: false
+  - id: A8
+    source: brief.md
+    text: 归档前所有版本载体已统一到下一 SemVer，manifest、pack、install 与 release 前置检查通过，目标 tag 尚未占用且
+      tag 发布 workflow 可用；归档后再按固定顺序完成合并、tag CI 与 npm `latest` 核对。
+    result: passed
+    reason:
+      text: 0.0.7 carriers, manifest, pack, install, tag availability, and workflow
+        are verified.
+      truncated: false
+  - id: A9
+    source: specs/blackbox-client-session/spec.md
+    text: The Blackbox provider MUST use a Fuploader-managed Chromium persistent
+      profile created inside the product state directory as its only
+      authentication source. It MUST NOT load, require, or inspect the Heybox
+      desktop client's `config.json`, account state, Cookie storage,
+      installation, or running process. The desktop client being absent,
+      stopped, or signed out MUST NOT prevent Blackbox from opening or reusing
+      its managed web session.
+    result: passed
+    reason:
+      text: Only managed web profile auth remains.
+      truncated: false
+  - id: A10
+    source: specs/blackbox-client-session/spec.md
+    text: The provider MUST never open or import Chrome, Edge, Electron, another
+      Playwright profile, or system browser Cookie databases. The profile
+      directory MUST be selected internally and MUST NOT be supplied through a
+      command document or ordinary configuration. Cookie values and storage
+      state MUST remain inside the persistent BrowserContext and MUST NOT be
+      exported into an independent request context, state file, or command
+      output.
+    result: passed
+    reason:
+      text: Internal profile and BrowserContext Cookie boundary pass.
+      truncated: false
+  - id: A11
+    source: specs/blackbox-client-session/spec.md
+    text: The web-session state machine MUST have explicit `headless_probe`,
+      `headed_login`, `ready`, `expired`, and `failed` states. It MUST begin
+      with a headless probe of the fixed Workshop entry URL and a read-only
+      module-list protocol request. On `login`, `relogin`, expired storage, or
+      an unusable profile, it MUST transition to `headed_login`, open the same
+      persistent profile in a visible Chromium window, and wait for the Workshop
+      route plus a successful read-only module-list response. It MUST persist
+      only non-sensitive state metadata; cookies, storage values, web tokens,
+      and signed URLs remain inside the browser profile and process memory.
+    result: passed
+    reason:
+      text: Five-state live transition is evidenced.
+      truncated: false
+  - id: A12
+    source: specs/blackbox-client-session/spec.md
+    text: After headed login succeeds, subsequent calls MUST return to headless mode
+      and reuse the same profile. A web session expiry during a read or before a
+      mutation MUST trigger one headed re-login and then retry the read-only
+      operation; an uncertain mutation MUST return `verification_required` and
+      MUST NOT be replayed automatically.
+    result: passed
+    reason:
+      text: Read re-login and POST no-replay pass.
+      truncated: false
+  - id: A13
+    source: specs/blackbox-client-session/spec.md
+    text: Workshop requests MUST use a fixed allowlisted protocol route through the
+      managed Playwright BrowserContext request object so HttpOnly browser
+      cookies remain attached without being exported. The route MUST generate
+      the web signer and identity fields observed from the Workshop page, MUST
+      reject arbitrary absolute URLs and caller-supplied headers or credentials,
+      and MUST return redacted status/error data to the CLI. The protocol
+      implementation MUST support GET reads and URL-encoded POST mutation forms
+      without exposing the browser page or request body as command output.
+    result: passed
+    reason:
+      text: Allowlist, protocol fields, and form encoding pass.
+      truncated: false
+  - id: A14
+    source: specs/blackbox-client-session/spec.md
+    text: The signer MUST match fixed regression vectors captured from successful
+      web requests and MUST vary correctly across different paths, timestamps,
+      and nonces. Authentication cookies MUST remain in the BrowserContext
+      Cookie jar; only the query fields and request headers demonstrated by the
+      current web client MAY be sent.
+    result: passed
+    reason:
+      text: Signer variation and live success pass.
+      truncated: false
+  - id: A15
+    source: specs/blackbox-client-session/spec.md
+    text: Callers MUST NOT be able to supply a profile path, cookie, token, pkey,
+      signature, API origin, or temporary upload credential through a Blackbox
+      command document or ordinary configuration. Errors and output MUST
+      recursively redact credentials, signatures, nonce values, device
+      identifiers, and signed upload parameters.
+    result: passed
+    reason:
+      text: Credential input rejection and redaction pass.
+      truncated: false
+  - id: A16
+    source: specs/blackbox-client-session/spec.md
+    text: The provider MUST continue to support plugin list, plugin detail, version
+      list, complete module metadata update with omitted-field preservation,
+      version creation, version edit, archive replacement, and individual
+      version deletion. It MUST NOT expose or invoke whole-module deletion.
+    result: passed
+    reason:
+      text: Required operations remain without module deletion.
+      truncated: false
+  - id: A17
+    source: specs/blackbox-client-session/spec.md
+    text: Module edits MUST read the current module, overlay only caller-specified
+      allowed fields, submit the complete current-client form, and compare each
+      requested field with a fresh detail read. Version creation and edit MUST
+      submit the current-client field set, poll GET-only readback, verify name,
+      type, game-version bindings, and an authoritative non-empty archive URL,
+      and MUST NOT blindly replay an ambiguous mutation.
+    result: passed
+    reason:
+      text: Complete forms and GET readback pass.
+      truncated: false
+  - id: A18
+    source: specs/blackbox-client-session/spec.md
+    text: Version deletion MUST poll until the row is absent or has the deleted
+      audit state. After the first delete settles, it MAY retry the same delete
+      exactly once only if the same version becomes active again, then MUST
+      perform final GET-only verification.
+    result: passed
+    reason:
+      text: Bounded delete retry and final GET pass.
+      truncated: false
+  - id: A19
+    source: specs/blackbox-client-session/spec.md
+    text: ZIP upload MUST use the verified web creator flow, including the
+      allowlisted Workshop upload-token route and constrained COS object upload.
+      It MUST NOT depend on desktop-account API endpoints. Temporary COS
+      credentials and signed URLs MUST remain in memory and MUST NOT be written
+      to plans, logs, analysis, or command output. The existing archive is
+      read-only input; the provider MUST calculate byte count and SHA-256 and
+      return only non-sensitive verification metadata.
+    result: passed
+    reason:
+      text: Web token and constrained COS upload pass.
+      truncated: false
+  - id: A20
+    source: specs/blackbox-client-session/spec.md
+    text: If more than one verified upload flow remains supported, fallback is
+      allowed only after a definite pre-mutation unavailability response. A
+      timeout or uncertain object upload/callback MUST be reported as
+      verification-required and MUST NOT cause an automatic second upload.
+    result: passed
+    reason:
+      text: Uncertain upload is not replayed.
+      truncated: false
+  - id: A21
+    source: specs/blackbox-client-session/spec.md
+    text: Real verification MUST use the Fuploader-managed web creator session to
+      select the TapTool plugin from the current account. It MUST record a
+      redacted baseline for module fields and active versions, then exercise
+      read list/detail/versions, allowed module-field edits, test-version
+      creation with a ZIP from `D:/Code/TAP Tool`, version-field edits, archive
+      replacement, and individual version deletion. Whole-module deletion MUST
+      NOT run.
+    result: passed
+    reason:
+      text: Live TapTool workflow is complete.
+      truncated: false
+  - id: A22
+    source: specs/blackbox-client-session/spec.md
+    text: Every test mutation MUST use a unique marker and immediate GET-only
+      readback. The final rollback MUST restore all changed module fields and
+      remove or mark deleted every test version so the active module fields and
+      version set match the baseline. Verification evidence MUST include exact
+      commands, redacted inputs, literal statuses, exit codes, baseline/modified
+      comparisons, and a runnable rollback procedure.
+    result: passed
+    reason:
+      text: Exact command, result, comparison, and rollback ledger exists.
+      truncated: false
+  - id: A23
+    source: specs/blackbox-client-session/spec.md
+    text: The change MUST update artifacts under
+      `analyze/blackbox/client-session-20260816/` with installed client version
+      and hashes, session-field provenance, bytecode/decompilation findings,
+      signer vectors, endpoint and field matrices, upload-flow evidence, real
+      verification results, and unresolved evidence gaps. Raw cookies, pkeys,
+      tokens, device ids, signatures, nonces, signed URLs, request bodies
+      containing private content, and temporary credentials MUST NOT be
+      committed.
+    result: passed
+    reason:
+      text: Required redacted analysis exists.
+      truncated: false
+  - id: A24
+    source: specs/blackbox-client-session/spec.md
+    text: Analysis MUST also record the managed-profile state-machine transitions,
+      Playwright/Chromium versions, venv dependency hashes, protocol allowlist,
+      login/readiness probes, and redacted expiry/re-login results. It MUST NOT
+      record the persistent profile contents or storage state.
+    result: passed
+    reason:
+      text: Runtime versions, hashes, states, and re-login are recorded.
+      truncated: false
+  - id: A25
+    source: specs/blackbox-client-session/spec.md
+    text: Automated verification MUST cover the absence of desktop/browser database
+      access, managed-profile selection, headed/headless transitions, web
+      request identity and signer vectors, recursive redaction, Workshop read
+      requests, module edits, version create/edit/delete, and ZIP upload
+      behavior. Existing non-Blackbox provider behavior MUST remain unchanged.
+    result: passed
+    reason:
+      text: Runtime executed Python 254, npm 24, pack, install, compile, and diff
+        checks successfully.
+      truncated: false
+  - id: A26
+    source: specs/blackbox-client-session/spec.md
+    text: "Before Native archive, release preparation MUST advance all package
+      version carriers to the same next SemVer, rebuild the distribution
+      manifest, pass package and installation checks, verify the target tag is
+      unoccupied, and confirm the tag publication workflow is available. The
+      operational release then occurs after Native archive: merge into `main`,
+      create the tag from merged `main`, wait for tag CI, and confirm npm
+      `latest` equals the released version."
+    result: passed
+    reason:
+      text: 0.0.7 release preparation and tag workflow are verified.
+      truncated: false
+builder_handoff:
+  candidate_id: c500e395-16ab-44ca-b31c-18a069f07e43
+  identity_provider: skill-coordinated
+  builder_execution_ref: skill-coordinated:builder:bed75798-a21e-4ff3-bc6b-e7151f7669cb
+  iteration: 1
+  summary:
+    text: Removed the packaged legacy desktop authentication module and stale CLI
+      wording, added package-level absence regression coverage, completed exact
+      live mutation/readback/rollback evidence, recorded managed Chromium and
+      venv hashes plus live re-login transitions, advanced all version carriers
+      to 0.0.7, rebuilt the manifest, and changed release acceptance to verify
+      pre-Archive readiness while retaining post-Archive merge/tag/npm
+      execution.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+    - A4
+    - A5
+    - A6
+    - A7
+    - A8
+    - A9
+    - A10
+    - A11
+    - A12
+    - A13
+    - A14
+    - A15
+    - A16
+    - A17
+    - A18
+    - A19
+    - A20
+    - A21
+    - A22
+    - A23
+    - A24
+    - A25
+    - A26
+  checks:
+    - name:
+        text: python full suite
+        truncated: false
+      result: passed
+      note:
+        text: 254/254
+        truncated: false
+    - name:
+        text: npm full suite
+        truncated: false
+      result: passed
+      note:
+        text: 24/24
+        truncated: false
+    - name:
+        text: package inventory
+        truncated: false
+      result: passed
+      note:
+        text: 51 files, 136355 bytes; blackbox_auth.py absent
+        truncated: false
+    - name:
+        text: managed install smoke
+        truncated: false
+      result: passed
+      note:
+        text: global install/runtime/launch/Skill/self-uninstall passed
+        truncated: false
+    - name:
+        text: version and manifest
+        truncated: false
+      result: passed
+      note:
+        text: all carriers 0.0.7; manifest current
+        truncated: false
+    - name:
+        text: compileall and diff check
+        truncated: false
+      result: passed
+      note:
+        text: exit 0
+        truncated: false
+  checks_truncated: false
+  known_limits: []
+  known_limits_truncated: false
+  submitted_at: 2026-08-16T03:52:27.156Z
+blockers: []
+verification:
+  candidate_id: c500e395-16ab-44ca-b31c-18a069f07e43
+  identity_provider: skill-coordinated
+  verifier_execution_ref: skill-coordinated:verifier:7855d351-485e-43a5-88ad-9710e0c8db60
+  iteration: 1
+  attempt: 2
+  assurance: skill-coordinated
+  verdict: pass
+  checks:
+    - id: python-full
+      name:
+        text: Python full suite
+        truncated: false
+      argv_display:
+        - text: -m
+          truncated: false
+        - text: unittest
+          truncated: false
+        - text: discover
+          truncated: false
+        - text: -s
+          truncated: false
+        - text: fupload/scripts/tests
+          truncated: false
+        - text: -p
+          truncated: false
+        - text: "[REDACTED]"
+          truncated: false
+      argv_truncated: false
+      cwd_ref: .
+      status: passed
+      exit_code: 0
+      duration_ms: 11334
+    - id: npm-full
+      name:
+        text: npm full suite
+        truncated: false
+      argv_display:
+        - text: test
+          truncated: false
+      argv_truncated: false
+      cwd_ref: .
+      status: passed
+      exit_code: 0
+      duration_ms: 103683
+    - id: npm-pack
+      name:
+        text: npm package inventory
+        truncated: false
+      argv_display:
+        - text: run
+          truncated: false
+        - text: test:pack
+          truncated: false
+      argv_truncated: false
+      cwd_ref: .
+      status: passed
+      exit_code: 0
+      duration_ms: 783
+    - id: npm-install
+      name:
+        text: managed install smoke
+        truncated: false
+      argv_display:
+        - text: run
+          truncated: false
+        - text: test:install
+          truncated: false
+      argv_truncated: false
+      cwd_ref: .
+      status: passed
+      exit_code: 0
+      duration_ms: 230935
+    - id: release-carriers
+      name:
+        text: version and manifest
+        truncated: false
+      argv_display:
+        - text: -NoProfile
+          truncated: false
+        - text: -Command
+          truncated: false
+        - text: npm run check:versions; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE };
+            npm run check:manifest
+          truncated: false
+      argv_truncated: false
+      cwd_ref: .
+      status: passed
+      exit_code: 0
+      duration_ms: 721
+    - id: source-integrity
+      name:
+        text: compile and diff check
+        truncated: false
+      argv_display:
+        - text: -NoProfile
+          truncated: false
+        - text: -Command
+          truncated: false
+        - text: python -m compileall -q fupload/scripts; if ($LASTEXITCODE -ne 0) { exit
+            $LASTEXITCODE }; git diff --check
+          truncated: false
+      argv_truncated: false
+      cwd_ref: .
+      status: passed
+      exit_code: 0
+      duration_ms: 193
+  summary:
+    text: A1-A26 pass with Runtime-recorded local checks; 0.0.7 is ready for
+      Archive, merge, tag, and npm publication.
+    truncated: false
+  risks:
+    - text: Tag CI and npm latest remain post-Archive execution steps.
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-08-16T04:02:44.427Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: blocked
+    unresolved_ids:
+      - A1
+      - A3
+      - A4
+      - A5
+      - A6
+      - A7
+      - A16
+      - A18
+      - A19
+      - A22
+    summary:
+      text: Implementation and automated verification pass, but the installed client's
+        current profile has no Open creator session. The official Workshop
+        module-list request returns relogin, preventing the required TapTool
+        read/write/rollback lifecycle and consequently blocking merge, tag CI,
+        and npm publication.
+      truncated: false
+    completed_at: 2026-08-15T22:03:15.899Z
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: recovery
+    unresolved_ids: []
+    summary:
+      text: Native confirmed acceptance criteria changed
+      truncated: false
+    completed_at: 2026-08-16T02:20:38.861Z
+  - goal_cycle: 2
+    iteration: 1
+    attempt: 0
+    outcome: recovery
+    unresolved_ids: []
+    summary:
+      text: Native confirmed acceptance criteria changed
+      truncated: false
+    completed_at: 2026-08-16T02:43:43.080Z
+  - goal_cycle: 3
+    iteration: 1
+    attempt: 1
+    outcome: fail
+    unresolved_ids:
+      - A3
+      - A8
+      - A9
+      - A22
+      - A24
+      - A25
+      - A26
+    summary:
+      text: Core tests and live web-only CRUD/upload/rollback pass, but the package
+        retains a legacy desktop-session module and A22/A24 evidence is
+        incomplete.
+      truncated: false
+    completed_at: 2026-08-16T03:37:07.209Z
+  - goal_cycle: 3
+    iteration: 2
+    attempt: 0
+    outcome: recovery
+    unresolved_ids: []
+    summary:
+      text: Native confirmed acceptance criteria changed
+      truncated: false
+    completed_at: 2026-08-16T03:51:55.128Z
+  - goal_cycle: 4
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: All A1-A26 pre-Archive acceptance criteria pass; first-verifier desktop
+        dependency and evidence gaps are fixed, and 0.0.7 is release-ready.
+      truncated: false
+    completed_at: 2026-08-16T03:54:24.088Z
+  - goal_cycle: 4
+    iteration: 1
+    attempt: 1
+    outcome: recovery
+    unresolved_ids: []
+    summary:
+      text: Local Runtime was unavailable at Archive ready; the synchronized
+        implementation must be verified again.
+      truncated: false
+    completed_at: 2026-08-16T03:55:49.816Z
+  - goal_cycle: 4
+    iteration: 1
+    attempt: 2
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: A1-A26 pass with Runtime-recorded local checks; 0.0.7 is ready for
+        Archive, merge, tag, and npm publication.
+      truncated: false
+    completed_at: 2026-08-16T04:02:44.427Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: false
+created_at: 2026-08-15T17:36:03.961Z

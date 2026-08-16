@@ -82,45 +82,68 @@ function readMarker(root) {
   }
 }
 
-function probeRuntime(executable, run = spawnSync) {
+function runtimeEnvironment(root, env) {
+  return {
+    ...env,
+    PLAYWRIGHT_BROWSERS_PATH: path.join(root, "browsers"),
+  };
+}
+
+function probeRuntime(executable, root, env, run = spawnSync) {
   if (!fs.existsSync(executable)) {
     return null;
   }
   const result = run(executable, [
     "-c",
-    "import importlib.metadata,sys; import qcloud_cos; print('.'.join(map(str,sys.version_info[:3]))); print(importlib.metadata.version('cos-python-sdk-v5'))",
-  ], { encoding: "utf8", shell: false, windowsHide: true });
+    "import importlib.metadata,json,pathlib,sys; import qcloud_cos; from playwright.sync_api import sync_playwright; p=sync_playwright().start(); executable=p.chromium.executable_path; p.stop(); print(json.dumps({'python_version': '.'.join(map(str,sys.version_info[:3])), 'cos_version': importlib.metadata.version('cos-python-sdk-v5'), 'playwright_version': importlib.metadata.version('playwright'), 'chromium_executable': executable})); sys.exit(0 if pathlib.Path(executable).is_file() else 1)",
+  ], {
+    encoding: "utf8",
+    env: runtimeEnvironment(root, env),
+    shell: false,
+    windowsHide: true,
+  });
   if (result.status !== 0) {
     return null;
   }
-  const [pythonVersion, dependencyVersion] = result.stdout.trim().split(/\r?\n/);
-  const match = pythonVersion?.match(/^(\d+)\.(\d+)\.(\d+)$/);
-  if (!match || !dependencyVersion) {
+  let details;
+  try {
+    details = JSON.parse(result.stdout.trim());
+  } catch {
     return null;
   }
-  return { version: match.slice(1).map(Number), dependencyVersion };
+  const match = details.python_version?.match(/^(\d+)\.(\d+)\.(\d+)$/);
+  if (!match || !details.cos_version || !details.playwright_version || !details.chromium_executable) {
+    return null;
+  }
+  return {
+    version: match.slice(1).map(Number),
+    dependencyVersion: details.cos_version,
+    playwrightVersion: details.playwright_version,
+    chromiumExecutable: details.chromium_executable,
+  };
 }
 
-function inspectRuntime({ root, platform, requirementsHash, run }) {
+function inspectRuntime({ root, platform, requirementsHash, env, run }) {
   const marker = readMarker(root);
   if (marker?.schema !== PYTHON_RUNTIME_SCHEMA || marker.requirements_sha256 !== requirementsHash) {
     return null;
   }
   const command = pythonRuntimeExecutable(root, platform);
-  const probe = probeRuntime(command, run);
+  const probe = probeRuntime(command, root, env, run);
   if (!probe || probe.version[0] !== 3 || probe.version[1] < 9) {
     return null;
   }
-  return { command, args: [], version: probe.version, dependencyVersion: probe.dependencyVersion };
+  return { command, args: [], ...probe };
 }
 
 function bounded(value) {
   return String(value || "").trim().slice(0, 4000);
 }
 
-function runChecked(run, command, args, message) {
+function runChecked(run, command, args, message, options = {}) {
   const result = run(command, args, {
     encoding: "utf8",
+    ...options,
     shell: false,
     windowsHide: true,
   });
@@ -191,7 +214,7 @@ export function ensurePythonRuntime({
   const parent = path.dirname(root);
   const lock = acquireRuntimeLock(root);
   try {
-    const current = inspectRuntime({ root, platform, requirementsHash, run });
+    const current = inspectRuntime({ root, platform, requirementsHash, env, run });
     if (current) {
       return { status: "current", root, requirements, python: current };
     }
@@ -205,13 +228,19 @@ export function ensurePythonRuntime({
     const backup = path.join(parent, `.python-backup-${nonce}`);
     fs.mkdirSync(parent, { recursive: true });
     let movedOld = false;
+    let created;
     try {
       runChecked(run, base.command, [...base.args, "-m", "venv", staging], "Could not create the Fuploader Python runtime");
       const stagingPython = pythonRuntimeExecutable(staging, platform);
       runChecked(run, stagingPython, [
         "-m", "pip", "install", "--disable-pip-version-check", "--no-input", "--requirement", requirements,
       ], "Could not install Fuploader Python dependencies");
-      const installed = probeRuntime(stagingPython, run);
+      runChecked(run, stagingPython, [
+        "-m", "playwright", "install", "chromium",
+      ], "Could not install Fuploader Chromium", {
+        env: runtimeEnvironment(staging, env),
+      });
+      const installed = probeRuntime(stagingPython, staging, env, run);
       if (!installed) {
         throw new Error("The Fuploader Python runtime did not pass its dependency probe.");
       }
@@ -220,6 +249,8 @@ export function ensurePythonRuntime({
         requirements_sha256: requirementsHash,
         python_version: installed.version.join("."),
         dependency_version: installed.dependencyVersion,
+        playwright_version: installed.playwrightVersion,
+        chromium_executable: path.relative(staging, installed.chromiumExecutable),
       });
       if (fs.existsSync(root)) {
         fs.renameSync(root, backup);
@@ -234,15 +265,20 @@ export function ensurePythonRuntime({
         }
         throw error;
       }
+      created = inspectRuntime({ root, platform, requirementsHash, env, run });
+      if (!created) {
+        fs.rmSync(root, { recursive: true, force: true });
+        if (movedOld) {
+          fs.renameSync(backup, root);
+          movedOld = false;
+        }
+        throw new Error("The installed Fuploader Python runtime failed final validation.");
+      }
       if (movedOld) {
         fs.rmSync(backup, { recursive: true, force: true });
       }
     } finally {
       fs.rmSync(staging, { recursive: true, force: true });
-    }
-    const created = inspectRuntime({ root, platform, requirementsHash, run });
-    if (!created) {
-      throw new Error("The installed Fuploader Python runtime failed final validation.");
     }
     return { status: "installed", root, requirements, python: created };
   } finally {

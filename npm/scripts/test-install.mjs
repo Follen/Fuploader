@@ -116,6 +116,14 @@ async function exercise({ name, ignoreScripts }) {
   if (!fs.existsSync(runtimeRoot)) {
     throw new Error("The install/launcher flow did not create the managed Python runtime.");
   }
+  const runtimeMarker = JSON.parse(fs.readFileSync(path.join(runtimeRoot, "runtime.json"), "utf8"));
+  if (runtimeMarker.playwright_version !== "1.62.0") {
+    throw new Error(`Unexpected managed Playwright version: ${runtimeMarker.playwright_version}`);
+  }
+  const chromiumExecutable = path.resolve(runtimeRoot, runtimeMarker.chromium_executable);
+  if (!fs.existsSync(chromiumExecutable)) {
+    throw new Error(`Managed Chromium executable is missing: ${chromiumExecutable}`);
+  }
 
   const uninstall = runInstalled(prefix, ["--skill-dir", customSkill, "uninstall"], { env, cwd: project });
   const lines = uninstall.stdout.trim().split(/\r?\n/).filter(Boolean);

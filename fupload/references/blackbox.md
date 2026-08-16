@@ -1,6 +1,8 @@
 # Heybox Workshop
 
-The blackbox provider reuses the signed-in Heybox desktop client's local login state. It never accepts credentials, cookies, tokens, signatures, or COS temporary credentials as input.
+The blackbox provider uses a Fuploader-managed persistent Chromium profile for the Workshop web session. It probes that profile headlessly. If the profile is missing or expired, it opens the Workshop login page visibly and waits for the user to finish login, then resumes through the same profile in headless mode.
+
+The Chromium profile lives under Fuploader's product state directory and is managed with the package's private Python venv. Fuploader does not read the Heybox desktop config or import Chrome, Edge, Electron, or another Playwright profile, and never accepts credentials, profile paths, cookies, tokens, signatures, endpoints, or COS temporary credentials as input. API calls use a fixed allowlisted web protocol and redact authentication and signed-upload material from output.
 
 The npm installer manages Tencent's official COS SDK in a Fuploader-only Python venv. `fupload update` synchronizes it, the launcher repairs a missing or stale runtime before executing the Python CLI, and `fupload uninstall` removes it. No system-wide `pip install` is required.
 

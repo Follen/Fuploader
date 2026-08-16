@@ -1,0 +1,25 @@
+{
+  "kind": "builder-handoff",
+  "summary": "Implemented desktop config AES session loading, Heybox 1.14.1 signer parity, current request fields, recursive redaction, complete module/version readback, paginated version discovery, stable single-retry version deletion, ZIP validation, and bounded COS fallback. Reversed the installed client and verified that the current desktop profile contains only the ordinary account session: the official Workshop requester reaches module/list but returns relogin, while the live renderer and mini-program adapters force target heybox and cannot provide a creator transport.",
+  "addressed_acceptance_ids": [
+    "A1", "A2", "A3", "A4", "A5", "A6", "A8", "A9", "A10", "A11",
+    "A12", "A13", "A14", "A15", "A16", "A17", "A18", "A19", "A20", "A21"
+  ],
+  "checks": [
+    {"name": "python-unittest", "result": "passed", "note": "246 tests passed"},
+    {"name": "python-compileall", "result": "passed", "note": "fupload/scripts compiled successfully"},
+    {"name": "npm-test", "result": "passed", "note": "23 tests passed"},
+    {"name": "npm-manifest", "result": "passed", "note": "manifest rebuilt and check passed"},
+    {"name": "npm-test-pack", "result": "passed", "note": "51 files, 134859 bytes"},
+    {"name": "npm-test-install", "result": "passed", "note": "global install, managed runtime, launcher, Skill, and self-uninstall passed"},
+    {"name": "blackbox-plugin-list", "result": "failed", "note": "exit 1; endpoint /wow/open_platform/module/list/; business status relogin; authentication_error"},
+    {"name": "taptool-live-lifecycle", "result": "not-run", "note": "authentication gate failed before baseline or mutation"}
+  ],
+  "known_limits": [
+    "The current Heybox Electron profile has user_heybox_id, user_pkey, and x_xhh_tokenid but no completed Open creator identity or open.auth.user state.",
+    "The installed 1.14.1 sendRequestV2 and mini-program request adapters ignore Workshop target selection and force the ordinary heybox requester; live renderer Workshop calls do not complete their callbacks.",
+    "The official requester with target heybox-workshop returns verify_pkey=failed and module/list=relogin for the current desktop account, including after restore_login, Cookie aliases, risk-token placement, and query variants.",
+    "TapTool module edits, version creation, archive replacement, and individual test-version deletion were not executed because the read-only authentication gate did not pass.",
+    "Merge, version bump, tag, CI, and npm publication remain deferred until real desktop creator authentication and the complete TapTool rollback workflow pass."
+  ]
+}

@@ -1,45 +1,43 @@
 """Heybox Workshop plugin provider."""
 from __future__ import annotations
-import hashlib, json, secrets, time
+import hashlib, json, time, zipfile
 from pathlib import Path
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.parse import urlsplit, urlunsplit
 from typing import Any, Mapping
 from .errors import FuploadError, ValidationError
-from .blackbox_auth import API_BASE, CLIENT_VERSION, hkey, load_session
+from .blackbox_web import API_ORIGIN, BlackboxWebSession
 
 API_MISC_BASE = "https://api.xiaoheihe.cn"
+API_BASE = API_ORIGIN
 
 class Blackbox:
-    def __init__(self, config: Mapping[str, Any] | None = None, transport=None):
+    def __init__(self, config: Mapping[str, Any] | None = None, transport=None, *, web_session=None, web_session_factory=None):
         self.config = dict(config or {})
-        self.profile = Path(self.config.get("client_profile") or Path.home() / "AppData/Roaming/heybox-pc-launcher")
         self._transport = transport
+        self._web_session = web_session
+        self._web_session_factory = web_session_factory or BlackboxWebSession
+
+    def close(self):
+        if self._web_session is not None:
+            self._web_session.close()
+            self._web_session = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
     def _request(self, method, path, body=None, query=None, *, base=API_BASE):
-        if self._transport: return self._transport(method, path, body or {}, query or {})
-        cookies, identity = load_session(self.profile); ts=int(time.time()); nonce=hashlib.md5((str(ts)+secrets.token_hex(16)).encode()).hexdigest().upper()
-        version = identity.get("version") or CLIENT_VERSION
-        params={
-            "app": "heybox",
-            "os_type": "Windows",
-            "web_version": "",
-            **identity,
-            "version": version,
-            "hkey": hkey(path,ts + 1,nonce),
-            "_time": ts,
-            "_chat_time": int(time.time()*1000),
-            "nonce": nonce,
-            **(query or {}),
-        }
-        json_body = base == API_MISC_BASE or path.startswith("/bbs/app/api/qcloud/")
-        headers={"Referer":"https://chat.xiaoheihe.cn","User-Agent":f"HeyboxApp/{identity.get('exe_version') or version}","x_xhh_tokenid":cookies["x_xhh_tokenid"],"Cookie":" ".join(f"{k}={v};" for k,v in cookies.items()),"Content-Type":("application/json;charset=utf-8" if json_body else "application/x-www-form-urlencoded;charset=utf-8")}
-        url=base.rstrip("/")+path+"?"+urlencode(params)
-        data=(json.dumps(body or {}, separators=(",", ":")).encode() if json_body else urlencode(body or {},doseq=True).encode()) if method=="POST" else None
-        try:
-            with urlopen(Request(url,data=data,headers=headers,method=method),timeout=60) as r: result=json.loads(r.read().decode())
-        except Exception as exc: raise FuploadError("Workshop API request failed", endpoint=path, verification_required=method=="POST") from exc
-        if not isinstance(result,dict) or result.get("status")!="ok": raise FuploadError("Workshop API rejected request", endpoint=path, details={"status":result.get("status") if isinstance(result,dict) else None})
-        return result
+        if self._transport:
+            if base != API_BASE:
+                raise ValidationError("API origin is fixed to Workshop web protocol", path="$.base")
+            return self._transport(method, path, body or {}, query or {})
+        if base != API_BASE:
+            raise ValidationError("API origin is fixed to Workshop web protocol", path="$.base")
+        if self._web_session is None:
+            self._web_session = self._web_session_factory()
+        return self._web_session.request(method, path, body=body, query=query)
     @staticmethod
     def _result(payload): return payload.get("result") or {}
     def execute_read(self, resource: str, action: str, args: Any):
@@ -60,15 +58,18 @@ class Blackbox:
         rows=self._result(self._request("GET","/wow/open_platform/module/list/")).get("moduleList") or []
         return {"total_count":len(rows),"plugins":[self._redact(x) for x in rows if isinstance(x,dict)]}
     def plugin_get(self,module_id:int):
+        detail=self._module_detail(module_id)
+        return {"module":self._redact(detail),"versions":[self._redact(x) for x in self._version_rows(module_id)]}
+    def _module_detail(self,module_id:int):
         detail=self._result(self._request("GET","/wow/open_platform/module/detail/",query={"moduleId":module_id}))
-        versions=self._result(self._request("GET","/wow/open_platform/module_version/list/",query={"moduleId":module_id,"offset":0,"limit":100}))
-        return {"module":self._redact(detail.get("module") or detail),"versions":[self._redact(x) for x in (versions.get("versionList") or [])]}
+        module=detail.get("module") or detail
+        return module if isinstance(module,dict) else {}
     def module_edit(self,doc):
         aliases={"module_id":"id","logo_url":"logoUrl","category_ids":"categoryIds","official_url":"officialUrl","core_folders":"coreFolders"}
         normalized={aliases.get(k,k):v for k,v in doc.items() if k not in {"schema","dry_run"}}
         if "id" not in normalized: raise ValidationError("id is required",path="$.id")
         module_id = int(normalized["id"])
-        current = self.plugin_get(module_id)["module"]
+        current = self._module_detail(module_id)
         # The web client sends a complete module object; preserve omitted fields.
         defaults = {"name":"", "logoUrl":"", "id":module_id, "categoryIds":[],
                     "type":1, "desc":"", "official":"", "officialUrl":"", "coreFolders":""}
@@ -77,36 +78,36 @@ class Blackbox:
         fields["id"] = module_id
         if isinstance(fields.get("coreFolders"),list): fields["coreFolders"]=",".join(map(str,fields["coreFolders"]))
         response=self._request("POST","/wow/open_platform/module/update/",body=fields)
-        actual=self.plugin_get(module_id)["module"]
-        mismatches=[]
-        for key,wanted in ((aliases.get(key,key), value) for key,value in normalized.items() if key in aliases or key in fields):
-            observed=actual.get(key)
-            if key=="coreFolders" and isinstance(observed,list): wanted=[x for x in str(wanted).split(",") if x]
-            if observed != wanted: mismatches.append(key)
-        if mismatches: raise FuploadError("module update readback mismatch",kind="verification_required",verification_required=True,details={"fields":mismatches})
+        expected={aliases.get(key,key):value for key,value in normalized.items() if key in aliases or key in fields}
+        self._wait_module(module_id,expected)
         return {"accepted":True,"verified":True,"module_id":module_id,"response":self._redact(response)}
     def version_upsert(self,doc):
         aliases={"module_id":"moduleId","version_id":"versionId","game_versions":"gameVersions","file_url":"fileUrl"}
         normalized={aliases.get(k,k):v for k,v in doc.items() if k not in {"schema","dry_run"}}
         upload_result = None
-        if "file" in normalized and "fileUrl" not in normalized:
+        if "file" in normalized:
             upload_result=self.upload_zip(int(normalized["moduleId"]),str(normalized["file"]))
             normalized["fileUrl"]=upload_result["url"]
         if "fileUrl" not in normalized and "versionId" in normalized:
             existing = self._find_version(int(normalized["moduleId"]), int(normalized["versionId"]))
-            if existing and existing.get("fileUrlHeybox"):
-                normalized["fileUrl"] = existing["fileUrlHeybox"]
+            current_url=self._archive_url(existing or {})
+            if current_url: normalized["fileUrl"]=current_url
         required=("moduleId","name","type","gameVersions","fileUrl")
         missing=[k for k in required if k not in normalized]
         if missing: raise ValidationError("missing field(s): %s"%", ".join(missing))
         games=normalized["gameVersions"] if isinstance(normalized["gameVersions"],list) else [x for x in str(normalized["gameVersions"]).split(",") if x]
         body={"moduleId":int(normalized["moduleId"]),"name":normalized["name"],"type":int(normalized["type"]),"gameVersions":",".join(map(str,games)),"fileUrl":normalized["fileUrl"]}
         if "versionId" in normalized: body["versionId"]=int(normalized["versionId"])
+        existing_ids={self._id_value(row.get("id")) for row in self._version_rows(body["moduleId"])} if "versionId" not in body else set()
         response=self._request("POST","/wow/open_platform/module_version/upsert/",body=body)
-        found=self._wait_version(body["moduleId"],body.get("versionId"),body["name"],
-                                 expected={"name":body["name"],"type":body["type"],"gameVersions":list(map(str,games))})
-        mismatches=[key for key,wanted in {"name":body["name"],"type":body["type"],"gameVersions":list(map(str,games))}.items() if found.get(key)!=wanted]
-        if not found.get("fileUrlHeybox"):
+        response_result=self._result(response)
+        response_id=(response_result.get("versionId") or response_result.get("id")) if isinstance(response_result,dict) else None
+        target_id=body.get("versionId") or (self._id_value(response_id) if response_id is not None else None)
+        expected = {"name":body["name"],"type":body["type"],"gameVersions":list(map(str,games))}
+        found=self._wait_version(body["moduleId"],target_id,body["name"],excluded_ids=existing_ids,
+                                 expected=expected,expected_archive=body["fileUrl"])
+        mismatches=[key for key,wanted in {"name":body["name"],"type":body["type"],"gameVersions":list(map(str,games))}.items() if self._comparable(key,found.get(key))!=self._comparable(key,wanted)]
+        if self._comparable("fileUrl", self._archive_url(found)) != self._comparable("fileUrl", body["fileUrl"]):
             mismatches.append("fileUrl")
         if mismatches: raise FuploadError("version upsert readback mismatch",kind="verification_required",verification_required=True,details={"fields":mismatches})
         result={"accepted":True,"verified":True,"module_id":body["moduleId"],"version_id":found.get("id"),"readback":self._redact(found),"response":self._redact(response)}
@@ -127,78 +128,105 @@ class Blackbox:
                 retry = True
                 response = self._request("POST","/wow/open_platform/module_version/delete/",body={"versionId":int(version_id),"moduleId":int(module_id)})
                 found = self._wait_version(int(module_id),int(version_id),None,deleted=True)
+                time.sleep(settle)
+                current = self._find_version(int(module_id), int(version_id))
+                if current is not None and current.get("auditState") != 4:
+                    raise FuploadError("version delete did not remain stable",kind="verification_required",verification_required=True)
         return {"accepted":True,"verified":True,"module_id":int(module_id),"version_id":int(version_id),"audit_state":found.get("auditState") if found else None,"retry":retry,"response":self._redact(response)}
     def _version_rows(self,module_id):
-        return self._result(self._request("GET","/wow/open_platform/module_version/list/",query={"moduleId":module_id,"offset":0,"limit":100})).get("versionList") or []
+        limit = int(self.config.get("version_page_size", 100))
+        max_pages = int(self.config.get("version_max_pages", 100))
+        rows = []
+        page_fingerprints = set()
+        for page_index in range(max_pages):
+            offset = page_index * limit
+            result = self._result(self._request(
+                "GET", "/wow/open_platform/module_version/list/",
+                query={"moduleId":module_id,"offset":offset,"limit":limit},
+            ))
+            page = result.get("versionList") or []
+            if not isinstance(page, list):
+                raise FuploadError("version list response is invalid", kind="verification_required", verification_required=True)
+            fingerprint = tuple(self._id_value(item.get("id")) for item in page if isinstance(item, Mapping))
+            if page and fingerprint in page_fingerprints:
+                raise FuploadError("version list pagination did not advance", kind="verification_required", verification_required=True)
+            page_fingerprints.add(fingerprint)
+            rows.extend(item for item in page if isinstance(item, dict))
+            total = next((result.get(key) for key in ("totalCount", "total_count", "total", "count") if isinstance(result.get(key), int)), None)
+            if not page or len(page) < limit or (total is not None and len(rows) >= total):
+                return rows
+        raise FuploadError("version list pagination exceeded the supported limit", kind="verification_required", verification_required=True)
 
     def _find_version(self, module_id, version_id):
-        return next((x for x in self._version_rows(module_id) if x.get("id") == version_id), None)
-    def _wait_version(self,module_id,version_id,name,deleted=False,expected=None):
-        for attempt in range(int(self.config.get("verify_attempts",20))):
+        wanted=self._id_value(version_id)
+        return next((x for x in self._version_rows(module_id) if self._id_value(x.get("id"))==wanted),None)
+    def _wait_module(self,module_id,expected):
+        attempts=int(self.config.get("verify_attempts",30))
+        mismatches=list(expected)
+        for attempt in range(attempts):
+            actual=self._module_detail(module_id)
+            mismatches=[key for key,wanted in expected.items() if self._comparable(key,actual.get(key))!=self._comparable(key,wanted)]
+            if not mismatches: return actual
+            if attempt+1<attempts: time.sleep(float(self.config.get("verify_interval",2)))
+        raise FuploadError("module update readback mismatch",kind="verification_required",verification_required=True,details={"fields":mismatches})
+    def _wait_version(self,module_id,version_id,name,deleted=False,expected=None,excluded_ids=None,expected_archive=None):
+        excluded_ids=excluded_ids or set()
+        for attempt in range(int(self.config.get("verify_attempts",30))):
             rows=self._version_rows(module_id)
-            found=next((x for x in rows if (version_id is not None and x.get("id")==version_id) or (version_id is None and x.get("name")==name)),None)
+            if version_id is not None:
+                candidates=[x for x in rows if self._id_value(x.get("id"))==self._id_value(version_id)]
+            else:
+                candidates=[x for x in rows if x.get("name")==name and self._id_value(x.get("id")) not in excluded_ids]
+            if len(candidates)>1: raise FuploadError("version write readback is ambiguous",kind="verification_required",verification_required=True)
+            found=candidates[0] if candidates else None
             matches_expected = found and all(
-                (list(map(str, found.get(key) or [])) if key == "gameVersions" else found.get(key)) == wanted
+                self._comparable(key,found.get(key))==self._comparable(key,wanted)
                 for key, wanted in (expected or {}).items()
             )
+            if matches_expected and expected_archive is not None:
+                matches_expected = self._comparable("fileUrl", self._archive_url(found)) == self._comparable("fileUrl", expected_archive)
             if (deleted and (found is None or found.get("auditState")==4)) or (not deleted and found and matches_expected): return found or {}
-            if attempt+1<int(self.config.get("verify_attempts",20)): time.sleep(float(self.config.get("verify_interval",2)))
+            if attempt+1<int(self.config.get("verify_attempts",30)): time.sleep(float(self.config.get("verify_interval",2)))
         raise FuploadError("version write was not confirmed by readback",kind="verification_required",verification_required=True)
     @staticmethod
     def _redact(value):
-        if isinstance(value,dict): return {k:("<redacted>" if any(s in k.lower() for s in ("token","secret","cookie","nonce","hkey")) else Blackbox._redact(v)) for k,v in value.items()}
-        if isinstance(value,list): return [Blackbox._redact(v) for v in value]
+        if isinstance(value,dict):
+            markers=("token","secret","cookie","nonce","hkey","pkey","credential","signature","authorization","authentication","device_id","signed_url","upload_url","presigned")
+            return {k:("<redacted>" if any(s in str(k).lower() for s in markers) else Blackbox._redact(v)) for k,v in value.items()}
+        if isinstance(value,(list,tuple)): return [Blackbox._redact(v) for v in value]
+        if isinstance(value,str):
+            parsed=urlsplit(value)
+            if parsed.scheme in {"http","https"} and parsed.netloc and parsed.query:
+                return urlunsplit((parsed.scheme,parsed.netloc,parsed.path,"<redacted>",parsed.fragment))
+        return value
+
+    @staticmethod
+    def _id_value(value):
+        try: return int(value)
+        except (TypeError,ValueError): return value
+    @staticmethod
+    def _archive_url(row): return row.get("fileUrlHeybox") or row.get("fileUrl") or row.get("file_url")
+    @staticmethod
+    def _comparable(key,value):
+        if key in {"categoryIds","gameVersions","coreFolders"}:
+            if isinstance(value,str): items=[item for item in value.split(",") if item]
+            elif isinstance(value,(list,tuple,set)): items=list(value)
+            else: items=[] if value is None else [value]
+            normalized=[]
+            for item in items:
+                if isinstance(item,Mapping): item=item.get("id",item.get("value"))
+                if item not in (None, ""):
+                    normalized.append(str(item))
+            return tuple(sorted(normalized))
+        if key in {"id","type"}: return Blackbox._id_value(value)
         return value
 
     def upload_zip(self, module_id: int, file_path: str, *, dry_run=False):
         path=Path(file_path)
         if not path.is_file(): raise ValidationError("file does not exist",path="$.file")
+        if not zipfile.is_zipfile(path): raise ValidationError("file must be a valid ZIP archive",path="$.file")
         if dry_run: return {"dry_run":True,"bytes":path.stat().st_size,"sha256":hashlib.sha256(path.read_bytes()).hexdigest()}
-        try:
-            return self._upload_zip_v2(path)
-        except FuploadError:
-            # The web creator still exposes the legacy Workshop token route.
-            # Fall back to it when the desktop generic uploader is unavailable.
-            return self._upload_zip_legacy(path)
-
-    def _upload_zip_v2(self, path: Path):
-        file_info = {"name": path.name, "mimetype": "application/zip", "fsize": path.stat().st_size}
-        info = self._result(self._request(
-            "POST", "/bbs/app/api/qcloud/cos/upload/info/v2", base=API_MISC_BASE,
-            body={"file_infos": json.dumps([file_info], separators=(",", ":")), "scope": "any", "need_cache": 0},
-        ))
-        keys = info.get("keys") or []
-        if not keys or not info.get("bucket"):
-            raise FuploadError("Current COS upload info response is incomplete", endpoint="/bbs/app/api/qcloud/cos/upload/info/v2", verification_required=True)
-        key = str(keys[0])
-        token = self._result(self._request(
-            "POST", "/bbs/app/api/qcloud/cos/upload/token/v2", base=API_MISC_BASE,
-            body={"bucket": info["bucket"], "keys": json.dumps([key], separators=(",", ":")), "mimetypes": json.dumps([file_info["mimetype"]]), "is_multipart_upload": 0},
-        ))
-        credentials = token.get("credentials") or {}
-        secret_id = credentials.get("tmpSecretId") or credentials.get("TmpSecretID")
-        secret_key = credentials.get("tmpSecretKey") or credentials.get("TmpSecretKey")
-        session_token = credentials.get("sessionToken") or credentials.get("Token")
-        if not all((secret_id, secret_key, session_token)):
-            raise FuploadError("Current COS upload credentials are incomplete", endpoint="/bbs/app/api/qcloud/cos/upload/token/v2", verification_required=True)
-        try:
-            from qcloud_cos import CosConfig, CosS3Client
-        except ModuleNotFoundError as exc:
-            raise FuploadError("The managed Fuploader Python runtime is missing the Heybox COS SDK", kind="environment_error", details={"repair_command":"fupload update"}) from exc
-        try:
-            cos=CosS3Client(CosConfig(Region=info.get("region") or "ap-shanghai",SecretId=secret_id,SecretKey=secret_key,Token=session_token,Scheme="https"))
-            with path.open("rb") as stream: cos.put_object(Bucket=info["bucket"],Key=key,Body=stream)
-        except Exception as exc:
-            raise FuploadError("COS upload failed", endpoint="/bbs/app/api/qcloud/cos/upload/token/v2", verification_required=True) from exc
-        callback = self._result(self._request(
-            "POST", "/bbs/app/api/qcloud/cos/upload/callback/v2", base=API_MISC_BASE,
-            query={"is_finished": "true"}, body={"keys": json.dumps([key], separators=(",", ":"))},
-        ))
-        urls = callback.get("preview_urls") or callback.get("previewUrls") or []
-        url = urls[0] if urls else callback.get("url")
-        if not url:
-            raise FuploadError("Current COS upload callback did not return a URL", endpoint="/bbs/app/api/qcloud/cos/upload/callback/v2", verification_required=True)
-        return {"url":url,"bytes":path.stat().st_size,"sha256":hashlib.sha256(path.read_bytes()).hexdigest(),"protocol":"v2"}
+        return self._upload_zip_legacy(path)
 
     def _upload_zip_legacy(self, path: Path):
         size_mb=path.stat().st_size/1024/1024

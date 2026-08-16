@@ -28,7 +28,7 @@ WRONG_TYPES = {
 POSITIVE_IDS = {
     "id", "mod_id", "file_id", "content_id", "source_id", "module_id",
     "game_version_id", "cloud_id", "game_type", "primary_category_id",
-    "project_id", "parent_file_id",
+    "project_id", "parent_file_id", "version_id",
 }
 
 NESTED_OBJECT_FIELDS = {
