@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   discoverPython,
+  discoverUv,
   ensurePythonRuntime,
   pythonRuntimeExecutable,
   pythonRuntimeRoot,
@@ -21,6 +22,23 @@ test("discovers a supported local Python interpreter", () => {
   assert.ok(python);
   assert.equal(python.version[0], 3);
   assert.ok(python.version[1] >= 9);
+});
+
+test("discovers uv and rejects invalid version output", () => {
+  let invocation;
+  const found = discoverUv({
+    run(command, args, options) {
+      invocation = { command, args, options };
+      return { status: 0, stdout: "uv 0.12.1 (build metadata)\n" };
+    },
+  });
+  assert.deepEqual(found, { command: "uv", args: [], version: [0, 12, 1] });
+  assert.equal(invocation.command, "uv");
+  assert.deepEqual(invocation.args, ["--version"]);
+  assert.equal(invocation.options.shell, false);
+  assert.equal(invocation.options.windowsHide, true);
+  assert.equal(discoverUv({ run: () => ({ status: 0, stdout: "unexpected\n" }) }), null);
+  assert.equal(discoverUv({ run: () => ({ status: 1, stdout: "" }) }), null);
 });
 
 test("launches managed Python with its Chromium directory", () => {
@@ -70,17 +88,33 @@ test("creates, reuses, and removes the managed Python runtime", (t) => {
     home: path.join(root, "home"),
   };
   let venvCreates = 0;
+  let uvInstalls = 0;
   let chromiumInstalls = 0;
+  const stagingRoots = [];
   function run(command, args, runOptions = {}) {
     if (args.includes("venv")) {
       const staging = args.at(-1);
+      stagingRoots.push(staging);
       fs.mkdirSync(path.dirname(pythonRuntimeExecutable(staging, "linux")), { recursive: true });
       fs.writeFileSync(pythonRuntimeExecutable(staging, "linux"), "python", "utf8");
       venvCreates += 1;
       return { status: 0, stdout: "", stderr: "" };
     }
-    if (args.includes("pip")) {
+    if (command === "managed-uv") {
+      assert.deepEqual(args, [
+        "pip", "install",
+        "--python", pythonRuntimeExecutable(stagingRoots.at(-1), "linux"),
+        "--requirements", path.join(packageRoot, "npm", "lib", "python-requirements.txt"),
+        "--link-mode", "copy",
+        "--no-config",
+        "--no-progress",
+        "--no-python-downloads",
+      ]);
+      uvInstalls += 1;
       return { status: 0, stdout: "installed", stderr: "" };
+    }
+    if (args.includes("pip")) {
+      assert.fail("pip fallback was used while uv was available");
     }
     if (args.includes("playwright") && args.includes("install")) {
       const executable = path.join(runOptions.env.PLAYWRIGHT_BROWSERS_PATH, "chromium-test", "chrome");
@@ -102,21 +136,27 @@ test("creates, reuses, and removes the managed Python runtime", (t) => {
     };
   }
   const discover = () => ({ command: "base-python", args: [], version: [3, 12, 0] });
-  const installed = ensurePythonRuntime({ ...options, run, discover });
+  const locateUv = () => ({ command: "managed-uv", args: [], version: [0, 12, 1] });
+  const installed = ensurePythonRuntime({ ...options, run, discover, discoverUv: locateUv });
   assert.equal(installed.status, "installed");
   assert.equal(installed.root, pythonRuntimeRoot(options));
   assert.equal(installed.python.dependencyVersion, "1.9.44");
   assert.equal(installed.python.playwrightVersion, "1.62.0");
   assert.ok(fs.existsSync(installed.python.chromiumExecutable));
-  const current = ensurePythonRuntime({ ...options, run, discover });
+  const marker = JSON.parse(fs.readFileSync(path.join(installed.root, "runtime.json"), "utf8"));
+  assert.equal(marker.dependency_installer, "uv");
+  assert.equal(marker.dependency_installer_version, "0.12.1");
+  const current = ensurePythonRuntime({ ...options, run, discover, discoverUv: () => null });
   assert.equal(current.status, "current");
   assert.equal(venvCreates, 1);
+  assert.equal(uvInstalls, 1);
   assert.equal(chromiumInstalls, 1);
   fs.rmSync(installed.python.chromiumExecutable);
-  const repaired = ensurePythonRuntime({ ...options, run, discover });
+  const repaired = ensurePythonRuntime({ ...options, run, discover, discoverUv: locateUv });
   assert.equal(repaired.status, "installed");
   assert.ok(fs.existsSync(repaired.python.chromiumExecutable));
   assert.equal(venvCreates, 2);
+  assert.equal(uvInstalls, 2);
   assert.equal(chromiumInstalls, 2);
   const removed = removePythonRuntime(options);
   assert.equal(removed.status, "removed");
@@ -173,13 +213,15 @@ test("keeps the existing runtime when Chromium installation fails", (t) => {
     };
   }
   const discover = () => ({ command: "base-python", args: [], version: [3, 12, 0] });
-  const installed = ensurePythonRuntime({ ...options, run, discover });
+  const withoutUv = () => null;
+  const installed = ensurePythonRuntime({ ...options, run, discover, discoverUv: withoutUv });
   const markerBefore = fs.readFileSync(path.join(installed.root, "runtime.json"), "utf8");
+  assert.equal(JSON.parse(markerBefore).dependency_installer, "pip");
 
   fs.appendFileSync(requirements, "# force replacement\n", "utf8");
   failChromium = true;
   assert.throws(
-    () => ensurePythonRuntime({ ...options, run, discover }),
+    () => ensurePythonRuntime({ ...options, run, discover, discoverUv: withoutUv }),
     /Could not install Fuploader Chromium: download failed/,
   );
   assert.equal(fs.readFileSync(path.join(installed.root, "runtime.json"), "utf8"), markerBefore);
@@ -192,7 +234,7 @@ test("keeps the existing runtime when Chromium installation fails", (t) => {
   failChromium = false;
   failFinalProbe = true;
   assert.throws(
-    () => ensurePythonRuntime({ ...options, run, discover }),
+    () => ensurePythonRuntime({ ...options, run, discover, discoverUv: withoutUv }),
     /failed final validation/,
   );
   assert.equal(fs.readFileSync(path.join(installed.root, "runtime.json"), "utf8"), markerBefore);
