@@ -42,7 +42,7 @@ fupload/
 - 网易 DD：Windows、Python 3、已安装并登录官方客户端
 - Heybox Workshop：Windows、Python 3、已安装并登录 Heybox 桌面客户端
 
-npm 安装和 `fupload update` 会在用户状态目录中创建 Fuploader 专用 Python venv，并自动安装 Heybox ZIP 上传所需的腾讯官方 COS SDK；不会修改系统 Python。使用 `npm --ignore-scripts` 安装时，首次运行实际 CLI 命令会校验并补齐该 runtime。
+npm 安装和 `fupload update` 会在用户状态目录中创建 Fuploader 专用 Python venv，优先使用可用的 `uv` 向其中安装固定版本依赖，并自动安装 Heybox ZIP 上传所需的腾讯官方 COS SDK；未安装 `uv` 时回退到 venv 自带的 pip，不会修改系统 Python。使用 `npm --ignore-scripts` 安装时，首次运行实际 CLI 命令会校验并补齐该 runtime。
 
 官方 `ncc` 的安装命令为 `npm i -g @newbeebox/newbeebox-creator-center-cli@latest`。Fuploader 不读取其凭据文件；用户在自己的终端完成 `ncc login`，Agent 仅用 `ncc whoami -o json` 验证。自动化可在启动 Agent 前注入 `NCC_TOKEN`，令牌不得写入命令参数、项目文件或 Git。
 

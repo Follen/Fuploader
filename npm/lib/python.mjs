@@ -6,7 +6,7 @@ import path from "node:path";
 
 import { productStateRoot } from "./managed-install.mjs";
 
-export const PYTHON_RUNTIME_SCHEMA = "fupload.python-runtime.v1";
+export const PYTHON_RUNTIME_SCHEMA = "fupload.python-runtime.v2";
 const RUNTIME_DIRECTORY = "python";
 const RUNTIME_MARKER = "runtime.json";
 const RUNTIME_LOCK_WAIT_MS = 5 * 60 * 1000;
@@ -43,6 +43,22 @@ export function discoverPython({ platform = process.platform, minimumMinor = 9 }
     }
   }
   return null;
+}
+
+export function discoverUv({ run = spawnSync } = {}) {
+  const result = run("uv", ["--version"], {
+    encoding: "utf8",
+    shell: false,
+    windowsHide: true,
+  });
+  if (result.error || result.status !== 0) {
+    return null;
+  }
+  const match = result.stdout.trim().match(/^uv (\d+)\.(\d+)\.(\d+)(?:\s|$)/);
+  if (!match) {
+    return null;
+  }
+  return { command: "uv", args: [], version: match.slice(1).map(Number) };
 }
 
 export function runPython(python, script, args, options = {}) {
@@ -129,7 +145,10 @@ function probeRuntime(executable, root, env, run = spawnSync) {
 
 function inspectRuntime({ root, platform, requirementsHash, env, run }) {
   const marker = readMarker(root);
-  if (marker?.schema !== PYTHON_RUNTIME_SCHEMA || marker.requirements_sha256 !== requirementsHash) {
+  if (
+    marker?.schema !== PYTHON_RUNTIME_SCHEMA ||
+    marker.requirements_sha256 !== requirementsHash
+  ) {
     return null;
   }
   const command = pythonRuntimeExecutable(root, platform);
@@ -210,6 +229,7 @@ export function ensurePythonRuntime({
   home = os.homedir(),
   run = spawnSync,
   discover = discoverPython,
+  discoverUv: locateUv = discoverUv,
 } = {}) {
   const requirements = pythonRequirementsFile(packageRoot);
   const content = fs.readFileSync(requirements);
@@ -218,7 +238,15 @@ export function ensurePythonRuntime({
   const parent = path.dirname(root);
   const lock = acquireRuntimeLock(root);
   try {
-    const current = inspectRuntime({ root, platform, requirementsHash, env, run });
+    const uv = locateUv({ run });
+    const dependencyInstaller = uv ? "uv" : "pip";
+    const current = inspectRuntime({
+      root,
+      platform,
+      requirementsHash,
+      env,
+      run,
+    });
     if (current) {
       return { status: "current", root, requirements, python: current };
     }
@@ -236,9 +264,22 @@ export function ensurePythonRuntime({
     try {
       runChecked(run, base.command, [...base.args, "-m", "venv", staging], "Could not create the Fuploader Python runtime");
       const stagingPython = pythonRuntimeExecutable(staging, platform);
-      runChecked(run, stagingPython, [
-        "-m", "pip", "install", "--disable-pip-version-check", "--no-input", "--requirement", requirements,
-      ], "Could not install Fuploader Python dependencies");
+      if (uv) {
+        runChecked(run, uv.command, [
+          ...uv.args,
+          "pip", "install",
+          "--python", stagingPython,
+          "--requirements", requirements,
+          "--link-mode", "copy",
+          "--no-config",
+          "--no-progress",
+          "--no-python-downloads",
+        ], "Could not install Fuploader Python dependencies with uv");
+      } else {
+        runChecked(run, stagingPython, [
+          "-m", "pip", "install", "--disable-pip-version-check", "--no-input", "--requirement", requirements,
+        ], "Could not install Fuploader Python dependencies");
+      }
       runChecked(run, stagingPython, [
         "-m", "playwright", "install", "chromium",
       ], "Could not install Fuploader Chromium", {
@@ -251,6 +292,8 @@ export function ensurePythonRuntime({
       writeMarker(staging, {
         schema: PYTHON_RUNTIME_SCHEMA,
         requirements_sha256: requirementsHash,
+        dependency_installer: dependencyInstaller,
+        dependency_installer_version: uv ? uv.version.join(".") : null,
         python_version: installed.version.join("."),
         dependency_version: installed.dependencyVersion,
         playwright_version: installed.playwrightVersion,
@@ -269,7 +312,13 @@ export function ensurePythonRuntime({
         }
         throw error;
       }
-      created = inspectRuntime({ root, platform, requirementsHash, env, run });
+      created = inspectRuntime({
+        root,
+        platform,
+        requirementsHash,
+        env,
+        run,
+      });
       if (!created) {
         fs.rmSync(root, { recursive: true, force: true });
         if (movedOld) {
