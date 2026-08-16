@@ -46,9 +46,13 @@ export function discoverPython({ platform = process.platform, minimumMinor = 9 }
 }
 
 export function runPython(python, script, args, options = {}) {
-  return spawnSync(python.command, [...python.args, script, ...args], {
+  const run = options.run || spawnSync;
+  const env = options.runtimeRoot
+    ? runtimeEnvironment(options.runtimeRoot, options.env || process.env)
+    : options.env || process.env;
+  return run(python.command, [...python.args, script, ...args], {
     cwd: options.cwd || process.cwd(),
-    env: options.env || process.env,
+    env,
     stdio: options.stdio || "inherit",
     encoding: options.encoding,
     shell: false,

@@ -11,6 +11,7 @@ import {
   pythonRuntimeExecutable,
   pythonRuntimeRoot,
   removePythonRuntime,
+  runPython,
 } from "../lib/python.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -20,6 +21,43 @@ test("discovers a supported local Python interpreter", () => {
   assert.ok(python);
   assert.equal(python.version[0], 3);
   assert.ok(python.version[1] >= 9);
+});
+
+test("launches managed Python with its Chromium directory", () => {
+  const runtimeRoot = path.join("state", "python");
+  let invocation;
+  const result = runPython(
+    { command: "managed-python", args: ["-I"] },
+    "fupload.py",
+    ["blackbox", "plugin", "list"],
+    {
+      cwd: "workspace",
+      env: { EXISTING_VALUE: "preserved" },
+      runtimeRoot,
+      run(command, args, options) {
+        invocation = { command, args, options };
+        return { status: 0 };
+      },
+    },
+  );
+
+  assert.equal(result.status, 0);
+  assert.equal(invocation.command, "managed-python");
+  assert.deepEqual(invocation.args, [
+    "-I",
+    "fupload.py",
+    "blackbox",
+    "plugin",
+    "list",
+  ]);
+  assert.equal(invocation.options.cwd, "workspace");
+  assert.equal(invocation.options.env.EXISTING_VALUE, "preserved");
+  assert.equal(
+    invocation.options.env.PLAYWRIGHT_BROWSERS_PATH,
+    path.join(runtimeRoot, "browsers"),
+  );
+  assert.equal(invocation.options.shell, false);
+  assert.equal(invocation.options.windowsHide, true);
 });
 
 test("creates, reuses, and removes the managed Python runtime", (t) => {
