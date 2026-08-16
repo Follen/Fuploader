@@ -175,6 +175,34 @@ class SchemaTests(unittest.TestCase):
             with self.assertRaisesRegex(ValidationError, "game-version strings"):
                 schema.validate(value)
 
+    def test_blackbox_rejects_invalid_ids_arrays_and_archives(self) -> None:
+        edit = get_schema("blackbox", "plugin", "edit")
+        for field, invalid in (("category_ids", [{"id": 1}]), ("core_folders", [False])):
+            with self.subTest(field=field), self.assertRaises(ValidationError):
+                edit.validate({"schema": edit.name, "id": 1, field: invalid})
+
+        version_edit = get_schema("blackbox", "version", "edit")
+        with self.assertRaises(ValidationError):
+            version_edit.validate({
+                "schema": version_edit.name, "version_id": -9, "module_id": 1,
+                "name": "v", "type": 1, "game_versions": ["1.0"],
+            })
+        with self.assertRaises(ValidationError):
+            version_edit.validate({
+                "schema": version_edit.name, "version_id": 9, "module_id": 1,
+                "name": "v", "type": 1, "game_versions": [{"bad": "shape"}],
+            })
+
+        update = get_schema("blackbox", "plugin", "update")
+        with tempfile.TemporaryDirectory() as directory:
+            not_zip = Path(directory) / "package.json"
+            not_zip.write_text("{}", encoding="utf-8")
+            with self.assertRaises(ValidationError):
+                update.validate({
+                    "schema": update.name, "module_id": 1, "name": "v", "type": 1,
+                    "game_versions": ["1.0"], "file": str(not_zip),
+                })
+
     def test_delete_requires_literal_confirmation(self) -> None:
         for platform, identifier in (("newbee", {"id": 1}), ("dd", {"sn": "one"})):
             for resource in ("plugin", "config", "wa"):

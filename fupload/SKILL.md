@@ -1,8 +1,8 @@
 ---
 name: fupload
-description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, and Heybox Workshop, including CurseForge author project lookup, plugin ZIP upload, and Heybox client-session version management. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, plugins, configurations, or WA.
+description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, and Heybox Workshop, including CurseForge author project lookup, plugin ZIP upload, and Heybox web-session version management. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, plugins, configurations, or WA.
 metadata:
-  version: "0.0.6"
+  version: "0.0.7"
 ---
 
 # Fupload
@@ -69,7 +69,7 @@ For npm package maintenance, use `fupload update` to update the CLI, managed Pyt
 - Read [references/newbee.md](references/newbee.md) only when the user explicitly selected the third-party Python NewBeeBox channel.
 - Read [references/dd.md](references/dd.md) only for DD.
 - Read [references/curseforge.md](references/curseforge.md) for every CurseForge lookup or upload.
-- Read [references/blackbox.md](references/blackbox.md) for Heybox Workshop plugin list/detail, metadata edit, version upload/edit/delete, and client-session authentication.
+- Read [references/blackbox.md](references/blackbox.md) for Heybox Workshop plugin list/detail, metadata edit, version upload/edit/delete, and managed web-session authentication.
 - For Python, run the exact leaf command with `--help` before creating its input. Treat help as the executable schema contract.
 
 ## Investigate
@@ -88,7 +88,7 @@ For DD, use the one active task session to read game types/builds and the resour
 
 For every existing DD update or edit, GET the detail first and rebuild the official full form before preparing the write. If a legacy record lacks a field now required by the official submit validator, such as `creation_statement`, stop before upload and collect that value. When the missing field belongs to a different action allowlist, plan and confirm the prerequisite edit first, read it back, then run the content update. Do not send `null`, create defaults, or guessed values to bypass the missing field.
 
-For Heybox Workshop, use the signed-in desktop client's local session automatically. `blackbox plugin list`, `get`, and `versions` are read-only; `plugin edit` preserves omitted module fields by reading the complete module first; `plugin update` and `version-edit` upload or reuse a ZIP URL and verify the version readback; `version-delete` waits for asynchronous soft deletion and retries once when the audit state temporarily returns active. Do not accept or print cookies, tokens, signatures, or temporary COS credentials, and do not delete a whole module.
+For Heybox Workshop, use Fuploader's managed Chromium web profile. If the profile is missing or the creator API reports an expired session, Fuploader opens the Workshop login page visibly for the user to complete login, then reuses the same profile headlessly for signed protocol requests. Never read the desktop client config or import another browser profile, and never accept a caller-supplied profile, cookie, token, signature, or endpoint. `blackbox plugin list`, `get`, and `versions` are read-only; `plugin edit` preserves omitted module fields by reading the complete module first; `plugin update` and `version-edit` upload or reuse a ZIP URL and verify the version readback; `version-delete` waits for asynchronous soft deletion and retries once when the audit state temporarily returns active. Do not print cookies, tokens, signatures, or temporary COS credentials, and do not delete a whole module.
 
 For DD WA create, collect user choices before generating JSON, then let the Python CLI supply only the official create defaults for omitted form values: seven-day share and purchase lifetimes, `need_buy=false`, category `ui_original`, `Interface/Addons`, empty VIP levels, and version `0`. Submit category IDs as strings even when a discovery response represents them numerically. WA create/update versions contain digits only; update must be numerically greater than the current remote value. Every `!WA:2!` create/update/edit is reparsed by the installed official `WowUIInterface.parseWa` chain, including unchanged edit content. Do not carry create defaults into WA update/edit; omitted existing fields preserve their remote value.
 

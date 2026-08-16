@@ -93,7 +93,7 @@ class Schema:
         return checked
 
     def _validate_conditionals(self, value: Dict[str, Any]) -> None:
-        for name in ("id", "mod_id", "file_id", "content_id", "source_id", "module_id", "game_version_id", "cloud_id"):
+        for name in ("id", "mod_id", "file_id", "content_id", "source_id", "module_id", "version_id", "game_version_id", "cloud_id"):
             if name in value and isinstance(value[name], int) and value[name] <= 0:
                 raise ValidationError("must be greater than zero", path="$.%s" % name)
         if value.get("public") is True and value.get("submit_for_review") is not True:
@@ -340,6 +340,17 @@ class Schema:
                 for field_name in ("game_versions", "game_version_names"):
                     if field_name in value:
                         raise ValidationError("must be omitted when parent_file_id is set", path="$.%s" % field_name)
+        if self.name.startswith("fupload.v1.blackbox"):
+            scalar_array("game_versions", (str,), "array must contain nonempty game-version strings")
+            if "game_versions" in value and any(not item.strip() for item in value["game_versions"]):
+                raise ValidationError("array must contain nonempty game-version strings", path="$.game_versions")
+            if "category_ids" in value and any(isinstance(item, bool) or not isinstance(item, int) or item <= 0 for item in value["category_ids"]):
+                raise ValidationError("array must contain positive integer IDs", path="$.category_ids")
+            scalar_array("core_folders", (str,), "array must contain nonempty folder names")
+            if "core_folders" in value and any(not item.strip() for item in value["core_folders"]):
+                raise ValidationError("array must contain nonempty folder names", path="$.core_folders")
+            if "file" in value and not zipfile.is_zipfile(value["file"]):
+                raise ValidationError("file must be a valid ZIP archive", path="$.file")
 
 
 def f(type_name: str, **kwargs: Any) -> Field:
@@ -559,12 +570,12 @@ register("blackbox", "plugin", "edit", required({
 }, ("id",)))
 register("blackbox", "plugin", "update", required({
     "module_id": f("integer"), "name": f("string", nonempty=True), "type": f("integer", choices=(1, 2, 3)),
-    "game_versions": f("array", nonempty=True), "file": f("string", local_file=True), "file_url": f("string"),
+    "game_versions": f("array", nonempty=True), "file": f("string", local_file=True), "file_url": f("string", nonempty=True),
 }, ("module_id", "name", "type", "game_versions", "file")))
 register("blackbox", "version", "edit", required({
     "version_id": f("integer"), "module_id": f("integer"), "name": f("string", nonempty=True),
     "type": f("integer", choices=(1, 2, 3)), "game_versions": f("array", nonempty=True),
-    "file": f("string", local_file=True), "file_url": f("string"),
+    "file": f("string", local_file=True), "file_url": f("string", nonempty=True),
 }, ("version_id", "module_id", "name", "type", "game_versions")))
 register("blackbox", "version", "delete", required({
     "version_id": f("integer"), "module_id": f("integer"),

@@ -206,7 +206,7 @@ def _blackbox_tree(platforms: argparse._SubParsersAction) -> None:
     root = platforms.add_parser(
         "blackbox",
         help="Heybox Workshop plugin management",
-        description="Reuse the signed-in Heybox desktop client login state; no credential input is accepted.",
+        description="Use a managed Heybox Workshop web session; an interactive browser opens when login is required.",
     )
     groups = root.add_subparsers(dest="resource_command", required=True)
     plugin = groups.add_parser("plugin", help="Heybox Workshop plugin metadata and versions").add_subparsers(dest="action_command", required=True)
@@ -281,17 +281,27 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 write_output(platform, operation, _dry_run_data(doc, schema.name), dry_run=True)
                 return 0
             provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else CurseForge()))
-            if platform == "dd":
-                data = provider.execute_write(resource, action, doc, getattr(args, "session", None))
-            else:
-                data = provider.execute_write(resource, action, doc)
+            try:
+                if platform == "dd":
+                    data = provider.execute_write(resource, action, doc, getattr(args, "session", None))
+                else:
+                    data = provider.execute_write(resource, action, doc)
+            finally:
+                close = getattr(provider, "close", None)
+                if close:
+                    close()
             write_output(platform, operation, data)
             return 0
         provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else CurseForge()))
-        if platform == "dd":
-            data = provider.execute_read(resource, action, args, getattr(args, "session", None))
-        else:
-            data = provider.execute_read(resource, action, args)
+        try:
+            if platform == "dd":
+                data = provider.execute_read(resource, action, args, getattr(args, "session", None))
+            else:
+                data = provider.execute_read(resource, action, args)
+        finally:
+            close = getattr(provider, "close", None)
+            if close:
+                close()
         write_output(platform, operation, data)
         return 0
     except (FuploadError, OSError, ValueError) as exc:

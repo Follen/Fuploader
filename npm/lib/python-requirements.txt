@@ -1,1 +1,2 @@
 cos-python-sdk-v5==1.9.44
+playwright==1.62.0
