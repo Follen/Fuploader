@@ -76,7 +76,9 @@ async function main() {
     return 1;
   }
   const script = path.join(target, "scripts", "fupload.py");
-  const result = runPython(runtime.python, script, options.forwarded);
+  const result = runPython(runtime.python, script, options.forwarded, {
+    runtimeRoot: runtime.root,
+  });
   if (result.error) {
     emitError("PYTHON_LAUNCH_FAILED", result.error.message);
     return 1;
