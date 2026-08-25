@@ -41,12 +41,32 @@ COMPLETE = ProjectStep.COMPLETE.value
 _SCHEMA = "fupload.v1.modus.project-state"
 _PLATFORMS = ("modus", "bigfoot")
 _BIGFOOT_EXCLUSIVE_CATEGORY_ID = 998
+_BASIC_INFO_KEYS = {
+    # Shared create/edit form fields.
+    "schema", "name", "project_name", "alt_name", "summary", "categories",
+    "synchronization_type", "publish_platforms", "publishPlatforms",
+    "required_tier_id", "requiredTierId", "repo_url",
+    # Create-only image fields and edit-only detail/image fields.
+    "logo_base64", "screenshot_base64s", "description",
+    "required_dependencies", "images", "image_ops",
+    # Known project-detail readback fields preserved in resumable snapshots.
+    "cf_url", "logo", "status",
+}
 _LICENSE_KEYS = {
     "type", "template", "license_template", "licenseTemplate",
     "holder", "copyright_holder", "copyrightHolder",
     "year", "copyright_year", "copyrightYear",
     "content", "license_content", "licenseContent",
 }
+
+
+def _basic_info_fields(value: Mapping[str, Any]) -> None:
+    unknown = sorted(set(value) - _BASIC_INFO_KEYS)
+    if unknown:
+        raise ValidationError(
+            "unknown basic_info field(s): %s" % ", ".join(unknown),
+            path="$.basic_info.%s" % unknown[0],
+        )
 
 
 def _nonempty_text(value: Any, *, path: str) -> str:
@@ -194,6 +214,7 @@ class ProjectStateMachine:
         self._require(ProjectStep.BASIC_INFO)
         value: Dict[str, Any] = dict(info or {})
         value.update(fields)
+        _basic_info_fields(value)
         name = value.get("name", value.get("project_name"))
         summary = value.get("summary")
         _nonempty_text(name, path="$.basic_info.name")
@@ -288,26 +309,33 @@ class ProjectStateMachine:
         game = snapshot.get("game")
         basic = snapshot.get("basic_info") or {}
         lic = snapshot.get("license") or {}
+        restored_game: Any = None
+        restored_basic: Dict[str, Any] = {}
+        restored_license: Dict[str, Any] = {}
         if state != CHOOSE_GAME:
-            self._game = _game(game)
+            restored_game = _game(game)
         if state in {LICENSE, COMPLETE}:
             if not isinstance(basic, Mapping):
                 raise ValidationError("basic_info must be an object", path="$.basic_info")
-            self._basic_info = dict(basic)
-            _nonempty_text(self._basic_info.get("name"), path="$.basic_info.name")
-            _nonempty_text(self._basic_info.get("summary"), path="$.basic_info.summary")
-            self._basic_info["publish_platforms"] = _platforms(self._basic_info.get("publish_platforms"))
-            self._basic_info["categories"] = _categories(self._basic_info.get("categories"))
-            self._basic_info["required_tier_id"] = _required_tier(self._basic_info.get("required_tier_id"))
-            if _BIGFOOT_EXCLUSIVE_CATEGORY_ID in self._basic_info["categories"] and self._basic_info["publish_platforms"] != ["bigfoot"]:
+            restored_basic = dict(basic)
+            _basic_info_fields(restored_basic)
+            _nonempty_text(restored_basic.get("name"), path="$.basic_info.name")
+            _nonempty_text(restored_basic.get("summary"), path="$.basic_info.summary")
+            restored_basic["publish_platforms"] = _platforms(restored_basic.get("publish_platforms"))
+            restored_basic["categories"] = _categories(restored_basic.get("categories"))
+            restored_basic["required_tier_id"] = _required_tier(restored_basic.get("required_tier_id"))
+            if _BIGFOOT_EXCLUSIVE_CATEGORY_ID in restored_basic["categories"] and restored_basic["publish_platforms"] != ["bigfoot"]:
                 raise ValidationError("category 998 requires bigfoot as the only publish platform", path="$.basic_info.publish_platforms")
-            if "bigfoot" in self._basic_info["publish_platforms"] and self._basic_info["required_tier_id"] is not None:
+            if "bigfoot" in restored_basic["publish_platforms"] and restored_basic["required_tier_id"] is not None:
                 raise ValidationError("required_tier_id must be null when bigfoot is selected", path="$.basic_info.required_tier_id")
-            derived_sync_type = (1 if "modus" in self._basic_info["publish_platforms"] else 0) | (2 if "bigfoot" in self._basic_info["publish_platforms"] else 0)
-            if self._basic_info.get("synchronization_type") != derived_sync_type:
+            derived_sync_type = (1 if "modus" in restored_basic["publish_platforms"] else 0) | (2 if "bigfoot" in restored_basic["publish_platforms"] else 0)
+            if restored_basic.get("synchronization_type") != derived_sync_type:
                 raise ValidationError("synchronization_type must match publish_platforms", path="$.basic_info.synchronization_type")
         if state == COMPLETE:
-            self._license = _license(lic)
+            restored_license = _license(lic)
+        self._game = restored_game
+        self._basic_info = restored_basic
+        self._license = restored_license
         self._step = str(state)
 
     def save(self, path: Union[str, os.PathLike[str]]) -> Path:

@@ -633,12 +633,21 @@ class ModUs:
         if size > MAX_PACKAGE_BYTES:
             raise ValidationError("release ZIP exceeds the 200 MB upload limit", path=file_path)
         parsed = urllib.parse.urlsplit(signed_url)
+        if parsed.scheme not in ("http", "https") or not parsed.hostname:
+            raise ValidationError("release upload URL must be HTTP(S)", path="signed_url")
+        # The query carries the object-store signature.  Keep a useful endpoint
+        # in errors without ever persisting that credential material.
+        endpoint_host = parsed.hostname
+        if parsed.port is not None:
+            endpoint_host = "%s:%d" % (endpoint_host, parsed.port)
+        endpoint = urllib.parse.urlunsplit((parsed.scheme, endpoint_host, parsed.path or "/", "", ""))
         conn_cls = http.client.HTTPSConnection if parsed.scheme == "https" else http.client.HTTPConnection
-        if parsed.scheme == "https":
-            conn = conn_cls(parsed.hostname, parsed.port, timeout=max(self.timeout, 600), context=ssl.create_default_context())
-        else:
-            conn = conn_cls(parsed.hostname, parsed.port, timeout=max(self.timeout, 600))
+        conn = None
         try:
+            if parsed.scheme == "https":
+                conn = conn_cls(parsed.hostname, parsed.port, timeout=max(self.timeout, 600), context=ssl.create_default_context())
+            else:
+                conn = conn_cls(parsed.hostname, parsed.port, timeout=max(self.timeout, 600))
             conn.putrequest("PUT", urllib.parse.urlunsplit(("", "", parsed.path or "/", parsed.query, "")))
             conn.putheader("Content-Type", "application/zip")
             conn.putheader("Content-Length", str(size))
@@ -650,15 +659,33 @@ class ModUs:
                         break
                     conn.send(chunk)
             response = conn.getresponse()
-            response.read()
+            raw = response.read(4096)
             if response.status < 200 or response.status >= 300:
-                raise FuploadError("ModUs binary upload returned HTTP %d" % response.status, http_status=response.status, verification_required=True, stage="binary_upload")
+                summary = redact(raw.decode("utf-8", errors="replace")) if raw else "<empty>"
+                raise FuploadError(
+                    "ModUs binary upload returned HTTP %d" % response.status,
+                    endpoint=endpoint,
+                    http_status=response.status,
+                    verification_required=True,
+                    stage="binary_upload",
+                    details={"response_summary": summary},
+                )
         except FuploadError:
             raise
-        except OSError as exc:
-            raise FuploadError("ModUs binary upload failed: %s" % exc, verification_required=True, stage="binary_upload") from exc
+        except (OSError, http.client.HTTPException) as exc:
+            raise FuploadError(
+                "ModUs binary upload failed",
+                endpoint=endpoint,
+                verification_required=True,
+                stage="binary_upload",
+                details={"response_summary": redact(str(exc)) or exc.__class__.__name__},
+            ) from exc
         finally:
-            conn.close()
+            if conn is not None:
+                try:
+                    conn.close()
+                except OSError:
+                    pass
         return {"status": "uploaded", "archive": path.name, "bytes": size}
 
     def release_delete(self, project_id: int, file_id: int) -> Any:
@@ -666,70 +693,108 @@ class ModUs:
 
     def publish(self, doc: Mapping[str, Any], *, update: bool = False) -> Dict[str, Any]:
         project_id = _positive_id(doc["project_id"], field="project_id")
-        allocated_file_id = not bool(doc.get("file_id"))
-        file_id = _positive_id(doc.get("file_id") or self.release_file_id(project_id), field="file_id")
-        metadata = {k: doc[k] for k in ("project_id", "version", "type", "supported_game_versions", "toc_version", "changelog", "path") if k in doc}
-        metadata["file_id"] = file_id
         file_path = doc.get("file")
-        if file_path is None and not update:
-            raise ValidationError("release ZIP file is required", path="file")
         archive = Path(str(file_path)) if file_path is not None else None
-        if archive is not None:
-            if not archive.is_file():
-                raise ValidationError("release ZIP file does not exist", path=str(file_path))
-            size = archive.stat().st_size
-            if size > MAX_PACKAGE_BYTES:
-                raise ValidationError("release ZIP exceeds the 200 MB upload limit", path=str(file_path))
-            md5 = hashlib.md5(archive.read_bytes()).hexdigest()
-            try:
-                unzip_size = sum(info.file_size for info in zipfile.ZipFile(str(archive)).infolist())
-            except (OSError, zipfile.BadZipFile) as exc:
-                raise ValidationError("release file is not a valid ZIP", path=str(file_path)) from exc
-            derived = parse_modus_zip(archive)
-            supplied_toc = doc.get("toc_version")
-            supplied_games = doc.get("supported_game_versions")
-            if supplied_toc is not None and str(supplied_toc) != derived["toc_version"]:
-                raise ValidationError("toc_version does not match the ZIP Interface field", path="$.toc_version")
-            if supplied_games is not None and _supported_game_versions(supplied_games) != derived["supported_game_versions"]:
-                raise ValidationError("supported_game_versions does not match the ZIP Interface field", path="$.supported_game_versions")
-            metadata.update({
-                "md5": md5,
-                "zip_size": size,
-                "unzip_size": unzip_size,
-                "toc_version": derived["toc_version"],
-                "supported_game_versions": derived["supported_game_versions"],
-                "path": doc.get("path") or archive.name,
-            })
+        supplied_file_id = doc.get("file_id")
         transaction: Dict[str, Any] = {
             "schema": "fupload.v1.modus.upload-transaction",
             "created_at": int(time.time()),
             "project_id": project_id,
-            "file_id": file_id,
+            "file_id": None,
             "update": bool(update),
             "archive": str(archive) if archive is not None else None,
-            "stages": ["file_id"] if allocated_file_id else [],
+            "stages": [],
         }
         transaction_path = Path(str(doc.get("transaction_log") or ((str(archive) + ".modus-transaction.json") if archive else "modus-transaction.json")))
 
         def save_transaction() -> None:
             transaction_path.write_text(json.dumps(transaction, ensure_ascii=False, indent=2), encoding="utf-8")
 
+        # Establish the audit record before reserving a file ID or validating
+        # the archive so every publish failure has a durable transaction.
         try:
-            transaction["stages"].append("release_metadata_update" if update else "release_metadata")
+            save_transaction()
+        except OSError as exc:
+            raise FuploadError(
+                "ModUs upload transaction could not be written",
+                stage="transaction_log",
+                details={"path": str(transaction_path)},
+            ) from exc
+
+        current_stage = "prepare"
+        try:
+            allocated_file_id = not bool(supplied_file_id)
+            current_stage = "file_id"
+            transaction["active_stage"] = current_stage
+            save_transaction()
+            if allocated_file_id:
+                transaction["stages"].append("file_id")
+                file_id = _positive_id(self.release_file_id(project_id), field="file_id")
+            else:
+                file_id = _positive_id(supplied_file_id, field="file_id")
+            transaction["file_id"] = file_id
+
+            metadata = {k: doc[k] for k in ("project_id", "version", "type", "supported_game_versions", "toc_version", "changelog", "path") if k in doc}
+            metadata["file_id"] = file_id
+            current_stage = "zip_preflight"
+            transaction["active_stage"] = current_stage
+            save_transaction()
+            if archive is None and not update:
+                raise ValidationError("release ZIP file is required", path="file")
+            if archive is not None:
+                if not archive.is_file():
+                    raise ValidationError("release ZIP file does not exist", path=str(file_path))
+                size = archive.stat().st_size
+                if size > MAX_PACKAGE_BYTES:
+                    raise ValidationError("release ZIP exceeds the 200 MB upload limit", path=str(file_path))
+                md5 = hashlib.md5(archive.read_bytes()).hexdigest()
+                try:
+                    unzip_size = sum(info.file_size for info in zipfile.ZipFile(str(archive)).infolist())
+                except (OSError, zipfile.BadZipFile) as exc:
+                    raise ValidationError("release file is not a valid ZIP", path=str(file_path)) from exc
+                derived = parse_modus_zip(archive)
+                supplied_toc = doc.get("toc_version")
+                supplied_games = doc.get("supported_game_versions")
+                if supplied_toc is not None and str(supplied_toc) != derived["toc_version"]:
+                    raise ValidationError("toc_version does not match the ZIP Interface field", path="$.toc_version")
+                if supplied_games is not None and _supported_game_versions(supplied_games) != derived["supported_game_versions"]:
+                    raise ValidationError("supported_game_versions does not match the ZIP Interface field", path="$.supported_game_versions")
+                metadata.update({
+                    "md5": md5,
+                    "zip_size": size,
+                    "unzip_size": unzip_size,
+                    "toc_version": derived["toc_version"],
+                    "supported_game_versions": derived["supported_game_versions"],
+                    "path": doc.get("path") or archive.name,
+                })
+            current_stage = "release_metadata_update" if update else "release_metadata"
+            transaction["stages"].append(current_stage)
+            transaction["active_stage"] = current_stage
+            save_transaction()
             result = self.release_metadata(metadata, update=update)
             if archive is None:
+                transaction.pop("active_stage", None)
                 transaction.update({"completed": True, "upload": None})
                 save_transaction()
                 return {"project_id": project_id, "file_id": file_id, "metadata": result, "upload": None, "transaction": _safe(transaction)}
-            transaction["stages"].append("signature")
+            current_stage = "signature"
+            transaction["stages"].append(current_stage)
+            transaction["active_stage"] = current_stage
+            save_transaction()
             signed = self.release_signature(project_id, file_id)
-            transaction["stages"].append("binary_upload")
+            current_stage = "binary_upload"
+            transaction["stages"].append(current_stage)
+            transaction["active_stage"] = current_stage
+            save_transaction()
             uploaded = self.upload_zip(signed, str(archive))
+            transaction.pop("active_stage", None)
             transaction.update({"completed": True, "upload": uploaded})
             save_transaction()
             return {"project_id": project_id, "file_id": file_id, "metadata": result, "upload": uploaded, "transaction": _safe(transaction)}
         except FuploadError as exc:
-            transaction["failed_stage"] = exc.stage or transaction["stages"][-1] if transaction["stages"] else "prepare"
+            if exc.stage in (None, "dependency_get"):
+                exc.stage = current_stage
+            transaction["failed_stage"] = exc.stage or current_stage
             transaction["error"] = exc.as_dict()
             transaction["retained_archive"] = bool(archive and archive.is_file())
             try:
@@ -737,6 +802,20 @@ class ModUs:
             except OSError:
                 pass
             raise
+        except OSError as exc:
+            wrapped = FuploadError(
+                "ModUs upload preparation failed",
+                stage=current_stage,
+                details={"response_summary": redact(str(exc)) or exc.__class__.__name__},
+            )
+            transaction["failed_stage"] = current_stage
+            transaction["error"] = wrapped.as_dict()
+            transaction["retained_archive"] = bool(archive and archive.is_file())
+            try:
+                save_transaction()
+            except OSError:
+                pass
+            raise wrapped from exc
 
     def execute_read(self, resource: str, action: str, args: Any = None) -> Any:
         if resource == "session" and action == "doctor": return self.doctor()

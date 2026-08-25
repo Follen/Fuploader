@@ -27,6 +27,39 @@ The complete project model includes `project_id`, `name`, `alt_name`, `summary`,
 `required_tier_id`, `required_dependencies`, `cf_url`, returned `logo`, `status`,
 `game`, and `description`. Write inputs use `project_state`, `publish_platforms`,
 `logo_base64`, the compatibility `screenshot_base64s`, and edit-only `image_ops`.
+
+### Project field contract
+
+| CLI/state field | Creator wire/readback | JSON type | Required/default | Source and state dependency | Successful readback |
+| --- | --- | --- | --- | --- | --- |
+| `schema` | none | string | required by every write document | versioned CLI envelope | not sent |
+| `project_id` | `projectId` | positive integer | edit/delete required; create assigned by server | outer write document, not form state | `projectId` |
+| `game` | none confirmed | object or non-empty string | required; no default | `choose_game`; object needs a stable ID/key | preserved in state snapshot |
+| `name` | `name` | non-empty string | required; no default | `basic_info` | `name` |
+| `alt_name` | `altName` | string/null | optional; omitted preserves value | `basic_info`; edit clear uses `<null>` | `altName` |
+| `summary` | `summary` | non-empty string | required; no default | `basic_info` | `summary` |
+| `categories` | comma-delimited `categories` | 1-5 positive integer IDs | required; no default | service `categories` enum; `basic_info`; ID 998 requires BigFoot only | comma-delimited `categories` |
+| `publish_platforms` | derived `synchronizationType` | non-empty unique enum array | required; no default | `basic_info`; values `modus`, `bigfoot`, or both | integer `1`, `2`, or `3` |
+| `synchronization_type` | `synchronizationType` | integer | derived; caller value is replaced | derived from platform toggles in `basic_info` | `synchronizationType` |
+| `required_tier_id` | `requiredTierId` | null for this account | defaults to null | service `subscription-tiers` enum; current result is `[]`; BigFoot requires null | `requiredTierId: null` |
+| `repo_url` | `repoUrl` | string/null | optional; omitted preserves value | `basic_info`; create empty is omitted; edit clear uses `<null>` | `repoUrl` |
+| `logo_base64` | `screenshotBase64sReqs.screenshotBase64s` | base64 string | optional; default empty string | create-only `basic_info`; sent as `logo.webp` | server-managed `logo` path |
+| `screenshot_base64s` | same create logo payload | string array | compatibility alias; default empty array | create-only `basic_info`; first value is used when `logo_base64` is absent | server-managed `logo` path |
+| `license.type` | `license` JSON string `type` | non-empty string | required; no default | separate `license` step | parsed `license` |
+| `license.holder/year/content` | fields inside `license` JSON string | non-empty strings | optional except custom content | separate `license` step; custom requires content | parsed `license` |
+| `description` | `description` | string/null | edit-only; omitted preserves value | edit `basic_info`; clear uses `<null>` | `description` |
+| `required_dependencies` | `requiredDependencies` | string/null | edit-only; omitted preserves value | edit `basic_info`; clear uses `<null>`; dependency query is dynamic | `requiredDependencies` |
+| `images` | `images` | non-negative integer | edit-only; required with `image_ops` | edit `basic_info` | `images` count |
+| `image_ops` | `imagesOps` | operation array | edit-only; no default | edit `basic_info`; upload requires base64, delete forbids it | `images` count |
+| `cf_url` | `cfUrl` | string/null | read-only | known detail field may be preserved in a snapshot but is never sent | `cfUrl` |
+| `logo` | `logo` | string/object/null | read-only | server-managed detail field; create uses `logo_base64` instead | `logo` |
+| `status` | `status` | integer/null | read-only | server-managed detail field | `status` |
+| `project_state` | none | object | required and must be `complete` | wraps `choose_game -> basic_info -> license`; unknown nested fields are rejected | local resumable snapshot |
+
+Create-only, edit-only, and read-only fields may be preserved in a resumable
+snapshot, but `_project_wire` sends only fields supported by the selected API
+operation. The state machine rejects unknown `basic_info` and `license` fields
+before changing state.
 `publish_platforms` is a non-empty array containing `modus`,
 `bigfoot`, or both; the two values are not mutually exclusive. Creator derives
 wire `synchronizationType` as 1 for ModUs, 2 for BigFoot, and 3 for both.
@@ -64,7 +97,10 @@ Deletion requires `confirm: "DELETE"`.
 `transaction_log` optionally selects the redacted transaction record path.
 Successful records include the completed `file_id`, metadata, signature, and
 binary upload stages that ran; failed records include `failed_stage`, a redacted
-error, and whether the ZIP was retained. The provider parses every ZIP `.toc`
+error, and whether the ZIP was retained. The transaction record is established
+before file-ID allocation and ZIP preflight, so those early failures are also
+durable. Binary-upload errors expose only a query-free endpoint identifier,
+status when available, and a bounded redacted response summary. The provider parses every ZIP `.toc`
 `Interface` value to derive
 `toc_version` and `supported_game_versions`; explicit caller values must match.
 The provider validates the ZIP, computes `md5`, `zip_size`, and `unzip_size`,

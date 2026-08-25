@@ -24,12 +24,6 @@ class ModusProjectSchemaTests(unittest.TestCase):
             "summary": "A project used for schema regression",
             "categories": [1800],
             "synchronization_type": "3",
-            "license": {
-                "type": "All Rights Reserved",
-                "holder": "ROLE",
-                "year": "2026",
-                "content": "Copyright (c) 2026 ROLE.",
-            },
             "images": 0,
             "screenshot_base64s": [],
             "repo_url": "https://example.invalid/repo",
@@ -39,7 +33,12 @@ class ModusProjectSchemaTests(unittest.TestCase):
         machine = ProjectStateMachine()
         machine.select_game({"id": "wow_retail"})
         machine.submit_basic_info(basic_info)
-        machine.submit_license(basic_info["license"])
+        machine.submit_license({
+            "type": "All Rights Reserved",
+            "holder": "ROLE",
+            "year": "2026",
+            "content": "Copyright (c) 2026 ROLE.",
+        })
         value = {"schema": self.schema.name, "project_state": machine.snapshot()}
         value.update(overrides)
         return value
@@ -160,15 +159,17 @@ class ModusProjectSchemaTests(unittest.TestCase):
 
     def _document_with_basic_info(self, **overrides):
         basic_info = _project_document(self._document())
+        license_value = basic_info.pop("license")
         basic_info.update(overrides)
         machine = ProjectStateMachine()
         machine.select_game({"id": "wow_retail"})
         machine.submit_basic_info(basic_info)
-        machine.submit_license(basic_info["license"])
+        machine.submit_license(license_value)
         return {"schema": self.schema.name, "project_state": machine.snapshot()}
 
     def _document_with_license(self, license_value):
         basic_info = _project_document(self._document())
+        basic_info.pop("license")
         machine = ProjectStateMachine()
         machine.select_game({"id": "wow_retail"})
         machine.submit_basic_info(basic_info)

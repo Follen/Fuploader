@@ -75,6 +75,32 @@ class ModusProjectStateMachineTests(unittest.TestCase):
                     machine.submit_basic_info(self.basic(required_tier_id=tier))
                 self.assertEqual(machine.state, BASIC_INFO)
 
+    def test_unknown_basic_info_field_is_rejected_without_mutating_state(self):
+        machine = ProjectStateMachine()
+        machine.select_game({"id": "wow_retail"})
+        before = machine.snapshot()
+
+        with self.assertRaisesRegex(ValidationError, "unknown basic_info field") as raised:
+            machine.submit_basic_info(self.basic(unexpected={"nested": True}))
+
+        self.assertEqual(raised.exception.details["path"], "$.basic_info.unexpected")
+        self.assertEqual(machine.snapshot(), before)
+
+    def test_unknown_basic_info_field_in_snapshot_is_rejected_without_rewriting_input(self):
+        machine = ProjectStateMachine()
+        machine.select_game({"id": "wow_retail"})
+        machine.submit_basic_info(self.basic())
+        machine.submit_license({"type": "MIT"})
+        snapshot = machine.snapshot()
+        snapshot["basic_info"]["unexpected"] = "fixture"
+        before = json.loads(json.dumps(snapshot))
+
+        with self.assertRaisesRegex(ValidationError, "unknown basic_info field") as raised:
+            ProjectStateMachine.from_snapshot(snapshot)
+
+        self.assertEqual(raised.exception.details["path"], "$.basic_info.unexpected")
+        self.assertEqual(snapshot, before)
+
     def test_snapshot_round_trip_and_file_persistence(self):
         machine = ProjectStateMachine()
         game = {"id": "wow_retail", "name": "Retail"}

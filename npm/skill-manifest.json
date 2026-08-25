@@ -1,9 +1,9 @@
 {
   "schema": "fupload.npm-skill-manifest.v1",
   "package_name": "@follenfang/fupload",
-  "package_version": "0.0.10",
-  "skill_version": "0.0.10",
-  "tree_sha256": "38621aa4709de68a1cc298c8183fe0a5647c8291b870defdbbb5f54d184fa94a",
+  "package_version": "0.0.11",
+  "skill_version": "0.0.11",
+  "tree_sha256": "a0d589cb5d67c7bfbd34862ee4c3109e88068662ae3b7430c0635e71ace9a8d9",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -92,8 +92,8 @@
     },
     {
       "path": "references/modus.md",
-      "bytes": 4492,
-      "sha256": "0b9cf6c4b3bc7aa37a3649ec6ccb6c8b8aa3d077c8febc2635548546150df356"
+      "bytes": 8705,
+      "sha256": "10c2db10ade101c6738d9007865db68da54892da59fc1cc0fc1a422296a4bf07"
     },
     {
       "path": "references/newbee-official-cli.md",
@@ -113,7 +113,7 @@
     {
       "path": "scripts/fupload_cli/__init__.py",
       "bytes": 50,
-      "sha256": "3f1afb95137eaedc622bb437c9c8a01bdaa729b911f3749e400a429d24abaaa2"
+      "sha256": "c7d5308bddd21b0e8042689cdeaba91ba45170a998f42844d42f88b7248fc057"
     },
     {
       "path": "scripts/fupload_cli/blackbox_web.py",
@@ -167,8 +167,8 @@
     },
     {
       "path": "scripts/fupload_cli/modus.py",
-      "bytes": 38821,
-      "sha256": "f5edb6898ce515a7e34f0fcab3dc022c2c5185f548644eabf5291e38b22dae22"
+      "bytes": 42241,
+      "sha256": "ee298b064f4b3c4a25081f76e93d48b18f1b810f647437e78d78a4a20ab5bd5c"
     },
     {
       "path": "scripts/fupload_cli/newbee_auth.py",
@@ -187,8 +187,8 @@
     },
     {
       "path": "scripts/fupload_cli/state_machine.py",
-      "bytes": 15325,
-      "sha256": "02f37b745bbb70860c09563b6778014bd1c69ca06ba28777415ad7ce84d02610"
+      "bytes": 16450,
+      "sha256": "da26b63be4e085b9b39aea4d13a2c58206836d98fa46400b243113ce4b1ff4a9"
     },
     {
       "path": "scripts/fupload_cli/transport.py",
@@ -208,7 +208,7 @@
     {
       "path": "SKILL.md",
       "bytes": 25720,
-      "sha256": "2e20b91ded57f4d91dbb658abf6fedc636785cc1b3ada23f985c9241c53cd3e6"
+      "sha256": "cfc3ce770c3594c5a787b25da03cb2e92e0f6ea6fbd162f26f4b6b3c44295a89"
     }
   ]
 }

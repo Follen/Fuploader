@@ -30,7 +30,7 @@ def write_zip(path: Path) -> bytes:
 class _UploadResponse:
     status = 200
 
-    def read(self):
+    def read(self, _limit=None):
         return b""
 
 
@@ -287,6 +287,91 @@ class ModusTests(unittest.TestCase):
             transaction = json.loads((Path(directory) / "transaction.json").read_text(encoding="utf-8"))
             self.assertTrue(transaction["completed"])
             self.assertEqual(transaction["stages"], result["transaction"]["stages"])
+
+    def test_publish_records_file_id_and_zip_preflight_failures(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive = root / "invalid.zip"
+            archive.write_bytes(b"not a zip")
+            transaction_path = root / "transaction.json"
+            provider = ModUs("token-fixture")
+
+            with mock.patch.object(
+                provider,
+                "release_file_id",
+                side_effect=FuploadError("allocation failed", endpoint="https://app.modus.cool/api/fileId", stage="file_id"),
+            ), self.assertRaises(FuploadError):
+                provider.publish({
+                    "project_id": 42,
+                    "file": str(archive),
+                    "transaction_log": str(transaction_path),
+                })
+            transaction = json.loads(transaction_path.read_text(encoding="utf-8"))
+            self.assertEqual(transaction["file_id"], None)
+            self.assertEqual(transaction["stages"], ["file_id"])
+            self.assertEqual(transaction["failed_stage"], "file_id")
+            self.assertEqual(transaction["active_stage"], "file_id")
+            self.assertTrue(transaction["retained_archive"])
+
+            with mock.patch.object(provider, "release_file_id", return_value=9), self.assertRaises(ValidationError) as raised:
+                provider.publish({
+                    "project_id": 42,
+                    "file": str(archive),
+                    "transaction_log": str(transaction_path),
+                })
+            self.assertEqual(raised.exception.stage, "zip_preflight")
+            transaction = json.loads(transaction_path.read_text(encoding="utf-8"))
+            self.assertEqual(transaction["file_id"], 9)
+            self.assertEqual(transaction["stages"], ["file_id"])
+            self.assertEqual(transaction["failed_stage"], "zip_preflight")
+            self.assertEqual(transaction["active_stage"], "zip_preflight")
+            self.assertTrue(transaction["retained_archive"])
+
+    def test_binary_upload_http_error_has_safe_endpoint_and_response_summary(self):
+        class FailedResponse:
+            status = 403
+
+            def read(self, _limit=None):
+                return b'{"token":"secret-value","message":"denied"}'
+
+        class FailedConnection(_FakeConnection):
+            def getresponse(self):
+                return FailedResponse()
+
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / "demo.zip"
+            write_zip(archive)
+            provider = ModUs("token-fixture")
+            signed_url = "https://user-info-secret@upload.modus.test/signed/path?X-Amz-Signature=secret&token=also-secret"
+            with mock.patch("fupload_cli.modus.http.client.HTTPSConnection", FailedConnection), self.assertRaises(FuploadError) as raised:
+                provider.upload_zip(signed_url, str(archive))
+            error = raised.exception.as_dict()
+            self.assertEqual(error["stage"], "binary_upload")
+            self.assertEqual(error["endpoint"], "https://upload.modus.test/signed/path")
+            self.assertEqual(error["http_status"], 403)
+            self.assertIn("response_summary", error["details"])
+            self.assertNotIn("secret-value", json.dumps(error))
+            self.assertNotIn("also-secret", json.dumps(error))
+            self.assertNotIn("user-info-secret", json.dumps(error))
+
+    def test_binary_upload_network_error_has_safe_endpoint_and_response_summary(self):
+        class FailedConnection(_FakeConnection):
+            def __init__(self, *_args, **_kwargs):
+                raise OSError("connection reset token=network-secret")
+
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / "demo.zip"
+            write_zip(archive)
+            provider = ModUs("token-fixture")
+            signed_url = "https://upload.modus.test/signed/path?token=query-secret"
+            with mock.patch("fupload_cli.modus.http.client.HTTPSConnection", FailedConnection), self.assertRaises(FuploadError) as raised:
+                provider.upload_zip(signed_url, str(archive))
+            error = raised.exception.as_dict()
+            self.assertEqual(error["stage"], "binary_upload")
+            self.assertEqual(error["endpoint"], "https://upload.modus.test/signed/path")
+            self.assertIn("response_summary", error["details"])
+            self.assertNotIn("network-secret", json.dumps(error))
+            self.assertNotIn("query-secret", json.dumps(error))
 
     def test_cli_plugin_upload_dry_run_does_not_construct_provider(self):
         from fupload_cli.cli import main
