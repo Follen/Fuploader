@@ -1,13 +1,13 @@
 ---
 name: fupload
-description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, and Heybox Workshop, including CurseForge author project lookup, plugin ZIP upload, and Heybox web-session version management. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, plugins, configurations, or WA.
+description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, Heybox Workshop, and ModUs.Creator, including local Creator login reuse and plugin ZIP publishing. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, ModUs, plugins, configurations, or WA.
 metadata:
-  version: "0.0.9"
+  version: "0.0.10"
 ---
 
 # Fupload
 
-Act as the publishing operator. For NewBeeBox, prefer the official `ncc` CLI whenever it is installed unless the user explicitly requests the third-party Python management tool. For DD, CurseForge, Heybox Workshop, and an explicitly selected third-party NewBeeBox workflow, use the bundled Python CLI. Keep investigation, choices, planning, confirmation, and recovery in the conversation.
+Act as the publishing operator. For NewBeeBox, prefer the official `ncc` CLI whenever it is installed unless the user explicitly requests the third-party Python management tool. For DD, CurseForge, Heybox Workshop, ModUs.Creator, and an explicitly selected third-party NewBeeBox workflow, use the bundled Python CLI. Keep investigation, choices, planning, confirmation, and recovery in the conversation.
 
 When installed from npm, interpret `<fupload-cli>` as `fupload`. Only while maintaining the source repository, directly installing this Skill, or when `fupload` is absent from PATH, use `python <skill-root>/scripts/fupload.py`. Keep the user's current project as the working directory in either mode.
 
@@ -15,7 +15,7 @@ When installed from npm, interpret `<fupload-cli>` as `fupload`. Only while main
 
 When the user has not already stated both dimensions, ask in one short message:
 
-1. Platform: NewBeeBox, DD, CurseForge, or Heybox Workshop.
+1. Platform: NewBeeBox, DD, CurseForge, Heybox Workshop, or ModUs.
 2. Resource and action: plugin/configuration/WA, then create/content update/metadata edit/delete. CurseForge supports public project listing and uploading a plugin ZIP to an existing project only.
 
 Map natural language consistently:
@@ -35,6 +35,8 @@ For DD, use the bundled Python CLI.
 
 For CurseForge, use the bundled Python CLI. Do not substitute direct HTTP calls or the CurseForge for Studios API for uploads: public project lookup uses the Core API, while game-version lookup and upload use the separate Upload API and credential.
 
+For ModUs, use the bundled Python CLI and the local ModUs.Creator login state. Do not use browser cookies, accept a caller-supplied token, or handcraft API requests.
+
 For NewBeeBox, apply this order exactly:
 
 1. If the user explicitly requests the third-party Python management tool, use the bundled Python CLI even when `ncc` is installed.
@@ -51,6 +53,8 @@ Never switch channels silently. Before changing channels, re-read remote state a
 For NewBeeBox, prefer an existing official `ncc login`, then a caller-provided `NCC_TOKEN`, then user-performed local login. Never ask the user to paste a token into the conversation. Never place a real NewBeeBox token in `--token`, shell history, command output, JSON, `.env`, `publish/`, `analyze/`, tests, Skill files, references, or Git. Do not inspect or copy the official CLI credential store.
 
 For CurseForge, use `~/.fupload/curseforge.env`, created idempotently by npm install/update, with `CURSEFORGE_AUTHOR_ID`, `CURSEFORGE_API_KEY`, and `CURSEFORGE_UPLOAD_TOKEN`. The author ID is non-secret: if absent, proactively ask for its numeric value or offer `--author-id`. The API key and upload token are secrets: never ask the user to paste either into the conversation; direct them to fill the local env file in their own editor or terminal, then run `curseforge session doctor`. Never print file contents or secret values. Process environment values may override the file without being shown.
+
+For ModUs, authentication comes only from `%LOCALAPPDATA%\ModUs.Creator\auth\token.dat` under the current Windows user. `modus session doctor` reports only token presence, DPAPI decryption, nonempty plaintext, and authenticated API readiness. Never print, copy, hash, or persist the token, ciphertext, Bearer header, or signed upload URL.
 
 If a token is pasted into the conversation, do not repeat or use it. Tell the user to revoke or regenerate it at its provider and configure the replacement locally. Check only whether the expected field is present, never its length, prefix, hash, or value.
 
@@ -70,6 +74,7 @@ For npm package maintenance, use `fupload update` to update the CLI, managed Pyt
 - Read [references/dd.md](references/dd.md) only for DD.
 - Read [references/curseforge.md](references/curseforge.md) for every CurseForge lookup or upload.
 - Read [references/blackbox.md](references/blackbox.md) for Heybox Workshop plugin list/detail, metadata edit, version upload/edit/delete, and managed web-session authentication.
+- Read [references/modus.md](references/modus.md) for every ModUs project, addon discovery, release, upload, update, or delete workflow.
 - For Python, run the exact leaf command with `--help` before creating its input. Treat help as the executable schema contract.
 
 ## Investigate
@@ -90,9 +95,13 @@ For every existing DD update or edit, GET the detail first and rebuild the offic
 
 For Heybox Workshop, use Fuploader's managed Chromium web profile. If the profile is missing or the creator API reports an expired session, Fuploader opens the Workshop login page visibly for the user to complete login, then reuses the same profile headlessly for signed protocol requests. Never read the desktop client config or import another browser profile, and never accept a caller-supplied profile, cookie, token, signature, or endpoint. `blackbox plugin list`, `get`, and `versions` are read-only; `plugin edit` preserves omitted module fields by reading the complete module first; `plugin update` and `version-edit` upload or reuse a ZIP URL and verify the version readback; `version-delete` waits for asynchronous soft deletion and retries once when the audit state temporarily returns active. Do not print cookies, tokens, signatures, or temporary COS credentials, and do not delete a whole module.
 
+For ModUs, run `modus session doctor`, then read account info, project list/detail, categories, `game-versions --key wow_builds`, subscription tiers, and the target's release list/detail before writing. Project create/edit requires a completed persisted state in the order `choose_game -> basic_info -> license -> complete`. Publish targets are a nonempty multi-select: ModUs and BigFoot may coexist; ModUs-only, BigFoot-only, and both derive synchronization values 1, 2, and 3. Category `998` is BigFoot-only. Use the returned category IDs. When subscription tiers returns `[]`, “none” is the complete choice and `required_tier_id` remains null.
+
 For DD WA create, collect user choices before generating JSON, then let the Python CLI supply only the official create defaults for omitted form values: seven-day share and purchase lifetimes, `need_buy=false`, category `ui_original`, `Interface/Addons`, empty VIP levels, and version `0`. Submit category IDs as strings even when a discovery response represents them numerically. WA create/update versions contain digits only; update must be numerically greater than the current remote value. Every `!WA:2!` create/update/edit is reparsed by the installed official `WowUIInterface.parseWa` chain, including unchanged edit content. Do not carry create defaults into WA update/edit; omitted existing fields preserve their remote value.
 
 For official NewBeeBox, use only `ncc whoami -o json` to verify authentication; do not inspect its credential files. For third-party Python NewBeeBox, run `newbee session doctor`; credentials must come from the Windows Known Folder auth-store and all authenticated requests must use fixed official HTTPS origins. For DD, run `dd session doctor`; discovery must accept only an Authenticode-valid executable from an allowed official NetEase publisher. Doctor is local-only and must not start a native login. Do not set endpoint, credential-directory, or DD executable-path environment overrides.
+
+For ModUs, require all four `modus session doctor` booleans to be true before an authenticated read or write. A false result means the local Creator session must be repaired in ModUs.Creator; do not ask for or accept token input.
 
 ## Own one DD task session
 
@@ -109,6 +118,8 @@ For a configuration, require a cloud backup already uploaded by the matching des
 Expose every business field writable through the selected channel. Do not silently accept a webpage preselection or invent a business default. This includes applicable game type/build, categories, origin, format, visibility, review submission, payment, lifetime, price, room/channel, synchronization, membership, associations, backup content, WTF roles, incremental selections, retail UI data, WA material mode, and install path. When official `ncc` does not expose a webpage field or action, state that capability boundary; do not guess a hidden flag or silently switch to Python.
 
 Use existing remote values only for omitted fields in `edit` or `update`, where omission means preserve. Show candidates by human name plus ID/SN and relevant status. Ask only choices that cannot be determined from the user's explicit request, local artifacts, or remote reads. For CurseForge upload, collect project ID, ZIP path, changelog, release type, version IDs/names or parent file choice, and each requested optional metadata field; do not infer visibility or approval from upload acceptance. For DD, do not draft the executable JSON incrementally: close the full dependency graph first, then generate one final JSON containing parent fields and stable child IDs/selectors. Python repeats the live GETs before upload or mutation and rejects missing or cross-parent selections; detail is authoritative when DD list and detail timestamps differ. When an existing plugin or WA has `assign_user_sn`, only public scope is selectable and the final rebuilt form must remain public.
+
+For ModUs project create/edit, collect the game object; name, alias, summary, category IDs, publish platforms, repository URL, description, dependency IDs, logo/screenshots; and license type, holder, year, and content. Preserve server-managed `logo`, `status`, and `game` detail fields. Project edits use explicit Creator null markers for cleared description, dependencies, and tier. For releases, collect project/file IDs, ZIP, version, release type, changelog, and transaction log path; ZIP parsing derives MD5, sizes, TOC, and supported game versions.
 
 ## Prepare and confirm
 
@@ -139,6 +150,8 @@ Run writes serially. For official `ncc`, always request `-o json`, parse stdout 
 For CurseForge, treat the Upload API's returned file ID as upload acceptance only. Record the ID and command result, then report that moderation, processing, manual release, and public visibility are separate states. On an interrupted or ambiguous upload, do not resend automatically because that can create a duplicate file; inspect the Authors project page or public file list before deciding on a new attempt. Follow the HTTP/error handling table in the CurseForge reference.
 
 In the third-party Python NewBeeBox channel, public plugin publication is three atomic writes: create privately, upload and verify the first version, then edit to public with explicit review intent. Never send a public `share_state` during Python create. In the official channel, follow the installed `ncc docs` sequence for create, init, push, and visibility instead of applying Python wire rules.
+
+For ModUs `plugin create|upload|update`, require the success transaction to record the actual file ID, metadata, signature, and binary-upload stages without the signed URL. A metadata-only `plugin edit` must record no binary upload. Read back with `plugin get`, `list`, and `versions`; for deletion, delete the release before its project and require negative detail readback for each object.
 
 Stop on the first failure. Report completed steps, retained IDs/SNs or media references, the redacted failure stage, whether verification is required, and the smallest safe retry. Explicit DD HTTP/business rejection has `verification_required=false`; interrupted PUT/mutation or failed readback after an accepted write has `verification_required=true`. Native DD failures may include a bounded message, HTTP status, native business code, field validation hints, and `details.log_path`. When `log_path` is present, read only the referenced Fuploader JSONL record under the DD version directory; do not inspect DD's other logs or any credential files. The Fuploader record contains sanitized request and response JSON/body plus byte counts and truncation flags, with signed URLs, cookies, JWTs, credentials, client identifiers, signatures, and tokens recursively redacted. Read back after an uncertain write before resending it. Official NewBeeBox exit codes are `0` success, `1` business error, `2` authentication failure, and `3` network error. Never loop on `quota_exceeded`.
 

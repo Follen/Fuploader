@@ -61,11 +61,16 @@ class Schema:
                     raise ValidationError("null is not allowed", path="$.%s" % name)
                 continue
             expected = JSON_TYPES[spec.type]
+            # Older Fupload documents used the Creator's display-name
+            # license string. Keep that input valid while structured license
+            # content is preferred for full-field round trips.
+            if self.name.startswith("fupload.v1.modus") and name == "license" and isinstance(item, str):
+                continue
             if spec.type in ("integer", "number") and isinstance(item, bool):
                 raise ValidationError("expected %s" % spec.type, path="$.%s" % name)
             if not isinstance(item, expected):
                 raise ValidationError("expected %s" % spec.type, path="$.%s" % name)
-            if spec.nonempty and item in ("", []):
+            if spec.nonempty and item in ("", [], {}):
                 raise ValidationError("must not be empty", path="$.%s" % name)
             if spec.max_length is not None and len(item) > spec.max_length:
                 raise ValidationError(
@@ -93,7 +98,24 @@ class Schema:
         return checked
 
     def _validate_conditionals(self, value: Dict[str, Any]) -> None:
-        for name in ("id", "mod_id", "file_id", "content_id", "source_id", "module_id", "version_id", "game_version_id", "cloud_id"):
+        if self.name in ("fupload.v1.modus.project.create", "fupload.v1.modus.project.edit"):
+            snapshot = value.get("project_state")
+            if snapshot is None:
+                raise ValidationError(
+                    "completed project_state is required; submit choose_game, basic_info, then license",
+                    path="$.project_state",
+                )
+            # Keep the persisted form contract in one place. Restoring the
+            # snapshot validates every completed prerequisite and its order.
+            from .state_machine import COMPLETE, ProjectStateMachine
+
+            machine = ProjectStateMachine.from_snapshot(snapshot)
+            if machine.state != COMPLETE:
+                raise ValidationError(
+                    "project state must be complete before submission",
+                    path="$.project_state.state",
+                )
+        for name in ("id", "project_id", "mod_id", "file_id", "content_id", "source_id", "module_id", "version_id", "game_version_id", "cloud_id"):
             if name in value and isinstance(value[name], int) and value[name] <= 0:
                 raise ValidationError("must be greater than zero", path="$.%s" % name)
         if value.get("public") is True and value.get("submit_for_review") is not True:
@@ -351,6 +373,74 @@ class Schema:
                 raise ValidationError("array must contain nonempty folder names", path="$.core_folders")
             if "file" in value and not zipfile.is_zipfile(value["file"]):
                 raise ValidationError("file must be a valid ZIP archive", path="$.file")
+        if self.name.startswith("fupload.v1.modus"):
+            object_array(
+                "supported_game_versions",
+                {"gameVersion", "server", "game_version"},
+                ("gameVersion", "server"),
+            )
+            # The Creator UI treats publishing targets as an independent
+            # multi-select state: at least one target is required, and ModUs
+            # and BigFoot may be selected together.
+            if "publish_platforms" in value:
+                platforms = value["publish_platforms"]
+                if not isinstance(platforms, list):
+                    raise ValidationError("expected array", path="$.publish_platforms")
+                if not platforms:
+                    raise ValidationError("must contain at least one platform", path="$.publish_platforms")
+                allowed_platforms = {"modus", "bigfoot"}
+                if any(not isinstance(item, str) or item not in allowed_platforms for item in platforms):
+                    raise ValidationError("platform must be modus or bigfoot", path="$.publish_platforms")
+                if len(set(platforms)) != len(platforms):
+                    raise ValidationError("platforms must not contain duplicates", path="$.publish_platforms")
+            # A license may be supplied as the desktop client's display name
+            # or as its underlying editable content object.
+            if "license" in value and isinstance(value["license"], dict):
+                license_value = value["license"]
+                allowed_license = {"type", "holder", "year", "content"}
+                unknown_license = sorted(set(license_value) - allowed_license)
+                if unknown_license:
+                    raise ValidationError(
+                        "unknown field(s): %s" % ", ".join(unknown_license),
+                        path="$.license.%s" % unknown_license[0],
+                    )
+                for name in allowed_license:
+                    if name in license_value and license_value[name] is not None:
+                        if not isinstance(license_value[name], str):
+                            raise ValidationError("expected string or null", path="$.license.%s" % name)
+                        if not license_value[name].strip():
+                            raise ValidationError("must not be empty", path="$.license.%s" % name)
+                # Empty object is the explicit clear/omitted state used by
+                # presence-aware edit schemas; non-empty objects are checked
+                # field-by-field above.
+            if "required_tier_id" in value and value["required_tier_id"] is not None:
+                tier = value["required_tier_id"]
+                if isinstance(tier, bool) or not isinstance(tier, int) or tier <= 0:
+                    raise ValidationError("must be a positive integer", path="$.required_tier_id")
+            for name in ("categories", "screenshot_base64s"):
+                scalar_array(name, (str, int), "array must contain nonempty values")
+                if name in value and any((isinstance(item, str) and not item.strip()) or (isinstance(item, bool)) for item in value[name]):
+                    raise ValidationError("array must contain nonempty values", path="$.%s" % name)
+            if "categories" in value and len(value["categories"]) > 5:
+                raise ValidationError("must contain at most 5 items", path="$.categories")
+            if "image_ops" in value:
+                object_array("image_ops", {"op", "name", "base64"}, ("op", "name"))
+                if "images" not in value:
+                    raise ValidationError("images is required when image_ops is supplied", path="$.images")
+                for index, operation in enumerate(value["image_ops"]):
+                    if operation["op"] not in ("upload", "delete"):
+                        raise ValidationError("must be upload or delete", path="$.image_ops[%d].op" % index)
+                    if not isinstance(operation["name"], str) or not operation["name"].strip():
+                        raise ValidationError("must not be empty", path="$.image_ops[%d].name" % index)
+                    if operation["op"] == "upload" and (not isinstance(operation.get("base64"), str) or not operation["base64"].strip()):
+                        raise ValidationError("base64 is required for upload", path="$.image_ops[%d].base64" % index)
+                    if operation["op"] == "delete" and "base64" in operation:
+                        raise ValidationError("base64 is not allowed for delete", path="$.image_ops[%d].base64" % index)
+            for name in ("version", "type"):
+                if name in value and isinstance(value[name], str) and not value[name].strip():
+                    raise ValidationError("must not be empty", path="$.%s" % name)
+            if "file" in value and not zipfile.is_zipfile(value["file"]):
+                raise ValidationError("file must be a valid ZIP archive", path="$.file")
 
 
 def f(type_name: str, **kwargs: Any) -> Field:
@@ -562,6 +652,55 @@ register("curseforge", "plugin", "upload", required({
     "relations": f("object"),
     "is_marked_for_manual_release": f("boolean"),
 }, ("project_id", "file", "changelog", "release_type")))
+
+# ModUs.Creator author project and release contracts.  The provider translates
+# snake_case input names to the desktop client's camelCase wire fields.
+MODUS_PROJECT_COMMON = {
+    "name": f("string", nonempty=True, max_length=120),
+    "alt_name": f("string", max_length=120),
+    "summary": f("string", nonempty=True, max_length=500),
+    "categories": f("array", nonempty=True, max_items=5),
+    "license": f("object", nullable=True),
+    "repo_url": f("string", max_length=500),
+    "required_tier_id": f("integer", nullable=True, minimum=1),
+    "publish_platforms": f("array", nonempty=True),
+    "project_state": f("object", nonempty=True),
+}
+MODUS_PROJECT_CREATE = {
+    **MODUS_PROJECT_COMMON,
+    "logo_base64": f("string", nonempty=True),
+    "screenshot_base64s": f("array"),
+}
+MODUS_PROJECT_EDIT = {
+    **MODUS_PROJECT_COMMON,
+    "description": f("string", nullable=True, max_length=100000),
+    "required_dependencies": f("string", nullable=True, max_length=4000),
+    "images": f("integer", minimum=0),
+    "image_ops": f("array", nonempty=True),
+}
+MODUS_RELEASE = {
+    "project_id": f("integer", minimum=1),
+    "file_id": f("integer", minimum=1),
+    "version": f("string", nonempty=True, max_length=120),
+    "type": f("string", nonempty=True, max_length=40),
+    "supported_game_versions": f("array", nonempty=True),
+    "md5": f("string", max_length=64),
+    "zip_size": f("integer", minimum=0),
+    "unzip_size": f("integer", minimum=0),
+    "path": f("string", max_length=500),
+    "toc_version": f("string", max_length=80),
+    "changelog": f("string", nullable=True, max_length=10000),
+    "file": f("string", local_file=True),
+    "transaction_log": f("string", max_length=1000),
+}
+register("modus", "project", "create", required(MODUS_PROJECT_CREATE, ("project_state",)))
+register("modus", "project", "edit", required(with_id(MODUS_PROJECT_EDIT, "project_id"), ("project_id", "project_state")))
+register("modus", "project", "delete", required({"project_id": f("integer", minimum=1), "confirm": f("string", choices=("DELETE",))}, ("project_id", "confirm")))
+register("modus", "plugin", "create", required(MODUS_RELEASE, ("project_id", "file")))
+register("modus", "plugin", "upload", required(MODUS_RELEASE, ("project_id", "file")))
+register("modus", "plugin", "update", required(MODUS_RELEASE, ("project_id", "file_id")))
+register("modus", "plugin", "edit", required(MODUS_RELEASE, ("project_id", "file_id")))
+register("modus", "plugin", "delete", required({"project_id": f("integer", minimum=1), "file_id": f("integer", minimum=1), "confirm": f("string", choices=("DELETE",))}, ("project_id", "file_id", "confirm")))
 
 register("blackbox", "plugin", "edit", required({
     "id": f("integer"), "name": f("string"), "logo_url": f("string"), "category_ids": f("array"),

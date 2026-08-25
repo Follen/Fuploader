@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from fupload_cli.errors import ValidationError
 from fupload_cli.schema import SCHEMAS, Field
+from fupload_cli.state_machine import ProjectStateMachine
 from tests.test_dd_wire_matrix import WireFixtures
 from tests.test_newbee_wire_matrix import NewBeeFixtures
 
@@ -62,6 +63,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
         (root / "newbee").mkdir()
         (root / "curseforge").mkdir()
         (root / "blackbox").mkdir()
+        (root / "modus").mkdir()
         cls.dd = WireFixtures(root / "dd")
         cls.newbee = NewBeeFixtures(root / "newbee")
         cls.curseforge_archive = root / "curseforge" / "addon.zip"
@@ -69,6 +71,9 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
             archive.writestr("Addon/Addon.toc", "## Interface: 110000\n")
         cls.blackbox_archive = root / "blackbox" / "addon.zip"
         with zipfile.ZipFile(cls.blackbox_archive, "w") as archive:
+            archive.writestr("Addon/Addon.toc", "## Interface: 110000\n")
+        cls.modus_archive = root / "modus" / "addon.zip"
+        with zipfile.ZipFile(cls.modus_archive, "w") as archive:
             archive.writestr("Addon/Addon.toc", "## Interface: 110000\n")
 
     @classmethod
@@ -101,7 +106,42 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
             elif resource == "version" and action == "delete":
                 base.update({"version_id": 191150996, "module_id": 101149612})
             return base
+        if platform == "modus":
+            base = {"schema": "fupload.v1.modus.%s.%s" % (resource, action)}
+            if resource == "project" and action == "create":
+                base["project_state"] = self._modus_project_state()
+            elif resource == "project" and action == "edit":
+                base.update({"project_id": 1, "project_state": self._modus_project_state()})
+            elif resource == "project" and action == "delete":
+                base.update({"project_id": 1, "confirm": "DELETE"})
+            elif resource == "plugin" and action in ("create", "upload"):
+                base.update({"project_id": 1, "file": str(self.modus_archive), "version": "1.0.0",
+                             "type": "release", "supported_game_versions": [
+                                 {"gameVersion": "12.1.0", "server": "wow_retail"}
+                             ]})
+            elif resource == "plugin" and action in ("update", "edit"):
+                base.update({"project_id": 1, "file_id": 2, "version": "1.0.1",
+                             "type": "release", "supported_game_versions": [
+                                 {"gameVersion": "12.1.0", "server": "wow_retail"}
+                             ]})
+            elif resource == "plugin" and action == "delete":
+                base.update({"project_id": 1, "file_id": 2, "confirm": "DELETE"})
+            return base
         return self.newbee.document(resource, action)
+
+    @staticmethod
+    def _modus_project_state() -> Dict[str, Any]:
+        machine = ProjectStateMachine()
+        machine.select_game({"id": "wow_retail"})
+        machine.submit_basic_info({
+            "name": "Fixture",
+            "summary": "Schema state matrix fixture",
+            "categories": [1800],
+            "publish_platforms": ["modus"],
+            "required_tier_id": 1,
+        })
+        machine.submit_license({"type": "All Rights Reserved"})
+        return machine.snapshot()
 
     @staticmethod
     def _path_matches(error: ValidationError, field: str) -> bool:
@@ -170,7 +210,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
             return not spec.nonempty
         if schema_name == "fupload.v1.curseforge.plugin.upload" and field == "relations":
             return False
-        return True
+        return not spec.nonempty
 
     def test_every_schema_rejects_an_unknown_top_level_field(self) -> None:
         count = 0

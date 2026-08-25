@@ -30,6 +30,13 @@ schema exposes them. The calling Skill must show the complete plan and obtain co
 """
 
 
+def _modus_provider(*, authenticate: bool = True) -> Any:
+    # Keep ModUs optional at import time so existing platform commands remain
+    # usable while the provider is installed or upgraded independently.
+    from .modus import Modus
+    return Modus(authenticate=authenticate)
+
+
 def _parser(**kwargs: Any) -> argparse.ArgumentParser:
     return argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -221,6 +228,65 @@ def _blackbox_tree(platforms: argparse._SubParsersAction) -> None:
     _write_leaf(plugin, "blackbox", "version", "delete", "Soft-delete one Heybox Workshop plugin version and verify its deleted state.", command="version-delete")
 
 
+def _modus_tree(platforms: argparse._SubParsersAction) -> None:
+    root = platforms.add_parser(
+        "modus", help="ModUs.Creator author plugin operations",
+        description="Reuse the local ModUs.Creator Windows login state; token and signed upload material are never accepted as input.",
+    )
+    groups = root.add_subparsers(dest="resource_command", required=True)
+    session = groups.add_parser("session", help="Local authentication diagnostics").add_subparsers(dest="action_command", required=True)
+    _read_leaf(session, "doctor", "Check the local ModUs.Creator token store, DPAPI decryption, and authenticated API readiness without exposing credentials.", platform="modus", resource="session", action="doctor")
+
+    account = groups.add_parser("account", help="ModUs author account and statistics").add_subparsers(dest="action_command", required=True)
+    _read_leaf(account, "info", "Read the current ModUs account capability flags.", platform="modus", resource="account", action="info")
+    _read_leaf(account, "subscription-count", "Read the active author subscription count.", platform="modus", resource="account", action="subscription-count")
+    _read_leaf(account, "statistics", "Read current author project statistics.", platform="modus", resource="account", action="statistics")
+
+    addon = groups.add_parser("addon", help="ModUs addon discovery and history APIs").add_subparsers(dest="action_command", required=True)
+    leaf = _read_leaf(addon, "info", "Resolve addon directories to project records.", platform="modus", resource="addon", action="info")
+    leaf.add_argument("--directory", dest="directories", action="append", required=True)
+    leaf.add_argument("--server-type", type=int, default=1)
+    leaf = _read_leaf(addon, "project-info", "Resolve addon project IDs to names.", platform="modus", resource="addon", action="project-info")
+    leaf.add_argument("--project-id", dest="project_ids", action="append", type=_positive, required=True)
+    leaf.add_argument("--server-type", type=int, default=1)
+    leaf = _read_leaf(addon, "history", "Read addon project version history.", platform="modus", resource="addon", action="history")
+    leaf.add_argument("--project-id", type=_positive, required=True)
+    leaf.add_argument("--server-type", type=int, default=1)
+    _page_flags(leaf)
+
+    options = groups.add_parser("options", help="Read ModUs dynamic choices").add_subparsers(dest="option_action", required=True)
+    _read_leaf(options, "categories", "List plugin categories returned by ModUs.", platform="modus", resource="options", action="categories")
+    game_versions = _read_leaf(options, "game-versions", "List supported ModUs game versions.", platform="modus", resource="options", action="game-versions")
+    game_versions.add_argument("--key", dest="keys", action="append", required=True, help="Request one game config key; repeatable.")
+    _read_leaf(options, "subscription-tiers", "List author subscription tiers returned by ModUs.", platform="modus", resource="options", action="subscription-tiers")
+
+    project = groups.add_parser("project", help="ModUs plugin project records").add_subparsers(dest="action_command", required=True)
+    for action, text in (
+        ("create", "Create a ModUs plugin project."),
+        ("edit", "Edit ModUs plugin project metadata."),
+        ("delete", "Delete one explicitly confirmed ModUs plugin project."),
+    ):
+        _write_leaf(project, "modus", "project", action, text)
+    leaf = _read_leaf(project, "list", "List plugin projects owned by the current ModUs author.", platform="modus", resource="project", action="list"); _list_flags(leaf)
+    leaf = _read_leaf(project, "get", "Read one ModUs plugin project detail.", platform="modus", resource="project", action="get"); leaf.add_argument("--project-id", type=_positive, required=True)
+    leaf = _read_leaf(project, "dependencies", "Query ModUs project dependency candidates.", platform="modus", resource="project", action="dependencies")
+    leaf.add_argument("--query", help="Dependency search text or JSON request body.")
+    leaf.add_argument("--project-id", type=_positive)
+
+    plugin = groups.add_parser("plugin", help="ModUs plugin releases and ZIP uploads").add_subparsers(dest="action_command", required=True)
+    for action, text in (
+        ("create", "Create and upload the first ModUs plugin release."),
+        ("upload", "Upload a ModUs plugin ZIP and register its release metadata."),
+        ("update", "Publish a new ModUs plugin release version."),
+        ("edit", "Edit ModUs plugin release metadata."),
+        ("delete", "Delete one explicitly confirmed ModUs plugin release."),
+    ):
+        _write_leaf(plugin, "modus", "plugin", action, text)
+    leaf = _read_leaf(plugin, "list", "List releases for one ModUs plugin project.", platform="modus", resource="plugin", action="list"); leaf.add_argument("--project-id", type=_positive, required=True); _page_flags(leaf)
+    leaf = _read_leaf(plugin, "get", "Read one ModUs plugin release detail.", platform="modus", resource="plugin", action="get"); leaf.add_argument("--project-id", type=_positive, required=True); leaf.add_argument("--file-id", type=_positive, required=True)
+    leaf = _read_leaf(plugin, "versions", "List releases for one ModUs plugin project.", platform="modus", resource="plugin", action="versions"); leaf.add_argument("--project-id", type=_positive, required=True); _page_flags(leaf)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = _parser(
         prog="fupload",
@@ -233,6 +299,7 @@ def build_parser() -> argparse.ArgumentParser:
     _dd_tree(platforms)
     _curseforge_tree(platforms)
     _blackbox_tree(platforms)
+    _modus_tree(platforms)
     return parser
 
 
@@ -280,7 +347,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if args.dry_run:
                 write_output(platform, operation, _dry_run_data(doc, schema.name), dry_run=True)
                 return 0
-            provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else CurseForge()))
+            provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider())))
             try:
                 if platform == "dd":
                     data = provider.execute_write(resource, action, doc, getattr(args, "session", None))
@@ -292,7 +359,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     close()
             write_output(platform, operation, data)
             return 0
-        provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else CurseForge()))
+        modus_doctor = platform == "modus" and resource == "session" and action == "doctor"
+        provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(authenticate=not modus_doctor))))
         try:
             if platform == "dd":
                 data = provider.execute_read(resource, action, args, getattr(args, "session", None))
