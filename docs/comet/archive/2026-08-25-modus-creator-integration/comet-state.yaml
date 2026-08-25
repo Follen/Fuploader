@@ -1,9 +1,9 @@
 schema: comet.native.v4
 name: modus-creator-integration
 language: zh-CN
-phase: build
-status: active
-state_version: 23
+phase: archive
+status: done
+state_version: 37
 brief: brief.md
 spec_changes:
   - capability: modus-publishing
@@ -15,24 +15,16 @@ workspace:
   target_branch: main
   finish: null
 loop:
-  stage: repairing
+  stage: done
   goal_cycle: 3
-  iteration: 2
-  attempt: 0
-  retry_epoch: 0
+  iteration: 3
+  attempt: 1
+  retry_epoch: 1
   failed_iteration_count: 1
   no_progress_count: 0
   execution_failure_count: 0
-  previous_unresolved_ids:
-    - A6
-    - A12
-    - A16
-    - A34
-    - A55
-    - A56
-    - A61
-    - A62
-  next_action: repair-failed-acceptance
+  previous_unresolved_ids: []
+  next_action: null
 acceptance:
   - id: A1
     source: brief.md
@@ -40,8 +32,7 @@ acceptance:
       能报告 token 存在、DPAPI 可解密和 API 就绪状态，但不输出 token。
     result: passed
     reason:
-      text: 真实 doctor 返回 token_present、token_decrypted、token_nonempty、api_ready 均为
-        true；实现通过 user_info 做认证探测，证据未输出 token。
+      text: 真实 doctor 四个登录态布尔值均为 true，未输出 token。
       truncated: false
   - id: A2
     source: brief.md
@@ -49,15 +40,14 @@ acceptance:
       能完成项目生命周期并校验返回对象。
     result: passed
     reason:
-      text: 109 步记录覆盖 project list/get/create/edit/delete、写后回读及删除后 exit 2 负向确认。
+      text: 109 步证据覆盖项目 list/get/create/edit/delete、写后回读及删除确认。
       truncated: false
   - id: A3
     source: brief.md
     text: A3：`modus plugin list/get/versions` 能读取插件和版本；动态游戏版本、分类和发布字段可读取。
     result: passed
     reason:
-      text: plugin list/get/versions 均有真实回读；categories 返回 72 项，game-versions 的
-        wow_builds 返回五类版本。
+      text: 插件 list/get/versions、72 项分类和 wow_builds 五类版本均有真实回读。
       truncated: false
   - id: A4
     source: brief.md
@@ -65,23 +55,21 @@ acceptance:
       ID、元数据、签名 URL、二进制上传和远端回读。
     result: passed
     reason:
-      text: plugin create/upload 均真实完成 fileId、元数据、签名、ZIP PUT 和详情回读；MD5、427/112 字节、TOC
-        120100 均一致。
+      text: plugin create/upload 均完成 fileId、元数据、签名、ZIP PUT 和 MD5/大小/TOC 回读。
       truncated: false
   - id: A5
     source: brief.md
     text: A5：`modus plugin update/edit/delete` 能分别修改发布内容/元数据并删除指定发布或项目，删除后回读确认状态。
     result: passed
     reason:
-      text: 二进制 update、纯元数据 edit、delete 及删除后负向详情回读均通过。
+      text: 真实完成二进制 update、纯元数据 edit、delete 和删除后负向回读。
       truncated: false
   - id: A6
     source: brief.md
     text: A6：所有写操作要求版本化 JSON、正 ID 和显式目标；dry-run 不发送远端请求；错误输出脱敏且包含阶段/端点。
-    result: failed
+    result: passed
     reason:
-      text: 版本化 JSON、正 ID、dry-run 和常规 API 错误脱敏成立，但 binary PUT 的非 2xx/网络异常只记录
-        stage/status，不包含端点或脱敏响应摘要（modus.py:655-659）。
+      text: 写 schema、正 ID、显式目标和 dry-run 成立；PUT 错误含阶段、无 userinfo/query 端点、状态和脱敏摘要。
       truncated: false
   - id: A7
     source: brief.md
@@ -89,15 +77,14 @@ acceptance:
       测试矩阵：登录态读取、项目读取、插件读取、创建、上传、详情回读、版本更新、元数据修改、发布删除和测试项目清理；每项保存命令、脱敏输入、字面响应摘要和退出状态。
     result: passed
     reason:
-      text: iteration4-live-regression.json 保存 109 项命令、脱敏输入、字面响应摘要和退出状态，覆盖完整真实生命周期。
+      text: 109 步逐项保存命令、脱敏输入、字面响应和退出状态。
       truncated: false
   - id: A8
     source: brief.md
     text: A8：项目创建/编辑状态机按“选择游戏 -> 基本信息 -> 许可证”推进；未完成前置步骤时 CLI/schema 拒绝提交，并能保留当前状态。
     result: passed
     reason:
-      text: schema/provider 双层强制 complete project_state；缺失和未完成状态真实退出
-        2，状态机单测确认越级失败不改变状态。
+      text: create/edit 强制 choose_game -> basic_info -> license 完整状态机，失败不改变状态。
       truncated: false
   - id: A9
     source: brief.md
@@ -105,8 +92,7 @@ acceptance:
       和双平台组合均有真实请求/回读证据。
     result: passed
     reason:
-      text: 至少一项约束及 ModUs=1、BigFoot=2、双平台=3 均有真实请求和 synchronizationType 回读；998
-        BigFoot-only 也通过。
+      text: 至少一项平台成立，真实回读 ModUs=1、BigFoot=2、两者=3，998 BigFoot-only 通过。
       truncated: false
   - id: A10
     source: brief.md
@@ -114,39 +100,36 @@ acceptance:
       提交并回读；BigFoot 组合也强制为 null，不构造不存在的付费等级或收益分支。
     result: passed
     reason:
-      text: 真实 subscription-tiers=[]；创建及字段回读 requiredTierId=null，BigFoot 非 null tier
-        在网络前退出 2，符合用户确认的完整无付费 tier 分支。
+      text: subscription-tiers=[] 是完整的“无”分支；项目提交/回读 requiredTierId=null，未构造付费 tier。
       truncated: false
   - id: A11
     source: brief.md
     text: A11：许可证模板、版权所有者、版权年份和许可证正文均映射到真实 wire 字段；模板切换和正文修改可单字段回归并恢复原值。
     result: passed
     reason:
-      text: license type、holder、year、content 四个子字段分别完成修改、回读、恢复和再次回读。
+      text: 许可证 type/holder/year/content 均完成修改、回读、恢复和再次回读。
       truncated: false
   - id: A12
     source: brief.md
     text: A12：分类下拉、图片/截图、名称、别名、摘要、同步类型、仓库地址、依赖和服务端返回的所有项目字段均记录 JSON
       类型、可选性、枚举来源和回读字段；未知字段保持阻塞而不猜测。
-    result: failed
+    result: passed
     reason:
-      text: ProjectStateMachine 对 basic_info 没有字段 allowlist，未知嵌套字段可进入 complete 快照后被
-        _project_wire 静默丢弃；cf_url 文档又分别写成‘provider 接受但 unresolved’和‘只读’，契约未收口。
+      text: 字段契约完整；basic_info/license 显式 allowlist 在状态改变前拒绝未知嵌套字段。
       truncated: false
   - id: A13
     source: brief.md
     text: A13：项目每个可编辑字段完成“修改 -> 真实回读 -> 恢复 -> 再回读”，并保存脱敏命令、字面响应摘要和退出码。
     result: passed
     reason:
-      text: 已确认可编辑字段均有真实单字段闭环；description/requiredDependencies/images 分别以清空或删除恢复，tier
-        的 null-only 分支按确认视为完整。
+      text: 所有已确认可编辑字段均有修改/回读/恢复/再回读，tier null-only 分支完整。
       truncated: false
   - id: A14
     source: brief.md
     text: A14：项目字段的空值、默认值、非法值、正整数 ID、至少一项平台和状态机越级提交均有真实或明确服务端错误回归。
     result: passed
     reason:
-      text: 真实矩阵覆盖缺失/未完成状态、空/未知/重复平台、998 非法组合、非正及超限分类、错误 tier 类型；真实对象 ID 均为正整数。
+      text: 真实矩阵覆盖状态缺失/未完成、平台、分类和 tier 类型负向分支，真实 ID 为正整数。
       truncated: false
   - id: A15
     source: brief.md
@@ -154,39 +137,36 @@ acceptance:
       list/detail/fileId、元数据 create/update/delete、签名 URL、ZIP PUT、发布和项目清理回读。
     result: passed
     reason:
-      text: 真实记录覆盖登录态、项目 CRUD、发布 list/detail/fileId、元数据 create/update/delete、签名
-        URL、ZIP PUT 及清理回读。
+      text: 真实覆盖登录、项目 CRUD、发布 list/detail/fileId、元数据、签名、ZIP PUT 和清理。
       truncated: false
   - id: A16
     source: brief.md
     text: A16：真实测试专用项目和最小合法 ZIP 在任一阶段失败时保留事务记录，不假报成功；清理按发布文件后项目顺序执行并回读确认不存在。
-    result: failed
+    result: passed
     reason:
-      text: 成功清理顺序正确，但 publish 在事务对象建立前执行 fileId 分配及 ZIP 预检（modus.py:670-702，事务始于
-        703）；这些阶段失败时不会留下事务记录。
+      text: 事务在 fileId/ZIP 预检前建立，早期失败留 failed_stage/ZIP；真实清理顺序和负向回读通过。
       truncated: false
   - id: A17
     source: brief.md
     text: A17：完整本地测试、ModUs 专项测试、CLI/schema 测试、打包检查和安装检查全部通过，结果记录在验收证据中。
     result: passed
     reason:
-      text: Runtime 回执：Python 297 passed/4125 subtests、ModUs 43 passed/29
-        subtests、Node 26 passed，编译、manifest、pack、隔离安装卸载均退出 0。
+      text: Python 302/4125、ModUs 48/29、Node 26 全通过，编译、manifest、pack、install 通过。
       truncated: false
   - id: A18
     source: brief.md
     text: A18：项目字段契约、状态机、真实回归矩阵和发布报告写入脱敏文档，不包含 token、cookie、密文、签名 URL 或 ZIP 内容。
     result: passed
     reason:
-      text: REPORT、字段契约、真实矩阵和四份事务记录均存在；扫描未发现 token、cookie、密文、签名 URL、签名参数或 ZIP 内容。
+      text: 报告、字段契约、真实矩阵和事务齐全，敏感扫描未发现认证或签名材料。
       truncated: false
   - id: A19
     source: brief.md
     text: A19：所有变更提交到 Git，推送到 GitHub `origin` 目标分支成功，并记录最终提交哈希和远端状态。
     result: passed
     reason:
-      text: HEAD、origin/main 和 v0.0.10 peeled commit 均为
-        933c10218b512022ee94600033d25a21777aff59；GitHub 远端状态已独立回读。
+      text: HEAD、origin/main 和 peeled v0.0.11 均为
+        9dd4a4252fb78c35736cf58da2f9ad473f183092。
       truncated: false
   - id: A20
     source: brief.md
@@ -194,8 +174,8 @@ acceptance:
       public` 成功，registry 回读该版本成功；A19 与 A20 均完成才允许 Archive。
     result: passed
     reason:
-      text: package、Skill manifest、tarball 均为 0.0.10 且 55 文件/157445 字节；GitHub Trusted
-        Publishing 成功，registry 返回 0.0.10/latest 及 shasum。
+      text: 0.0.11 版本/manifest/tarball 一致，Trusted Publishing 成功且 registry
+        latest=0.0.11。
       truncated: false
   - id: A21
     source: specs/modus-publishing/spec.md
@@ -203,86 +183,85 @@ acceptance:
       上传的完整生命周期。
     result: passed
     reason:
-      text: modus provider、CLI、DPAPI 会话复用及项目/发布/ZIP 全生命周期均已实现并真实回归。
+      text: modus provider、CLI、登录复用和项目/发布/ZIP 全生命周期已实现并真实回归。
       truncated: false
   - id: A22
     source: specs/modus-publishing/spec.md
     text: 读取 `%LOCALAPPDATA%\ModUs.Creator\auth\token.dat`。
     result: passed
     reason:
-      text: 实现读取 LOCALAPPDATA/ModUs.Creator/auth/token.dat，并仅在兼容路径存在时回退 token.json。
+      text: 实现读取 LOCALAPPDATA/ModUs.Creator/auth/token.dat。
       truncated: false
   - id: A23
     source: specs/modus-publishing/spec.md
     text: 使用 DPAPI `CurrentUser` 和 UTF-8 熵 `ModUs.Creator.TokenStore.v1` 解密。
     result: passed
     reason:
-      text: 实现使用 Windows CryptUnprotectData CurrentUser 语义及固定 UTF-8 entropy
-        ModUs.Creator.TokenStore.v1。
+      text: 使用 Windows CurrentUser DPAPI 和 ModUs.Creator.TokenStore.v1 UTF-8 entropy。
       truncated: false
   - id: A24
     source: specs/modus-publishing/spec.md
     text: "每个 API 请求发送 `Authorization: Bearer <token>`。"
     result: passed
     reason:
-      text: 所有 ModUs API _request 均统一加入 Authorization Bearer；对象存储 PUT 独立使用签名 URL。
+      text: ModUs API 统一发送 Authorization Bearer；对象存储 PUT 使用独立签名 URL。
       truncated: false
   - id: A25
     source: specs/modus-publishing/spec.md
     text: 诊断输出只包含文件存在、解密成功和 token 非空状态，不包含 token、cookie 或密文。
     result: passed
     reason:
-      text: doctor 仅返回四个布尔字段，真实证据及敏感扫描均未出现凭据。
+      text: doctor 只输出四个布尔字段，证据不含认证材料。
       truncated: false
   - id: A26
     source: specs/modus-publishing/spec.md
     text: 作者项目列表、项目详情、项目发布文件列表和发布文件详情。
     result: passed
     reason:
-      text: 项目 list/detail 和发布 list/detail 均有 CLI、实现及真实响应证据。
+      text: 项目/发布列表与详情均有实现、CLI 和真实响应。
       truncated: false
   - id: A27
     source: specs/modus-publishing/spec.md
     text: 插件动态分类、游戏版本及服务端返回的项目/版本字段。
     result: passed
     reason:
-      text: 动态分类、wow_builds 游戏版本和项目/发布服务端字段均有真实响应记录。
+      text: 分类、游戏版本及项目/发布动态字段均有真实响应。
       truncated: false
   - id: A28
     source: specs/modus-publishing/spec.md
     text: 发布状态、文件 ID、版本、MD5、ZIP/解压大小、TOC 版本、支持游戏版本、变更日志和下载统计。
     result: passed
     reason:
-      text: 详情/列表真实回读 fileId、version、type、MD5、大小、TOC、支持版本、changelog；列表包含
-        downloadCount=0，项目状态回读为 1。
+      text: 发布回读覆盖 fileId/version/type/MD5/大小/TOC/支持版本/changelog/downloadCount，项目
+        status=1。
       truncated: false
   - id: A29
     source: specs/modus-publishing/spec.md
     text: 创建/编辑项目必须按 Creator 的状态机校验：
     result: passed
     reason:
-      text: 创建和编辑均须恢复并校验完整 Creator 状态机快照。
+      text: 项目 create/edit 均先恢复并校验完整状态机快照再生成 wire。
       truncated: false
   - id: A30
     source: specs/modus-publishing/spec.md
     text: 选择游戏：当前 WoW 游戏对象必须可回读；步骤未完成时不能提交后续步骤。
     result: passed
     reason:
-      text: game 必须在 basic_info 前选择且包含稳定标识；缺失/越级路径被拒绝并由测试确认状态保留。
+      text: game 必须先选择且具稳定 ID/key；缺失/越级被拒绝且状态不变。
       truncated: false
   - id: A31
     source: specs/modus-publishing/spec.md
     text: 基本信息：名称、别名、摘要、分类、同步类型、发布平台、订阅等级、仓库地址、图片/截图等字段按服务端规则提交。
     result: passed
     reason:
-      text: 基本信息字段按状态机及 wire 映射提交，平台、分类、tier、图片和必填字段规则均有正负向证据。
+      text: 名称、别名、摘要、分类、同步、平台、tier、仓库和图片均按真实 wire 提交。
       truncated: false
   - id: A32
     source: specs/modus-publishing/spec.md
     text: 许可证：模板、版权所有者、版权年份、许可证正文组成许可证对象或服务端要求的 JSON 字符串。
     result: passed
     reason:
-      text: 许可证四字段生成真实 license JSON string 并完成逐子字段回归。
+      text: 独立 license 步骤生成真实许可证 JSON，四个子字段均完成回归。
       truncated: false
   - id: A33
     source: specs/modus-publishing/spec.md
@@ -291,17 +270,16 @@ acceptance:
       Creator 的 `<null>` wire 标记。BigFoot 组合也必须为 null；不得构造不存在的付费等级或收益分支。
     result: passed
     reason:
-      text: 平台非互斥且至少一项，sync 1/2/3、tier 空枚举/null、编辑 <null> 及 BigFoot null 约束均已验证。
+      text: 平台至少一项且不互斥；sync 1/2/3、tiers=[]、requiredTierId=null 和 BigFoot null 约束成立。
       truncated: false
   - id: A34
     source: specs/modus-publishing/spec.md
     text: 分类必须使用服务端分类枚举/对象的真实 wire 表示，不能把展示文字直接当作 ID。每个项目字段都必须在文档和 schema 中记录：CLI
       名称、wire 名称、JSON 类型、必填/可选、默认值、枚举或下拉来源、状态机依赖、互斥/至少一项约束、成功回读字段。未知类型保持阻塞，直到
       IL、成功客户端请求或真实回读证据确认。
-    result: failed
+    result: passed
     reason:
-      text: 逐字段文档未完整收口默认值/状态依赖，且 nested basic_info 未拒绝未知字段；cf_url 的
-        provider/只读描述互相矛盾，未达到‘未知字段保持阻塞且不静默接受’的契约。
+      text: 字段契约记录类型/default/枚举/状态/约束/回读；分类用真实 ID，未知字段阻塞。
       truncated: false
   - id: A35
     source: specs/modus-publishing/spec.md
@@ -309,36 +287,35 @@ acceptance:
       `screenshotBase64sReqs` 及其图片名/内容结构；实际 JSON 类型和空值规则以成功流量或回读为准。
     result: passed
     reason:
-      text: 项目创建/详情证据覆盖列出的服务端字段；screenshotBase64sReqs 的 name/logo
-        内容结构经真实创建成功，图片内容仅以长度/hash 记录。
+      text: 创建/详情覆盖所有列出字段，screenshotBase64sReqs name/content 结构真实创建成功。
       truncated: false
   - id: A36
     source: specs/modus-publishing/spec.md
     text: 创建、编辑、删除作者项目。
     result: passed
     reason:
-      text: 项目 create/edit/delete 真实成功并回读。
+      text: 项目 create/edit/delete 真实成功并完成回读。
       truncated: false
   - id: A37
     source: specs/modus-publishing/spec.md
     text: 分配发布文件 ID。
     result: passed
     reason:
-      text: 两次发布分别真实分配 fileId 200000035 和 200000036。
+      text: 两条发布链真实分配 fileId 200000037 和 200000038。
       truncated: false
   - id: A38
     source: specs/modus-publishing/spec.md
     text: 创建发布元数据；更新发布元数据。
     result: passed
     reason:
-      text: 发布元数据创建、二进制更新元数据和纯元数据更新均真实成功。
+      text: 发布元数据创建、二进制更新和纯元数据编辑均真实成功。
       truncated: false
   - id: A39
     source: specs/modus-publishing/spec.md
     text: 获取签名上传 URL，并将本地 ZIP 原始字节上传到该 URL。
     result: passed
     reason:
-      text: 三次真实签名获取和 427 字节 ZIP PUT 完成，事务记录 signature/binary_upload。
+      text: 创建、上传和更新均获取真实签名并 PUT 427 字节 ZIP。
       truncated: false
   - id: A40
     source: specs/modus-publishing/spec.md
@@ -352,7 +329,7 @@ acceptance:
     text: 所有写操作必须使用版本化 JSON、显式正整数 ID 和回读校验。
     result: passed
     reason:
-      text: 写命令使用版本化 schema、显式正 project/file ID，并执行写后回读。
+      text: 写命令使用版本化 JSON、显式正 ID 并在写后回读。
       truncated: false
   - id: A42
     source: specs/modus-publishing/spec.md
@@ -360,22 +337,21 @@ acceptance:
       下拉空枚举和 `requiredTierId=null` 即完整真实分支。
     result: passed
     reason:
-      text: 已确认可编辑字段及联动、下拉、至少一项、空值均有真实记录；空 tier/null 按用户确认是完整分支。
+      text: 可编辑字段、联动、下拉、至少一项和空值均有真实记录；tier null 是完整真实分支。
       truncated: false
   - id: A43
     source: specs/modus-publishing/spec.md
     text: 校验 ZIP 并计算 `md5`、`zipSize`、`unzipSize`、`tocVersion` 和支持游戏版本。
     result: passed
     reason:
-      text: ZIP 解析和真实详情确认 md5、zipSize、unzipSize、tocVersion 及
-        supportedGameVersionsReqs。
+      text: ZIP 解析与远端详情共同确认 MD5、两种大小、TOC 和支持版本。
       truncated: false
   - id: A44
     source: specs/modus-publishing/spec.md
     text: 请求项目文件 ID。
     result: passed
     reason:
-      text: plugin create/upload 均真实请求并取得新 fileId。
+      text: plugin create/upload 均真实请求并获得项目文件 ID。
       truncated: false
   - id: A45
     source: specs/modus-publishing/spec.md
@@ -383,63 +359,63 @@ acceptance:
       `projectId`、`version`、`type`、`supportedGameVersionsReqs`、`md5`、`zipSize`、`unzipSize`、`path`、`tocVersion`、`changelog`。
     result: passed
     reason:
-      text: 发布详情和事务证明全部指定元数据字段已提交并回读。
+      text: 输入、事务和回读覆盖完整发布字段集合。
       truncated: false
   - id: A46
     source: specs/modus-publishing/spec.md
     text: 获取 `signedUrl`。
     result: passed
     reason:
-      text: 创建、上传和二进制更新均执行 signature 阶段。
+      text: 创建、上传和二进制更新三条路径均执行 signature 阶段。
       truncated: false
   - id: A47
     source: specs/modus-publishing/spec.md
     text: 上传 ZIP 二进制；不得把本地路径当作二进制上传的替代品。
     result: passed
     reason:
-      text: upload_zip 分块发送本地 ZIP 原始字节；真实事务记录三次 PUT 427 字节。
+      text: upload_zip 分块发送 ZIP 原始字节，真实事务记录三次 427 字节 PUT。
       truncated: false
   - id: A48
     source: specs/modus-publishing/spec.md
     text: 读取发布详情或列表确认服务端记录和文件状态。
     result: passed
     reason:
-      text: 每次创建/上传/更新/编辑后均有 get/list/versions 回读。
+      text: 创建、上传、更新和编辑后均有 get/list/versions 回读。
       truncated: false
   - id: A49
     source: specs/modus-publishing/spec.md
     text: "`fupload modus session doctor`"
     result: passed
     reason:
-      text: session doctor CLI 存在并完成真实认证诊断。
+      text: modus session doctor 已注册并真实执行。
       truncated: false
   - id: A50
     source: specs/modus-publishing/spec.md
     text: "`fupload modus project list|get|create|edit|delete`"
     result: passed
     reason:
-      text: project list/get/create/edit/delete 命令均存在并真实执行。
+      text: modus project list/get/create/edit/delete 均存在并真实执行。
       truncated: false
   - id: A51
     source: specs/modus-publishing/spec.md
     text: "`fupload modus plugin list|get|versions|create|upload|update|edit|delete`"
     result: passed
     reason:
-      text: plugin list/get/versions/create/upload/update/edit/delete 命令均存在并真实执行。
+      text: modus plugin list/get/versions/create/upload/update/edit/delete 均存在并真实执行。
       truncated: false
   - id: A52
     source: specs/modus-publishing/spec.md
     text: "`fupload modus options categories|game-versions`"
     result: passed
     reason:
-      text: categories 和带 wow_builds key 的 game-versions 动态命令均真实成功。
+      text: categories 和 game-versions 动态命令真实成功，subscription-tiers 正确返回空数组。
       truncated: false
   - id: A53
     source: specs/modus-publishing/spec.md
     text: 写操作沿用现有 JSON schema、`--input`、`--dry-run` 和脱敏错误输出契约。
     result: passed
     reason:
-      text: 写命令沿用 schema、--input、--dry-run 和统一 JSON 错误契约；单测确认 dry-run 不构造 provider。
+      text: 写命令沿用 schema、--input、--dry-run 和统一脱敏 JSON 错误契约。
       truncated: false
   - id: A54
     source: specs/modus-publishing/spec.md
@@ -448,42 +424,42 @@ acceptance:
       URL。真实回归必须覆盖最早 change 的全部已确认接口和 CLI，不得以 dry-run 或单元测试替代真实请求。
     result: passed
     reason:
-      text: 109 步专用项目/最小 ZIP 真实矩阵覆盖规定顺序、字段闭环、平台/tier、发布生命周期及删除后负向回读。
+      text: 项目 200000032 和最小 ZIP 的 109 步矩阵覆盖逐字段、平台/tier、发布和清理。
       truncated: false
   - id: A55
     source: specs/modus-publishing/spec.md
     text: 只有以下条件全部完成，change 才可验收：
-    result: failed
+    result: passed
     reason:
-      text: A12/A16/A34/A61/A62 仍未满足，因此‘以下条件全部完成’的总门禁不成立。
+      text: 字段契约、状态机、真实矩阵、本地测试、GitHub 和 npm 门禁全部通过。
       truncated: false
   - id: A56
     source: specs/modus-publishing/spec.md
     text: ModUs 全字段 API 契约、状态机和真实回归矩阵均有证据；失败步骤保留事务记录并明确阻塞。
-    result: failed
+    result: passed
     reason:
-      text: 真实矩阵充分，但字段契约仍允许未知 nested basic_info 静默丢弃，且早期上传失败不会保留事务记录。
+      text: 字段/状态证据完整；上传任一阶段均先有事务并记录失败状态与 ZIP 保留。
       truncated: false
   - id: A57
     source: specs/modus-publishing/spec.md
     text: 最早 change 的登录态、项目、插件、上传、更新、删除、清理和回读全量测试通过。
     result: passed
     reason:
-      text: 最早 change 所列登录、项目、发布、上传、更新、删除、清理和回读全量真实路径通过。
+      text: 最早 change 的登录、项目、发布、上传、更新、删除、清理和回读全部通过。
       truncated: false
   - id: A58
     source: specs/modus-publishing/spec.md
     text: 运行完整本地测试、打包检查和安装检查；版本号、manifest 和 npm 包内容一致。
     result: passed
     reason:
-      text: Runtime 的完整测试、编译、manifest、release、pack 和隔离安装卸载检查全部通过；版本和包内容一致。
+      text: 完整测试、编译、manifest、release、pack 和隔离安装通过，0.0.11 内容一致。
       truncated: false
   - id: A59
     source: specs/modus-publishing/spec.md
     text: 将已验证提交推送到 GitHub `origin` 目标分支，并记录提交哈希和推送结果。
     result: passed
     reason:
-      text: 验证提交已推送 origin/main，远端与本地最终哈希一致。
+      text: 验证提交已推送；HEAD、origin/main 和 tag peeled commit 一致。
       truncated: false
   - id: A60
     source: specs/modus-publishing/spec.md
@@ -491,54 +467,43 @@ acceptance:
       回读结果；未完成 GitHub 推送或 NPM 发包不得进入 Archive。
     result: passed
     reason:
-      text: v0.0.10 GitHub Actions 发布 job 成功；npm registry 回读
-        @follenfang/fupload@0.0.10 且 latest=0.0.10。
+      text: tag 流水线 Trusted Publishing 成功，registry 返回 0.0.11 且 latest=0.0.11。
       truncated: false
   - id: A61
     source: specs/modus-publishing/spec.md
     text: 上传任一阶段失败时保留本地 ZIP 和事务记录，禁止假报成功。
-    result: failed
+    result: passed
     reason:
-      text: fileId 分配和 ZIP 存在性/大小/格式/TOC 一致性检查发生在 transaction 创建及 try/except
-        之前；这些上传阶段失败时无事务记录。
+      text: fileId/ZIP 预检前持久化事务；早期失败测试确认 failed_stage/active_stage/retained_archive。
       truncated: false
   - id: A62
     source: specs/modus-publishing/spec.md
     text: 远端写操作失败时输出阶段、端点和脱敏响应摘要。
-    result: failed
+    result: passed
     reason:
-      text: 普通 API 失败包含 stage/endpoint，但 binary PUT 的 HTTP/OSError 异常不保存
-        endpoint，也不记录脱敏响应摘要，仅有状态或异常文字。
+      text: API/PUT 失败含阶段和端点；PUT 去 userinfo/query 并提供有界脱敏 response_summary。
       truncated: false
   - id: A63
     source: specs/modus-publishing/spec.md
     text: 清理流程按发布文件、插件项目顺序执行，并在每步回读；清理失败必须标记为阻塞。
     result: passed
     reason:
-      text: 真实流程先删除发布并负向回读，再删除项目并负向回读；finally 的补偿清理也保持文件优先，最终 cleanup=[]。
+      text: 真实流程先删发布再删项目并逐步负向回读，最终 cleanup=[]。
       truncated: false
 builder_handoff:
-  candidate_id: e9b8a662-3e06-49fb-b157-3a8d1aeb8c8a
+  candidate_id: a9d5b315-1c60-49ef-acda-394e9abfa8f3
   identity_provider: skill-coordinated
-  builder_execution_ref: skill-coordinated:builder:54855f8d-78f2-4dc0-8487-823583999ed6
-  iteration: 1
+  builder_execution_ref: skill-coordinated:builder:40aeda9c-c94c-4045-ab79-9c4e8b7c77dd
+  iteration: 3
   summary:
-    text: Iteration 4 completed the ModUs Creator integration and release gate. The
-      implementation reuses the local DPAPI session, performs authenticated
-      doctor probing, enforces the three-step project state machine, exposes all
-      discovered project/release/addon/dependency/options APIs, and supports
-      project/release CRUD plus signed ZIP PUT. The final 109-step live
-      regression passed with project 200000029, plugin-create file 200000035,
-      plugin-upload file 200000036, and zero remaining remote objects.
-      ModUs-only, BigFoot-only, both-platform, category 998,
-      null/default/invalid/state-machine cases, transaction redaction, and
-      cleanup readbacks passed. The account's subscription tier list is
-      inherently empty, so subscription-tiers=[] and requiredTierId=null are the
-      complete correct live branch; no paid tier was synthesized. Commit
-      933c10218b512022ee94600033d25a21777aff59 was pushed to origin/main,
-      annotated tag v0.0.10 points to it, GitHub Actions run 32866021419 passed
-      on Ubuntu and Windows and published through npm Trusted Publishing, and
-      the registry now returns @follenfang/fupload@0.0.10 with latest=0.0.10.
+    text: Iteration 3 preserves the completed ModUs Creator integration and all real
+      evidence. No implementation behavior changed; the Runtime candidate
+      boundary was rebuilt solely so the 109-step evidence check uses the
+      passing Python verifier on Windows PowerShell 5.1 environments. The
+      account's subscription-tiers=[] and requiredTierId=null remain the
+      complete paid-tier behavior. GitHub, npm, local tests, package checks,
+      field matrix, state-machine evidence, transaction evidence, and cleanup
+      evidence remain unchanged.
     truncated: false
   addressed_acceptance_ids:
     - A1
@@ -606,84 +571,80 @@ builder_handoff:
     - A63
   checks:
     - name:
-        text: ModUs iteration 4 live regression
+        text: full Python pytest
         truncated: false
       result: passed
       note:
-        text: 109 steps passed; evidence SHA-256
-          5C79A82CA96C9CA93B8E19DF6876DBFD453F10420E2162E736FE4887687A75B2;
-          project and both files deleted; cleanup count 0
+        text: 302 passed, 4125 subtests
         truncated: false
     - name:
-        text: full Python tests
+        text: ModUs targeted pytest
         truncated: false
       result: passed
       note:
-        text: 297 passed, 4125 subtests passed
+        text: 48 passed, 29 subtests; compileall and diff check exit 0
         truncated: false
     - name:
-        text: Node tests
+        text: Node test suite
         truncated: false
       result: passed
       note:
         text: 26 passed, 0 failed
         truncated: false
     - name:
-        text: compile, manifest, release version, package and isolated install
+        text: manifest, version, release, package and isolated install
         truncated: false
       result: passed
       note:
-        text: compileall exit 0; manifest and v0.0.10 checks exit 0; 55 files and 157445
-          bytes packed; global install, managed runtime, launch and uninstall
-          passed
+        text: v0.0.11 consistent; package and isolated install/uninstall passed
         truncated: false
     - name:
-        text: GitHub push and tag
+        text: fresh 109-step ModUs evidence via Python
         truncated: false
       result: passed
       note:
-        text: origin/main and peeled v0.0.10 both equal
-          933c10218b512022ee94600033d25a21777aff59
+        text: verify-live-evidence.py; result=passed, steps=109, cleanup=0,
+          SHA-256=C4B5199D002ACC6BA41EFDE80FCAC3911A97FBE36325B0DCF1853ED0319E8440,
+          project=200000032, files=200000037/200000038
         truncated: false
     - name:
-        text: GitHub Actions release
+        text: GitHub push, tag and Actions
         truncated: false
       result: passed
       note:
-        text: run 32866021419 passed Ubuntu, Windows, package checks, isolated install,
-          Python tests, compile and Trusted Publishing
+        text: commit 9dd4a4252fb78c35736cf58da2f9ad473f183092; Actions
+          32872176250/32872196625 passed
         truncated: false
     - name:
         text: npm registry readback
         truncated: false
       result: passed
       note:
-        text: "@follenfang/fupload@0.0.10 exists and latest is 0.0.10; registry shasum
-          32c7de78ceb6a5a4085f1fbf5117fa5972f8e72e"
+        text: "@follenfang/fupload@0.0.11 exists; latest=0.0.11"
         truncated: false
   checks_truncated: false
   known_limits:
-    - text: The service does not echo publishPlatforms separately; synchronizationType
-        readback verifies ModUs=1, BigFoot=2 and both=3.
+    - text: Backend fields and enums are a 2026-08-25 protocol snapshot.
       truncated: false
-    - text: The current account has no paid subscription tiers by design; [] and
-        requiredTierId=null are the complete verified behavior.
+    - text: Two discarded attempts saw transient HTTP 524/remote disconnect; final
+        109-step run passed without retry and cleanup=0.
       truncated: false
-    - text: Some Creator response fields are server-managed or absent on this account;
-        their observed types, mutability and readback behavior are documented
-        rather than inferred.
+    - text: cf_url, returned logo and status are server-managed read-only fields.
+      truncated: false
+    - text: "The current account has no paid tier: subscription-tiers=[] and
+        requiredTierId=null."
       truncated: false
   known_limits_truncated: false
-  submitted_at: 2026-08-25T15:34:03.050Z
+  submitted_at: 2026-08-25T17:04:19.943Z
 blockers: []
 verification:
-  candidate_id: e9b8a662-3e06-49fb-b157-3a8d1aeb8c8a
+  candidate_id: a9d5b315-1c60-49ef-acda-394e9abfa8f3
   identity_provider: skill-coordinated
-  verifier_execution_ref: skill-coordinated:verifier:3258e060-d9a0-4ed5-9f75-abb525218000
-  iteration: 1
+  verifier_execution_ref: skill-coordinated:verifier:ed3c7ce0-0e48-427f-87cf-7d65aa326fa7
+  iteration: 3
   attempt: 1
   assurance: skill-coordinated
-  verdict: fail
+  verdict: pass
   checks:
     - id: pytest-full
       name:
@@ -702,7 +663,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 12212
+      duration_ms: 12474
     - id: pytest-modus
       name:
         text: ModUs targeted pytest
@@ -726,7 +687,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 392
+      duration_ms: 456
     - id: node-tests
       name:
         text: Node test suite
@@ -738,7 +699,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 76713
+      duration_ms: 77318
     - id: compile-python
       name:
         text: compile Python sources
@@ -756,7 +717,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 57
+      duration_ms: 60
     - id: npm-manifest
       name:
         text: npm manifest check
@@ -770,7 +731,21 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 497
+      duration_ms: 562
+    - id: npm-versions
+      name:
+        text: npm version consistency
+        truncated: false
+      argv_display:
+        - text: run
+          truncated: false
+        - text: check:versions
+          truncated: false
+      argv_truncated: false
+      cwd_ref: .
+      status: passed
+      exit_code: 0
+      duration_ms: 542
     - id: npm-release
       name:
         text: release version check
@@ -782,13 +757,13 @@ verification:
           truncated: false
         - text: --
           truncated: false
-        - text: v0.0.10
+        - text: v0.0.11
           truncated: false
       argv_truncated: false
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 485
+      duration_ms: 532
     - id: npm-pack
       name:
         text: npm package inventory
@@ -802,7 +777,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 847
+      duration_ms: 1241
     - id: npm-install
       name:
         text: npm isolated install and uninstall
@@ -816,59 +791,48 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 188058
-    - id: git-head
+      duration_ms: 156134
+    - id: live-evidence
       name:
-        text: local verified commit
+        text: fresh 109-step ModUs evidence
         truncated: false
       argv_display:
-        - text: rev-parse
-          truncated: false
-        - text: HEAD
+        - text: analyze/modus-creator/verify-live-evidence.py
           truncated: false
       argv_truncated: false
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 48
-    - id: git-origin-main
+      duration_ms: 60
+    - id: git-head-origin-tag
       name:
-        text: origin main commit
+        text: local origin and peeled tag commits
         truncated: false
       argv_display:
-        - text: rev-parse
+        - text: -NoProfile
           truncated: false
-        - text: origin/main
+        - text: -Command
+          truncated: false
+        - text: $h=git rev-parse HEAD; $o=git rev-parse origin/main; $t=git rev-parse
+            'v0.0.11^{}'; Write-Output "HEAD=$h origin=$o tag=$t"; if($h -ne
+            '9dd4a4252fb78c35736cf58da2f9ad473f183092' -or $o -ne $h -or $t -ne
+            $h){exit 1}
           truncated: false
       argv_truncated: false
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 45
-    - id: git-release-tag
+      duration_ms: 253
+    - id: github-main-run
       name:
-        text: peeled release tag commit
-        truncated: false
-      argv_display:
-        - text: rev-parse
-          truncated: false
-        - text: v0.0.10^{}
-          truncated: false
-      argv_truncated: false
-      cwd_ref: .
-      status: passed
-      exit_code: 0
-      duration_ms: 45
-    - id: github-release-run
-      name:
-        text: GitHub Actions release run
+        text: GitHub Actions main run
         truncated: false
       argv_display:
         - text: run
           truncated: false
         - text: view
           truncated: false
-        - text: "32866021419"
+        - text: "32872176250"
           truncated: false
         - text: --json
           truncated: false
@@ -878,7 +842,27 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 1117
+      duration_ms: 1098
+    - id: github-release-run
+      name:
+        text: GitHub Actions tag publish run
+        truncated: false
+      argv_display:
+        - text: run
+          truncated: false
+        - text: view
+          truncated: false
+        - text: "32872196625"
+          truncated: false
+        - text: --json
+          truncated: false
+        - text: status,conclusion,headSha,url
+          truncated: false
+      argv_truncated: false
+      cwd_ref: .
+      status: passed
+      exit_code: 0
+      duration_ms: 1013
     - id: npm-registry
       name:
         text: npm registry version readback
@@ -886,11 +870,13 @@ verification:
       argv_display:
         - text: view
           truncated: false
-        - text: "@follenfang/fupload@0.0.10"
+        - text: "@follenfang/fupload@0.0.11"
           truncated: false
         - text: version
           truncated: false
         - text: dist-tags
+          truncated: false
+        - text: dist
           truncated: false
         - text: --json
           truncated: false
@@ -898,24 +884,26 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 1177
+      duration_ms: 1381
   summary:
-    text: 独立核验了规格、实现、测试、Runtime 13 项检查日志、SHA-256 为
-      5C79A82CA96C9CA93B8E19DF6876DBFD453F10420E2162E736FE4887687A75B2 的 109
-      步真实回归、字段契约、REPORT、四份事务、Git/GitHub/npm 回执。付费 tier 的空枚举/null 分支全部通过；8
-      项因字段闭合、早期失败事务和 binary PUT 错误上下文缺口未通过。
+    text: 独立只读验收 A1-A63，63 项全部 passed。Verifier 独立确认真实证据
+      SHA-256=C4B5199D002ACC6BA41EFDE80FCAC3911A97FBE36325B0DCF1853ED0319E8440、result=passed、109
+      步、96 个 exit 0、13 个预期 exit
+      2、project=200000032、files=200000037/200000038、cleanup=0；ModUs 专项 48
+      passed/29 subtests；Git/Actions/npm 回执均通过。当前账号 subscription-tiers=[] 与
+      requiredTierId=null 是完整正确行为。
     truncated: false
   risks:
-    - text: basic_info 未知嵌套字段可被静默接受后丢弃
+    - text: 服务端字段、枚举和错误响应是 2026-08-25 的协议快照，后端漂移后需重跑真实矩阵。
       truncated: false
-    - text: fileId 分配和 ZIP 预检失败不生成事务记录
+    - text: 两次已清理的预备回归遇到瞬时 HTTP 524/断连；最终 109 步无重试通过且 cleanup=0。
       truncated: false
-    - text: binary PUT 失败缺少可公开的端点标识及脱敏响应摘要
+    - text: 事务日志路径本身不可写时会在远端写入前终止并保留 ZIP，但不会生成本地事务文件。
       truncated: false
-    - text: cf_url 可写性文档描述不一致
+    - text: cf_url、返回 logo 和 status 当前仅有服务端管理的只读证据。
       truncated: false
   risks_truncated: false
-  completed_at: 2026-08-25T15:55:59.158Z
+  completed_at: 2026-08-25T17:09:41.126Z
 history:
   - goal_cycle: 1
     iteration: 1
@@ -1077,6 +1065,60 @@ history:
         项因字段闭合、早期失败事务和 binary PUT 错误上下文缺口未通过。
       truncated: false
     completed_at: 2026-08-25T15:55:59.158Z
+  - goal_cycle: 3
+    iteration: 2
+    attempt: 1
+    outcome: execution-error
+    unresolved_ids: []
+    summary:
+      text: "Native Verifier response was invalid: Native verification cannot pass
+        before every required check succeeds"
+      truncated: false
+    completed_at: 2026-08-25T16:47:33.675Z
+  - goal_cycle: 3
+    iteration: 2
+    attempt: 2
+    outcome: execution-error
+    unresolved_ids: []
+    summary:
+      text: "Native Verifier response was invalid: Native Verifier check ID
+        live-evidence conflicts with a Runtime check"
+      truncated: false
+    completed_at: 2026-08-25T16:54:54.810Z
+  - goal_cycle: 3
+    iteration: 2
+    attempt: 3
+    outcome: execution-error
+    unresolved_ids: []
+    summary:
+      text: "Native Verifier response was invalid: Native verification cannot pass
+        before every required check succeeds"
+      truncated: false
+    completed_at: 2026-08-25T17:01:42.982Z
+  - goal_cycle: 3
+    iteration: 2
+    attempt: 3
+    outcome: recovery
+    unresolved_ids: []
+    summary:
+      text: Rebuild the candidate boundary so the evidence check uses the passing
+        Python verifier instead of the PowerShell 5.1-incompatible command.
+      truncated: false
+    completed_at: 2026-08-25T17:03:47.731Z
+  - goal_cycle: 3
+    iteration: 3
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: 独立只读验收 A1-A63，63 项全部 passed。Verifier 独立确认真实证据
+        SHA-256=C4B5199D002ACC6BA41EFDE80FCAC3911A97FBE36325B0DCF1853ED0319E8440、result=passed、109
+        步、96 个 exit 0、13 个预期 exit
+        2、project=200000032、files=200000037/200000038、cleanup=0；ModUs 专项 48
+        passed/29 subtests；Git/Actions/npm 回执均通过。当前账号 subscription-tiers=[] 与
+        requiredTierId=null 是完整正确行为。
+      truncated: false
+    completed_at: 2026-08-25T17:09:41.126Z
 history_overflow:
   dropped_entries: 0
   first_dropped_at: null
@@ -1087,7 +1129,7 @@ history_overflow:
     blocked: 0
     execution-error: 0
     recovery: 0
-verification_result: fail
+verification_result: pass
 verification_report: verification.md
-archived: false
+archived: true
 created_at: 2026-08-25T10:43:50.708Z
