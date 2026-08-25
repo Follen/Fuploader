@@ -17,6 +17,7 @@ JSON_TYPES = {
     "boolean": (bool,),
     "array": (list,),
     "object": (dict,),
+    "identifier": (int, str),
 }
 
 
@@ -98,6 +99,21 @@ class Schema:
         return checked
 
     def _validate_conditionals(self, value: Dict[str, Any]) -> None:
+        if self.name.startswith("fupload.v1.modus.config"):
+            exclude = value.get("exclude_wtf")
+            if exclude == 1 and (value.get("account_name") or value.get("role_name")):
+                raise ValidationError("account_name and role_name must be empty when exclude_wtf=1", path="$.account_name")
+            if exclude == 0 and not str(value.get("account_name") or "").strip():
+                raise ValidationError("account_name is required when exclude_wtf=0", path="$.account_name")
+        if self.name.startswith(("fupload.v1.modus.config", "fupload.v1.modus.wa")):
+            if "title" in value and len(str(value["title"]).strip()) < 6:
+                raise ValidationError("must contain at least 6 characters", path="$.title")
+            if "content_text" in value and len(str(value["content_text"]).strip()) <= 20:
+                raise ValidationError("must contain more than 20 characters", path="$.content_text")
+            if "tags" in value:
+                tags = [item.strip() for item in str(value["tags"]).split(",")]
+                if any(not item for item in tags) or not 1 <= len(tags) <= 3:
+                    raise ValidationError("must contain 1 to 3 comma-delimited tag IDs", path="$.tags")
         if self.name in ("fupload.v1.modus.project.create", "fupload.v1.modus.project.edit"):
             snapshot = value.get("project_state")
             if snapshot is None:
@@ -693,6 +709,31 @@ MODUS_RELEASE = {
     "file": f("string", local_file=True),
     "transaction_log": f("string", max_length=1000),
 }
+MODUS_BUILD_ID = f("integer", minimum=0, maximum=4)
+MODUS_SHARE = {
+    "share_id": f("identifier", nonempty=True), "addons_id": f("string", nonempty=True, max_length=10000),
+    "account_name": f("string", nullable=True, max_length=120), "backup_id": f("integer", minimum=1),
+    "content": f("string", nonempty=True), "content_text": f("string", nonempty=True),
+    "image_url": f("string", nonempty=True, max_length=1000), "is_paid": f("integer", choices=(0, 1)),
+    "is_public": f("integer", choices=(0, 1)), "price": f("number", minimum=0),
+    "share_type": f("integer", minimum=0), "tags": f("string", nonempty=True, max_length=1000),
+    "title": f("string", nonempty=True, max_length=120), "exclude_wtf": f("integer", choices=(0, 1)),
+    "role_name": f("string", nullable=True, max_length=120), "required_tier_id": f("integer", nullable=True, minimum=1),
+    "sub_type": f("integer", choices=(0, 1)), "platform": f("integer", choices=(1, 3)),
+    "synchronization_type": f("integer", choices=(1, 3)), "server_type": MODUS_BUILD_ID,
+}
+MODUS_IMPORT = {
+    "import_id": f("identifier", nonempty=True), "code_text": f("string", nonempty=True),
+    "content": f("string", nonempty=True), "addons_id": f("string", nonempty=True, max_length=10000),
+    "content_text": f("string", nonempty=True), "file_path": f("string", choices=("",)),
+    "image_url": f("string", nonempty=True, max_length=1000), "is_paid": f("integer", choices=(0, 1)),
+    "is_public": f("integer", choices=(0, 1)), "price": f("number", minimum=0),
+    "share_type": f("integer", minimum=0), "support_addon": f("string", nonempty=True, max_length=120),
+    "tags": f("string", nonempty=True, max_length=1000), "title": f("string", nonempty=True, max_length=120),
+    "version": f("string", nonempty=True, max_length=120), "required_tier_id": f("integer", nullable=True, minimum=1),
+    "sub_type": f("integer", choices=(0, 1)), "platform": f("integer", choices=(1, 3)),
+    "synchronization_type": f("integer", choices=(1, 3)), "server_type": MODUS_BUILD_ID,
+}
 register("modus", "project", "create", required(MODUS_PROJECT_CREATE, ("project_state",)))
 register("modus", "project", "edit", required(with_id(MODUS_PROJECT_EDIT, "project_id"), ("project_id", "project_state")))
 register("modus", "project", "delete", required({"project_id": f("integer", minimum=1), "confirm": f("string", choices=("DELETE",))}, ("project_id", "confirm")))
@@ -701,7 +742,18 @@ register("modus", "plugin", "upload", required(MODUS_RELEASE, ("project_id", "fi
 register("modus", "plugin", "update", required(MODUS_RELEASE, ("project_id", "file_id")))
 register("modus", "plugin", "edit", required(MODUS_RELEASE, ("project_id", "file_id")))
 register("modus", "plugin", "delete", required({"project_id": f("integer", minimum=1), "file_id": f("integer", minimum=1), "confirm": f("string", choices=("DELETE",))}, ("project_id", "file_id", "confirm")))
-
+register("modus", "config", "create", required(MODUS_SHARE, ("addons_id", "backup_id", "content", "content_text", "image_url", "tags", "title", "exclude_wtf")))
+register("modus", "config", "update", required(MODUS_SHARE, ("share_id",)))
+register("modus", "config", "edit", required(MODUS_SHARE, ("share_id",)))
+register("modus", "config", "delete", required({"share_id": f("identifier", nonempty=True), "confirm": f("string", choices=("DELETE",)), "server_type": MODUS_BUILD_ID}, ("share_id", "confirm")))
+register("modus", "config", "backup-edit", required({"backup_id": f("integer", minimum=1), "backup_name": f("string", nonempty=True, max_length=200), "server_type": MODUS_BUILD_ID}, ("backup_id", "backup_name")))
+register("modus", "config", "backup-delete", required({"backup_id": f("integer", minimum=1), "confirm": f("string", choices=("DELETE",)), "server_type": MODUS_BUILD_ID}, ("backup_id", "confirm")))
+register("modus", "wa", "create", required(MODUS_IMPORT, ("code_text", "content", "addons_id", "content_text", "image_url", "support_addon", "tags", "title", "version")))
+register("modus", "wa", "update", required(MODUS_IMPORT, ("import_id",)))
+register("modus", "wa", "edit", required(MODUS_IMPORT, ("import_id",)))
+register("modus", "wa", "delete", required({"import_id": f("identifier", nonempty=True), "confirm": f("string", choices=("DELETE",)), "server_type": MODUS_BUILD_ID}, ("import_id", "confirm")))
+register("modus", "wa", "version-publish", required({"import_id": f("identifier", nonempty=True), "version": f("string", nonempty=True, max_length=120), "code_text": f("string", nonempty=True), "changelog": f("string", max_length=10000), "server_type": MODUS_BUILD_ID}, ("import_id", "version", "code_text")))
+register("modus", "wa", "version-delete", required({"version_id": f("identifier", nonempty=True), "confirm": f("string", choices=("DELETE",)), "server_type": MODUS_BUILD_ID}, ("version_id", "confirm")))
 register("blackbox", "plugin", "edit", required({
     "id": f("integer"), "name": f("string"), "logo_url": f("string"), "category_ids": f("array"),
     "type": f("integer", choices=(1, 9)), "desc": f("string"), "official": f("string"),

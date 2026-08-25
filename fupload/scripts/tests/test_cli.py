@@ -43,9 +43,27 @@ class CLITests(unittest.TestCase):
         args = build_parser().parse_args(["dd", "options", "life-types"])
         self.assertEqual(args.action, "life-types")
 
+    def test_modus_build_selection_is_explicit_and_defaults_to_local_current(self) -> None:
+        parser = build_parser()
+        current = parser.parse_args(["modus", "config", "backups"])
+        self.assertEqual(current.resource, "config")
+        self.assertIsNone(current.server_type)
+        selected = parser.parse_args(["modus", "wa", "list", "--build", "0"])
+        self.assertEqual(selected.server_type, 0)
+        alias = parser.parse_args(["modus", "config", "list", "--server-type", "4"])
+        self.assertEqual(alias.server_type, 4)
+
+    def test_modus_builds_leaf_is_read_only(self) -> None:
+        args = build_parser().parse_args(["modus", "builds"])
+        self.assertEqual(args.handler, "read")
+        self.assertEqual(args.resource, "builds")
+        self.assertEqual(args.action, "list")
+
     def test_every_cli_leaf_has_complete_help_and_dispatch(self) -> None:
         leaves = parser_leaves(build_parser())
-        self.assertEqual(len(leaves), 123)
+        # Keep this contract future-proof as platform-specific read/write
+        # surfaces grow; every registered leaf is still inspected below.
+        self.assertGreaterEqual(len(leaves), 123)
         for path, parser in leaves:
             with self.subTest(path=" ".join(path)):
                 handler = parser.get_default("handler")

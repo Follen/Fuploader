@@ -30,11 +30,11 @@ schema exposes them. The calling Skill must show the complete plan and obtain co
 """
 
 
-def _modus_provider(*, authenticate: bool = True) -> Any:
+def _modus_provider(*, authenticate: bool = True, main_session: bool = False) -> Any:
     # Keep ModUs optional at import time so existing platform commands remain
     # usable while the provider is installed or upgraded independently.
     from .modus import Modus
-    return Modus(authenticate=authenticate)
+    return Modus(authenticate=authenticate, main_session=main_session)
 
 
 def _parser(**kwargs: Any) -> argparse.ArgumentParser:
@@ -86,6 +86,19 @@ def _read_leaf(parent: argparse._SubParsersAction, name: str, summary: str, **de
     if defaults.get("platform") == "dd" and defaults.get("resource") != "session":
         leaf.add_argument("--session", help="Opaque task session ID returned by `dd session start`; required for this live DD read.")
     return leaf
+
+
+def _modus_server_flag(parser: argparse.ArgumentParser) -> None:
+    """Select the WoW Build sent as ``server`` and ``X-Server-Type``.
+
+    ``None`` deliberately means "use the main client's current Build". Build
+    zero is valid, so this is an integer flag rather than ``_positive``.
+    ``--build`` is a concise alias; both names write the same input field.
+    """
+    parser.add_argument(
+        "--server-type", "--build", dest="server_type", type=int, default=None,
+        metavar="BUILD_ID", help="WoW Build id; omitted follows the local ModUs current Build (0-4).",
+    )
 
 
 def _newbee_relationship_tree(parent: argparse.ArgumentParser, resource: str, label: str) -> None:
@@ -236,6 +249,7 @@ def _modus_tree(platforms: argparse._SubParsersAction) -> None:
     groups = root.add_subparsers(dest="resource_command", required=True)
     session = groups.add_parser("session", help="Local authentication diagnostics").add_subparsers(dest="action_command", required=True)
     _read_leaf(session, "doctor", "Check the local ModUs.Creator token store, DPAPI decryption, and authenticated API readiness without exposing credentials.", platform="modus", resource="session", action="doctor")
+    _read_leaf(groups, "builds", "List the fixed ModUs WoW Build ids, codes, names, and the locally selected current Build.", platform="modus", resource="builds", action="list")
 
     account = groups.add_parser("account", help="ModUs author account and statistics").add_subparsers(dest="action_command", required=True)
     _read_leaf(account, "info", "Read the current ModUs account capability flags.", platform="modus", resource="account", action="info")
@@ -245,13 +259,13 @@ def _modus_tree(platforms: argparse._SubParsersAction) -> None:
     addon = groups.add_parser("addon", help="ModUs addon discovery and history APIs").add_subparsers(dest="action_command", required=True)
     leaf = _read_leaf(addon, "info", "Resolve addon directories to project records.", platform="modus", resource="addon", action="info")
     leaf.add_argument("--directory", dest="directories", action="append", required=True)
-    leaf.add_argument("--server-type", type=int, default=1)
+    _modus_server_flag(leaf)
     leaf = _read_leaf(addon, "project-info", "Resolve addon project IDs to names.", platform="modus", resource="addon", action="project-info")
     leaf.add_argument("--project-id", dest="project_ids", action="append", type=_positive, required=True)
-    leaf.add_argument("--server-type", type=int, default=1)
+    _modus_server_flag(leaf)
     leaf = _read_leaf(addon, "history", "Read addon project version history.", platform="modus", resource="addon", action="history")
     leaf.add_argument("--project-id", type=_positive, required=True)
-    leaf.add_argument("--server-type", type=int, default=1)
+    _modus_server_flag(leaf)
     _page_flags(leaf)
 
     options = groups.add_parser("options", help="Read ModUs dynamic choices").add_subparsers(dest="option_action", required=True)
@@ -259,6 +273,9 @@ def _modus_tree(platforms: argparse._SubParsersAction) -> None:
     game_versions = _read_leaf(options, "game-versions", "List supported ModUs game versions.", platform="modus", resource="options", action="game-versions")
     game_versions.add_argument("--key", dest="keys", action="append", required=True, help="Request one game config key; repeatable.")
     _read_leaf(options, "subscription-tiers", "List author subscription tiers returned by ModUs.", platform="modus", resource="options", action="subscription-tiers")
+    _read_leaf(options, "config-tags", "List configuration-share tag choices from the official ModUs client data.", platform="modus", resource="options", action="config-tags")
+    _read_leaf(options, "wa-tags", "List string tag choices from the official ModUs client data.", platform="modus", resource="options", action="wa-tags")
+    _read_leaf(options, "wa-support-addons", "List applicable-addon choices from the official ModUs client data.", platform="modus", resource="options", action="wa-support-addons")
 
     project = groups.add_parser("project", help="ModUs plugin project records").add_subparsers(dest="action_command", required=True)
     for action, text in (
@@ -282,9 +299,23 @@ def _modus_tree(platforms: argparse._SubParsersAction) -> None:
         ("delete", "Delete one explicitly confirmed ModUs plugin release."),
     ):
         _write_leaf(plugin, "modus", "plugin", action, text)
-    leaf = _read_leaf(plugin, "list", "List releases for one ModUs plugin project.", platform="modus", resource="plugin", action="list"); leaf.add_argument("--project-id", type=_positive, required=True); _page_flags(leaf)
-    leaf = _read_leaf(plugin, "get", "Read one ModUs plugin release detail.", platform="modus", resource="plugin", action="get"); leaf.add_argument("--project-id", type=_positive, required=True); leaf.add_argument("--file-id", type=_positive, required=True)
-    leaf = _read_leaf(plugin, "versions", "List releases for one ModUs plugin project.", platform="modus", resource="plugin", action="versions"); leaf.add_argument("--project-id", type=_positive, required=True); _page_flags(leaf)
+    leaf = _read_leaf(plugin, "list", "List releases for one ModUs plugin project.", platform="modus", resource="plugin", action="list"); leaf.add_argument("--project-id", type=_positive, required=True); _modus_server_flag(leaf); _page_flags(leaf)
+    leaf = _read_leaf(plugin, "get", "Read one ModUs plugin release detail.", platform="modus", resource="plugin", action="get"); leaf.add_argument("--project-id", type=_positive, required=True); leaf.add_argument("--file-id", type=_positive, required=True); _modus_server_flag(leaf)
+    leaf = _read_leaf(plugin, "versions", "List releases for one ModUs plugin project.", platform="modus", resource="plugin", action="versions"); leaf.add_argument("--project-id", type=_positive, required=True); _modus_server_flag(leaf); _page_flags(leaf)
+
+    config = groups.add_parser("config", help="ModUs main-client configuration shares and backups").add_subparsers(dest="action_command", required=True)
+    for action, text in (("create", "Create a configuration share from an existing ModUs cloud backup."), ("update", "Update a configuration share."), ("edit", "Edit a configuration share."), ("delete", "Delete one explicitly confirmed configuration share."), ("backup-edit", "Rename an existing ModUs cloud backup."), ("backup-delete", "Delete one explicitly confirmed ModUs cloud backup.")):
+        _write_leaf(config, "modus", "config", action, text)
+    leaf = _read_leaf(config, "list", "List ModUs configuration shares.", platform="modus", resource="config", action="list"); _modus_server_flag(leaf); leaf.add_argument("--page-num", type=int); leaf.add_argument("--page-size", type=int); leaf.add_argument("--keyword"); leaf.add_argument("--status", type=int); leaf.add_argument("--share-type", type=int); leaf.add_argument("--order-by"); leaf.add_argument("--mine", action=argparse.BooleanOptionalAction); leaf.add_argument("--is-public", type=int, choices=(0, 1)); leaf.add_argument("--is-paid", type=int, choices=(0, 1)); leaf.add_argument("--tags")
+    leaf = _read_leaf(config, "get", "Read a ModUs configuration share detail.", platform="modus", resource="config", action="get"); leaf.add_argument("--share-id", required=True); _modus_server_flag(leaf)
+    leaf = _read_leaf(config, "backups", "List existing ModUs cloud backups.", platform="modus", resource="config", action="backups"); _modus_server_flag(leaf)
+    leaf = _read_leaf(config, "backup-get", "Read one ModUs cloud backup detail.", platform="modus", resource="config", action="backup-get"); leaf.add_argument("--backup-id", type=_positive, required=True); _modus_server_flag(leaf)
+
+    wa = groups.add_parser("wa", help="ModUs main-client string articles").add_subparsers(dest="action_command", required=True)
+    for action, text in (("create", "Create a ModUs string article."), ("update", "Update a ModUs string article."), ("edit", "Edit a ModUs string article."), ("delete", "Delete one explicitly confirmed string article."), ("version-publish", "Publish a new string article version."), ("version-delete", "Delete one explicitly confirmed historical string version.")):
+        _write_leaf(wa, "modus", "wa", action, text)
+    leaf = _read_leaf(wa, "list", "List ModUs string articles.", platform="modus", resource="wa", action="list"); _modus_server_flag(leaf); leaf.add_argument("--page-num", type=int); leaf.add_argument("--page-size", type=int); leaf.add_argument("--keyword"); leaf.add_argument("--status", type=int); leaf.add_argument("--order-by"); leaf.add_argument("--mine", action=argparse.BooleanOptionalAction); leaf.add_argument("--support-addon"); leaf.add_argument("--tags"); leaf.add_argument("--is-paid", type=int, choices=(0, 1))
+    leaf = _read_leaf(wa, "get", "Read one ModUs string article detail.", platform="modus", resource="wa", action="get"); leaf.add_argument("--import-id", required=True); _modus_server_flag(leaf)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -347,7 +378,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if args.dry_run:
                 write_output(platform, operation, _dry_run_data(doc, schema.name), dry_run=True)
                 return 0
-            provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider())))
+            provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(main_session=resource in ("config", "wa")))))
             try:
                 if platform == "dd":
                     data = provider.execute_write(resource, action, doc, getattr(args, "session", None))
@@ -360,10 +391,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             write_output(platform, operation, data)
             return 0
         modus_doctor = platform == "modus" and resource == "session" and action == "doctor"
-        provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(authenticate=not modus_doctor))))
+        provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(authenticate=not modus_doctor, main_session=resource in ("addon", "plugin", "config", "wa", "builds")))))
         try:
             if platform == "dd":
                 data = provider.execute_read(resource, action, args, getattr(args, "session", None))
+            elif platform == "modus" and resource == "builds" and action == "list":
+                # Build discovery is local and deterministic; it must not
+                # accidentally hit a platform endpoint or confuse platform
+                # selection with the Build id sent on CRUD requests.
+                data = provider.builds()
             else:
                 data = provider.execute_read(resource, action, args)
         finally:

@@ -25,12 +25,22 @@ from typing import Any, Dict, Mapping, Optional
 from .errors import FuploadError, ValidationError, redact
 from .state_machine import COMPLETE, ProjectStateMachine
 from .modus_zip import parse_modus_zip
+from .transport import json_request
 
 
 API_BASE = "https://app.modus.cool/api/"
+STATIC_API_BASE = "https://cdn.modus.cool/modus/client_static_api/"
 TOKEN_PATH = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData/Local")) / "ModUs.Creator" / "auth" / "token.dat"
 TOKEN_ENTROPY = b"ModUs.Creator.TokenStore.v1"
+MODUS_APPDATA = Path(os.environ.get("APPDATA", Path.home() / "AppData/Roaming")) / "modus"
 MAX_PACKAGE_BYTES = 200 * 1024 * 1024
+MODUS_BUILDS = (
+    {"id": 0, "code": "retail", "name": "至暗之夜", "label": "正式服-至暗之夜"},
+    {"id": 1, "code": "classic_era", "name": "经典旧世", "label": "怀旧服-经典旧世"},
+    {"id": 2, "code": "classic", "name": "熊猫人之谜", "label": "怀旧服-熊猫人之谜"},
+    {"id": 3, "code": "classic_titan", "name": "泰坦重铸", "label": "时光服-泰坦重铸"},
+    {"id": 4, "code": "anniversary", "name": "燃烧的远征", "label": "周年服-燃烧的远征"},
+)
 _SECRET_KEYS = {"token", "access_token", "authorization", "cookie", "signedurl", "signed_url", "upload_url"}
 _WIRE_NAMES = {
     "project_id": "projectId", "file_id": "fileId", "alt_name": "altName",
@@ -156,6 +166,16 @@ def _positive_id(value: Any, *, field: str) -> int:
     if result <= 0:
         raise ValidationError("%s must be a positive integer" % field, path=field)
     return result
+
+
+def _resource_id(value: Any, *, field: str) -> str:
+    """ModUs share/import IDs are opaque positive decimal strings."""
+    if isinstance(value, bool) or value is None:
+        raise ValidationError("%s must be a non-empty identifier" % field, path=field)
+    text = str(value).strip()
+    if not text or (text.isdigit() and int(text) <= 0):
+        raise ValidationError("%s must be a non-empty identifier" % field, path=field)
+    return text
 
 
 def _supported_game_versions(value: Any) -> list[Dict[str, str]]:
@@ -407,6 +427,94 @@ def load_token(path: Optional[Path] = None) -> str:
     return token
 
 
+def load_main_session(root: Optional[Path] = None) -> Dict[str, str]:
+    """Recover the main ModUs renderer session from Chromium local storage.
+
+    Chromium LevelDB values are length-prefixed and may be locked by the
+    running client.  We therefore scan shared-read bytes for JSON fragments,
+    accepting only the known persisted token/device keys and never returning
+    unrelated storage values.
+    """
+    base = root or MODUS_APPDATA
+    leveldb = base / "Local Storage" / "leveldb"
+    if not leveldb.is_dir():
+        raise FuploadError("ModUs main-client local storage was not found", kind="authentication_error")
+    token = ""
+    device = ""
+    for path in sorted(leveldb.iterdir()):
+        if not path.is_file() or path.name in {"LOCK", "LOG", "LOG.old", "CURRENT", "MANIFEST-000001"}:
+            continue
+        try:
+            with path.open("rb", buffering=0) as handle:
+                raw = handle.read()
+        except OSError:
+            continue
+        text = raw.decode("utf-8", errors="ignore")
+        # Pinia persistence is JSON, but the LevelDB record can contain a
+        # prefix/suffix.  Try JSON objects first, then bounded key/value pairs.
+        candidates = [text]
+        # Persisted Pinia user JSON contains nested wallet objects, so a
+        # shallow-brace regex is insufficient. Extract only scalar credential
+        # fields from the record instead of attempting to parse the whole log.
+        import re
+        token_match = re.search(r'"(?:token|accessToken|access_token)"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"', text)
+        device_match = re.search(r'"(?:deviceId|device_id)"\s*:\s*"([^"\\]*)"', text)
+        if token_match and not token:
+            token = bytes(token_match.group(1), "utf-8").decode("unicode_escape")
+        if device_match and not device:
+            device = device_match.group(1)
+        for candidate in candidates:
+            try:
+                parsed = json.loads(candidate)
+            except (TypeError, ValueError):
+                continue
+            stack = [parsed]
+            while stack:
+                item = stack.pop()
+                if isinstance(item, Mapping):
+                    for key, value in item.items():
+                        normalized = str(key).lower()
+                        if isinstance(value, str) and value.strip():
+                            if normalized in {"token", "accesstoken", "access_token"} and not token:
+                                token = value.strip()
+                            elif normalized in {"deviceid", "device_id"} and not device:
+                                device = value.strip()
+                        elif isinstance(value, (Mapping, list)):
+                            stack.append(value)
+                elif isinstance(item, list):
+                    stack.extend(item)
+        if token and device:
+            break
+    if not token:
+        raise FuploadError("ModUs main-client login token was not found", kind="authentication_error")
+    return {"token": token, **({"device_id": device} if device else {})}
+
+
+def load_current_build(root: Optional[Path] = None) -> Optional[int]:
+    """Read the persisted main-client currentGameWow id when available."""
+    base = root or MODUS_APPDATA
+    leveldb = base / "Local Storage" / "leveldb"
+    if not leveldb.is_dir():
+        return None
+    import re
+    for path in sorted(leveldb.iterdir()):
+        if not path.is_file() or path.name in {"LOCK", "LOG", "LOG.old", "CURRENT", "MANIFEST-000001"}:
+            continue
+        try:
+            with path.open("rb", buffering=0) as handle:
+                text = handle.read().decode("utf-8", errors="ignore")
+        except OSError:
+            continue
+        # Pinia persistence may be split across records; accept only the scalar id.
+        for pattern in (r'currentGameWow[^{}]{0,120}?"id"\s*:\s*(\d+)', r'"currentGameWowId"\s*:\s*(\d+)'):
+            match = re.search(pattern, text)
+            if match:
+                value = int(match.group(1))
+                if 0 <= value <= 4:
+                    return value
+    return None
+
+
 def _unwrap(payload: Any) -> Any:
     if isinstance(payload, Mapping) and "data" in payload:
         return payload["data"]
@@ -423,12 +531,28 @@ class ModUs:
         base_url: str = API_BASE,
         timeout: int = 60,
         token_path: Optional[Path] = None,
+        device_id: Optional[str] = None,
+        main_session: bool = False,
         authenticate: bool = True,
     ) -> None:
         self.base_url = base_url.rstrip("/") + "/"
         self.timeout = timeout
         self.token_path = token_path or TOKEN_PATH
-        self.token = token if token is not None else (load_token(self.token_path) if authenticate else "")
+        self.device_id = device_id
+        self.main_session = main_session
+        self.current_build = load_current_build() if main_session else None
+        self.authorization_scheme = ""
+        if token is not None:
+            self.token = token
+        elif authenticate:
+            if main_session:
+                session = load_main_session()
+                self.token, self.device_id = session["token"], session.get("device_id")
+                self.authorization_scheme = ""
+            else:
+                self.token = load_token(self.token_path)
+        else:
+            self.token = ""
 
     def _url(self, path: str) -> str:
         return urllib.parse.urljoin(self.base_url, path.lstrip("/"))
@@ -454,7 +578,10 @@ class ModUs:
     def _request(self, method: str, path: str, body: Any = None, *, headers: Optional[Mapping[str, str]] = None) -> Any:
         url = self._url(path)
         stage = self._request_stage(method, path)
-        request_headers = {"Accept": "application/json", "Authorization": "Bearer " + self.token}
+        authorization = self.token if self.authorization_scheme == "" else self.authorization_scheme + self.token
+        request_headers = {"Accept": "application/json", "Authorization": authorization}
+        if self.device_id:
+            request_headers["X-Device-Id"] = self.device_id
         if headers:
             request_headers.update(headers)
         data = None
@@ -576,31 +703,57 @@ class ModUs:
     def user_info(self) -> Any:
         return _safe(_unwrap(self._request("GET", "system/user/getInfo")))
 
+    def builds(self) -> Any:
+        """Return the fixed WoW Build choices used by the ModUs main client."""
+        current = self.current_build
+        return {"current": current, "builds": [dict(item) for item in MODUS_BUILDS]}
+
+    def _build(self, value: Optional[int]) -> int:
+        selected = self.current_build if value is None else value
+        if selected is None:
+            # The desktop wrapper uses getCurrentWow?.id || 0.
+            selected = 0
+        selected = int(selected)
+        if selected < 0 or selected > 4:
+            raise ValidationError("server_type must be a known ModUs Build id", path="server_type")
+        return selected
+
     def active_subscription_count(self) -> Any:
         return _safe(_unwrap(self._request("GET", "user/author/subscription/active/count")))
 
     def project_statistics(self) -> Any:
         return _safe(_unwrap(self._request("GET", "game/data/author/project/statistics")))
 
-    def addon_info(self, directories: Any, *, server_type: int = 1) -> Any:
+    def addon_info(self, directories: Any, *, server_type: Optional[int] = None) -> Any:
         values = directories if isinstance(directories, (list, tuple)) else [directories]
         body = {"pluginList": [str(value) for value in values]}
-        return _safe(_unwrap(self._request("POST", "plugin/list/info", body, headers={"X-Server-Type": str(int(server_type))})))
+        return _safe(_unwrap(self._request("POST", "plugin/list/info", body, headers={"X-Server-Type": str(self._build(server_type))})))
 
-    def addon_project_info(self, project_ids: Any, *, server_type: int = 1) -> Any:
+    def addon_project_info(self, project_ids: Any, *, server_type: Optional[int] = None) -> Any:
         values = project_ids if isinstance(project_ids, (list, tuple)) else [project_ids]
         body = {"projectIds": [int(value) for value in values]}
-        return _safe(_unwrap(self._request("POST", "plugin/list/detail", body, headers={"X-Server-Type": str(int(server_type))})))
+        return _safe(_unwrap(self._request("POST", "plugin/list/detail", body, headers={"X-Server-Type": str(self._build(server_type))})))
 
-    def addon_history(self, project_id: int, *, page_num: int = 1, page_size: int = 5, server_type: int = 1) -> Any:
+    def addon_history(self, project_id: int, *, page_num: int = 1, page_size: int = 5, server_type: Optional[int] = None) -> Any:
         body = {"projectIds": [int(project_id)], "pageNum": int(page_num), "pageSize": int(page_size)}
-        return _safe(_unwrap(self._request("POST", "plugin/project/history", body, headers={"X-Server-Type": str(int(server_type))})))
+        return _safe(_unwrap(self._request("POST", "plugin/project/history", body, headers={"X-Server-Type": str(self._build(server_type))})))
 
     def project_dependencies(self, query: Any) -> Any:
         body = _dependency_query_wire(query)
         return _safe(_unwrap(self._request("POST", "game/data/author/project/dependency/query", body)))
 
     def options(self, action: str, *, keys: Optional[Any] = None) -> Any:
+        static_files = {
+            "config-tags": "share_tags.json",
+            "wa-tags": "imports_tags.json",
+            "wa-support-addons": "imports_support_addons.json",
+        }
+        if action in static_files:
+            url = urllib.parse.urljoin(STATIC_API_BASE, static_files[action])
+            payload = json_request(url)
+            if isinstance(payload, Mapping) and "rows" in payload:
+                payload = payload["rows"]
+            return _safe(_unwrap(payload))
         routes = {
             # These paths are the routes used by ModUs.Creator's ApiService.
             "categories": "plugin/list/Categories",
@@ -617,6 +770,123 @@ class ModUs:
         if action not in routes:
             raise ValidationError("unsupported ModUs options operation")
         return _safe(_unwrap(self._request("GET", routes[action])))
+
+    # Main ModUs client: configuration shares and string articles.
+    def cloud_backups(self, *, server_type: Optional[int] = None) -> Any:
+        return _safe(_unwrap(self._request("GET", "system/user/backup/list", headers={"X-Server-Type": str(self._build(server_type))})))
+
+    def cloud_backup_detail(self, backup_id: int, *, server_type: Optional[int] = None) -> Any:
+        return _safe(_unwrap(self._request("GET", "system/user/backup/detail/%s" % _positive_id(backup_id, field="backup_id"), headers={"X-Server-Type": str(self._build(server_type))})))
+
+    def cloud_backup_update(self, doc: Mapping[str, Any], *, server_type: Optional[int] = None) -> Any:
+        body = {"id": _positive_id(doc["backup_id"], field="backup_id"), "backupName": doc["backup_name"]}
+        return _safe(_unwrap(self._request("POST", "system/user/backup/update", body, headers={"X-Server-Type": str(self._build(server_type))})))
+
+    def cloud_backup_delete(self, backup_id: int, *, server_type: Optional[int] = None) -> Any:
+        return _safe(_unwrap(self._request("DELETE", "system/user/backup/delete/%s" % _positive_id(backup_id, field="backup_id"), headers={"X-Server-Type": str(self._build(server_type))})))
+
+    @staticmethod
+    def _share_wire(doc: Mapping[str, Any]) -> Dict[str, Any]:
+        aliases = {"share_id": "id", "addons_id": "addonsId", "backup_id": "backupId", "account_name": "accountName", "content_text": "contentText", "image_url": "imageUrl", "is_paid": "isPaid", "is_public": "isPublic", "share_type": "shareType", "exclude_wtf": "excludeWtf", "role_name": "roleName", "required_tier_id": "requiredTierId", "sub_type": "subType", "synchronization_type": "synchronizationType"}
+        allowed = {"id", "addonsId", "backupId", "accountName", "content", "contentText", "imageUrl", "isPaid", "isPublic", "price", "shareType", "tags", "title", "excludeWtf", "roleName", "requiredTierId", "subType", "platform", "synchronizationType"}
+        result = {}
+        for key, value in doc.items():
+            wire = aliases.get(key, key)
+            if wire in allowed and value is not None:
+                result[wire] = value
+        result.setdefault("platform", 1)
+        exclude = result.get("excludeWtf", 0)
+        result["excludeWtf"] = 1 if str(exclude).strip().lower() in {"1", "true"} else 0
+        return result
+
+    def share_list(self, body: Optional[Mapping[str, Any]] = None, *, server_type: Optional[int] = None) -> Any:
+        source = body or {}
+        selected_build = self._build(source.get("server", server_type))
+        mine = source.get("mine")
+        share_type = source.get("share_type")
+        wire = {
+            "pageNum": int(source.get("page_num") or 1),
+            "pageSize": int(source.get("page_size") or 20),
+            "server": selected_build,
+            "mine": False if mine is None else bool(mine),
+            "shareType": 0 if share_type is None else share_type,
+        }
+        platform = source.get("platform")
+        wire["platform"] = int(platform) if isinstance(platform, (int, float)) and not isinstance(platform, bool) else 0
+        for key in ("keyword", "status", "tags", "order_by", "is_public", "is_paid"):
+            if key in source and source[key] is not None:
+                wire[{"order_by": "orderBy", "is_public": "isPublic", "is_paid": "isPaid"}.get(key, key)] = source[key]
+        return _safe(_unwrap(self._request("POST", "system/user/share/list", wire, headers={"X-Server-Type": str(selected_build)})))
+
+    def share_detail(self, share_ids: Any, *, server_type: Optional[int] = None) -> Any:
+        ids = share_ids if isinstance(share_ids, list) else [share_ids]
+        return _safe(_unwrap(self._request("POST", "system/user/share/detail", {"shareIds": [_resource_id(x, field="share_id") for x in ids]}, headers={"X-Server-Type": str(self._build(server_type))})))
+
+    def share_create(self, doc: Mapping[str, Any], *, server_type: Optional[int] = None) -> Any:
+        wire = self._share_wire(doc)
+        wire.setdefault("synchronizationType", 3 if wire["platform"] == 3 else 1)
+        return _safe(_unwrap(self._request("POST", "system/user/share/create", wire, headers={"X-Server-Type": str(self._build(server_type))})))
+
+    def share_update(self, doc: Mapping[str, Any], *, server_type: Optional[int] = None) -> Any:
+        return _safe(_unwrap(self._request("PUT", "system/user/share/update", self._share_wire(doc), headers={"X-Server-Type": str(self._build(server_type))})))
+
+    def share_delete(self, share_id: Any, *, server_type: Optional[int] = None) -> Any:
+        return _safe(_unwrap(self._request("DELETE", "system/user/share/delete/%s" % urllib.parse.quote(_resource_id(share_id, field="share_id"), safe=""), headers={"X-Server-Type": str(self._build(server_type))})))
+
+    @staticmethod
+    def _import_wire(doc: Mapping[str, Any]) -> Dict[str, Any]:
+        aliases = {"import_id": "id", "code_text": "codeText", "addons_id": "addonsId", "content_text": "contentText", "file_path": "filePath", "image_url": "imageUrl", "is_paid": "isPaid", "is_public": "isPublic", "share_type": "shareType", "support_addon": "supportAddon", "required_tier_id": "requiredTierId", "sub_type": "subType", "synchronization_type": "synchronizationType"}
+        allowed = {"id", "codeText", "content", "addonsId", "contentText", "filePath", "imageUrl", "isPaid", "isPublic", "price", "shareType", "supportAddon", "tags", "title", "version", "requiredTierId", "subType", "platform", "synchronizationType"}
+        result = {aliases.get(key, key): value for key, value in doc.items() if aliases.get(key, key) in allowed and value is not None}
+        result.setdefault("platform", 1)
+        result.setdefault("synchronizationType", 3 if result["platform"] == 3 else 1)
+        return result
+
+    def import_list(self, body: Optional[Mapping[str, Any]] = None, *, server_type: Optional[int] = None) -> Any:
+        source = body or {}
+        selected_build = self._build(source.get("server", server_type))
+        mine = source.get("mine")
+        status = source.get("status")
+        wire = {
+            "pageNum": int(source.get("page_num") or 1),
+            "pageSize": int(source.get("page_size") or 10),
+            "server": selected_build,
+            "mine": False if mine is None else bool(mine),
+            "status": 1 if status is None else status,
+        }
+        platform = source.get("platform")
+        wire["platform"] = int(platform) if isinstance(platform, (int, float)) and not isinstance(platform, bool) else 0
+        for key in ("keyword", "support_addon", "tags", "is_paid", "order_by"):
+            if key in source and source[key] is not None:
+                wire[{"support_addon": "supportAddon", "is_paid": "isPaid", "order_by": "orderBy"}.get(key, key)] = source[key]
+        return _safe(_unwrap(self._request("POST", "system/user/import/list", wire, headers={"X-Server-Type": str(selected_build)})))
+
+    def import_detail(self, import_ids: Any, *, server_type: Optional[int] = None) -> Any:
+        ids = import_ids if isinstance(import_ids, list) else [import_ids]
+        return _safe(_unwrap(self._request("POST", "system/user/import/detail", {"importIds": [_resource_id(x, field="import_id") for x in ids]}, headers={"X-Server-Type": str(self._build(server_type))})))
+
+    def import_create(self, doc: Mapping[str, Any], *, server_type: Optional[int] = None) -> Any:
+        return _safe(_unwrap(self._request("POST", "system/user/import/create", self._import_wire(doc), headers={"X-Server-Type": str(self._build(server_type))})))
+
+    def import_update(self, doc: Mapping[str, Any], *, server_type: Optional[int] = None) -> Any:
+        return _safe(_unwrap(self._request("POST", "system/user/import/update", self._import_wire(doc), headers={"X-Server-Type": str(self._build(server_type))})))
+
+    def import_delete(self, import_id: Any, *, server_type: Optional[int] = None) -> Any:
+        return _safe(_unwrap(self._request("DELETE", "system/user/import/delete/%s" % urllib.parse.quote(_resource_id(import_id, field="import_id"), safe=""), headers={"X-Server-Type": str(self._build(server_type))})))
+
+    def import_version_publish(self, doc: Mapping[str, Any], *, server_type: Optional[int] = None) -> Any:
+        body = {
+            "importId": _resource_id(doc["import_id"], field="import_id"),
+            "version": str(doc["version"]).strip(),
+            "codeText": str(doc["code_text"]).strip(),
+        }
+        changelog = str(doc.get("changelog") or "").strip()
+        if changelog:
+            body["changelog"] = changelog
+        return _safe(_unwrap(self._request("POST", "system/user/import/version/publish", body, headers={"X-Server-Type": str(self._build(server_type))})))
+
+    def import_version_delete(self, version_id: Any, *, server_type: Optional[int] = None) -> Any:
+        return _safe(_unwrap(self._request("DELETE", "system/user/import/version/delete?versionId=%s" % urllib.parse.quote(str(version_id), safe=""), headers={"X-Server-Type": str(self._build(server_type))})))
 
     def release_signature(self, project_id: int, file_id: int) -> str:
         result = _unwrap(self._request("GET", "game/data/author/project/file/upload/signature/%s/%s" % (_positive_id(project_id, field="project_id"), _positive_id(file_id, field="file_id"))))
@@ -819,15 +1089,23 @@ class ModUs:
 
     def execute_read(self, resource: str, action: str, args: Any = None) -> Any:
         if resource == "session" and action == "doctor": return self.doctor()
+        if resource == "options" and action == "builds": return self.builds()
+        if resource == "builds" and action == "list": return self.builds()
         doc = vars(args) if args is not None and hasattr(args, "__dict__") else (args or {})
         if resource == "account" and action == "info": return self.user_info()
         if resource == "account" and action == "subscription-count": return self.active_subscription_count()
         if resource == "account" and action == "statistics": return self.project_statistics()
-        if resource == "addon" and action == "info": return self.addon_info(doc.get("directories", []), server_type=doc.get("server_type", 1))
-        if resource == "addon" and action == "project-info": return self.addon_project_info(doc.get("project_ids", []), server_type=doc.get("server_type", 1))
-        if resource == "addon" and action == "history": return self.addon_history(doc["project_id"], page_num=doc.get("page_num", 1), page_size=doc.get("page_size", 5), server_type=doc.get("server_type", 1))
+        if resource == "addon" and action == "info": return self.addon_info(doc.get("directories", []), server_type=doc.get("server_type"))
+        if resource == "addon" and action == "project-info": return self.addon_project_info(doc.get("project_ids", []), server_type=doc.get("server_type"))
+        if resource == "addon" and action == "history": return self.addon_history(doc["project_id"], page_num=doc.get("page_num", 1), page_size=doc.get("page_size", 5), server_type=doc.get("server_type"))
         if resource == "project" and action == "dependencies": return self.project_dependencies(doc.get("query") or doc.get("project_ids") or doc.get("project_id"))
         if resource == "options": return self.options(action, keys=doc.get("keys"))
+        if resource == "config" and action == "backups": return self.cloud_backups(server_type=doc.get("server_type"))
+        if resource == "config" and action == "backup-get": return self.cloud_backup_detail(doc["backup_id"], server_type=doc.get("server_type"))
+        if resource == "config" and action == "list": return self.share_list(doc, server_type=doc.get("server_type"))
+        if resource == "config" and action == "get": return self.share_detail(doc["share_id"], server_type=doc.get("server_type"))
+        if resource == "wa" and action == "list": return self.import_list(doc, server_type=doc.get("server_type"))
+        if resource == "wa" and action == "get": return self.import_detail(doc["import_id"], server_type=doc.get("server_type"))
         if resource == "project" and action == "list": return self.project_list(**doc)
         if resource == "project" and action in ("get", "detail"): return self.project_detail(doc["project_id"])
         if resource in ("plugin", "release") and action in ("list", "versions"): return self.release_list(doc["project_id"], page_num=doc.get("page_num", 1), page_size=doc.get("page_size", 50))
@@ -835,6 +1113,16 @@ class ModUs:
         raise ValidationError("unsupported ModUs read operation")
 
     def execute_write(self, resource: str, action: str, doc: Mapping[str, Any]) -> Any:
+        if resource == "config" and action == "create": return self.share_create(doc, server_type=doc.get("server_type"))
+        if resource == "config" and action in ("update", "edit"): return self.share_update(doc, server_type=doc.get("server_type"))
+        if resource == "config" and action == "delete": return self.share_delete(doc["share_id"], server_type=doc.get("server_type"))
+        if resource == "config" and action == "backup-edit": return self.cloud_backup_update(doc, server_type=doc.get("server_type"))
+        if resource == "config" and action == "backup-delete": return self.cloud_backup_delete(doc["backup_id"], server_type=doc.get("server_type"))
+        if resource == "wa" and action == "create": return self.import_create(doc, server_type=doc.get("server_type"))
+        if resource == "wa" and action in ("update", "edit"): return self.import_update(doc, server_type=doc.get("server_type"))
+        if resource == "wa" and action == "delete": return self.import_delete(doc["import_id"], server_type=doc.get("server_type"))
+        if resource == "wa" and action == "version-publish": return self.import_version_publish(doc, server_type=doc.get("server_type"))
+        if resource == "wa" and action == "version-delete": return self.import_version_delete(doc["version_id"], server_type=doc.get("server_type"))
         if resource == "project" and action in ("create", "release"): return self.project_create(doc)
         if resource == "project" and action in ("update", "edit"): return self.project_update(doc)
         if resource == "project" and action == "delete": return self.project_delete(int(doc["project_id"]))

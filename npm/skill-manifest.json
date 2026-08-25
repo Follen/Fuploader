@@ -1,9 +1,9 @@
 {
   "schema": "fupload.npm-skill-manifest.v1",
   "package_name": "@follenfang/fupload",
-  "package_version": "0.0.11",
-  "skill_version": "0.0.11",
-  "tree_sha256": "a0d589cb5d67c7bfbd34862ee4c3109e88068662ae3b7430c0635e71ace9a8d9",
+  "package_version": "0.0.12",
+  "skill_version": "0.0.12",
+  "tree_sha256": "f1e559aef665537c4b2b24f15dab01b9e4140378bd3a70a00331d56358d2071a",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -92,8 +92,8 @@
     },
     {
       "path": "references/modus.md",
-      "bytes": 8705,
-      "sha256": "10c2db10ade101c6738d9007865db68da54892da59fc1cc0fc1a422296a4bf07"
+      "bytes": 13492,
+      "sha256": "919b8b097fd1ec14d38583e84f4d33a5320d24af03703dc1c06a072dbab33e68"
     },
     {
       "path": "references/newbee-official-cli.md",
@@ -113,7 +113,7 @@
     {
       "path": "scripts/fupload_cli/__init__.py",
       "bytes": 50,
-      "sha256": "c7d5308bddd21b0e8042689cdeaba91ba45170a998f42844d42f88b7248fc057"
+      "sha256": "cad1ed5cd2ed3020e1fc98c2036d22b47e1138772e9829f5dd61c39cc3bd810f"
     },
     {
       "path": "scripts/fupload_cli/blackbox_web.py",
@@ -127,8 +127,8 @@
     },
     {
       "path": "scripts/fupload_cli/cli.py",
-      "bytes": 31958,
-      "sha256": "897c2e7a7fea00125023d7fc977aaa6e3b7729b50a468e7deadfacc04d89f9b8"
+      "bytes": 36811,
+      "sha256": "bdd159c7d86c009685417e7b4a25194d98a49547e036606b920ff44090b1619e"
     },
     {
       "path": "scripts/fupload_cli/curseforge.py",
@@ -167,8 +167,8 @@
     },
     {
       "path": "scripts/fupload_cli/modus.py",
-      "bytes": 42241,
-      "sha256": "ee298b064f4b3c4a25081f76e93d48b18f1b810f647437e78d78a4a20ab5bd5c"
+      "bytes": 60792,
+      "sha256": "9cf3d8127e2b7583f1760a74f88512b81ab272ea116bf9ca185c7531eba960d2"
     },
     {
       "path": "scripts/fupload_cli/newbee_auth.py",
@@ -182,8 +182,8 @@
     },
     {
       "path": "scripts/fupload_cli/schema.py",
-      "bytes": 46291,
-      "sha256": "025d6f4af1e8adda87aed14a075028c370e78bf0def6738ab303e2f1798aefd8"
+      "bytes": 51541,
+      "sha256": "aca30dc7997f47645b3da154fa3656fefa1179733e1d61e7ff0de326734f2575"
     },
     {
       "path": "scripts/fupload_cli/state_machine.py",
@@ -208,7 +208,7 @@
     {
       "path": "SKILL.md",
       "bytes": 25720,
-      "sha256": "cfc3ce770c3594c5a787b25da03cb2e92e0f6ea6fbd162f26f4b6b3c44295a89"
+      "sha256": "fe14cba8f02167dce36034ce8b73784793c92ed3de37dda1ab982a5a8a9cc8de"
     }
   ]
 }

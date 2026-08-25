@@ -24,6 +24,7 @@ WRONG_TYPES = {
     "boolean": 1,
     "array": {},
     "object": [],
+    "identifier": [],
 }
 
 POSITIVE_IDS = {
@@ -126,6 +127,33 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                              ]})
             elif resource == "plugin" and action == "delete":
                 base.update({"project_id": 1, "file_id": 2, "confirm": "DELETE"})
+            elif resource == "config":
+                if action in ("create", "update", "edit"):
+                    base.update({"share_id": "1000000000000001", "addons_id": "1,2", "backup_id": 1,
+                                 "content": "<p>fixture content with enough detail</p>", "content_text": "fixture content with enough detail",
+                                 "image_url": "https://cdn.invalid/cover.webp", "is_paid": 0,
+                                 "is_public": 1, "price": 0, "share_type": 0, "tags": "1",
+                                 "title": "Fixture share", "exclude_wtf": 1, "account_name": "",
+                                 "role_name": "", "sub_type": 0})
+                elif action == "delete":
+                    base.update({"share_id": 1, "confirm": "DELETE"})
+                elif action == "backup-edit":
+                    base.update({"backup_id": 1, "backup_name": "Fixture backup"})
+                elif action == "backup-delete":
+                    base.update({"backup_id": 1, "confirm": "DELETE"})
+            elif resource == "wa":
+                if action in ("create", "update", "edit"):
+                    base.update({"import_id": 1, "code_text": "SAMPLE", "content": "<p>fixture content with enough detail</p>",
+                                 "addons_id": "1512221", "content_text": "fixture content with enough detail", "file_path": "",
+                                 "image_url": "https://cdn.invalid/cover.webp", "is_paid": 0, "is_public": 1,
+                                 "price": 0, "share_type": 0, "support_addon": "FixtureAddon",
+                                 "tags": "1", "title": "Fixture string", "version": "1.0", "sub_type": 0})
+                elif action == "delete":
+                    base.update({"import_id": 1, "confirm": "DELETE"})
+                elif action == "version-publish":
+                    base.update({"import_id": 1, "version": "2.0", "code_text": "SAMPLE", "changelog": "notes"})
+                elif action == "version-delete":
+                    base.update({"version_id": 1, "confirm": "DELETE"})
             return base
         return self.newbee.document(resource, action)
 
@@ -150,6 +178,8 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
 
     @staticmethod
     def _adjust(doc: Dict[str, Any], field: str, state: str) -> None:
+        if field == "exclude_wtf" and state == "falsy":
+            doc["account_name"] = "FixtureAccount"
         if field == "public":
             doc["submit_for_review"] = False
             if state != "omitted":
@@ -189,6 +219,7 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
             "boolean": False,
             "array": [],
             "object": {},
+            "identifier": "",
         }[spec.type]
 
     @staticmethod
