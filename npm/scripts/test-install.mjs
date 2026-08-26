@@ -158,5 +158,10 @@ try {
   await exercise({ name: "ignore-scripts", ignoreScripts: true });
   process.stdout.write("Global install, managed Python runtime, Python launch, Skill, and self-uninstall checks passed.\n");
 } finally {
-  fs.rmSync(temporary, { recursive: true, force: true });
+  fs.rmSync(temporary, {
+    recursive: true,
+    force: true,
+    maxRetries: process.platform === "win32" ? 20 : 0,
+    retryDelay: 200,
+  });
 }
