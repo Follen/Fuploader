@@ -25,11 +25,12 @@ from typing import Any, Dict, Mapping, Optional
 from .errors import FuploadError, ValidationError, redact
 from .state_machine import COMPLETE, ProjectStateMachine
 from .modus_zip import parse_modus_zip
-from .transport import json_request
+from .transport import json_request, multipart_request
 
 
 API_BASE = "https://app.modus.cool/api/"
 STATIC_API_BASE = "https://cdn.modus.cool/modus/client_static_api/"
+RESOURCE_BASE = "https://cdn.modus.cool/"
 TOKEN_PATH = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData/Local")) / "ModUs.Creator" / "auth" / "token.dat"
 TOKEN_ENTROPY = b"ModUs.Creator.TokenStore.v1"
 MODUS_APPDATA = Path(os.environ.get("APPDATA", Path.home() / "AppData/Roaming")) / "modus"
@@ -110,6 +111,14 @@ def _category_ids(value: Any) -> Any:
     return output
 
 
+def _tag_filter(value: Any) -> list[str]:
+    values = value if isinstance(value, (list, tuple, set)) else str(value).split(",")
+    result = [str(item).strip() for item in values if str(item).strip()]
+    if not result:
+        raise ValidationError("tag filter must contain at least one ID", path="tags")
+    return result
+
+
 def _sync_type(value: Any) -> Any:
     if value is None:
         return 0
@@ -134,13 +143,22 @@ def _image_ops(value: Any) -> list[Dict[str, str]]:
         path = "image_ops[%d]" % index
         if not isinstance(item, Mapping):
             raise ValidationError("image operation must be an object", path=path)
-        unknown = sorted(set(item) - {"op", "name", "base64"})
+        op = item.get("op")
+        if op not in ("upload", "delete", "rename"):
+            raise ValidationError("image operation must be upload, delete, or rename", path=path + ".op")
+        allowed = {"op", "from", "to"} if op == "rename" else {"op", "name", "base64"}
+        unknown = sorted(set(item) - allowed)
         if unknown:
             raise ValidationError("unknown image operation field(s): %s" % ", ".join(unknown), path=path + "." + unknown[0])
-        op = item.get("op")
+        if op == "rename":
+            source, target = item.get("from"), item.get("to")
+            if not isinstance(source, str) or not source.strip():
+                raise ValidationError("rename image operation requires from", path=path + ".from")
+            if not isinstance(target, str) or not target.strip():
+                raise ValidationError("rename image operation requires to", path=path + ".to")
+            result.append({"op": op, "from": source.strip(), "to": target.strip()})
+            continue
         name = item.get("name")
-        if op not in ("upload", "delete"):
-            raise ValidationError("image operation must be upload or delete", path=path + ".op")
         if not isinstance(name, str) or not name.strip():
             raise ValidationError("image operation name must be non-empty", path=path + ".name")
         operation = {"op": op, "name": name.strip()}
@@ -294,7 +312,7 @@ def _project_wire(value: Mapping[str, Any], *, create: bool = False) -> Dict[str
     """Project project create/update fields to Creator's request shape."""
     result: Dict[str, Any] = {}
     for key in ("name", "alt_name", "summary", "repo_url"):
-        if key in value and value[key] is not None:
+        if key in value and (value[key] is not None or not create):
             wire_name = _WIRE_NAMES.get(key, key)
             if create:
                 if key == "repo_url" and not str(value[key]).strip():
@@ -363,13 +381,56 @@ def _business_code(payload: Mapping[str, Any]) -> Optional[int]:
         return None
 
 
+def _image_upload_record(payload: Any) -> Dict[str, str]:
+    """Extract the reusable key and display URL used by the main client."""
+    data = _unwrap(payload)
+    if not isinstance(data, Mapping):
+        raise FuploadError(
+            "ModUs image upload returned no media record",
+            kind="platform_data_error",
+            stage="media_upload",
+        )
+
+    download_url = data.get("downloadUrl") or data.get("url") or data.get("fileUrl")
+    reference = data.get("cosStoreKey") or data.get("cosStoreUrl") or data.get("key")
+    if not reference and isinstance(download_url, str) and download_url.strip():
+        parsed = urllib.parse.urlsplit(download_url.strip())
+        reference = urllib.parse.unquote(parsed.path.lstrip("/"))
+    if not isinstance(reference, str) or not reference.strip():
+        raise FuploadError(
+            "ModUs image upload omitted its object key",
+            kind="platform_data_error",
+            stage="media_upload",
+        )
+
+    reference = reference.strip()
+    if isinstance(download_url, str) and download_url.strip():
+        display_url = download_url.strip()
+    elif reference.startswith(("https://", "http://")):
+        display_url = reference
+    else:
+        display_url = urllib.parse.urljoin(RESOURCE_BASE, reference.lstrip("/"))
+    return {"key": reference, "url": display_url, "reference": reference}
+
+
 def _safe(value: Any) -> Any:
     """Recursively redact credentials and presigned URLs in API results."""
     if isinstance(value, Mapping):
         result = {}
         for key, item in value.items():
             normalized = str(key).replace("-", "_").lower()
-            result[str(key)] = "[REDACTED]" if normalized in _SECRET_KEYS else _safe(item)
+            if normalized in _SECRET_KEYS:
+                result[str(key)] = "[REDACTED]"
+            elif normalized in {
+                "content", "contenttext", "codetext", "changelog",
+                "description", "licensecontent",
+            }:
+                # write_output() hashes these fields before serializing JSON.
+                # Preserve the original here so the digest represents the
+                # service value instead of a generic redaction placeholder.
+                result[str(key)] = item
+            else:
+                result[str(key)] = _safe(item)
         return result
     if isinstance(value, list):
         return [_safe(item) for item in value]
@@ -599,7 +660,7 @@ class ModUs:
             except Exception:
                 detail = "HTTP %d" % exc.code
             raise FuploadError(redact(str(detail)), endpoint=url, http_status=exc.code, kind="platform_error", stage=stage) from exc
-        except (OSError, urllib.error.URLError) as exc:
+        except (OSError, urllib.error.URLError, http.client.IncompleteRead) as exc:
             raise FuploadError("ModUs request failed: %s" % exc, endpoint=url, verification_required=method != "GET", stage=stage) from exc
         if status < 200 or status >= 300:
             raise FuploadError("ModUs returned HTTP %d" % status, endpoint=url, http_status=status, stage=stage)
@@ -621,6 +682,32 @@ class ModUs:
         return payload
 
     def doctor(self) -> Dict[str, Any]:
+        if self.main_session:
+            result = {
+                "token_present": False,
+                "token_decrypted": False,
+                "token_nonempty": False,
+                "api_ready": False,
+            }
+            try:
+                session = load_main_session()
+                token = str(session.get("token") or "").strip()
+                result["token_present"] = bool(token)
+                result["token_decrypted"] = bool(token)
+                result["token_nonempty"] = bool(token)
+                if not token:
+                    return result
+                previous_token, previous_device = self.token, self.device_id
+                self.token = token
+                self.device_id = session.get("device_id")
+                try:
+                    self.user_info()
+                    result["api_ready"] = True
+                finally:
+                    self.token, self.device_id = previous_token, previous_device
+            except (FuploadError, OSError, UnicodeError, ValueError, TypeError):
+                pass
+            return result
         selected = self.token_path
         if not selected.is_file() and selected.with_name("token.json").is_file():
             selected = selected.with_name("token.json")
@@ -771,6 +858,143 @@ class ModUs:
             raise ValidationError("unsupported ModUs options operation")
         return _safe(_unwrap(self._request("GET", routes[action])))
 
+    @staticmethod
+    def _option_rows(value: Any) -> list[Mapping[str, Any]]:
+        if isinstance(value, Mapping):
+            value = value.get("rows", value.get("data", []))
+        return [item for item in value if isinstance(item, Mapping)] if isinstance(value, list) else []
+
+    @classmethod
+    def _nested_option_rows(cls, value: Any) -> list[Mapping[str, Any]]:
+        rows: list[Mapping[str, Any]] = []
+        pending = list(cls._option_rows(value))
+        while pending:
+            item = pending.pop(0)
+            rows.append(item)
+            pending.extend(cls._option_rows(item.get("children", [])))
+        return rows
+
+    @staticmethod
+    def _csv_values(value: Any) -> list[str]:
+        return [item.strip() for item in str(value or "").split(",") if item.strip()]
+
+    @staticmethod
+    def _account_rows(backup: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+        value = backup.get("wtfAccounts") or []
+        if isinstance(value, str):
+            try:
+                value = json.loads(value)
+            except (TypeError, ValueError):
+                value = []
+        return [item for item in value if isinstance(item, Mapping)] if isinstance(value, list) else []
+
+    @staticmethod
+    def _backup_addons_id(backup: Mapping[str, Any]) -> Optional[str]:
+        value = backup.get("knownAddons")
+        if not isinstance(value, str) or not value.strip():
+            return None
+        try:
+            parsed = json.loads(value)
+        except (TypeError, ValueError):
+            return None
+        project_ids = parsed.get("projectids") if isinstance(parsed, Mapping) else None
+        return None if project_ids is None else str(project_ids)
+
+    def _validate_project_write(self, action: str, doc: Mapping[str, Any]) -> None:
+        if action not in {"create", "release", "update", "edit"}:
+            return
+        document = _project_document(doc)
+        allowed_categories = {
+            int(item["id"])
+            for item in self._nested_option_rows(self.options("categories"))
+            if item.get("id") is not None
+        }
+        unknown = [item for item in document.get("categories", []) if item not in allowed_categories]
+        if unknown:
+            raise ValidationError(
+                "category is not present in current Creator options",
+                path="$.project_state.basic_info.categories",
+            )
+
+    def _validate_main_write(self, resource: str, action: str, doc: Mapping[str, Any]) -> None:
+        if resource not in {"config", "wa"} or action not in {"create", "update", "edit"}:
+            return
+
+        if "tags" in doc:
+            option_name = "config-tags" if resource == "config" else "wa-tags"
+            allowed_tags = {str(item.get("id")) for item in self._option_rows(self.options(option_name)) if item.get("id") is not None}
+            unknown = [item for item in self._csv_values(doc.get("tags")) if item not in allowed_tags]
+            if unknown:
+                raise ValidationError("tag is not present in current %s options" % option_name, path="$.tags")
+
+        tier_id = doc.get("required_tier_id")
+        if tier_id is not None:
+            tiers = self._option_rows(self.options("subscription-tiers"))
+            allowed_tiers = {
+                str(item.get("id"))
+                for item in tiers
+                if item.get("id") is not None and item.get("isEnabled", item.get("is_enabled", 1)) not in (0, False)
+            }
+            if str(tier_id) not in allowed_tiers:
+                raise ValidationError("required_tier_id is not present in current tier options", path="$.required_tier_id")
+
+        if resource == "wa" and ("support_addon" in doc or "addons_id" in doc):
+            selected_doc = dict(doc)
+            if action in {"update", "edit"} and (
+                "support_addon" not in selected_doc or "addons_id" not in selected_doc
+            ):
+                current = self.import_detail(doc["import_id"], server_type=doc.get("server_type"))
+                current = current[0] if isinstance(current, list) and current else current
+                if isinstance(current, Mapping):
+                    selected_doc.setdefault("support_addon", current.get("supportAddon"))
+                    selected_doc.setdefault("addons_id", current.get("addonsId"))
+            support_rows = self._option_rows(self.options("wa-support-addons"))
+            selected = next((item for item in support_rows if str(item.get("name")) == str(selected_doc.get("support_addon"))), None)
+            if selected is None or str(selected.get("id")) != str(selected_doc.get("addons_id")):
+                raise ValidationError("support_addon and addons_id must match current options", path="$.support_addon")
+            return
+
+        if resource != "config":
+            return
+        linkage_fields = {"backup_id", "addons_id", "account_name", "role_name", "exclude_wtf"}
+        if not linkage_fields.intersection(doc):
+            return
+        merged = dict(doc)
+        if action in {"update", "edit"} and "backup_id" not in merged:
+            current = self.share_detail(doc["share_id"], server_type=doc.get("server_type"))
+            current = current[0] if isinstance(current, list) and current else current
+            if isinstance(current, Mapping):
+                aliases = {
+                    "backupId": "backup_id", "addonsId": "addons_id", "accountName": "account_name",
+                    "roleName": "role_name", "excludeWtf": "exclude_wtf",
+                }
+                for wire, local in aliases.items():
+                    if local not in merged and wire in current:
+                        merged[local] = current[wire]
+        backup_id = merged.get("backup_id")
+        backups = self._option_rows(self.cloud_backups(server_type=merged.get("server_type")))
+        backup = next((item for item in backups if str(item.get("id")) == str(backup_id)), None)
+        if backup is None:
+            raise ValidationError("backup_id is not present in the selected Build", path="$.backup_id")
+        expected_addons = self._backup_addons_id(backup)
+        if expected_addons is not None and "addons_id" in merged and str(merged.get("addons_id")) != expected_addons:
+            raise ValidationError("addons_id does not match selected backup knownAddons.projectids", path="$.addons_id")
+        if int(merged.get("exclude_wtf") or 0) == 1:
+            return
+        account_name = str(merged.get("account_name") or "")
+        account = next((item for item in self._account_rows(backup) if account_name in {
+            str(item.get("id") or ""), str(item.get("accountId") or ""),
+            str(item.get("name") or ""), str(item.get("characterName") or ""),
+        }), None)
+        if account is None:
+            raise ValidationError("account_name is not present in selected backup", path="$.account_name")
+        roles = [str(item) for item in account.get("roles") or [] if str(item)]
+        role_name = str(merged.get("role_name") or "")
+        if roles and not role_name:
+            raise ValidationError("role_name is required for selected account", path="$.role_name")
+        if role_name and role_name not in roles:
+            raise ValidationError("role_name is not present in selected account", path="$.role_name")
+
     # Main ModUs client: configuration shares and string articles.
     def cloud_backups(self, *, server_type: Optional[int] = None) -> Any:
         return _safe(_unwrap(self._request("GET", "system/user/backup/list", headers={"X-Server-Type": str(self._build(server_type))})))
@@ -785,6 +1009,40 @@ class ModUs:
     def cloud_backup_delete(self, backup_id: int, *, server_type: Optional[int] = None) -> Any:
         return _safe(_unwrap(self._request("DELETE", "system/user/backup/delete/%s" % _positive_id(backup_id, field="backup_id"), headers={"X-Server-Type": str(self._build(server_type))})))
 
+    def image_upload(self, file_path: str) -> Dict[str, Any]:
+        """Upload an image through the exact ModUs main-client multipart API."""
+        path = Path(file_path)
+        if not path.is_file():
+            raise ValidationError("image file does not exist", path="$.file")
+        authorization = self.token if self.authorization_scheme == "" else self.authorization_scheme + self.token
+        headers = {"Accept": "application/json", "Authorization": authorization}
+        if self.device_id:
+            headers["X-Device-Id"] = self.device_id
+        payload = multipart_request(
+            self._url("game/data/file/upload/file/image"),
+            str(path),
+            file_field="file",
+            headers=headers,
+            timeout=max(self.timeout, 600),
+        )
+        if isinstance(payload, Mapping):
+            business_code = _business_code(payload)
+            if payload.get("success") is False or (business_code is not None and business_code != 200):
+                raise FuploadError(
+                    str(payload.get("msg") or payload.get("message") or "ModUs image upload was rejected"),
+                    endpoint=self._url("game/data/file/upload/file/image"),
+                    business_code=business_code,
+                    kind="platform_error",
+                    stage="media_upload",
+                )
+        record = _image_upload_record(payload)
+        content = path.read_bytes()
+        return {
+            **record,
+            "bytes": len(content),
+            "sha256": hashlib.sha256(content).hexdigest(),
+        }
+
     @staticmethod
     def _share_wire(doc: Mapping[str, Any]) -> Dict[str, Any]:
         aliases = {"share_id": "id", "addons_id": "addonsId", "backup_id": "backupId", "account_name": "accountName", "content_text": "contentText", "image_url": "imageUrl", "is_paid": "isPaid", "is_public": "isPublic", "share_type": "shareType", "exclude_wtf": "excludeWtf", "role_name": "roleName", "required_tier_id": "requiredTierId", "sub_type": "subType", "synchronization_type": "synchronizationType"}
@@ -793,7 +1051,7 @@ class ModUs:
         for key, value in doc.items():
             wire = aliases.get(key, key)
             if wire in allowed and value is not None:
-                result[wire] = value
+                result[wire] = str(value) if wire == "addonsId" else value
         result.setdefault("platform", 1)
         exclude = result.get("excludeWtf", 0)
         result["excludeWtf"] = 1 if str(exclude).strip().lower() in {"1", "true"} else 0
@@ -815,7 +1073,9 @@ class ModUs:
         wire["platform"] = int(platform) if isinstance(platform, (int, float)) and not isinstance(platform, bool) else 0
         for key in ("keyword", "status", "tags", "order_by", "is_public", "is_paid"):
             if key in source and source[key] is not None:
-                wire[{"order_by": "orderBy", "is_public": "isPublic", "is_paid": "isPaid"}.get(key, key)] = source[key]
+                wire[{"order_by": "orderBy", "is_public": "isPublic", "is_paid": "isPaid"}.get(key, key)] = (
+                    _tag_filter(source[key]) if key == "tags" else source[key]
+                )
         return _safe(_unwrap(self._request("POST", "system/user/share/list", wire, headers={"X-Server-Type": str(selected_build)})))
 
     def share_detail(self, share_ids: Any, *, server_type: Optional[int] = None) -> Any:
@@ -823,9 +1083,7 @@ class ModUs:
         return _safe(_unwrap(self._request("POST", "system/user/share/detail", {"shareIds": [_resource_id(x, field="share_id") for x in ids]}, headers={"X-Server-Type": str(self._build(server_type))})))
 
     def share_create(self, doc: Mapping[str, Any], *, server_type: Optional[int] = None) -> Any:
-        wire = self._share_wire(doc)
-        wire.setdefault("synchronizationType", 3 if wire["platform"] == 3 else 1)
-        return _safe(_unwrap(self._request("POST", "system/user/share/create", wire, headers={"X-Server-Type": str(self._build(server_type))})))
+        return _safe(_unwrap(self._request("POST", "system/user/share/create", self._share_wire(doc), headers={"X-Server-Type": str(self._build(server_type))})))
 
     def share_update(self, doc: Mapping[str, Any], *, server_type: Optional[int] = None) -> Any:
         return _safe(_unwrap(self._request("PUT", "system/user/share/update", self._share_wire(doc), headers={"X-Server-Type": str(self._build(server_type))})))
@@ -838,6 +1096,8 @@ class ModUs:
         aliases = {"import_id": "id", "code_text": "codeText", "addons_id": "addonsId", "content_text": "contentText", "file_path": "filePath", "image_url": "imageUrl", "is_paid": "isPaid", "is_public": "isPublic", "share_type": "shareType", "support_addon": "supportAddon", "required_tier_id": "requiredTierId", "sub_type": "subType", "synchronization_type": "synchronizationType"}
         allowed = {"id", "codeText", "content", "addonsId", "contentText", "filePath", "imageUrl", "isPaid", "isPublic", "price", "shareType", "supportAddon", "tags", "title", "version", "requiredTierId", "subType", "platform", "synchronizationType"}
         result = {aliases.get(key, key): value for key, value in doc.items() if aliases.get(key, key) in allowed and value is not None}
+        if "addonsId" in result:
+            result["addonsId"] = str(result["addonsId"])
         result.setdefault("platform", 1)
         result.setdefault("synchronizationType", 3 if result["platform"] == 3 else 1)
         return result
@@ -858,7 +1118,9 @@ class ModUs:
         wire["platform"] = int(platform) if isinstance(platform, (int, float)) and not isinstance(platform, bool) else 0
         for key in ("keyword", "support_addon", "tags", "is_paid", "order_by"):
             if key in source and source[key] is not None:
-                wire[{"support_addon": "supportAddon", "is_paid": "isPaid", "order_by": "orderBy"}.get(key, key)] = source[key]
+                wire[{"support_addon": "supportAddon", "is_paid": "isPaid", "order_by": "orderBy"}.get(key, key)] = (
+                    _tag_filter(source[key]) if key == "tags" else source[key]
+                )
         return _safe(_unwrap(self._request("POST", "system/user/import/list", wire, headers={"X-Server-Type": str(selected_build)})))
 
     def import_detail(self, import_ids: Any, *, server_type: Optional[int] = None) -> Any:
@@ -1113,6 +1375,9 @@ class ModUs:
         raise ValidationError("unsupported ModUs read operation")
 
     def execute_write(self, resource: str, action: str, doc: Mapping[str, Any]) -> Any:
+        if resource == "media" and action == "upload": return self.image_upload(str(doc["file"]))
+        if resource == "project": self._validate_project_write(action, doc)
+        self._validate_main_write(resource, action, doc)
         if resource == "config" and action == "create": return self.share_create(doc, server_type=doc.get("server_type"))
         if resource == "config" and action in ("update", "edit"): return self.share_update(doc, server_type=doc.get("server_type"))
         if resource == "config" and action == "delete": return self.share_delete(doc["share_id"], server_type=doc.get("server_type"))

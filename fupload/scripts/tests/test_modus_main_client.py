@@ -12,10 +12,75 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from fupload_cli.cli import build_parser
 from fupload_cli.modus import ModUs, load_main_session
 from fupload_cli.schema import get_schema
-from fupload_cli.errors import ValidationError
+from fupload_cli.errors import FuploadError, ValidationError
 
 
 class ModusMainClientTests(unittest.TestCase):
+    def test_main_doctor_reuses_main_session_without_creator_token_file(self):
+        provider = ModUs(main_session=True, authenticate=False)
+        with mock.patch("fupload_cli.modus.load_main_session", return_value={
+            "token": "MAIN-TOKEN", "device_id": "MAIN-DEVICE",
+        }), mock.patch.object(provider, "user_info", return_value={"id": 1}) as user_info:
+            result = provider.doctor()
+        self.assertEqual(result, {
+            "token_present": True,
+            "token_decrypted": True,
+            "token_nonempty": True,
+            "api_ready": True,
+        })
+        user_info.assert_called_once_with()
+        self.assertEqual(provider.token, "")
+        self.assertIsNone(provider.device_id)
+
+    def test_media_upload_uses_main_client_multipart_contract(self):
+        provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
+        with tempfile.TemporaryDirectory() as directory:
+            image = Path(directory) / "cover.webp"
+            image.write_bytes(b"RIFF-fixture-WEBP")
+            response = {
+                "code": 200,
+                "data": {
+                    "cosStoreKey": "modus/assets/cover.webp",
+                    "cosStoreUrl": "https://cdn.invalid/modus/assets/cover.webp",
+                },
+            }
+            with mock.patch("fupload_cli.modus.multipart_request", return_value=response) as upload:
+                result = provider.image_upload(str(image))
+
+        self.assertEqual(result["key"], "modus/assets/cover.webp")
+        self.assertEqual(result["reference"], result["key"])
+        self.assertEqual(result["bytes"], len(b"RIFF-fixture-WEBP"))
+        self.assertEqual(len(result["sha256"]), 64)
+        self.assertEqual(upload.call_args.args[0], "https://app.modus.cool/api/game/data/file/upload/file/image")
+        self.assertEqual(upload.call_args.args[1], str(image))
+        self.assertEqual(upload.call_args.kwargs["file_field"], "file")
+        self.assertEqual(upload.call_args.kwargs["headers"], {
+            "Accept": "application/json", "Authorization": "TOKEN", "X-Device-Id": "DEVICE",
+        })
+
+    def test_media_upload_accepts_official_response_aliases_and_rejects_business_failure(self):
+        provider = ModUs("TOKEN", main_session=True)
+        with tempfile.TemporaryDirectory() as directory:
+            image = Path(directory) / "cover.png"
+            image.write_bytes(b"png")
+            with mock.patch("fupload_cli.modus.multipart_request", return_value={
+                "data": {"downloadUrl": "https://cdn.invalid/path/cover.png"},
+            }):
+                result = provider.image_upload(str(image))
+            self.assertEqual(result["key"], "path/cover.png")
+            with mock.patch("fupload_cli.modus.multipart_request", return_value={"code": 500, "msg": "bad image"}):
+                with self.assertRaisesRegex(FuploadError, "bad image"):
+                    provider.image_upload(str(image))
+
+    def test_media_upload_schema_and_cli_route_are_registered(self):
+        with tempfile.TemporaryDirectory() as directory:
+            image = Path(directory) / "cover.webp"
+            image.write_bytes(b"RIFF-fixture-WEBP")
+            schema = get_schema("modus", "media", "upload")
+            self.assertEqual(schema.validate({"schema": schema.name, "file": str(image)})["file"], str(image))
+        args = build_parser().parse_args(["modus", "media", "upload", "--input", "input.json", "--dry-run"])
+        self.assertEqual((args.platform, args.resource, args.action), ("modus", "media", "upload"))
+
     def test_config_list_cli_envelope_keeps_build_in_body_and_header(self):
         args = build_parser().parse_args(["modus", "config", "list", "--build", "0", "--page-size", "20"])
         provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
@@ -25,6 +90,15 @@ class ModusMainClientTests(unittest.TestCase):
         self.assertEqual(body["server"], 0)
         self.assertEqual(request.call_args.kwargs["headers"]["X-Server-Type"], "0")
         self.assertEqual(body["platform"], 0)
+
+    def test_main_list_tag_filters_use_arrays(self):
+        provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
+        with mock.patch.object(provider, "_request", return_value={"data": {}}) as request:
+            provider.share_list({"tags": "1, 2"}, server_type=3)
+        self.assertEqual(request.call_args.args[2]["tags"], ["1", "2"])
+        with mock.patch.object(provider, "_request", return_value={"data": {}}) as request:
+            provider.import_list({"tags": "3"}, server_type=4)
+        self.assertEqual(request.call_args.args[2]["tags"], ["3"])
 
     @staticmethod
     def _share_document(**overrides):
@@ -66,6 +140,7 @@ class ModusMainClientTests(unittest.TestCase):
             schema.validate({**document, "exclude_wtf": 0, "account_name": ""})
         schema.validate({**document, "exclude_wtf": 0, "account_name": "Account"})
         schema.validate({**document, "exclude_wtf": 0, "account_name": "Account", "role_name": "Role"})
+        self.assertEqual(schema.validate({**document, "addons_id": ""})["addons_id"], "")
         for required_field in (
             "addons_id", "backup_id", "content", "content_text", "image_url",
             "tags", "title", "exclude_wtf",
@@ -98,9 +173,26 @@ class ModusMainClientTests(unittest.TestCase):
                 with self.subTest(resource=resource, field=field, invalid=invalid):
                     with self.assertRaises(ValidationError):
                         schema.validate({**document, field: invalid})
+            for overrides in (
+                {"tags": "1,1"},
+                {"is_paid": 1},
+                {"price": 1},
+                {"share_type": 1},
+                {"platform": 1, "synchronization_type": 3},
+                {"platform": 3, "synchronization_type": 1},
+                {"platform": 3},
+                {"synchronization_type": 3},
+            ):
+                with self.subTest(resource=resource, overrides=overrides):
+                    with self.assertRaises(ValidationError):
+                        schema.validate({**document, **overrides})
         config_schema = get_schema("modus", "config", "create")
+        self.assertEqual(
+            config_schema.validate({**self._share_document(addons_id=""), "schema": config_schema.name})["addons_id"],
+            "",
+        )
         with self.assertRaises(ValidationError):
-            config_schema.validate({**self._share_document(addons_id=""), "schema": config_schema.name})
+            config_schema.validate({**self._share_document(addons_id=7), "schema": config_schema.name})
         wa_schema = get_schema("modus", "wa", "create")
         with self.assertRaises(ValidationError):
             wa_schema.validate({**self._import_document(file_path="unexpected"), "schema": wa_schema.name})
@@ -134,6 +226,30 @@ class ModusMainClientTests(unittest.TestCase):
                 schema.validate({**document, "required_tier_id": 7})["required_tier_id"],
                 7,
             )
+            with self.assertRaises(ValidationError):
+                schema.validate({
+                    **document,
+                    "required_tier_id": 7,
+                    "platform": 3,
+                    "synchronization_type": 3,
+                })
+
+    def test_main_image_reference_count_and_csv_shape(self):
+        for resource, document in (
+            ("config", self._share_document()),
+            ("wa", self._import_document()),
+        ):
+            schema = get_schema("modus", resource, "create")
+            document["schema"] = schema.name
+            ten = ",".join("modus/image/%d.webp" % index for index in range(10))
+            self.assertEqual(schema.validate({**document, "image_url": ten})["image_url"], ten)
+            for invalid in (
+                "modus/image/1.webp,,modus/image/2.webp",
+                ",".join("modus/image/%d.webp" % index for index in range(11)),
+            ):
+                with self.subTest(resource=resource, invalid=invalid):
+                    with self.assertRaises(ValidationError):
+                        schema.validate({**document, "image_url": invalid})
 
     def test_config_and_wa_addons_id_accept_string_and_csv_values(self):
         config_schema = get_schema("modus", "config", "create")
@@ -175,11 +291,10 @@ class ModusMainClientTests(unittest.TestCase):
             "imageUrl": "https://cdn.invalid/cover.webp", "isPaid": 0, "isPublic": 1,
             "price": 0, "shareType": 0, "tags": "1,2", "title": "A full title",
             "excludeWtf": 1, "accountName": "", "roleName": "", "subType": 0,
-            "platform": 1, "synchronizationType": 1,
+            "platform": 1,
         }
         self.assertEqual(calls[0][0:3], ("POST", "system/user/share/create", expected))
         update_expected = {"id": "share/opaque", **expected}
-        update_expected.pop("synchronizationType")
         self.assertEqual(calls[1][0:3], (
             "PUT", "system/user/share/update", update_expected,
         ))
@@ -208,7 +323,11 @@ class ModusMainClientTests(unittest.TestCase):
                 body = calls[-1][2]
                 self.assertEqual(body["excludeWtf"], expected)
                 self.assertEqual(body["platform"], 1)
-                self.assertEqual(body["synchronizationType"], 1)
+
+        with mock.patch.object(provider, "_request", side_effect=request):
+            provider.share_update(self._share_document(exclude_wtf=None))
+        self.assertEqual(calls[-1][2]["excludeWtf"], 0)
+        self.assertNotIn("synchronizationType", calls[-1][2])
 
     def test_default_lists_match_main_client_payloads(self):
         provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
@@ -240,7 +359,7 @@ class ModusMainClientTests(unittest.TestCase):
             })
         self.assertEqual(request.call_args.args[2], {
             "pageNum": 3, "pageSize": 40, "server": 2, "mine": True,
-            "shareType": 0, "platform": 0, "keyword": "unit", "tags": "1,2",
+            "shareType": 0, "platform": 0, "keyword": "unit", "tags": ["1", "2"],
             "orderBy": "hot", "isPaid": 0,
         })
         self.assertEqual(request.call_args.kwargs["headers"], {"X-Server-Type": "2"})
@@ -254,7 +373,7 @@ class ModusMainClientTests(unittest.TestCase):
         self.assertEqual(request.call_args.args[2], {
             "pageNum": 2, "pageSize": 25, "server": 3, "mine": True,
             "status": 1, "platform": 0, "keyword": "aura", "supportAddon": "WeakAuras",
-            "tags": "4,5", "isPaid": 0, "orderBy": "latest",
+            "tags": ["4", "5"], "isPaid": 0, "orderBy": "latest",
         })
         self.assertEqual(request.call_args.kwargs["headers"], {"X-Server-Type": "3"})
 
@@ -341,6 +460,15 @@ class ModusMainClientTests(unittest.TestCase):
             self.assertEqual(body["platform"], 1)
             self.assertEqual(body["synchronizationType"], 1)
 
+    def test_addons_id_is_stringified_on_main_client_wires(self):
+        provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
+        with mock.patch.object(provider, "_request", return_value={"data": {}}) as request:
+            provider.share_create(self._share_document(addons_id=1512221))
+        self.assertEqual(request.call_args.args[2]["addonsId"], "1512221")
+        with mock.patch.object(provider, "_request", return_value={"data": {}}) as request:
+            provider.import_create(self._import_document(addons_id=1512221))
+        self.assertEqual(request.call_args.args[2]["addonsId"], "1512221")
+
     def test_selected_subscription_tier_is_sent_but_none_is_omitted(self):
         provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
         with mock.patch.object(provider, "_request", return_value={"data": {}}) as request:
@@ -381,6 +509,63 @@ class ModusMainClientTests(unittest.TestCase):
         self.assertEqual(calls[1][1], "system/user/share/delete/share%2Fopaque")
         self.assertEqual(calls[2][2], {"importIds": ["wa/opaque"]})
         self.assertEqual(calls[3][1], "system/user/import/delete/wa%2Fopaque")
+
+    def test_dynamic_config_preflight_binds_backup_addons_account_role_and_tags(self):
+        provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
+        backup = {
+            "id": 11,
+            "knownAddons": json.dumps({"projectids": "9,11"}),
+            "wtfAccounts": json.dumps([{"name": "Account", "roles": ["Role"]}]),
+        }
+        document = self._share_document(
+            exclude_wtf=0, account_name="Account", role_name="Role", required_tier_id=None,
+        )
+
+        with mock.patch.object(provider, "options", return_value=[{"id": 1}, {"id": 2}]), \
+                mock.patch.object(provider, "cloud_backups", return_value=[backup]):
+            provider._validate_main_write("config", "create", document)
+            invalid_cases = (
+                ({"tags": "999"}, "tag is not present"),
+                ({"addons_id": "999"}, "addons_id does not match"),
+                ({"account_name": "Missing"}, "account_name is not present"),
+                ({"role_name": ""}, "role_name is required"),
+                ({"role_name": "Missing"}, "role_name is not present"),
+                ({"backup_id": 99}, "backup_id is not present"),
+            )
+            for overrides, message in invalid_cases:
+                with self.subTest(overrides=overrides):
+                    with self.assertRaisesRegex(ValidationError, message):
+                        provider._validate_main_write("config", "create", {**document, **overrides})
+
+    def test_dynamic_wa_preflight_binds_tag_addon_and_tier(self):
+        provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
+        options = {
+            "wa-tags": [{"id": 2}],
+            "wa-support-addons": [{"id": 7, "name": "Addon"}],
+            "subscription-tiers": [{"id": 5, "isEnabled": 1}],
+        }
+        document = self._import_document(addons_id="7", required_tier_id=5)
+        with mock.patch.object(provider, "options", side_effect=lambda action: options[action]):
+            provider._validate_main_write("wa", "create", document)
+            for overrides, message in (
+                ({"tags": "999"}, "tag is not present"),
+                ({"addons_id": "8"}, "support_addon and addons_id"),
+                ({"support_addon": "Missing"}, "support_addon and addons_id"),
+                ({"required_tier_id": 99}, "required_tier_id is not present"),
+            ):
+                with self.subTest(overrides=overrides):
+                    with self.assertRaisesRegex(ValidationError, message):
+                        provider._validate_main_write("wa", "create", {**document, **overrides})
+
+    def test_dynamic_preflight_failure_happens_before_mutation_request(self):
+        provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
+        with mock.patch.object(
+            provider, "_validate_main_write",
+            side_effect=ValidationError("dynamic option rejected", path="$.tags"),
+        ), mock.patch.object(provider, "_request") as request:
+            with self.assertRaisesRegex(ValidationError, "dynamic option rejected"):
+                provider.execute_write("wa", "create", self._import_document())
+        request.assert_not_called()
 
 
 if __name__ == "__main__":

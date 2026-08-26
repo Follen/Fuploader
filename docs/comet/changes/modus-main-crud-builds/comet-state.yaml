@@ -3,275 +3,191 @@ name: modus-main-crud-builds
 language: zh-CN
 phase: build
 status: active
-state_version: 5
+state_version: 10
 brief: brief.md
-spec_changes: []
+spec_changes:
+  - capability: modus-full-field-regression
+    operation: create
+    source: specs/modus-full-field-regression/spec.md
 workspace:
   isolation: current
   change_branch: main
   target_branch: main
   finish: null
 loop:
-  stage: repairing
-  goal_cycle: 1
-  iteration: 2
+  stage: building
+  goal_cycle: 2
+  iteration: 1
   attempt: 0
   retry_epoch: 0
-  failed_iteration_count: 1
+  failed_iteration_count: 0
   no_progress_count: 0
   execution_failure_count: 0
-  previous_unresolved_ids:
-    - A4
-    - A5
-    - A6
-    - A7
-    - A8
-  next_action: repair-failed-acceptance
+  previous_unresolved_ids: []
+  next_action: submit-builder-candidate
 acceptance:
   - id: A1
     source: brief.md
-    text: A1：`modus session doctor` 从本机 ModUs 登录态得到 `api_ready=true`，输出无认证材料。
-    result: passed
-    reason:
-      text: 独立真实 doctor api_ready=true，布尔输出未暴露认证材料。
-      truncated: false
+    text: A1：Creator 与主程序两个 `session doctor` 均真实复用对应本机登录态并得到
+      `api_ready=true`，输出只含脱敏布尔状态。
+    result: pending
+    reason: null
   - id: A2
     source: brief.md
-    text: A2：`modus builds` 返回所有已确认 Build 的 id/code/name，当前 Build 可被显式选择。
-    result: passed
-    reason:
-      text: modus builds 和显式 Build 0-4 入口存在。
-      truncated: false
+    text: A2：Creator
+      项目字段矩阵完整覆盖名称、别名、摘要、分类、同步、ModUs/大脚至少一项、tier、仓库、依赖、许可证全部子字段、logo/screenshot、图片操作及服务端只读字段；每个可写字段均有真实修改/回读/恢复/再回读记录。
+    result: pending
+    reason: null
   - id: A3
     source: brief.md
-    text: A3：每个 Build 的配置备份列表、配置分享列表和 WA 列表真实请求成功；业务 500 时记录实际字段/Build 并修正后重试，不能把
-      500 当空列表。
-    result: passed
-    reason:
-      text: 独立逐 Build 真实复验 backups/config/WA 全部成功且无业务 500。
-      truncated: false
+    text: A3：Creator 项目真实 create/detail/edit/delete；项目 logo/screenshot 创建与图片
+      upload/delete edit 均提交真实图片内容并回读服务端图片状态。
+    result: pending
+    reason: null
   - id: A4
     source: brief.md
-    text: A4：配置分享真实 create、detail、update、delete，所有写后回读成功，最终对象不存在。
-    result: failed
-    reason:
-      text: 真实 CRUD 成功但字段 schema 将字符串 addonsId 错定义为 integer，且验收文字要求对象不存在而实际协议为
-        status=4 软删除。
-      truncated: false
+    text: A4：Creator 插件版本字段矩阵完整覆盖 project/file
+      ID、version、type、支持游戏版本、MD5、ZIP/解压大小、对象路径、TOC、changelog；create/upload/update/edit/delete
+      均真实执行，ZIP 原始字节 PUT、写后回读和最终清理成功。
+    result: pending
+    reason: null
   - id: A5
     source: brief.md
-    text: A5：WA/字符串真实 create、detail、update、version
-      publish（若账号允许）、delete，所有写后回读成功，最终对象不存在。
-    result: failed
-    reason:
-      text: 真实 WA CRUD/版本已运行，但 _import_wire 遗漏
-        platform/synchronizationType，未与主程序默认逻辑一致；addonsId 类型也错误。
-      truncated: false
+    text: A5：`modus builds` 返回 Build 0..4；每个 Build 的 backup/config/WA
+      列表均真实成功，`server` 与 `X-Server-Type` 同步，任何业务 500 必须定位字段并修正，不能当空结果。
+    result: pending
+    reason: null
   - id: A6
     source: brief.md
-    text: A6：请求字段与主程序 bundle
-      一致，包含分页、server、platform、mine、status、shareType、orderBy、同步、公开/付费、tier、内容和
-      Build 联动字段。
-    result: failed
-    reason:
-      text: 字段完整度不足：配置/WA addonsId 应为字符串；WA create/update 缺 platform 与
-        synchronizationType；配置 create/update 缺客户端默认 platform=1 和 excludeWtf 规范化。
-      truncated: false
+    text: A6：配置分享字段矩阵完整覆盖分页/过滤字段及
+      `addonsId`、`backupId`、账号/角色、HTML/纯文本正文、`imageUrl`、公开/付费/价格、分享类型、标签、标题、WTF
+      排除、tier、subType、platform、synchronizationType、Build；每个可写字段真实修改/回读/恢复/再回读。
+    result: pending
+    reason: null
   - id: A7
     source: brief.md
-    text: A7：全量本地测试、编译和脱敏扫描通过；真实回归证据保存命令、输入摘要、响应摘要和退出状态。
-    result: failed
-    reason:
-      text: 检查通过，但真实证据为静态摘要且未附可重跑生成器，字段缺口修复后需重新回归。
-      truncated: false
+    text: A7：配置本地图片通过主程序真实二进制上传取得服务端引用；该引用分别用于配置 create 和 update，detail 回读匹配；随后配置
+      delete 并验证软删除和活动列表缺失。
+    result: pending
+    reason: null
   - id: A8
     source: brief.md
-    text: A8：代码、文档和测试推送到 GitHub；新 npm 包 manifest/tarball/registry 版本一致并可全局安装。
-    result: failed
-    reason:
-      text: 当前改动尚未提交推送，npm 仍是 0.0.11。
-      truncated: false
-builder_handoff:
-  candidate_id: a3077f20-7c5e-4f13-bc66-7e6280967d1e
-  identity_provider: skill-coordinated
-  builder_execution_ref: skill-coordinated:builder:75579ada-6030-468e-bb27-e47b3bcef8ba
-  iteration: 1
-  summary:
-    text: 已完成 ModUs 主程序整合与真实回归：加入五个 WoW Build 映射及本地 current Build 选择，配置/WA 的 server
-      与 X-Server-Type 同步，修正 16 位字符串资源 ID 和软删除状态语义；真实 doctor、五 Build
-      backups/config/WA 列表及 Build 4 配置与 WA
-      create/detail/update/detail/delete/软删除回读均通过。新增脱敏证据
-      analyze/modus/live-main-crud-builds-20260826.json。全量 Python 308
-      passed、Node 26 passed、compileall、manifest、package inventory 通过。A8 的 GitHub
-      推送和新 npm 发布在下一步完成。
-    truncated: false
-  addressed_acceptance_ids:
-    - A1
-    - A2
-    - A3
-    - A4
-    - A5
-    - A6
-    - A7
-  checks:
-    - name:
-        text: pytest-all
-        truncated: false
-      result: passed
-      note:
-        text: 308 passed; 3960 subtests
-        truncated: false
-    - name:
-        text: node-tests
-        truncated: false
-      result: passed
-      note:
-        text: 26 passed
-        truncated: false
-    - name:
-        text: compileall
-        truncated: false
-      result: passed
-      note:
-        text: exit 0
-        truncated: false
-    - name:
-        text: manifest-and-package
-        truncated: false
-      result: passed
-      note:
-        text: manifest check and 55-file package inventory
-        truncated: false
-    - name:
-        text: live-multi-build-crud
-        truncated: false
-      result: passed
-      note:
-        text: five Build reads; Build 4 config/WA CRUD and status=4 post-delete readback
-        truncated: false
-  checks_truncated: false
-  known_limits:
-    - text: ModUs delete is soft-delete and detail remains queryable with
-        status=4/isPublic=0
-      truncated: false
-    - text: subscription tiers are empty for the current account; requiredTierId
-        remains null
-      truncated: false
-  known_limits_truncated: false
-  submitted_at: 2026-08-25T18:04:15.951Z
+    text: A8：WA/字符串字段矩阵完整覆盖分页/过滤字段及适用插件、封面&图片、标签、版本号、codeText、HTML/纯文本正文、同步到大脚、tier、公开/付费/价格、shareType、subType、platform、synchronizationType、Build；每个可写字段真实修改/回读/恢复/再回读。
+    result: pending
+    reason: null
+  - id: A9
+    source: brief.md
+    text: A9：WA 本地图片通过主程序真实二进制上传取得服务端引用；该引用分别用于 WA create 和 update，detail 回读匹配；WA
+      version publish/detail/delete 与 WA delete 均真实完成并最终清理。
+    result: pending
+    reason: null
+  - id: A10
+    source: brief.md
+    text: A10：所有下拉/枚举/联动分支有正负向证据，包括分类、游戏版本、适用插件、标签、同步模式、平台至少一项、WTF
+      与账号/角色、tier=无、付费/价格、Build 0..4；非法组合在远端写入前失败。
+    result: pending
+    reason: null
+  - id: A11
+    source: brief.md
+    text: A11：真实证据逐步保存命令、脱敏输入摘要、响应摘要、退出状态，以及正文/图片/ZIP 的长度和
+      SHA-256；证据能证明写入与回读使用同一内容，又不泄漏原文或签名材料。
+    result: pending
+    reason: null
+  - id: A12
+    source: brief.md
+    text: A12：全量 Python/Node、编译、manifest、tarball、隔离安装和脱敏扫描通过；最终代码与文档推送 GitHub，发布高于
+      `0.0.12` 的新 npm 版本，tag/registry/latest/全局安装版本一致。
+    result: pending
+    reason: null
+  - id: A13
+    source: specs/modus-full-field-regression/spec.md
+    text: Fupload SHALL reuse the separate local authenticated sessions of
+      ModUs.Creator and the ModUs main client. It SHALL expose diagnostic
+      readiness without returning credentials. Creator project/plugin requests
+      SHALL use the Creator session; configuration, WA/string and main-media
+      requests SHALL use the main-client session.
+    result: pending
+    reason: null
+  - id: A14
+    source: specs/modus-full-field-regression/spec.md
+    text: Fupload SHALL model every Creator project field exposed by the installed
+      client, including state-machine ordering, dropdown enums, at-least-one
+      platform selection, the real no-tier branch, all license subfields,
+      dependencies, repository, logo/screenshot creation payload and edit image
+      operations. A real regression SHALL mutate every writable field
+      independently, read it back, restore it and read the restoration back.
+      Local project images SHALL be submitted through the exact official create
+      or edit image wire form and their server-managed result SHALL be read
+      back.
+    result: pending
+    reason: null
+  - id: A15
+    source: specs/modus-full-field-regression/spec.md
+    text: Fupload SHALL support project and release discovery plus real release
+      create, upload, update, metadata edit and delete. It SHALL derive and
+      submit the exact ZIP metadata, allocate a file ID, obtain a signed upload
+      URL, PUT the original ZIP bytes, read back all release fields and clean up
+      in dependency order. Evidence SHALL bind the ZIP input to the uploaded
+      object with length and SHA-256 while removing signed URL material.
+    result: pending
+    reason: null
+  - id: A16
+    source: specs/modus-full-field-regression/spec.md
+    text: Fupload SHALL expose all confirmed Build IDs and use the selected Build
+      consistently in request body `server` and `X-Server-Type`. Backup,
+      configuration and WA/string list operations SHALL run successfully for
+      each Build with exact official defaults and filters. Business error
+      responses SHALL remain errors.
+    result: pending
+    reason: null
+  - id: A17
+    source: specs/modus-full-field-regression/spec.md
+    text: Fupload SHALL model all official configuration list and write fields,
+      their types, defaults, enums and interdependencies. It SHALL upload a
+      local cover/image using the official main-client binary image protocol,
+      extract the reusable server reference, use it in real create and update
+      requests, and verify the detail response. Every other writable
+      configuration field SHALL undergo the same mutate/read/restore/read cycle.
+      Delete success SHALL follow the service's soft-delete semantics and
+      active-list exclusion.
+    result: pending
+    reason: null
+  - id: A18
+    source: specs/modus-full-field-regression/spec.md
+    text: Fupload SHALL model all official WA/string list, article, code, version,
+      applicable-addon, tag, publication, payment, synchronization, platform,
+      tier and Build fields. It SHALL upload a local cover/image using the
+      official main-client binary image protocol, use the returned reference in
+      real create and update requests and verify the detail response. It SHALL
+      also publish, read and delete a real version and finally soft-delete the
+      test article.
+    result: pending
+    reason: null
+  - id: A19
+    source: specs/modus-full-field-regression/spec.md
+    text: Documentation SHALL contain complete Creator project/release,
+      configuration and WA/string field matrices with CLI name, wire name, JSON
+      type, required/default behavior, enum source, state dependency, write
+      endpoint and readback location. Positive and negative regression SHALL
+      cover dropdown values, empty/null branches, mutually constrained fields,
+      at-least-one selections, current no-tier behavior and all Builds. Invalid
+      combinations SHALL fail before remote mutation.
+    result: pending
+    reason: null
+  - id: A20
+    source: specs/modus-full-field-regression/spec.md
+    text: Real regression evidence SHALL be generated against the final
+      implementation and record each command, redacted input summary, response
+      summary and exit status. Mutable content, image and ZIP inputs SHALL
+      include length and SHA-256 rather than raw bytes/text. The final release
+      SHALL be newer than 0.0.12, pushed to GitHub, pass Windows and Ubuntu CI
+      plus Trusted Publishing, match the npm registry/latest version and install
+      globally.
+    result: pending
+    reason: null
+builder_handoff: null
 blockers: []
-verification:
-  candidate_id: a3077f20-7c5e-4f13-bc66-7e6280967d1e
-  identity_provider: skill-coordinated
-  verifier_execution_ref: skill-coordinated:verifier:aacc4f93-7dab-4cd0-bb60-870d04f7de62
-  iteration: 1
-  attempt: 1
-  assurance: skill-coordinated
-  verdict: fail
-  checks:
-    - id: python-all
-      name:
-        text: all Python tests
-        truncated: false
-      argv_display:
-        - text: -m
-          truncated: false
-        - text: pytest
-          truncated: false
-        - text: -q
-          truncated: false
-        - text: fupload/scripts/tests
-          truncated: false
-      argv_truncated: false
-      cwd_ref: .
-      status: passed
-      exit_code: 0
-      duration_ms: 12675
-    - id: compile
-      name:
-        text: compileall
-        truncated: false
-      argv_display:
-        - text: -m
-          truncated: false
-        - text: compileall
-          truncated: false
-        - text: -q
-          truncated: false
-        - text: fupload/scripts
-          truncated: false
-      argv_truncated: false
-      cwd_ref: .
-      status: passed
-      exit_code: 0
-      duration_ms: 70
-    - id: node-tests
-      name:
-        text: Node tests
-        truncated: false
-      argv_display:
-        - text: test
-          truncated: false
-      argv_truncated: false
-      cwd_ref: .
-      status: passed
-      exit_code: 0
-      duration_ms: 82476
-    - id: manifest
-      name:
-        text: manifest check
-        truncated: false
-      argv_display:
-        - text: run
-          truncated: false
-        - text: check:manifest
-          truncated: false
-      argv_truncated: false
-      cwd_ref: .
-      status: passed
-      exit_code: 0
-      duration_ms: 559
-    - id: package
-      name:
-        text: package inventory
-        truncated: false
-      argv_display:
-        - text: run
-          truncated: false
-        - text: test:pack
-          truncated: false
-      argv_truncated: false
-      cwd_ref: .
-      status: passed
-      exit_code: 0
-      duration_ms: 1011
-    - id: live-evidence
-      name:
-        text: live multi-build CRUD evidence JSON
-        truncated: false
-      argv_display:
-        - text: -c
-          truncated: false
-        - text: import json; p='analyze/modus/live-main-crud-builds-20260826.json';
-            d=json.load(open(p,encoding='utf-8')); assert d['result']=='passed'
-            and len(d['builds'])==5 and d['crud']['config']['delete']=='passed'
-            and d['crud']['wa']['delete']=='passed'
-          truncated: false
-      argv_truncated: false
-      cwd_ref: .
-      status: passed
-      exit_code: 0
-      duration_ms: 48
-  summary:
-    text: A1-A3 通过；A4-A8 未满足。必须回 Build 修正 addonsId
-      类型、platform/synchronizationType/excludeWtf 默认与规范化，重跑真实 CRUD/版本，然后完成 GitHub
-      与 npm 发布。
-    truncated: false
-  risks:
-    - text: ModUs 使用软删除，详情仍会返回 status=4；正式验收文字应以软删除状态为删除成功。
-      truncated: false
-  risks_truncated: false
-  completed_at: 2026-08-25T18:24:05.056Z
+verification: null
 history:
   - goal_cycle: 1
     iteration: 1
@@ -289,6 +205,27 @@ history:
         GitHub 与 npm 发布。
       truncated: false
     completed_at: 2026-08-25T18:24:05.056Z
+  - goal_cycle: 1
+    iteration: 2
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: A1-A8 all passed after implementation and release. Runtime checks,
+        independent evidence audit, GitHub workflow, npm registry and real
+        global installation all agree on candidate d73eacf / version 0.0.12.
+      truncated: false
+    completed_at: 2026-08-25T19:45:40.908Z
+  - goal_cycle: 1
+    iteration: 2
+    attempt: 1
+    outcome: recovery
+    unresolved_ids: []
+    summary:
+      text: 用户明确要求全字段真实回归；当前验收遗漏 Creator 项目图片、配置封面和 WA/字符串封面二进制上传及其字段闭环，0.0.12
+        不构成最终验收。退回需求修订，补齐三类图片上传、所有字段逐项修改回读恢复、完整真实 CRUD 和重新发版。
+      truncated: false
+    completed_at: 2026-08-26T03:07:01.246Z
 history_overflow:
   dropped_entries: 0
   first_dropped_at: null
@@ -299,7 +236,7 @@ history_overflow:
     blocked: 0
     execution-error: 0
     recovery: 0
-verification_result: fail
-verification_report: verification.md
+verification_result: pending
+verification_report: null
 archived: false
 created_at: 2026-08-25T17:47:13.608Z

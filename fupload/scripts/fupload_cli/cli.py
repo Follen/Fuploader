@@ -248,7 +248,13 @@ def _modus_tree(platforms: argparse._SubParsersAction) -> None:
     )
     groups = root.add_subparsers(dest="resource_command", required=True)
     session = groups.add_parser("session", help="Local authentication diagnostics").add_subparsers(dest="action_command", required=True)
-    _read_leaf(session, "doctor", "Check the local ModUs.Creator token store, DPAPI decryption, and authenticated API readiness without exposing credentials.", platform="modus", resource="session", action="doctor")
+    doctor = _read_leaf(session, "doctor", "Check one local ModUs token store, DPAPI decryption, and authenticated API readiness without exposing credentials.", platform="modus", resource="session", action="doctor")
+    doctor.add_argument(
+        "--client",
+        choices=("creator", "main"),
+        default="creator",
+        help="Authenticated client session to diagnose (technical default: creator).",
+    )
     _read_leaf(groups, "builds", "List the fixed ModUs WoW Build ids, codes, names, and the locally selected current Build.", platform="modus", resource="builds", action="list")
 
     account = groups.add_parser("account", help="ModUs author account and statistics").add_subparsers(dest="action_command", required=True)
@@ -302,6 +308,9 @@ def _modus_tree(platforms: argparse._SubParsersAction) -> None:
     leaf = _read_leaf(plugin, "list", "List releases for one ModUs plugin project.", platform="modus", resource="plugin", action="list"); leaf.add_argument("--project-id", type=_positive, required=True); _modus_server_flag(leaf); _page_flags(leaf)
     leaf = _read_leaf(plugin, "get", "Read one ModUs plugin release detail.", platform="modus", resource="plugin", action="get"); leaf.add_argument("--project-id", type=_positive, required=True); leaf.add_argument("--file-id", type=_positive, required=True); _modus_server_flag(leaf)
     leaf = _read_leaf(plugin, "versions", "List releases for one ModUs plugin project.", platform="modus", resource="plugin", action="versions"); leaf.add_argument("--project-id", type=_positive, required=True); _modus_server_flag(leaf); _page_flags(leaf)
+
+    media = groups.add_parser("media", help="ModUs main-client image uploads").add_subparsers(dest="action_command", required=True)
+    _write_leaf(media, "modus", "media", "upload", "Upload one local image and return its reusable ModUs object key and URL.")
 
     config = groups.add_parser("config", help="ModUs main-client configuration shares and backups").add_subparsers(dest="action_command", required=True)
     for action, text in (("create", "Create a configuration share from an existing ModUs cloud backup."), ("update", "Update a configuration share."), ("edit", "Edit a configuration share."), ("delete", "Delete one explicitly confirmed configuration share."), ("backup-edit", "Rename an existing ModUs cloud backup."), ("backup-delete", "Delete one explicitly confirmed ModUs cloud backup.")):
@@ -378,7 +387,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if args.dry_run:
                 write_output(platform, operation, _dry_run_data(doc, schema.name), dry_run=True)
                 return 0
-            provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(main_session=resource in ("config", "wa")))))
+            provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(main_session=resource in ("media", "config", "wa")))))
             try:
                 if platform == "dd":
                     data = provider.execute_write(resource, action, doc, getattr(args, "session", None))
@@ -391,7 +400,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             write_output(platform, operation, data)
             return 0
         modus_doctor = platform == "modus" and resource == "session" and action == "doctor"
-        provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(authenticate=not modus_doctor, main_session=resource in ("addon", "plugin", "config", "wa", "builds")))))
+        modus_main_session = resource in ("addon", "plugin", "config", "wa", "builds") or (
+            modus_doctor and getattr(args, "client", "creator") == "main"
+        )
+        provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(authenticate=not modus_doctor, main_session=modus_main_session))))
         try:
             if platform == "dd":
                 data = provider.execute_read(resource, action, args, getattr(args, "session", None))

@@ -3,11 +3,12 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 import sys
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from fupload_cli.errors import ValidationError
-from fupload_cli.modus import _project_document, _project_wire
+from fupload_cli.modus import ModUs, _project_document, _project_wire
 from fupload_cli.state_machine import ProjectStateMachine
 from fupload_cli.schema import get_schema
 
@@ -90,6 +91,32 @@ class ModusProjectSchemaTests(unittest.TestCase):
         with self.assertRaisesRegex(ValidationError, "at most five"):
             self._document_with_basic_info(categories=[1, 2, 3, 4, 5, 6])
 
+    def test_creator_category_preflight_rejects_unknown_id_before_project_mutation(self) -> None:
+        provider = ModUs("TOKEN", authenticate=False)
+        for action in ("create", "edit"):
+            with self.subTest(action=action):
+                document = self._document_with_basic_info(categories=[999999999])
+                if action == "edit":
+                    document["project_id"] = 9
+                with mock.patch.object(provider, "options", return_value=[{
+                    "id": 1028, "children": [{"id": 1800}],
+                }]) as options, \
+                        mock.patch.object(provider, "_request") as request:
+                    with self.assertRaisesRegex(ValidationError, "category is not present"):
+                        provider.execute_write("project", action, document)
+                options.assert_called_once_with("categories")
+                request.assert_not_called()
+
+    def test_creator_category_preflight_accepts_current_option(self) -> None:
+        provider = ModUs("TOKEN", authenticate=False)
+        document = self._document_with_basic_info(categories=[1800])
+        with mock.patch.object(provider, "options", return_value=[{
+            "id": 1028, "children": [{"id": 1800}],
+        }]), \
+                mock.patch.object(provider, "_request", return_value={"data": {"projectId": 9}}) as request:
+            provider.execute_write("project", "create", document)
+        self.assertEqual(request.call_args.args[1], "game/data/author/project/release")
+
     def test_legacy_license_display_name_remains_valid(self) -> None:
         self.schema.validate(self._document_with_license("All Rights Reserved"))
 
@@ -118,6 +145,11 @@ class ModusProjectSchemaTests(unittest.TestCase):
         self.assertEqual(wire["description"], "<null>")
         self.assertEqual(wire["requiredDependencies"], "<null>")
 
+    def test_project_update_wire_uses_optional_text_clear_markers(self) -> None:
+        wire = _project_wire({"project_id": 9, "alt_name": None, "repo_url": None})
+        self.assertEqual(wire["altName"], "<null>")
+        self.assertEqual(wire["repoUrl"], "<null>")
+
     def test_project_update_wire_uses_creator_image_operations(self) -> None:
         wire = _project_wire({
             "project_id": 9,
@@ -127,6 +159,32 @@ class ModusProjectSchemaTests(unittest.TestCase):
         self.assertEqual(wire["images"], 1)
         self.assertEqual(wire["imagesOps"][0]["op"], "upload")
         self.assertNotIn("screenshotBase64sReqs", wire)
+
+    def test_project_update_wire_uses_creator_image_rename(self) -> None:
+        wire = _project_wire({
+            "project_id": 9,
+            "images": 2,
+            "image_ops": [{"op": "rename", "from": "2.webp", "to": "1.webp"}],
+        })
+        self.assertEqual(wire["imagesOps"], [
+            {"op": "rename", "from": "2.webp", "to": "1.webp"},
+        ])
+
+    def test_creator_image_operation_shapes_are_mutually_exclusive(self) -> None:
+        schema = get_schema("modus", "project", "edit")
+        for operation in (
+            {"op": "rename", "from": "1.webp"},
+            {"op": "rename", "from": "1.webp", "to": "2.webp", "name": "1.webp"},
+            {"op": "upload", "name": "1.webp"},
+            {"op": "delete", "name": "1.webp", "base64": "AA=="},
+            {"op": "upload", "name": "1.webp", "from": "2.webp", "base64": "AA=="},
+        ):
+            with self.subTest(operation=operation):
+                document = self._document()
+                document["schema"] = schema.name
+                document.update({"project_id": 9, "images": 1, "image_ops": [operation]})
+                with self.assertRaises(ValidationError):
+                    schema.validate(document)
 
     def test_completed_project_state_snapshot_can_be_mapped(self) -> None:
         snapshot = self._document()["project_state"]

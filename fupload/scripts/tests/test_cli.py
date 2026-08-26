@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from fupload_cli.cli import build_parser, main
-from fupload_cli.io import write_error, write_output
+from fupload_cli.io import sanitize_output, write_error, write_output
 from fupload_cli.schema import SCHEMAS
 
 
@@ -244,6 +244,20 @@ class CLITests(unittest.TestCase):
         self.assertNotIn("private-content", repr(data))
         self.assertEqual(data["details"]["password"], "[REDACTED]")
         self.assertIn("content_summary", data["details"])
+
+    def test_modus_content_and_base64_are_hashed_as_bytes(self) -> None:
+        safe = sanitize_output({
+            "codeText": "!WA:2!private",
+            "contentText": "private article",
+            "changelog": "private change",
+            "logo_base64": "AAEC",
+        })
+        self.assertNotIn("private", repr(safe))
+        self.assertEqual(safe["codeText_summary"]["bytes"], len("!WA:2!private".encode("utf-8")))
+        self.assertEqual(safe["contentText_summary"]["bytes"], len("private article".encode("utf-8")))
+        self.assertEqual(safe["changelog_summary"]["bytes"], len("private change".encode("utf-8")))
+        self.assertEqual(safe["logo_base64_summary"]["bytes"], 3)
+        self.assertEqual(safe["logo_base64_summary"]["source_encoding"], "base64")
 
     def test_wrong_stage_field_is_rejected_before_network(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

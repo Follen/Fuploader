@@ -114,6 +114,37 @@ class Schema:
                 tags = [item.strip() for item in str(value["tags"]).split(",")]
                 if any(not item for item in tags) or not 1 <= len(tags) <= 3:
                     raise ValidationError("must contain 1 to 3 comma-delimited tag IDs", path="$.tags")
+                if len(set(tags)) != len(tags):
+                    raise ValidationError("must not contain duplicate tag IDs", path="$.tags")
+            if "image_url" in value:
+                images = [item.strip() for item in str(value["image_url"]).split(",")]
+                if any(not item for item in images) or not 1 <= len(images) <= 10:
+                    raise ValidationError("must contain 1 to 10 comma-delimited image references", path="$.image_url")
+            if value.get("required_tier_id") is not None and (
+                value.get("platform") == 3 or value.get("synchronization_type") == 3
+            ):
+                raise ValidationError(
+                    "required_tier_id cannot be combined with BigFoot synchronization",
+                    path="$.required_tier_id",
+                )
+            if value.get("is_paid", 0) != 0:
+                raise ValidationError("current ModUs form requires is_paid=0", path="$.is_paid")
+            if value.get("price", 0) != 0:
+                raise ValidationError("current ModUs form requires price=0", path="$.price")
+            if value.get("share_type", 0) != 0:
+                raise ValidationError("current ModUs form requires share_type=0", path="$.share_type")
+            platform = value.get("platform")
+            synchronization = value.get("synchronization_type")
+            if (platform is None) != (synchronization is None):
+                raise ValidationError(
+                    "platform and synchronization_type must be provided together",
+                    path="$.synchronization_type" if synchronization is None else "$.platform",
+                )
+            if platform is not None and synchronization is not None and platform != synchronization:
+                raise ValidationError(
+                    "platform and synchronization_type must select the same ModUs/BigFoot targets",
+                    path="$.synchronization_type",
+                )
         if self.name in ("fupload.v1.modus.project.create", "fupload.v1.modus.project.edit"):
             snapshot = value.get("project_state")
             if snapshot is None:
@@ -440,14 +471,28 @@ class Schema:
             if "categories" in value and len(value["categories"]) > 5:
                 raise ValidationError("must contain at most 5 items", path="$.categories")
             if "image_ops" in value:
-                object_array("image_ops", {"op", "name", "base64"}, ("op", "name"))
+                if not isinstance(value["image_ops"], list) or not value["image_ops"]:
+                    raise ValidationError("expected nonempty array", path="$.image_ops")
                 if "images" not in value:
                     raise ValidationError("images is required when image_ops is supplied", path="$.images")
                 for index, operation in enumerate(value["image_ops"]):
-                    if operation["op"] not in ("upload", "delete"):
-                        raise ValidationError("must be upload or delete", path="$.image_ops[%d].op" % index)
-                    if not isinstance(operation["name"], str) or not operation["name"].strip():
-                        raise ValidationError("must not be empty", path="$.image_ops[%d].name" % index)
+                    path = "$.image_ops[%d]" % index
+                    if not isinstance(operation, dict):
+                        raise ValidationError("expected object", path=path)
+                    op = operation.get("op")
+                    if op not in ("upload", "delete", "rename"):
+                        raise ValidationError("must be upload, delete, or rename", path=path + ".op")
+                    allowed = {"op", "from", "to"} if op == "rename" else {"op", "name", "base64"}
+                    unknown = sorted(set(operation) - allowed)
+                    if unknown:
+                        raise ValidationError("unknown field", path=path + "." + unknown[0])
+                    if op == "rename":
+                        for name in ("from", "to"):
+                            if not isinstance(operation.get(name), str) or not operation[name].strip():
+                                raise ValidationError("must not be empty", path=path + "." + name)
+                        continue
+                    if not isinstance(operation.get("name"), str) or not operation["name"].strip():
+                        raise ValidationError("must not be empty", path=path + ".name")
                     if operation["op"] == "upload" and (not isinstance(operation.get("base64"), str) or not operation["base64"].strip()):
                         raise ValidationError("base64 is required for upload", path="$.image_ops[%d].base64" % index)
                     if operation["op"] == "delete" and "base64" in operation:
@@ -455,7 +500,7 @@ class Schema:
             for name in ("version", "type"):
                 if name in value and isinstance(value[name], str) and not value[name].strip():
                     raise ValidationError("must not be empty", path="$.%s" % name)
-            if "file" in value and not zipfile.is_zipfile(value["file"]):
+            if self.name.startswith("fupload.v1.modus.plugin") and "file" in value and not zipfile.is_zipfile(value["file"]):
                 raise ValidationError("file must be a valid ZIP archive", path="$.file")
 
 
@@ -711,7 +756,7 @@ MODUS_RELEASE = {
 }
 MODUS_BUILD_ID = f("integer", minimum=0, maximum=4)
 MODUS_SHARE = {
-    "share_id": f("identifier", nonempty=True), "addons_id": f("string", nonempty=True, max_length=10000),
+    "share_id": f("identifier", nonempty=True), "addons_id": f("string", max_length=10000),
     "account_name": f("string", nullable=True, max_length=120), "backup_id": f("integer", minimum=1),
     "content": f("string", nonempty=True), "content_text": f("string", nonempty=True),
     "image_url": f("string", nonempty=True, max_length=1000), "is_paid": f("integer", choices=(0, 1)),
@@ -742,6 +787,7 @@ register("modus", "plugin", "upload", required(MODUS_RELEASE, ("project_id", "fi
 register("modus", "plugin", "update", required(MODUS_RELEASE, ("project_id", "file_id")))
 register("modus", "plugin", "edit", required(MODUS_RELEASE, ("project_id", "file_id")))
 register("modus", "plugin", "delete", required({"project_id": f("integer", minimum=1), "file_id": f("integer", minimum=1), "confirm": f("string", choices=("DELETE",))}, ("project_id", "file_id", "confirm")))
+register("modus", "media", "upload", required({"file": f("string", local_file=True)}, ("file",)))
 register("modus", "config", "create", required(MODUS_SHARE, ("addons_id", "backup_id", "content", "content_text", "image_url", "tags", "title", "exclude_wtf")))
 register("modus", "config", "update", required(MODUS_SHARE, ("share_id",)))
 register("modus", "config", "edit", required(MODUS_SHARE, ("share_id",)))

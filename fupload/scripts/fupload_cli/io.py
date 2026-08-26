@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import base64
+import binascii
 import hashlib
 import json
 import sys
@@ -22,8 +24,10 @@ _SENSITIVE_KEYS = {
 }
 _RAW_CONTENT_KEYS = {
     "content", "wa_str", "t_wa_str", "raw_wtf", "wtf_zip", "download_url",
-    "import_string",
+    "import_string", "content_text", "contenttext", "code_text", "codetext",
+    "description", "changelog", "license_content", "licensecontent",
 }
+_BASE64_CONTENT_KEYS = {"base64", "logo_base64", "screenshot_base64s"}
 
 
 class _DuplicateKey(ValueError):
@@ -101,6 +105,18 @@ def sanitize_output(value: Any) -> Any:
                 result[str(key) + "_summary"] = {
                     "bytes": len(text),
                     "sha256": hashlib.sha256(text).hexdigest(),
+                }
+            elif normalized in _BASE64_CONTENT_KEYS and isinstance(item, str):
+                try:
+                    content = base64.b64decode(item, validate=True)
+                    encoding = "base64"
+                except (binascii.Error, ValueError):
+                    content = item.encode("utf-8")
+                    encoding = "utf-8"
+                result[str(key) + "_summary"] = {
+                    "bytes": len(content),
+                    "sha256": hashlib.sha256(content).hexdigest(),
+                    "source_encoding": encoding,
                 }
             else:
                 result[key] = sanitize_output(item)

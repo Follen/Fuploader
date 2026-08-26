@@ -14,6 +14,17 @@ from .errors import FuploadError
 from .trust import official_opener, require_official_url
 
 
+_IMAGE_CONTENT_TYPES = {
+    ".bmp": "image/bmp",
+    ".gif": "image/gif",
+    ".jpeg": "image/jpeg",
+    ".jpg": "image/jpeg",
+    ".png": "image/png",
+    ".svg": "image/svg+xml",
+    ".webp": "image/webp",
+}
+
+
 def _http_error_details(raw: bytes, fallback: str) -> tuple[str, Any]:
     """Extract a server error only from a conforming UTF-8 JSON object."""
     try:
@@ -88,7 +99,8 @@ def multipart_request(
             str(value).encode("utf-8"), b"\r\n",
         ])
     filename = os.path.basename(file_path)
-    content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
+    suffix = os.path.splitext(filename)[1].lower()
+    content_type = _IMAGE_CONTENT_TYPES.get(suffix) or mimetypes.guess_type(filename)[0] or "application/octet-stream"
     chunks.extend([
         ("--%s\r\n" % boundary).encode(),
         ('Content-Disposition: form-data; name="%s"; filename="%s"\r\n' % (file_field, filename)).encode("utf-8"),
