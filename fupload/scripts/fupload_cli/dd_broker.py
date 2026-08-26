@@ -282,6 +282,31 @@ def _load_live_state() -> Optional[Dict[str, Any]]:
     return value
 
 
+def _remove_session_state(path: Path, session_id: str, timeout: float = 5) -> bool:
+    deadline = time.monotonic() + timeout
+    while True:
+        try:
+            current = _read_json(path)
+        except FuploadError as exc:
+            if isinstance(exc.__cause__, FileNotFoundError):
+                return True
+            if not isinstance(exc.__cause__, OSError):
+                return False
+        else:
+            if current.get("session_id") != session_id:
+                return False
+            try:
+                path.unlink()
+                return True
+            except FileNotFoundError:
+                return True
+            except OSError:
+                pass
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(0.05)
+
+
 def doctor() -> Dict[str, Any]:
     dd_dir, signature = _dd_module().discover_dd_info()
     processes = running_dd_processes()
@@ -471,15 +496,23 @@ def status(session_id: Optional[str] = None) -> Dict[str, Any]:
 
 def stop(session_id: str) -> Dict[str, Any]:
     data = _send({"session_id": session_id, "command": "stop"}, timeout=30)
-    deadline = time.time() + 30
-    while time.time() < deadline and _load_live_state():
+    deadline = time.monotonic() + 30
+    while True:
+        try:
+            state = _load_live_state()
+        except FuploadError as exc:
+            if exc.kind != "session_error" or not isinstance(exc.__cause__, OSError):
+                raise
+        else:
+            if not state:
+                break
+        if time.monotonic() >= deadline:
+            raise FuploadError(
+                "DD task session acknowledged stop but did not finish cleanup",
+                kind="session_stop_failed",
+                stage="session",
+            )
         time.sleep(0.05)
-    if _load_live_state():
-        raise FuploadError(
-            "DD task session acknowledged stop but did not finish cleanup",
-            kind="session_stop_failed",
-            stage="session",
-        )
     result = dict(data or {})
     result["cleanup_complete"] = True
     return result
@@ -615,12 +648,7 @@ def _serve(startup_id: str) -> int:
         listener.close()
         if sidecar is not None:
             sidecar.__exit__(None, None, None)
-        try:
-            current = _read_json(state_path)
-            if current.get("session_id") == session_id:
-                state_path.unlink()
-        except (FuploadError, OSError):
-            pass
+        _remove_session_state(state_path, session_id)
 
 
 def main(argv: Optional[List[str]] = None) -> int:

@@ -172,6 +172,42 @@ class DDSessionTests(unittest.TestCase):
         self.assertTrue(write_error.exception.verification_required)
         self.assertFalse(read_error.exception.verification_required)
 
+    def test_broker_stop_retries_transient_state_read_lock(self) -> None:
+        locked = FuploadError(
+            "DD broker state is unreadable",
+            kind="session_error",
+            stage="session",
+        )
+        locked.__cause__ = PermissionError("locked")
+        with mock.patch.object(
+            dd_broker, "_send", return_value={"running": False}
+        ), mock.patch.object(
+            dd_broker,
+            "_load_live_state",
+            side_effect=[locked, {"session_id": "session"}, None],
+        ), mock.patch.object(dd_broker.time, "sleep"):
+            stopped = dd_broker.stop("session")
+        self.assertTrue(stopped["cleanup_complete"])
+
+    def test_broker_cleanup_retries_transient_state_file_locks(self) -> None:
+        locked = FuploadError(
+            "DD broker state is unreadable",
+            kind="session_error",
+            stage="session",
+        )
+        locked.__cause__ = PermissionError("locked")
+        state_path = mock.Mock()
+        state_path.unlink.side_effect = [PermissionError("locked"), None]
+        with mock.patch.object(dd_broker, "_read_json", side_effect=[
+            locked,
+            {"session_id": "session"},
+            {"session_id": "session"},
+        ]) as read, mock.patch.object(dd_broker.time, "sleep"):
+            removed = dd_broker._remove_session_state(state_path, "session")
+        self.assertTrue(removed)
+        self.assertEqual(read.call_count, 3)
+        self.assertEqual(state_path.unlink.call_count, 2)
+
     def test_broker_reuses_one_sidecar_and_preserves_structured_errors(self) -> None:
         counters = {"enter": 0, "exit": 0}
         operations = []

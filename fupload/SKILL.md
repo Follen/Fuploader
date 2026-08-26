@@ -2,7 +2,7 @@
 name: fupload
 description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, Heybox Workshop, and ModUs.Creator, including local Creator login reuse and plugin ZIP publishing. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, ModUs, plugins, configurations, or WA.
 metadata:
-  version: "0.0.13"
+  version: "0.0.14"
 ---
 
 # Fupload
