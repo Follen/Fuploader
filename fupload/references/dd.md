@@ -2,11 +2,26 @@
 
 ## Task session
 
-Run `dd session doctor` first. Doctor only discovers the installation, verifies the Authenticode publisher, reports official DD processes and reads local broker state; it does not login. When `gui_running=true`, explain that the official DD GUI must close and obtain explicit user consent. Only then run `dd session start --confirm-close-gui`. When `gui_running=false`, run `dd session start` without the confirmation flag.
+Run `dd session doctor` first. Doctor only discovers the installation, verifies the Authenticode publisher, reports official DD processes and reads local broker state; it does not login or run either native relogin flow. When `gui_running=true`, explain that the official DD GUI must close and obtain explicit user consent. Only then run `dd session start --confirm-close-gui`. When `gui_running=false`, run `dd session start` without the confirmation flag.
 
-`start` closes only identity- and signature-verified official GUI processes, starts one task broker and returns an opaque `session_id`. Pass that value through `--session` to every DD read and write. All operations are serialized through one native login. Run `dd session status --session <id>` for a local status check and always run `dd session stop --session <id>` in `finally`; successful stop reports `cleanup_complete=true`. The ten-minute idle timeout is only a crash fallback.
+`start` closes only identity- and signature-verified official GUI processes, starts one task broker, and reads the official `AccountCredStorage` auto account and credential. It selects the native relogin flow only from this strict enum matrix:
 
-Do not request or expose token, Cookie, JWT, credential database, signed URL, `clientNo`, raw WA content, or raw backup objects. The device state remains under Windows Known Folder Roaming AppData at `CCVoiceHub/Fupload/sidecar-device.json`.
+- `Account.method=urs`, `Cred.type=urs_token`, `Cred.modifier=normal`: run `UrsReLoginFlow(controller, sdk, token, username)` for the email login state.
+- `Account.method=mobile`, `Cred.type=urs_mobile_token`, `Cred.modifier=mobile_password|mobile_uplink`: run `MobileReLoginFlow(controller, sdk, cgi, netconfig, token, isPassword, username)` for the mobile login state. `isPassword` is true only for `mobile_password`.
+
+Missing, unknown, or contradictory enum combinations fail before either flow is called. Do not infer account kind from the account string, coerce a value, or fall back to the other flow after a login failure. Do not request or accept manual account names, passwords, tokens, credential values, or account-type overrides.
+
+After the selected flow succeeds, both credential kinds use the same JWT refresh, author API client, GET, parser, upload, mutation, readback, logout, and cleanup path. `start` returns an opaque `session_id`; pass it through `--session` to every DD read and write. All operations are serialized through this one task session and one native login. Run `dd session status --session <id>` for a local status check and always run `dd session stop --session <id>` in `finally`; successful stop reports `cleanup_complete=true`. The ten-minute idle timeout is only a crash fallback.
+
+Do not request or expose account names, credential values, tokens, Cookies, JWTs, the credential database, signed URLs, `clientNo`, raw WA content, or raw backup objects. The safe credential kind may be reported without its account identity or value. The device state remains under Windows Known Folder Roaming AppData at `CCVoiceHub/Fupload/sidecar-device.json`.
+
+## Authentication compatibility verification
+
+Any change to DD authentication or session dispatch requires automated tests for every supported email and mobile enum combination. Each case must select exactly one matching flow, verify its constructor arguments, and reject missing, unknown, or contradictory combinations before login without fallback. Unified tests cover the common JWT refresh, author API client, resource operations, single broker/sidecar/login lifecycle, and explicit logout path after dispatch; this common path does not need to be repeated per credential kind.
+
+Run the full isolated live matrix only under the account currently persisted by the official DD client, and record its safe credential kind. Do not switch that account merely to repeat the matrix for another credential kind. In one task session, read the live dependency graph for every current non-exploration seasonal build, then cover plugin and WA create, update, edit, readback, binary upload, delete, and final cleanup. For configuration, run the same CRUD, image-upload, readback, and cleanup matrix on every build where `/backup/list` returns a cloud backup whose `/backup/detail` supports valid selections. When a build has no usable cloud backup, record an explicit safe `N/A` reason; never silently skip it or fabricate a backup selector.
+
+Verification evidence may contain only the safe credential kind, executed command, exit status, readback result, `N/A` items, implementation commit, DD version, resource hashes, and cleanup result. Redact account names, credential values, passwords, tokens, Cookies, JWTs, signed URLs, `clientNo`, signatures, device proofs, raw WA strings, and raw configuration backup content. Cleanup may remove only the isolated objects recorded as created by that run; do not modify pre-existing remote resources. A completed, failed, or timed-out run must verify that no DD sidecar, task broker, or live broker state remains.
 
 ## GET before one final JSON
 

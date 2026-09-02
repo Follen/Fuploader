@@ -1282,6 +1282,24 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(config_readback_projection({"need_buy": False})["need_buy"], 0)
         self.assertEqual(config_readback_projection({"need_buy": True})["need_buy"], 1)
 
+    def test_dd_config_readback_normalizes_empty_optional_groups(self) -> None:
+        projected = config_readback_projection({
+            "unknown_addon": None,
+            "vip_levels": None,
+        })
+        self.assertEqual(projected["unknown_addon"], {"items": [], "inner_version": {}})
+        self.assertEqual(projected["known_wa"], {"items": [], "inner_version": {}})
+        self.assertEqual(projected["wtf"], {"accounts": []})
+        self.assertEqual(projected["vip_levels"], [])
+
+        with self.assertRaisesRegex(FuploadError, "known_addon"):
+            _verify_fields(
+                {"known_addon": {"items": [{"addon_id": 7}], "inner_version": {"7": 1}}},
+                projected,
+                ("known_addon",),
+                "/share/detail",
+            )
+
     def test_dd_channel_parser_keeps_parent_room_on_nested_channels(self) -> None:
         value = safe_channels({"data": [{
             "teamId": "room", "teamName": "Room",

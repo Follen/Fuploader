@@ -1,9 +1,9 @@
 {
   "schema": "fupload.npm-skill-manifest.v1",
   "package_name": "@follenfang/fupload",
-  "package_version": "0.0.15",
-  "skill_version": "0.0.15",
-  "tree_sha256": "cfccc3347d2013188a37b120b94282c839ad81eb4fa92f8617e0cfa12dfbbaef",
+  "package_version": "0.0.16",
+  "skill_version": "0.0.16",
+  "tree_sha256": "aba774b14679854ac01a09711aa10b2f7266af2c43e8220cc67c64b9559bfb51",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -87,8 +87,8 @@
     },
     {
       "path": "references/dd.md",
-      "bytes": 16543,
-      "sha256": "782d7c89d865df545fb6ffe4d7ee4492e6e5b192a3f71e4aef6424183a6a4f24"
+      "bytes": 19727,
+      "sha256": "2804e4b77c000d0bd12ca3f69bbcd5720f759fd4e84b4127ea3461093bf5da7c"
     },
     {
       "path": "references/modus.md",
@@ -113,7 +113,7 @@
     {
       "path": "scripts/fupload_cli/__init__.py",
       "bytes": 50,
-      "sha256": "9159fa55aa8ef07864abf206b64aabd44ea78c2e987ead8b51ec9384b5d1cebf"
+      "sha256": "f0d2cbd76206a61d5fd78eef58ad808108f9538963da2c0ea67df79c8a41e104"
     },
     {
       "path": "scripts/fupload_cli/blackbox_web.py",
@@ -137,18 +137,18 @@
     },
     {
       "path": "scripts/fupload_cli/dd_broker.py",
-      "bytes": 26638,
-      "sha256": "a23fb486dd1ca9d0a1d2f2ca642690535a28e05051ce828ce066cdbc67b37b37"
+      "bytes": 27637,
+      "sha256": "1ba00dcaea80905769bb2e00a6e965f2a1e9bb46a33534d1e77a6564158605a8"
     },
     {
       "path": "scripts/fupload_cli/dd_sidecar.py",
-      "bytes": 35279,
-      "sha256": "255b9cb5af61b0dc6ecdda53ed3139068f5747b63909071f75ee9a5f29277be6"
+      "bytes": 37603,
+      "sha256": "6ad1ab9e2145757f44b410d87d554485566812d9584820180ff3bb7b5bc7763a"
     },
     {
       "path": "scripts/fupload_cli/dd.py",
-      "bytes": 113135,
-      "sha256": "e89538e64f408aa17db212d68d0e7473d9071678e5c8b46eda5b3d5a3f73e9bd"
+      "bytes": 113914,
+      "sha256": "31e349cfee243c1ae8afefd74acfe3f5d79771a1c23ed1892aaf9d8e9b416922"
     },
     {
       "path": "scripts/fupload_cli/errors.py",
@@ -157,8 +157,8 @@
     },
     {
       "path": "scripts/fupload_cli/io.py",
-      "bytes": 5319,
-      "sha256": "57af3921d016815ed5747788881f86c8a6ce04a939e9f6f6571bd6a3f7383a4d"
+      "bytes": 5436,
+      "sha256": "4e5929f80223493057244613caf23575275c5838bf6505da0f3b01c5bae791da"
     },
     {
       "path": "scripts/fupload_cli/modus_zip.py",
@@ -207,8 +207,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 25720,
-      "sha256": "fae17edc0a59ea74dc70a5744b5aef46a057c23a9056e6d6b1e60990fa54782f"
+      "bytes": 28383,
+      "sha256": "2477e603ca826b9bd31533995f2217bfd9239c070adbaa2aa4b829fb6a89fb7f"
     }
   ]
 }

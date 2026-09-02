@@ -415,6 +415,10 @@ def start(confirm_close_gui: bool) -> Dict[str, Any]:
             "running": True,
             "reused": True,
             "login_count": active.get("login_count", 1),
+            "broker_count": active.get("broker_count", 1),
+            "sidecar_count": active.get("sidecar_count", 1),
+            "native_login_count": active.get("native_login_count", 1),
+            "credential_kind": active.get("credential_kind"),
         }
     processes = running_dd_processes()
     if processes and not confirm_close_gui:
@@ -452,6 +456,10 @@ def start(confirm_close_gui: bool) -> Dict[str, Any]:
                 "running": True,
                 "reused": False,
                 "login_count": 1,
+                "broker_count": state.get("broker_count", 1),
+                "sidecar_count": state.get("sidecar_count", 1),
+                "native_login_count": state.get("native_login_count", 1),
+                "credential_kind": state.get("credential_kind"),
                 "closed_gui_processes": len(processes),
             }
         if startup.exists():
@@ -575,6 +583,10 @@ def _serve(startup_id: str) -> int:
         sidecar = _dd_module().Sidecar().__enter__()
         state["dd_dir"] = str(sidecar.dd_dir)
         state["signature"] = sidecar.signature
+        state["credential_kind"] = sidecar.credential_kind
+        state["broker_count"] = 1
+        state["sidecar_count"] = 1
+        state["native_login_count"] = 1
         _atomic_json(state_path, state)
         try:
             startup_path.unlink()
@@ -603,6 +615,10 @@ def _serve(startup_id: str) -> int:
                             "started_at": started_at,
                             "last_activity": last_activity,
                             "login_count": 1,
+                            "broker_count": state.get("broker_count", 1),
+                            "sidecar_count": state.get("sidecar_count", 1),
+                            "native_login_count": state.get("native_login_count", 1),
+                            "credential_kind": state.get("credential_kind"),
                             "dd_dir": state.get("dd_dir"),
                             "signature": state.get("signature"),
                         }

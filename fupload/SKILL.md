@@ -2,7 +2,7 @@
 name: fupload
 description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, Heybox Workshop, and ModUs.Creator, including local Creator login reuse and plugin ZIP publishing. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, ModUs, plugins, configurations, or WA.
 metadata:
-  version: "0.0.15"
+  version: "0.0.16"
 ---
 
 # Fupload
@@ -53,6 +53,8 @@ Never switch channels silently. Before changing channels, re-read remote state a
 For NewBeeBox, prefer an existing official `ncc login`, then a caller-provided `NCC_TOKEN`, then user-performed local login. Never ask the user to paste a token into the conversation. Never place a real NewBeeBox token in `--token`, shell history, command output, JSON, `.env`, `publish/`, `analyze/`, tests, Skill files, references, or Git. Do not inspect or copy the official CLI credential store.
 
 For CurseForge, use `~/.fupload/curseforge.env`, created idempotently by npm install/update, with `CURSEFORGE_AUTHOR_ID`, `CURSEFORGE_API_KEY`, and `CURSEFORGE_UPLOAD_TOKEN`. The author ID is non-secret: if absent, proactively ask for its numeric value or offer `--author-id`. The API key and upload token are secrets: never ask the user to paste either into the conversation; direct them to fill the local env file in their own editor or terminal, then run `curseforge session doctor`. Never print file contents or secret values. Process environment values may override the file without being shown.
+
+For DD, reuse only the official client's local auto account and credential through `dd session start`. Never request or accept an email address, mobile number, password, token, credential value, or account-type override. Account and credential values must not appear in CLI output, plans, logs, tests, or analysis evidence; only the safe credential kind may be retained for diagnosis and verification.
 
 For ModUs, authentication comes only from `%LOCALAPPDATA%\ModUs.Creator\auth\token.dat` under the current Windows user. `modus session doctor` reports only token presence, DPAPI decryption, nonempty plaintext, and authenticated API readiness. Never print, copy, hash, or persist the token, ciphertext, Bearer header, or signed upload URL.
 
@@ -107,7 +109,11 @@ For ModUs, require all four `modus session doctor` booleans to be true before an
 
 Before any DD live GET or write, run `dd session doctor`. If it reports `gui_running=true`, tell the user that continuing will close the listed official DD GUI instances and ask for explicit consent. Without consent, do not run start, do not close a process, and do not issue a native login. After consent, run `dd session start --confirm-close-gui`; when no GUI is running, run `dd session start` without that flag.
 
+`dd session start` automatically selects the native relogin flow from the official `Account.method`, `Cred.type`, and `Cred.modifier` enums. `urs + urs_token + normal` uses `UrsReLoginFlow` for an email session; `mobile + urs_mobile_token + mobile_password|mobile_uplink` uses `MobileReLoginFlow` for a mobile session. Missing, unknown, or contradictory combinations fail before any flow runs. Never infer the account kind from its text, coerce an enum, or try the other flow after a failure.
+
 Keep the returned opaque `session_id` only in task memory and pass it as `--session <id>` to every DD GET, write, readback, status, and delete. Reuse this one session for the complete task, serialize all commands, stop on the first failure, and never start one session per item in a batch. In a `finally` path, always run `dd session stop --session <id>` and require `cleanup_complete=true`; the ten-minute idle timeout is only an abnormal-exit fallback.
+
+Email and mobile differ only during native relogin. After a matching flow succeeds, both reuse the same JWT refresh, author API client, GET, upload, mutation, readback, logout, and cleanup path through that one task session.
 
 For every DD configuration, first list backups, select `backup_sn`, then run `dd config backup-get --sn <backup>`. Select a WTF account/server/role before presenting that account's known/unknown WA choices. For a retail configuration, present the safe edit-mode and cooldown selector metadata. Send only stable IDs and returned selectors; never request, display, store, or reconstruct raw backup objects or retail import strings.
 
@@ -146,6 +152,10 @@ For a Python delete, first run the resource `get` command, show the exact name a
 ## Execute and verify
 
 Run writes serially. For official `ncc`, always request `-o json`, parse stdout as JSON, and treat stderr only as progress diagnostics. For Python, parse its stable JSON output. Never scrape human text. After each successful step, immediately run the corresponding info/get/list/versions/history command and compare the intended fields in the same DD session when applicable. DD performs a bounded GET-only readback poll and never resends a mutation during verification. For DD plugin update, use a nonempty `/addon/addon_versions` result only as a pre-upload duplicate guard; the matching author-list item's `latest_version` is the primary success confirmation and `detail_v2` is supplementary. Plugin edit also uses the same-SN author projection when detail remains stale. An empty history is diagnostic-only. Treat “submitted for review” and “under review” as distinct from “approved” or “publicly visible.”
+
+When validating a DD authentication change, automated dispatch and constructor tests must cover every supported email and mobile enum combination, select exactly one matching flow with the correct arguments, and reject missing, unknown, or contradictory combinations without fallback. Exercise the shared JWT refresh, author API, resource, broker, sidecar, and logout path once through unified tests; do not require that common path to be repeated per credential kind.
+
+Run the full isolated live matrix only with the official client's currently persisted account and record its safe credential kind; do not switch the persisted account merely to repeat the matrix. For every current non-exploration seasonal build, read the dependency graph and complete plugin and WA create, update, edit, readback, binary upload, delete, and final cleanup. Complete the same configuration matrix, including image upload, only for builds where `/backup/list` and `/backup/detail` provide a usable cloud backup. Record an explicit safe `N/A` reason for every build without one; never silently skip it or fabricate a backup selector. Evidence must record the executed commands, exit status, readback, `N/A` items, implementation commit, DD version, resource hashes, and cleanup result while redacting account names, credential values, tokens, Cookies, JWTs, signed URLs, `clientNo`, raw WA strings, and raw backup content. Cleanup may touch only objects created by that test run, and the run must finish with no sidecar, task broker, or live broker state.
 
 For CurseForge, treat the Upload API's returned file ID as upload acceptance only. Record the ID and command result, then report that moderation, processing, manual release, and public visibility are separate states. On an interrupted or ambiguous upload, do not resend automatically because that can create a duplicate file; inspect the Authors project page or public file list before deciding on a new attempt. Follow the HTTP/error handling table in the CurseForge reference.
 

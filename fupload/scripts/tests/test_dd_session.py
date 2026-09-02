@@ -13,7 +13,7 @@ import unittest
 import urllib.error
 import urllib.request
 from pathlib import Path
-from types import SimpleNamespace
+from types import ModuleType, SimpleNamespace
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -24,6 +24,306 @@ import fupload_cli.dd_broker as dd_broker
 
 
 class DDSessionTests(unittest.TestCase):
+
+    @staticmethod
+    def _native_sidecar_module():
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            return importlib.import_module("fupload_cli.dd_sidecar")
+
+    @staticmethod
+    def _persisted_login(method, credential_type, modifier):
+        account = SimpleNamespace(
+            method=SimpleNamespace(name=method),
+            name="private-account@example.invalid",
+        )
+        credential = SimpleNamespace(
+            type=SimpleNamespace(name=credential_type),
+            modifier=SimpleNamespace(name=modifier),
+            value="private-persisted-token",
+        )
+        return account, credential
+
+    def test_native_relogin_uses_urs_flow_for_email_credential(self) -> None:
+        module = self._native_sidecar_module()
+        account, credential = self._persisted_login("urs", "urs_token", "normal")
+        urs_flow = mock.Mock(return_value=object())
+        mobile_flow = mock.Mock(side_effect=AssertionError("mobile flow must not run"))
+        dependencies = [object() for _ in range(4)]
+
+        result = module._create_relogin_flow(
+            account, credential, *dependencies, urs_flow, mobile_flow,
+        )
+
+        self.assertIs(result, urs_flow.return_value)
+        urs_flow.assert_called_once_with(
+            dependencies[0], dependencies[1], credential.value, account.name,
+        )
+        mobile_flow.assert_not_called()
+
+    def test_native_relogin_supports_both_mobile_credential_modifiers(self) -> None:
+        module = self._native_sidecar_module()
+        for modifier, is_password in (("mobile_password", True), ("mobile_uplink", False)):
+            with self.subTest(modifier=modifier):
+                account, credential = self._persisted_login(
+                    "mobile", "urs_mobile_token", modifier,
+                )
+                urs_flow = mock.Mock(side_effect=AssertionError("URS flow must not run"))
+                mobile_flow = mock.Mock(return_value=object())
+                dependencies = [object() for _ in range(4)]
+
+                result = module._create_relogin_flow(
+                    account, credential, *dependencies, urs_flow, mobile_flow,
+                )
+
+                self.assertIs(result, mobile_flow.return_value)
+                mobile_flow.assert_called_once_with(
+                    *dependencies, credential.value, is_password, account.name,
+                )
+                urs_flow.assert_not_called()
+
+    def test_all_persisted_login_kinds_share_ready_and_logout_pipeline(self) -> None:
+        module = self._native_sidecar_module()
+        combinations = (
+            ("urs", "urs_token", "normal", "email", "urs"),
+            ("mobile", "urs_mobile_token", "mobile_password", "mobile", "mobile"),
+            ("mobile", "urs_mobile_token", "mobile_uplink", "mobile", "mobile"),
+        )
+
+        for method, credential_type, modifier, kind, expected_flow in combinations:
+            with self.subTest(method=method, modifier=modifier):
+                events = []
+                account, credential = self._persisted_login(
+                    method, credential_type, modifier,
+                )
+
+                class Signal:
+                    def __init__(self):
+                        self.callback = None
+
+                    def connect(self, callback):
+                        self.callback = callback
+
+                    def emit(self, *args):
+                        self.callback(*args)
+
+                flow_instances = []
+
+                class BaseFlow:
+                    flow_kind = ""
+
+                    def __init__(self, *args):
+                        self.args = args
+                        self.sigResult = Signal()
+                        flow_instances.append(self)
+
+                    def start(self):
+                        events.append("flow:" + self.flow_kind)
+                        self.sigResult.emit(True, "")
+
+                class UrsFlow(BaseFlow):
+                    flow_kind = "urs"
+
+                class MobileFlow(BaseFlow):
+                    flow_kind = "mobile"
+
+                class JwtHelper:
+                    def __init__(self):
+                        self.sigJwtUpdated = Signal()
+
+                    def startRequestJwt(self):
+                        events.append("jwt")
+                        self.sigJwtUpdated.emit()
+
+                    @staticmethod
+                    def getJwt():
+                        return "private-jwt"
+
+                class MessageCenter:
+                    state = SimpleNamespace(isStopped=lambda: True)
+
+                    @staticmethod
+                    def logout():
+                        events.append("logout")
+
+                class Container:
+                    def __init__(self):
+                        self.services = {
+                            "AccountCredStorage": SimpleNamespace(
+                                getAutoAccount=lambda: account,
+                                getCred=lambda selected: credential if selected is account else None,
+                            ),
+                            "LoginController": SimpleNamespace(_cookie="private-cookie"),
+                            "JwtHelper": JwtHelper(),
+                            "UrsSDK": object(),
+                            "CgiHelper": object(),
+                            "NetConfig": object(),
+                            "MessageCenter": MessageCenter(),
+                        }
+
+                    def get_instance(self, name):
+                        return self.services[name]
+
+                    @staticmethod
+                    def shutdown():
+                        events.append("container-shutdown")
+
+                class Qt:
+                    @staticmethod
+                    def process_events(_milliseconds):
+                        return None
+
+                    @staticmethod
+                    def shutdown():
+                        events.append("qt-shutdown")
+
+                container = Container()
+                qt = Qt()
+
+                class ContainerManager:
+                    @staticmethod
+                    def get_container():
+                        return container
+
+                class QtRuntime:
+                    @staticmethod
+                    def get_instance():
+                        return qt
+
+                class NepWrapper:
+                    def __init__(self, _parent):
+                        pass
+
+                    @staticmethod
+                    def isDllInited():
+                        return True
+
+                clients = []
+
+                class UiApiClient:
+                    def __init__(self, _nep, login_cookie=None):
+                        self.login_cookie = login_cookie
+                        self._session = SimpleNamespace(headers={})
+                        self._token = "private-token"
+                        clients.append(self)
+
+                    @staticmethod
+                    def login():
+                        events.append("author-login")
+                        return True
+
+                    @staticmethod
+                    def close():
+                        events.append("client-close")
+
+                def package(name):
+                    value = ModuleType(name)
+                    value.__path__ = []
+                    return value
+
+                external_modules = {
+                    "cli_anything": package("cli_anything"),
+                    "cli_anything.ccvoicehub": package("cli_anything.ccvoicehub"),
+                    "cli_anything.ccvoicehub.core": package("cli_anything.ccvoicehub.core"),
+                    "cli_anything.ccvoicehub.core.container": SimpleNamespace(
+                        ContainerManager=ContainerManager,
+                    ),
+                    "cli_anything.ccvoicehub.core.qt_runtime": SimpleNamespace(
+                        QtRuntime=QtRuntime,
+                    ),
+                    "cli_anything.ccvoicehub.core.ui_api_client": SimpleNamespace(
+                        UiApiClient=UiApiClient,
+                    ),
+                    "components": package("components"),
+                    "components.login": package("components.login"),
+                    "components.login.flow": SimpleNamespace(
+                        MobileReLoginFlow=MobileFlow,
+                        UrsReLoginFlow=UrsFlow,
+                    ),
+                    "components.login.login_controller": SimpleNamespace(
+                        renameLogAfterLogin=None,
+                    ),
+                    "components.wow_ui": package("components.wow_ui"),
+                    "components.wow_ui.nep_wrapper": SimpleNamespace(
+                        NepWrapper=NepWrapper,
+                    ),
+                    "components.net_server": package("components.net_server"),
+                    "components.net_server.messagecenter": SimpleNamespace(
+                        State=SimpleNamespace(isStopped=lambda state: state.isStopped()),
+                    ),
+                    "logger": package("logger"),
+                    "logger.cclogger": SimpleNamespace(renameLogAfterLogin=None),
+                }
+
+                with mock.patch.dict(sys.modules, external_modules):
+                    session = module.open_session(timeout=0.1)
+                    try:
+                        self.assertEqual(session[2]._fupload_credential_kind, kind)
+                        self.assertEqual(len(flow_instances), 1)
+                        self.assertEqual(flow_instances[0].flow_kind, expected_flow)
+                        self.assertEqual(
+                            events,
+                            ["flow:" + expected_flow, "jwt", "author-login"],
+                        )
+                        self.assertEqual(len(clients), 1)
+                        self.assertEqual(clients[0].login_cookie, "private-cookie")
+                        self.assertEqual(
+                            clients[0]._session.headers["User-Agent"], module.USER_AGENT,
+                        )
+                    finally:
+                        module.close_session(session)
+
+                self.assertEqual(events.count("logout"), 1)
+                self.assertEqual(events.count("client-close"), 1)
+                self.assertEqual(events.count("container-shutdown"), 1)
+                self.assertEqual(events.count("qt-shutdown"), 1)
+
+    def test_native_relogin_reports_only_safe_credential_kind(self) -> None:
+        module = self._native_sidecar_module()
+        email = self._persisted_login("urs", "urs_token", "normal")
+        mobile_password = self._persisted_login(
+            "mobile", "urs_mobile_token", "mobile_password",
+        )
+        mobile_uplink = self._persisted_login(
+            "mobile", "urs_mobile_token", "mobile_uplink",
+        )
+
+        self.assertEqual(module._credential_kind(*email), "email")
+        self.assertEqual(module._credential_kind(*mobile_password), "mobile")
+        self.assertEqual(module._credential_kind(*mobile_uplink), "mobile")
+
+    def test_native_relogin_rejects_unknown_or_conflicting_state_before_flow(self) -> None:
+        module = self._native_sidecar_module()
+        combinations = (
+            ("urs", "urs_mobile_token", "normal"),
+            ("mobile", "urs_token", "mobile_password"),
+            ("urs", "urs_token", "mobile_password"),
+            ("mobile", "urs_mobile_token", "normal"),
+            ("private-method", "private-type", "private-modifier"),
+        )
+        for method, credential_type, modifier in combinations:
+            with self.subTest(
+                method=method, credential_type=credential_type, modifier=modifier,
+            ):
+                account, credential = self._persisted_login(method, credential_type, modifier)
+                urs_flow = mock.Mock()
+                mobile_flow = mock.Mock()
+
+                with self.assertRaisesRegex(RuntimeError, "unsupported credential combination") as raised:
+                    module._create_relogin_flow(
+                        account, credential, object(), object(), object(), object(),
+                        urs_flow, mobile_flow,
+                    )
+
+                message = str(raised.exception)
+                for private_value in (
+                    account.name, credential.value, method, credential_type, modifier,
+                ):
+                    self.assertNotIn(private_value, message)
+                urs_flow.assert_not_called()
+                mobile_flow.assert_not_called()
 
     def test_sidecar_requests_use_encoding_neutral_ascii_json(self) -> None:
         sidecar = Sidecar.__new__(Sidecar)
@@ -215,6 +515,7 @@ class DDSessionTests(unittest.TestCase):
         class FakeSidecar:
             dd_dir = Path("D:/Software/NetEaseDD/100128")
             signature = {"status": "Valid", "publisher": "NetEase"}
+            credential_kind = "email"
 
             def __enter__(self):
                 counters["enter"] += 1
@@ -263,7 +564,12 @@ class DDSessionTests(unittest.TestCase):
                 state = dd_broker._read_json(state_path)
                 session_id = state["session_id"]
 
-                self.assertTrue(dd_broker.status(session_id)["running"])
+                broker_status = dd_broker.status(session_id)
+                self.assertTrue(broker_status["running"])
+                self.assertEqual(broker_status["credential_kind"], "email")
+                self.assertEqual(broker_status["broker_count"], 1)
+                self.assertEqual(broker_status["sidecar_count"], 1)
+                self.assertEqual(broker_status["native_login_count"], 1)
                 self.assertEqual(
                     dd_broker.execute(session_id, "read", "plugin", "list", {"page": 1}),
                     {"read": "plugin"},
@@ -289,6 +595,59 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(counters, {"enter": 1, "exit": 1})
         self.assertEqual(len({operation[1] for operation in operations}), 1)
         self.assertEqual([operation[0] for operation in operations], ["read"] + ["write"] * 7)
+
+    def test_broker_lifecycle_is_single_for_each_credential_kind(self) -> None:
+        for credential_kind in ("email", "mobile"):
+            with self.subTest(credential_kind=credential_kind):
+                counters = {"enter": 0, "exit": 0}
+
+                class FakeSidecar:
+                    dd_dir = Path("D:/Software/NetEaseDD/100128")
+                    signature = {"status": "Valid", "publisher": "NetEase"}
+
+                    def __enter__(self):
+                        counters["enter"] += 1
+                        self.credential_kind = credential_kind
+                        return self
+
+                    def __exit__(self, *_args):
+                        counters["exit"] += 1
+
+                module = SimpleNamespace(Sidecar=FakeSidecar)
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    dd_broker._atomic_json(
+                        root / dd_broker.STARTUP_NAME,
+                        {"startup_id": "startup", "auth_key": "auth"},
+                    )
+                    with mock.patch.object(
+                        dd_broker, "_state_dir", return_value=root,
+                    ), mock.patch.object(
+                        dd_broker, "_dd_module", return_value=module,
+                    ), mock.patch.object(dd_broker, "_pid_running", return_value=True):
+                        thread = threading.Thread(
+                            target=dd_broker._serve, args=("startup",), daemon=True,
+                        )
+                        thread.start()
+                        state_path = root / dd_broker.STATE_NAME
+                        deadline = time.time() + 5
+                        while time.time() < deadline and not state_path.exists():
+                            time.sleep(0.01)
+                        self.assertTrue(state_path.exists())
+                        session_id = dd_broker._read_json(state_path)["session_id"]
+
+                        status = dd_broker.status(session_id)
+                        self.assertEqual(status["credential_kind"], credential_kind)
+                        self.assertEqual(status["broker_count"], 1)
+                        self.assertEqual(status["sidecar_count"], 1)
+                        self.assertEqual(status["native_login_count"], 1)
+
+                        stopped = dd_broker.stop(session_id)
+                        self.assertTrue(stopped["cleanup_complete"])
+                        thread.join(timeout=5)
+
+                self.assertFalse(thread.is_alive())
+                self.assertEqual(counters, {"enter": 1, "exit": 1})
 
     def test_upload_wire_names_ignore_special_local_basenames(self) -> None:
         sidecar = Sidecar.__new__(Sidecar)
@@ -750,6 +1109,66 @@ class DDSessionTests(unittest.TestCase):
         self.assertFalse(raised.exception.verification_required)
         self.assertEqual(raised.exception.details["log_path"], "D:/DD/Fupload/logs/error.jsonl")
         self.assertEqual(logged.call_args.args[3]["field"], "version")
+
+    def test_native_get_retries_one_exact_invalid_signature_rejection(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            get=mock.Mock(side_effect=[
+                {"code": 409, "msg": "签名无效"},
+                {"code": 0, "result": [{"game_version": "12.1.0"}]},
+            ]),
+        )
+
+        result = module.run_command((None, None, None, None, client), {
+            "action": "request", "method": "GET", "path": "/game_versions/list",
+            "payload": {"game_type": 10001},
+        })
+
+        self.assertEqual(result["code"], 0)
+        self.assertEqual(client.get.call_count, 2)
+
+    def test_native_post_never_retries_invalid_signature_rejection(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            post=mock.Mock(return_value={"code": 409, "msg": "签名无效"}),
+        )
+        with mock.patch.object(module, "write_error_log", return_value="error.jsonl"):
+            with self.assertRaises(module.SidecarFailure):
+                module.run_command((None, None, None, None, client), {
+                    "action": "request", "method": "POST", "path": "/share/create",
+                    "payload": {"title": "temporary"},
+                })
+        client.post.assert_called_once()
+
+    def test_native_get_retries_invalid_signature_only_once(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            get=mock.Mock(return_value={"code": 409, "msg": "签名无效"}),
+        )
+        with mock.patch.object(module, "write_error_log", return_value="error.jsonl"):
+            with self.assertRaises(module.SidecarFailure):
+                module.run_command((None, None, None, None, client), {
+                    "action": "request", "method": "GET", "path": "/game_versions/list",
+                    "payload": {"game_type": 10001},
+                })
+        self.assertEqual(client.get.call_count, 2)
+
+    def test_native_get_does_not_retry_other_409_rejections(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            get=mock.Mock(return_value={"code": 409, "msg": "other conflict"}),
+        )
+        with mock.patch.object(module, "write_error_log", return_value="error.jsonl"):
+            with self.assertRaises(module.SidecarFailure):
+                module.run_command((None, None, None, None, client), {
+                    "action": "request", "method": "GET", "path": "/game_versions/list",
+                    "payload": {"game_type": 10001},
+                })
+        client.get.assert_called_once()
 
     def test_native_rejected_post_writes_sanitized_request_and_response_to_log_path(self) -> None:
         with mock.patch.dict(os.environ, {

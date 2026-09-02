@@ -551,10 +551,52 @@ def wait_until(qt, predicate, timeout):
     return bool(predicate())
 
 
+def _enum_name(value):
+    name = getattr(value, "name", None)
+    return name if isinstance(name, str) else None
+
+
+def _create_relogin_flow(
+    account, credential, controller, sdk, cgi, netconfig,
+    urs_flow_class, mobile_flow_class,
+):
+    method = _enum_name(getattr(account, "method", None))
+    credential_type = _enum_name(getattr(credential, "type", None))
+    modifier = _enum_name(getattr(credential, "modifier", None))
+
+    if (method, credential_type, modifier) == ("urs", "urs_token", "normal"):
+        return urs_flow_class(controller, sdk, credential.value, account.name)
+    if (
+        method == "mobile"
+        and credential_type == "urs_mobile_token"
+        and modifier in ("mobile_password", "mobile_uplink")
+    ):
+        return mobile_flow_class(
+            controller, sdk, cgi, netconfig, credential.value,
+            modifier == "mobile_password", account.name,
+        )
+    raise RuntimeError("DD persisted login state uses an unsupported credential combination")
+
+
+def _credential_kind(account, credential):
+    method = _enum_name(getattr(account, "method", None))
+    credential_type = _enum_name(getattr(credential, "type", None))
+    modifier = _enum_name(getattr(credential, "modifier", None))
+    if (method, credential_type, modifier) == ("urs", "urs_token", "normal"):
+        return "email"
+    if (
+        method == "mobile"
+        and credential_type == "urs_mobile_token"
+        and modifier in ("mobile_password", "mobile_uplink")
+    ):
+        return "mobile"
+    raise RuntimeError("DD persisted login state uses an unsupported credential combination")
+
+
 def open_session(timeout=45):
     from cli_anything.ccvoicehub.core.container import ContainerManager
     from cli_anything.ccvoicehub.core.qt_runtime import QtRuntime
-    from components.login.flow import MobileReLoginFlow
+    from components.login.flow import MobileReLoginFlow, UrsReLoginFlow
     import components.login.login_controller as login_controller_module
     import logger.cclogger as cclogger
 
@@ -562,7 +604,7 @@ def open_session(timeout=45):
     container = ContainerManager.get_container()
     storage = container.get_instance("AccountCredStorage")
     account = storage.getAutoAccount()
-    credential = storage.getCred(account)
+    credential = storage.getCred(account) if account else None
     if not account or not credential:
         raise RuntimeError("DD has no persisted credential; sign in with the desktop client first")
     cclogger.renameLogAfterLogin = lambda *_args, **_kwargs: None
@@ -581,11 +623,12 @@ def open_session(timeout=45):
         state["jwt"] = True
 
     jwt_helper.sigJwtUpdated.connect(jwt_result)
-    flow = MobileReLoginFlow(
-        controller, container.get_instance("UrsSDK"), container.get_instance("CgiHelper"),
-        container.get_instance("NetConfig"), credential.value,
-        credential.modifier.name == "mobile_password", account.name,
+    flow = _create_relogin_flow(
+        account, credential, controller,
+        container.get_instance("UrsSDK"), container.get_instance("CgiHelper"),
+        container.get_instance("NetConfig"), UrsReLoginFlow, MobileReLoginFlow,
     )
+    flow._fupload_credential_kind = _credential_kind(account, credential)
     flow.sigResult.connect(login_result)
     flow.start()
     if not wait_until(qt, lambda: state["done"], timeout) or not state["ok"]:
@@ -608,6 +651,12 @@ def open_session(timeout=45):
 
 def api_result(payload):
     return payload.get("result") if isinstance(payload, dict) else None
+
+
+def _retryable_get_signature_rejection(payload):
+    if not isinstance(payload, dict) or payload.get("code") != 409:
+        return False
+    return str(payload.get("msg") or payload.get("message") or "").strip() == "签名无效"
 
 
 def _native_json(value):
@@ -673,7 +722,13 @@ def run_command(session, command):
             method = command.get("method", "GET").upper()
             path = command["path"]
             params = command.get("payload") or {}
-            response_payload = client.get(path, params) if method == "GET" else client.post(path, params)
+            if method == "GET":
+                response_payload = client.get(path, params)
+                if _retryable_get_signature_rejection(response_payload):
+                    client._fupload_last_response_error = None
+                    response_payload = client.get(path, params)
+            else:
+                response_payload = client.post(path, params)
             if isinstance(response_payload, dict) and response_payload.get("code") not in (None, 0):
                 rejected_payload = response_payload
                 response_probe = getattr(client, "_fupload_last_response_error", None)
@@ -831,7 +886,11 @@ def main():
     session = None
     try:
         session = open_session()
-        output({"ready": True, "device_state_created": created})
+        output({
+            "ready": True,
+            "device_state_created": created,
+            "credential_kind": getattr(session[2], "_fupload_credential_kind", None),
+        })
         for line in sys.stdin:
             if not line.strip():
                 continue

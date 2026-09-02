@@ -215,6 +215,20 @@ class CLITests(unittest.TestCase):
         self.assertEqual(data["client_id"], "[REDACTED]")
         self.assertEqual(data["nested"]["x-amz-security-token"], "[REDACTED]")
 
+    def test_cli_output_exposes_only_safe_credential_kind_enum(self) -> None:
+        from fupload_cli.io import sanitize_output
+
+        for kind in ("email", "mobile"):
+            self.assertEqual(sanitize_output({"credential_kind": kind})["credential_kind"], kind)
+        self.assertEqual(
+            sanitize_output({"credential_kind": "raw-secret"})["credential_kind"],
+            "[REDACTED]",
+        )
+        self.assertEqual(
+            sanitize_output({"credential": "email"})["credential"],
+            "[REDACTED]",
+        )
+
     def test_cli_error_details_use_the_same_redaction_boundary(self) -> None:
         from fupload_cli.errors import FuploadError
 
