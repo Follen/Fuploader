@@ -93,7 +93,9 @@ def sanitize_output(value: Any) -> Any:
         result: Dict[str, Any] = {}
         for key, item in value.items():
             normalized = str(key).replace("-", "_").lower()
-            if normalized in {"token_present", "token_decrypted", "token_nonempty", "api_ready"} and isinstance(item, bool):
+            if normalized == "credential_kind" and item in {"email", "mobile"}:
+                result[key] = item
+            elif normalized in {"token_present", "token_decrypted", "token_nonempty", "api_ready"} and isinstance(item, bool):
                 result[key] = item
             elif normalized in _SENSITIVE_KEYS or any(
                 marker in normalized
