@@ -10,7 +10,7 @@ Fuploader 的 DD provider 自动复用当前 Windows 官方 DD 客户端持久�
 - 不通过先调用一种流、失败后再尝试另一种流来猜测凭据类型；未知或互相矛盾的枚举组合在原生登录前失败。
 - 两类登录态共用现有单 broker、单 sidecar、单次登录、串行请求、显式 logout、十分钟异常兜底和登录后的全部 DD 资源代码。
 - 补齐分流、错误、进程生命周期和敏感信息脱敏的自动化测试与用户文档。
-- 使用当前受信官方 DD 客户端，分别在邮箱和手机登录态下完成全部非探索赛季 build 的插件、配置和 WA 真实 create/update/edit/delete、读回与依赖顺序清理。
+- 使用当前受信官方 DD 客户端，分别在邮箱和手机登录态下完成全部非探索赛季 build 的插件和 WA 真实 create/update/edit/delete；配置只覆盖当前账号实际返回可用云备份的 build。无可用云备份的 build 必须在证据中明确标记为不适用，不能静默跳过。
 
 # Non-goals
 
@@ -27,8 +27,8 @@ Fuploader 的 DD provider 自动复用当前 Windows 官方 DD 客户端持久�
 - A3：缺失、未知或相互矛盾的账号/凭据枚举组合在调用任何原生登录流前确定性失败；错误只暴露安全枚举与阶段，不泄漏账号名、凭据、token、Cookie、JWT 或 `clientNo`，也不自动尝试另一条登录流。
 - A4：两类登录态都只启动一个 broker、一个 sidecar 和一次匹配的原生重登录；登录后复用同一 JWT、作者 API client、GET、上传、mutation、读回和 logout 管线，失败与超时均无遗留进程或 broker state。
 - A5：DD 会话分流矩阵、broker 生命周期、脱敏、完整 Python 测试、编译、manifest、tarball 和隔离安装检查全部通过，且现有手机登录相关合同无回归。
-- A6：邮箱登录态下，当前全部非探索赛季 build 的依赖读取成功，插件、配置、WA 的真实 create/update/edit/delete、上传、读回和最终清理全部成功并生成脱敏证据。
-- A7：手机登录态下执行与 A6 相同的全量真实矩阵并成功；证据分别记录所用安全 credential kind、实际命令、退出状态、读回与清理结果，不记录敏感凭据。
+- A6：邮箱登录态下，当前全部非探索赛季 build 的依赖读取、插件和 WA 的真实 create/update/edit/delete、上传、读回和最终清理全部成功；配置在当前账号实际返回可用云备份的每个 build 上完成同样的全 CRUD，并为无可用云备份的 build 记录明确的不适用原因，最终生成脱敏证据。
+- A7：手机登录态下执行与 A6 相同的动态全量矩阵并成功；配置覆盖以该登录态当前账号实际存有的可用云备份为准。证据分别记录所用安全 credential kind、实际命令、退出状态、读回、不适用项与清理结果，不记录敏感凭据。
 - A8：DD Skill/reference 和完整 `dd-publishing` Spec 明确说明自动邮箱/手机分流、支持矩阵、失败语义、共用登录后代码和两类登录态的真实验证要求。
 
 # Constraints and invariants
@@ -45,6 +45,7 @@ Fuploader 的 DD provider 自动复用当前 Windows 官方 DD 客户端持久�
 - 邮箱使用 `UrsReLoginFlow`；手机继续使用 `MobileReLoginFlow`，并从 modifier 计算 `isPassword`。
 - 登录成功后只保留一个公共 session tuple 和公共资源执行路径，不增加 email/mobile 业务分支。
 - 对邮箱和手机登录态分别执行全量真实资源矩阵，而不是用单元测试或单一登录 smoke 替代。
+- 配置真实矩阵以当前账号实际存有的可用云备份为适用边界；插件和 WA 仍覆盖全部非探索赛季 build，缺少配置备份的 build 只允许明确标记不适用。
 - 本 change 使用独立 worktree；完成并验收后合并到 `main` 并删除 worktree。
 
 # Open questions
@@ -54,6 +55,6 @@ Fuploader 的 DD provider 自动复用当前 Windows 官方 DD 客户端持久�
 # Verification expectations
 
 - 自动化检查至少包括 DD session focused tests、全量 Python suite、`compileall`、Node suite、manifest/version、pack 和隔离安装门禁。
-- 真实检查分别在邮箱与手机持久化登录态下执行 `session doctor/start/status/stop`、JWT/作者 API ready、全部非探索赛季 build 的读取矩阵，以及插件/配置/WA create/update/edit/delete、二进制上传、写后读回和依赖顺序清理。
+- 真实检查分别在邮箱与手机持久化登录态下执行 `session doctor/start/status/stop`、JWT/作者 API ready、全部非探索赛季 build 的读取矩阵、插件与 WA 的全 build create/update/edit/delete，以及当前账号每个可用云备份 build 的配置 create/update/edit/delete、二进制上传、写后读回和依赖顺序清理。
 - 两轮真实证据必须绑定最终实现 commit 和当前 DD 版本/资源哈希，输出只含安全枚举、摘要、长度、SHA-256、业务码与对象测试标识。
 - 验证结束必须确认无 `netease_dd.exe` sidecar、无 broker 进程、无 live broker state，且所有测试对象均已清理或明确列出需人工处理的阻塞项。

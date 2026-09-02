@@ -3,7 +3,7 @@ name: dd-email-mobile-session-reuse
 language: zh-CN
 phase: build
 status: active
-state_version: 2
+state_version: 5
 brief: brief.md
 spec_changes:
   - capability: dd-publishing
@@ -16,7 +16,7 @@ workspace:
   finish: null
 loop:
   stage: building
-  goal_cycle: 1
+  goal_cycle: 2
   iteration: 1
   attempt: 0
   retry_epoch: 0
@@ -60,14 +60,15 @@ acceptance:
     reason: null
   - id: A6
     source: brief.md
-    text: A6：邮箱登录态下，当前全部非探索赛季 build 的依赖读取成功，插件、配置、WA 的真实
-      create/update/edit/delete、上传、读回和最终清理全部成功并生成脱敏证据。
+    text: A6：邮箱登录态下，当前全部非探索赛季 build 的依赖读取、插件和 WA 的真实
+      create/update/edit/delete、上传、读回和最终清理全部成功；配置在当前账号实际返回可用云备份的每个 build 上完成同样的全
+      CRUD，并为无可用云备份的 build 记录明确的不适用原因，最终生成脱敏证据。
     result: pending
     reason: null
   - id: A7
     source: brief.md
-    text: A7：手机登录态下执行与 A6 相同的全量真实矩阵并成功；证据分别记录所用安全 credential
-      kind、实际命令、退出状态、读回与清理结果，不记录敏感凭据。
+    text: A7：手机登录态下执行与 A6 相同的动态全量矩阵并成功；配置覆盖以该登录态当前账号实际存有的可用云备份为准。证据分别记录所用安全
+      credential kind、实际命令、退出状态、读回、不适用项与清理结果，不记录敏感凭据。
     result: pending
     reason: null
   - id: A8
@@ -620,9 +621,11 @@ acceptance:
   - id: A81
     source: specs/dd-publishing/spec.md
     text: 真实验证必须分别在官方客户端持久化的邮箱与手机登录态下执行。每种登录态都先证明自动分流选择唯一匹配的 flow、JWT ready、作者 API
-      ready、单 broker/sidecar/登录和显式 logout；再按当前 DD 环境动态返回的全部非探索赛季 build
-      执行插件、配置、WA 的
-      create/update/edit/delete、二进制上传、写后读回和依赖顺序清理。两轮使用同一登录后业务代码和同一字段/wire
+      ready、单 broker/sidecar/登录和显式 logout；再按当前 DD 环境动态返回的全部非探索赛季 build 执行插件与 WA
+      的 create/update/edit/delete、二进制上传、写后读回和依赖顺序清理。配置对当前账号 `/backup/list` 返回且
+      `/backup/detail` 可恢复合法选择的每个 build 执行相同的
+      create/update/edit/delete、图片上传、写后读回和清理；没有可用云备份的 build
+      必须在证据中明确标记为不适用并记录安全原因，不能静默跳过或伪造 backup selector。两轮使用同一登录后业务代码和同一字段/wire
       矩阵，但分别生成绑定最终 commit、DD 版本和资源哈希的脱敏证据。批量六插件测试记录 GUI 进程数、sidecar
       数和原生登录次数。测试对象只按本次记录的 SN 清理，任何不确定删除先读回；验证结束必须确认无 sidecar、broker 进程或 live
       broker state。
@@ -631,7 +634,20 @@ acceptance:
 builder_handoff: null
 blockers: []
 verification: null
-history: []
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 0
+    outcome: recovery
+    unresolved_ids: []
+    summary:
+      text: Config live CRUD now covers only non-exploration builds for which the
+        current persisted account returns a usable cloud backup. Plugin and WA
+        live CRUD still cover every current non-exploration build. Missing
+        config backups are recorded explicitly as not applicable, never silently
+        skipped.
+      truncated: false
+    completed_at: 2026-09-02T06:33:31.121Z
 history_overflow:
   dropped_entries: 0
   first_dropped_at: null

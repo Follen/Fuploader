@@ -47,6 +47,8 @@ class DDLiveRegressionTests(unittest.TestCase):
         self.assertEqual(plan["per_build_mutations"]["plugin"], ["create", "update", "edit", "delete"])
         self.assertEqual(plan["per_build_mutations"]["config"], ["create", "update", "edit", "delete"])
         self.assertEqual(plan["per_build_mutations"]["wa"], ["create", "update", "edit", "delete"])
+        self.assertEqual(plan["preflight_before_mutation"]["current_account_backup_builds"], ["usable-backup-detail"])
+        self.assertNotIn("usable-backup-detail", plan["preflight_before_mutation"]["every_non_exploration_build"])
         self.assertTrue(plan["six_plugin_batch"])
         self.assertEqual(len(plan["binary_uploads"]), 6)
 
@@ -143,6 +145,20 @@ class DDLiveRegressionTests(unittest.TestCase):
             "material": [], "font": [], "wtf_roles": [],
         }
         self.assertIsNone(runner._config_documents(detail, "No content", Path("image.png")))
+
+    def test_build_matrix_accepts_only_explicit_config_not_applicable_state(self) -> None:
+        self.assertTrue(runner._build_matrix_passed({
+            "plugin": "passed", "config": runner.CONFIG_NOT_APPLICABLE, "wa": "passed",
+        }))
+        self.assertTrue(runner._build_matrix_passed({
+            "plugin": "passed", "config": "passed", "wa": "passed",
+        }))
+        self.assertFalse(runner._build_matrix_passed({
+            "plugin": "passed", "config": "preflight_passed", "wa": "passed",
+        }))
+        self.assertFalse(runner._build_matrix_passed({
+            "plugin": "preflight_passed", "config": runner.CONFIG_NOT_APPLICABLE, "wa": "passed",
+        }))
 
     def test_special_assets_keep_bytes_and_exercise_special_names(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
