@@ -1,9 +1,9 @@
 {
   "schema": "fupload.npm-skill-manifest.v1",
   "package_name": "@follenfang/fupload",
-  "package_version": "0.0.15",
-  "skill_version": "0.0.15",
-  "tree_sha256": "fa00286005db0349f1e5dd982a2fdde9c0acc187d07038c65a1a9c9c93e53bc3",
+  "package_version": "0.0.16",
+  "skill_version": "0.0.16",
+  "tree_sha256": "701e4721b3c44d2e925152a9da9e0cf2f21f440997fd442e1d4342baf605df73",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -113,7 +113,7 @@
     {
       "path": "scripts/fupload_cli/__init__.py",
       "bytes": 50,
-      "sha256": "9159fa55aa8ef07864abf206b64aabd44ea78c2e987ead8b51ec9384b5d1cebf"
+      "sha256": "f0d2cbd76206a61d5fd78eef58ad808108f9538963da2c0ea67df79c8a41e104"
     },
     {
       "path": "scripts/fupload_cli/blackbox_web.py",
@@ -208,7 +208,7 @@
     {
       "path": "SKILL.md",
       "bytes": 27596,
-      "sha256": "53f4e63b59c29c1da11968f1fe9465608243b416844d63c917c93cc4a4a0edac"
+      "sha256": "d2c1bb7b78dc246b5829e336a903492ee78429b21b2a11196ae959123a9fa428"
     }
   ]
 }

@@ -3,7 +3,7 @@ name: dd-email-mobile-session-reuse
 language: zh-CN
 phase: build
 status: active
-state_version: 5
+state_version: 7
 brief: brief.md
 spec_changes:
   - capability: dd-publishing
@@ -16,7 +16,7 @@ workspace:
   finish: null
 loop:
   stage: building
-  goal_cycle: 2
+  goal_cycle: 3
   iteration: 1
   attempt: 0
   retry_epoch: 0
@@ -60,21 +60,21 @@ acceptance:
     reason: null
   - id: A6
     source: brief.md
-    text: A6：邮箱登录态下，当前全部非探索赛季 build 的依赖读取、插件和 WA 的真实
-      create/update/edit/delete、上传、读回和最终清理全部成功；配置在当前账号实际返回可用云备份的每个 build 上完成同样的全
-      CRUD，并为无可用云备份的 build 记录明确的不适用原因，最终生成脱敏证据。
+    text: A6：官方客户端当前已持久化账号下，当前全部非探索赛季 build 的依赖读取、插件和 WA 的真实
+      create/update/edit/delete、上传、读回和最终清理全部成功；配置在该账号实际返回可用云备份的每个 build 上完成同样的全
+      CRUD，并为无可用云备份的 build 记录明确的不适用原因。
     result: pending
     reason: null
   - id: A7
     source: brief.md
-    text: A7：手机登录态下执行与 A6 相同的动态全量矩阵并成功；配置覆盖以该登录态当前账号实际存有的可用云备份为准。证据分别记录所用安全
-      credential kind、实际命令、退出状态、读回、不适用项与清理结果，不记录敏感凭据。
+    text: A7：当前账号的真实证据记录所用安全 credential kind、实际命令、退出状态、读回、不适用项、最终实现 commit、DD
+      版本、资源哈希与清理结果，不记录敏感凭据；邮箱和手机分流矩阵均由自动化测试通过，不要求切换当前持久化账号重复真实矩阵。
     result: pending
     reason: null
   - id: A8
     source: brief.md
     text: A8：DD Skill/reference 和完整 `dd-publishing` Spec
-      明确说明自动邮箱/手机分流、支持矩阵、失败语义、共用登录后代码和两类登录态的真实验证要求。
+      明确说明自动邮箱/手机分流、支持矩阵、失败语义、共用登录后代码，以及仅对当前已持久化账号执行真实验证的边界。
     result: pending
     reason: null
   - id: A9
@@ -476,11 +476,13 @@ acceptance:
       sidecar 失败还保留有界异常消息和 `code`/`error_code`。签名 URL query 内的
       credential、signature 和 token 必须在 sidecar 返回前脱敏；CLI 输出不包含
       token、Cookie、JWT、登录 code、clientNo、signed URL、原始 WA、raw backup 或完整
-      payload。写成功仅表示业务 code 接受，不等于审核通过。每次 create/update/edit/delete 后必须调用对应
-      detail/list/version 读回；读回使用有界短时 GET-only 轮询，期间不得重发 mutation。插件 update
-      以作者列表 `latest_version` 为成功判据，详情和版本历史只作补充；插件 edit 逐字段比较 detail 与同一 SN
-      author item，两份官方投影都未反映提交字段时才是不确定结果。配置将官方 `need_buy=0/1` wire 值投影到详情
-      boolean 后比较，不放宽其他字段的类型合同。
+      payload。官方 client 对只读 GET 返回业务码 `409` 且消息精确为 `签名无效` 时，允许在同一 session
+      内重新签名并重试一次；第二次失败必须上抛，POST、上传及任何其他错误不得自动重放。写成功仅表示业务 code 接受，不等于审核通过。每次
+      create/update/edit/delete 后必须调用对应 detail/list/version 读回；读回使用有界短时 GET-only
+      轮询，期间不得重发 mutation。插件 update 以作者列表 `latest_version` 为成功判据，详情和版本历史只作补充；插件
+      edit 逐字段比较 detail 与同一 SN author item，两份官方投影都未反映提交字段时才是不确定结果。配置将官方
+      `need_buy=0/1` wire 值投影到详情 boolean 后比较；官方详情对空内容组、空 WTF 和空 VIP 等级返回 `null`
+      或省略字段时，只规范化为对应空结构，非空内容及错误类型不放宽。
     result: pending
     reason: null
   - id: A65
@@ -620,13 +622,15 @@ acceptance:
     reason: null
   - id: A81
     source: specs/dd-publishing/spec.md
-    text: 真实验证必须分别在官方客户端持久化的邮箱与手机登录态下执行。每种登录态都先证明自动分流选择唯一匹配的 flow、JWT ready、作者 API
-      ready、单 broker/sidecar/登录和显式 logout；再按当前 DD 环境动态返回的全部非探索赛季 build 执行插件与 WA
-      的 create/update/edit/delete、二进制上传、写后读回和依赖顺序清理。配置对当前账号 `/backup/list` 返回且
+    text: 邮箱与手机持久化登录态的自动分流必须由合同测试分别覆盖：每种受支持的官方枚举组合只选择唯一匹配的 flow，并验证构造参数、JWT/作者 API
+      共用管线、单 broker/sidecar/登录和显式
+      logout；不要求为真实验收切换官方客户端当前账号。真实验证只在官方客户端当前已持久化账号下执行，并记录安全 credential
+      kind；按当前 DD 环境动态返回的全部非探索赛季 build 执行插件与 WA 的
+      create/update/edit/delete、二进制上传、写后读回和依赖顺序清理。配置对该账号 `/backup/list` 返回且
       `/backup/detail` 可恢复合法选择的每个 build 执行相同的
       create/update/edit/delete、图片上传、写后读回和清理；没有可用云备份的 build
-      必须在证据中明确标记为不适用并记录安全原因，不能静默跳过或伪造 backup selector。两轮使用同一登录后业务代码和同一字段/wire
-      矩阵，但分别生成绑定最终 commit、DD 版本和资源哈希的脱敏证据。批量六插件测试记录 GUI 进程数、sidecar
+      必须在证据中明确标记为不适用并记录安全原因，不能静默跳过或伪造 backup selector。真实矩阵使用同一登录后业务代码和同一字段/wire
+      矩阵，生成绑定最终 commit、DD 版本和资源哈希的脱敏证据。批量六插件测试记录 GUI 进程数、sidecar
       数和原生登录次数。测试对象只按本次记录的 SN 清理，任何不确定删除先读回；验证结束必须确认无 sidecar、broker 进程或 live
       broker state。
     result: pending
@@ -648,6 +652,15 @@ history:
         skipped.
       truncated: false
     completed_at: 2026-09-02T06:33:31.121Z
+  - goal_cycle: 2
+    iteration: 1
+    attempt: 0
+    outcome: recovery
+    unresolved_ids: []
+    summary:
+      text: Native confirmed acceptance criteria changed
+      truncated: false
+    completed_at: 2026-09-02T08:14:55.247Z
 history_overflow:
   dropped_entries: 0
   first_dropped_at: null
