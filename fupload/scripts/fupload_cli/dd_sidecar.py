@@ -653,6 +653,12 @@ def api_result(payload):
     return payload.get("result") if isinstance(payload, dict) else None
 
 
+def _retryable_get_signature_rejection(payload):
+    if not isinstance(payload, dict) or payload.get("code") != 409:
+        return False
+    return str(payload.get("msg") or payload.get("message") or "").strip() == "签名无效"
+
+
 def _native_json(value):
     to_json = getattr(value, "toJson", None)
     if callable(to_json):
@@ -716,7 +722,13 @@ def run_command(session, command):
             method = command.get("method", "GET").upper()
             path = command["path"]
             params = command.get("payload") or {}
-            response_payload = client.get(path, params) if method == "GET" else client.post(path, params)
+            if method == "GET":
+                response_payload = client.get(path, params)
+                if _retryable_get_signature_rejection(response_payload):
+                    client._fupload_last_response_error = None
+                    response_payload = client.get(path, params)
+            else:
+                response_payload = client.post(path, params)
             if isinstance(response_payload, dict) and response_payload.get("code") not in (None, 0):
                 rejected_payload = response_payload
                 response_probe = getattr(client, "_fupload_last_response_error", None)

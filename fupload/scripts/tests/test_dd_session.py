@@ -861,6 +861,66 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(raised.exception.details["log_path"], "D:/DD/Fupload/logs/error.jsonl")
         self.assertEqual(logged.call_args.args[3]["field"], "version")
 
+    def test_native_get_retries_one_exact_invalid_signature_rejection(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            get=mock.Mock(side_effect=[
+                {"code": 409, "msg": "签名无效"},
+                {"code": 0, "result": [{"game_version": "12.1.0"}]},
+            ]),
+        )
+
+        result = module.run_command((None, None, None, None, client), {
+            "action": "request", "method": "GET", "path": "/game_versions/list",
+            "payload": {"game_type": 10001},
+        })
+
+        self.assertEqual(result["code"], 0)
+        self.assertEqual(client.get.call_count, 2)
+
+    def test_native_post_never_retries_invalid_signature_rejection(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            post=mock.Mock(return_value={"code": 409, "msg": "签名无效"}),
+        )
+        with mock.patch.object(module, "write_error_log", return_value="error.jsonl"):
+            with self.assertRaises(module.SidecarFailure):
+                module.run_command((None, None, None, None, client), {
+                    "action": "request", "method": "POST", "path": "/share/create",
+                    "payload": {"title": "temporary"},
+                })
+        client.post.assert_called_once()
+
+    def test_native_get_retries_invalid_signature_only_once(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            get=mock.Mock(return_value={"code": 409, "msg": "签名无效"}),
+        )
+        with mock.patch.object(module, "write_error_log", return_value="error.jsonl"):
+            with self.assertRaises(module.SidecarFailure):
+                module.run_command((None, None, None, None, client), {
+                    "action": "request", "method": "GET", "path": "/game_versions/list",
+                    "payload": {"game_type": 10001},
+                })
+        self.assertEqual(client.get.call_count, 2)
+
+    def test_native_get_does_not_retry_other_409_rejections(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            get=mock.Mock(return_value={"code": 409, "msg": "other conflict"}),
+        )
+        with mock.patch.object(module, "write_error_log", return_value="error.jsonl"):
+            with self.assertRaises(module.SidecarFailure):
+                module.run_command((None, None, None, None, client), {
+                    "action": "request", "method": "GET", "path": "/game_versions/list",
+                    "payload": {"game_type": 10001},
+                })
+        client.get.assert_called_once()
+
     def test_native_rejected_post_writes_sanitized_request_and_response_to_log_path(self) -> None:
         with mock.patch.dict(os.environ, {
             "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
