@@ -78,6 +78,17 @@ class DDLiveRegressionTests(unittest.TestCase):
         self.assertNotIn("abcdef", wire)
         self.assertEqual(len(value["content"]["sha256"]), 64)
 
+    def test_summary_preserves_all_redacted_execution_steps(self) -> None:
+        steps = [
+            {"label": "step-%s" % index, "credential": "secret-%s" % index}
+            for index in range(25)
+        ]
+        value = runner._summary({"steps": steps, "other": list(range(25))})
+        self.assertEqual(len(value["steps"]), 25)
+        self.assertEqual(value["steps"][-1]["label"], "step-24")
+        self.assertEqual(value["steps"][-1]["credential"], "[REDACTED]")
+        self.assertEqual(value["other"]["count"], 25)
+
     def test_harness_stops_on_first_required_failure(self) -> None:
         evidence = {"steps": []}
         completed = subprocess.CompletedProcess([], 7, stdout=json.dumps({"success": False}), stderr="failed")

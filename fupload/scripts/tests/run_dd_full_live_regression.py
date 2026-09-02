@@ -60,7 +60,7 @@ def _summary(value: Any, key: str = "") -> Any:
     if isinstance(value, Mapping):
         return {str(k): _summary(v, str(k)) for k, v in value.items()}
     if isinstance(value, list):
-        if len(value) > 20:
+        if len(value) > 20 and key.casefold() != "steps":
             return {"count": len(value), "sample": [_summary(item) for item in value[:3]]}
         return [_summary(item) for item in value]
     if isinstance(value, str):
