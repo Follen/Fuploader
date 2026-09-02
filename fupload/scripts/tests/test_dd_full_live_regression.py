@@ -142,12 +142,25 @@ class DDLiveRegressionTests(unittest.TestCase):
         self.assertIsNotNone(documents)
         create, update = documents
         self.assertEqual(create["backup_sn"], "backup-current")
-        self.assertEqual(create["known_addon_ids"], [77])
-        self.assertEqual(create["wtf_role_ids"], ["wtf-current"])
+        self.assertEqual(create["known_addon_ids"], [])
+        self.assertEqual(create["wtf_role_ids"], [])
         self.assertEqual(create["material_names"], ["Icons"])
         self.assertIsNone(create["retail_ui_config"])
-        self.assertEqual(update["known_addon_update_ids"], [77])
+        self.assertEqual(update["known_addon_update_ids"], [])
         self.assertEqual(update["material_update_names"], ["Icons"])
+
+    def test_dynamic_config_falls_back_to_addon_when_backup_has_no_files(self) -> None:
+        detail = {
+            "reference": "backup-current", "game_type": 2,
+            "known_addon": [{"reference": 77}], "unknown_addon": [],
+            "material": [], "font": [],
+            "wtf_roles": [{"selector": "wtf-current"}],
+        }
+        documents = runner._config_documents(detail, "Addon fallback", Path("image.png"))
+        self.assertIsNotNone(documents)
+        create, _update = documents
+        self.assertEqual(create["known_addon_ids"], [77])
+        self.assertEqual(create["wtf_role_ids"], ["wtf-current"])
 
     def test_dynamic_config_rejects_backup_without_usable_content(self) -> None:
         detail = {

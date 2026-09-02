@@ -333,10 +333,10 @@ def _backup_selections(detail: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
             if isinstance(item, Mapping) and item.get("reference") not in (None, "")
         ]
 
-    known_addon = refs("known_addon")[:1] if role else []
-    unknown_addon = refs("unknown_addon")[:1] if role and not known_addon else []
     material = refs("material")[:1]
     font = refs("font")[:1]
+    known_addon = refs("known_addon")[:1] if role and not (material or font) else []
+    unknown_addon = refs("unknown_addon")[:1] if role and not (material or font or known_addon) else []
     if not (known_addon or unknown_addon or material or font):
         return None
     return {
