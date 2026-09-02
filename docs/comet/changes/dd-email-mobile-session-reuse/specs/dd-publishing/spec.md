@@ -1,0 +1,151 @@
+# 网易 DD 插件、配置与 WA 完整发布规格
+
+## 官方证据与全量对齐门槛
+
+DD 写入契约必须从当前官方网页的编辑器打开投影、表单状态变化、校验表达式和最终 submit builder，以及当前官方原生客户端的 transport/异常链路逐项提取。插件、配置、WA 的 create、update、edit、delete 均维护可复核的 wire 矩阵；矩阵至少记录字段存在性、JSON 类型、来源、动作、默认值、缺失/null/false/0/空字符串/空数组语义、父依赖、条件清空、上传 descriptor、endpoint 和读回投影。
+
+“全量对齐”不能由 mock suite、单个成功对象、HTTP 2xx、业务 code 0 或上一轮通过记录单独证明。每个 mutation 字段和条件分支必须有源码证据及合同测试；受控真实验证必须覆盖当前动态返回的全部非探索赛季 build 的只读依赖图，并在具备依赖的隔离对象上覆盖三类资源的 create/update/edit/delete。审计报告保存在不跟踪的 `analyze/`，逐项记录证据、差异、修复、验证和残余限制。本轮全量重审还必须记录逐动作请求体矩阵：对插件、配置、WA 的 create/update/edit/delete，列出最终 wire body 字段、字段来源、动作可写性、条件清空、父 selector provenance、readback 判据、对应测试和本轮结论；缺证字段不能标记为已对齐。
+
+## 官方 adapter 与任务会话
+
+DD provider 仅支持 Windows 官方 DD 客户端。安装发现按显式 CLI 参数、已验证运行进程、卸载/安装注册信息、官方用户配置和已知安装根目录的版本子目录收集候选；每个候选都必须包含 `netease_dd.exe`、`ccvoicehub.res`、`ccsub64` 和所需原生模块，并在启动前通过 Windows Authenticode 链与源码维护的 NetEase 组织发布者允许集合。多个有效版本选择版本号最高者。无有效候选时停止，不执行同名伪造 binary。
+
+`dd session doctor` 只读取安装、版本、签名、进程冲突、受信 Known Folder 状态目录和 broker 状态，不启动任何原生重登录流，不创建登录会话。稳定独立 `clientNo` 原子保存在受信 Roaming AppData 下的 `CCVoiceHub/Fupload/sidecar-device.json`；格式错误时停止，不输出、读取 GUI 值或静默轮换。
+
+`dd session start --confirm-close-gui` 只在调用方已经取得用户同意后执行。CLI 记录并再次验证官方 GUI 的 PID、启动时间、绝对路径、签名和发布者，先请求正常退出；限时后只可终止仍为同一身份的进程。身份变化、出现新的官方 GUI、关闭失败或仍有 GUI 会话时，必须在登录前停止。未提供确认标志时 sidecar 数和 relogin 数都保持为零。
+
+start 启动本地 task broker，由 broker 独占一个官方 `netease_dd.exe` sidecar，并从官方 `AccountCredStorage` 读取 auto account 和 credential。原生重登录必须按官方枚举严格分流：`Account.method=urs + Cred.type=urs_token + Cred.modifier=normal` 使用 `UrsReLoginFlow(controller, sdk, token, username)`；`Account.method=mobile + Cred.type=urs_mobile_token + Cred.modifier=mobile_password|mobile_uplink` 使用 `MobileReLoginFlow(controller, sdk, cgi, netconfig, token, isPassword, username)`，其中 `isPassword` 仅在 modifier 为 `mobile_password` 时为 true。缺失、未知或相互矛盾的组合在调用任何 flow 前失败，不能根据账号字符串猜测类型，也不能在一条 flow 失败后尝试另一条 flow。
+
+两类 flow 成功后进入完全相同的 JWT 刷新、作者 API client、GET、解析、上传、mutation、读回和清理管线；不得复制 email/mobile 业务实现。broker 返回不含凭据的 opaque `session_id`；所有 DD 资源命令必须显式连接该 session，不能隐式创建 sidecar。broker 严格串行调度所有操作；同一 Windows 用户只能有一个 Fupload DD session，每个 task 只执行一次匹配的原生重登录。十分钟空闲超时仅作崩溃兜底。
+
+`dd session status` 只读 broker 状态，不登录。`dd session stop` 按官方退出链显式调用 message-center logout、泵送事件直到 stopped，再执行依赖释放和 Qt 退出；全部发布任务在 `finally` 中 stop。异常退出后，不重放可能已发送的 mutation，先在新 session 中读回。
+
+## 两阶段选择与 GET 依赖图
+
+DD GUI 通过父控件变化后再加载子控件；CLI 不得把这些联动改成静态 schema、硬编码枚举或猜测默认值。每次写入采用以下两阶段契约：
+
+1. Agent 在同一 task session 中读取目标详情和顶层候选，选择父项后再调用子项 GET。
+2. 每个 GET 返回安全显示字段、稳定业务 ID 或绑定父上下文的 opaque selector，以及可供 Agent 判断下一级 GET 的依赖描述；不返回原始后端对象。
+3. 上游选择改变时，Agent 丢弃所有下游选择并重新 GET。依赖闭合前不得生成写入 JSON。
+4. 依赖闭合后只生成一次最终业务 JSON。JSON 同时保存父字段和子 ID/selector；名称可在发布计划中显示，但不作为提交值。
+5. Python 执行写命令时，在同一 session 内重复全部 live GET，逐层验证父项、子项、目标当前状态和 selector provenance。校验在任何文件上传或 mutation 前完成。
+6. Python 从最新 GET 恢复官方要求的完整 wire 对象。JSON 中出现复制的 backend 对象、跨父 selector、过期 ID、空的必需候选集或不再属于父项的子项时，以精确 JSON path 确定失败，`verification_required=false`。
+
+依赖图至少包含：
+
+- `game_type -> game_versions`；插件的 `game_type` 为上下文固定/create-only，版本可在允许动作中调整。
+- `primary_category_id -> second_category_ids`；主分类改变即清空全部二级分类。
+- `jump_room -> room_id -> channel_id/channel_type`；频道只在所选房间的 `channelList` 中有效。
+- `scope -> share_code_life_type/anchor-VIP availability/sync_room`；private 会按官方 builder 清空会员和同步相关值。
+- presentation-only `usage_mode=free|paid -> need_buy/need_anchor_vip -> price_fen/buy_life_type/vip_levels`。outer usage mode 在已有 SN 后锁定，但付费对象的付费方式子项及其参数仍按 live 页面能力编辑。
+- `with_associate + game_type -> associated_acts`；引用只发送当前作者候选中的 `{sn,act_type}`。
+- `need_anchor_vip -> vip_levels`；等级非空时必须来自 live 候选，但官方 submit 允许空数组。只关闭 anchor VIP 保留已有等级；切为 private 或将 outer usage mode 切回 free 才清空等级。
+- `with_file -> WA material file/file_install_path`。
+- `backup_sn -> /backup/detail -> WTF account -> server -> role`。
+- `backup_sn + selected WTF account -> known_wa/unknown_wa`；候选取自 `backup.detail.extra.wa_account_info[account]`，切换备份或账号时两组 WA 全部失效。
+- `backup_sn + retail game_type -> retail_ui_config selectors`；selector 绑定备份、section、account、index 和条目身份。
+- `game_type -> WA category_ids`，最多五项。
+
+配置写 JSON 使用一个绑定账号上下文的 WTF role selector，不把 account/server/role 拆成可错配的独立自由文本。known/unknown WA 使用备份 GET 返回的稳定 uid selector；unknown WA 的内部 `id` 由 Python 从当前账号映射恢复。正式服编辑模式/冷却配置只接受 opaque selector、默认 selector 和向导开关，永不输出或接收 `import_string`。
+
+## 动态读取和 endpoint 合同
+
+作者 API 固定 origin 为 `https://uiapi.w.163.com`。原生登录先取 `/server/ts`，再经 NEP 签名调用 `/login/dflogin` 并持有 `x-w163-token`；GET/POST 使用官方 `x-timestamp` 签名，signed URL 只作不透明值。频道链为 `/v1/jwt` 后请求 `/v1/mixteammsgproxy/channelList?source=pluginPublish`，header 为 `Authentication: <jwt>`。
+
+只读接口覆盖：`/game_type/list`、`/game_versions/list`、`/addon/category`、`/addon/addon_list`、`/addon/detail_v2`、必要时 `/addon/detail`、`/addon/addon_versions`、`/backup/list`、`/backup/detail`、`/share/list`、`/share/detail`、`/wa/categories`、`/wa/list`、`/wa/detail`、`/anchor_vip/level/list`、频道和当前作者关联候选。列表必须遍历真实分页，作者列表顶层 `count` 可作为总数；空的必需动态候选阻止写入。VIP 等级只在 `need_anchor_vip=true` 时读取，频道只在 `jump_room=true` 时读取，关闭的可选功能不得被无关 endpoint 阻断。既有对象由 detail 确认所有权和稳定详情字段；插件 author item 还承担官方修改弹窗的 latest-version 初始投影，其他资源的 author list 只作交叉核对。两个读模型的时间戳不是可比较的写前门禁。插件 update 在上传前遍历 `/addon/addon_versions` 分页：非空结果用于拒绝任一历史重复版本，空或不可用结果不阻止当前版本检查。写后读回以匹配作者列表项的 `latest_version` 为主，`detail_v2` 是补充投影；空历史不能单独判定写入失败或触发重放。
+
+写接口为 `/addon/create|modify|delete`、`/share/create|modify|delete`、`/wa/create|modify|delete`。create、update、edit 虽可能共用 modify endpoint，仍使用独立动作白名单；delete 只接收资源 ID、显式确认字段和当前 session，在 delete 前 GET 所有权/状态，在 delete 后 list/get 读回不存在状态。
+
+## 上传合同
+
+所有上传严格执行 `GET /file/upload -> PUT signed URL -> 使用 d_url 构建业务 payload`。授权返回的 `maxSize` 是最终服务端上限；本地前端上限先行校验。PUT 必须保持 signed URL 原样，header 仅按官方合同设置 `Content-Type` 和 `X-Amz-Acl: public-read`，字面 HTTP 200 才算成功。
+
+| 资源 | 扩展名/上限 | file_type | business_id | file_name | MIME |
+| --- | --- | --- | --- | --- | --- |
+| 插件包 | `.zip`；服务端 `maxSize` | `a19-ui-res` | `addon` | 固定 `addon.zip` | `application/x-zip-compressed` |
+| WA 材质 | `.zip`；50 MiB 且服务端 `maxSize` | `a19-ui-res` | `wa` | 固定 `wa_materials.zip` | `application/x-zip-compressed` |
+| 插件 logo/详情图 | `.png/.jpg/.jpeg/.gif`；10 MiB；1/8 张 | `a19-ui-media` | `img` | 显式空字符串 | 按扩展名确定 |
+| 配置展示图 | 同上；最多 8 张 | `a19-ui-media` | `img` | 省略 | 按扩展名确定 |
+| WA 展示图 | 同上；最多 8 张 | `a19-ui-media` | `img` | 省略 | 按扩展名确定 |
+
+`file_name` 的固定、空字符串和省略是三个不同 wire 状态；绝不回退到本地 basename。MIME 使用源码内确定性扩展名映射，不依赖 OS registry。测试覆盖空格、中文、括号、`+`、`#`、`%` 和 Unicode 文件名，且本地字节与 SHA-256 不变。
+
+## 公共表单字段
+
+三类资源的公共字段为 `scope`、`share_code_life_type`、`need_buy`、`price_fen`、`buy_life_type`、`jump_room`、`room_id`、`channel_id`、`channel_type`、`sync_room`、`creation_statement`、`with_associate`、`associated_acts`、`need_anchor_vip`、`vip_levels`。金额输入为分；官方 submit 接受 0，非零值范围为 10..20000 分。
+
+公共条件规则必须与官方 builder 一致：private 关闭 anchor VIP、清空等级并关闭同步；未关联房间清空 room/channel 并关闭同步；未关联内容清空 `associated_acts`；create 的免费表单价格归零，存量付费表单只关闭一次性购买时可保留隐藏历史价格；需要购买时校验 0 或合法非零价格及购买有效期；plugin 与 WA public 强制 `share_code_life_type=forever`；config public 省略该字段，config private 才提交它。
+
+官方外层 `usage_mode=free|paid` 是由 `need_buy || need_anchor_vip` 表达的展示态，不作为 wire 字段。create 通过两个子开关明确选择模式；已有 SN 后 outer mode 不可直接从 free 切 paid 或从 paid 切 free。已有 paid 对象仍可在官方允许范围内调整 `need_buy`、`need_anchor_vip`、价格、购买有效期和会员等级，但结果必须保持至少一种付费方式；由 scope 等其他官方条件触发的清空按官方 builder 执行。Python 先 GET 当前模式，再验证编辑后的结果，不能把两个 wire 子开关粗暴标成 create-only。
+
+## 插件动作和字段
+
+插件字段完整覆盖 `game_type`、`game_versions`、`addon_type`、`name`、`description`、`logo`、`detail_imgs`、`primary_category_id`、`second_category_ids`、`detail_url`、`release_type`、`version`、`html_desc`、`update_desc` 及公共字段；modify/delete 另含 `sn`。限制：名称/描述/版本各 80 字符，更新说明 1000 字符。字段覆盖不等于每个动作都可写。
+
+create 允许全部创建字段并建立首版；`game_type`、首版元数据和 outer usage mode 为 create-only。update 只允许新包、`version/game_versions/release_type/update_desc` 及官方版本页字段。edit 只允许官方已有记录的商业、关联、房间/频道和创建声明控件；`name`、`description`、`addon_type`、logo、详情图、分类、`html_desc` 以及所有版本字段不属于 edit allowlist。已验证的 `description` 传入 `/addon/modify` 可能被业务接受但远端保持原值，CLI 必须在 schema 层拒绝，避免假成功。update/edit 先 GET detail_v2/detail 和作者列表，再从 form model 构造完整 `/addon/modify` payload，禁止透传审核、统计和临时字段。
+
+插件 create 的官方初始默认值只在 create 表单中应用。update/edit 必须严格重放官方 `author item -> detail dialog projection -> editor pick -> submit` 路径：`detail_v2` 提供稳定详情字段和顶层 `game_versions`；同一 SN 作者列表项的 `latest_version` 只在详情中的版本占位为 null/缺失时补齐 `detail_url`、`release_type`、`version`，不得覆盖稳定元数据或顶层 build；`scope`、`price_fen` 和 `vip_levels` 按官方独立投影加入；尾部汇总分类按官方 `slice(0,-1)` 语义移除。存量记录中两个官方投影都缺失的 `buy_life_type` 等字段不得注入 create 默认值。公共条件字段只执行插件官方 submit 实际执行的清空规则，不得调用会额外制造字段的通用归一化 helper。
+
+## 配置动作和字段
+
+配置顶层字段完整覆盖 `backup_sn`、`scope`、`title`、`brief_desc`、`desc`、`update_desc`、`display_imgs`、`known_addon`、`unknown_addon`、`wtf`、`material`、`font`、`known_wa`、`unknown_wa`、可选 `retail_ui_config` 及公共字段；modify/delete 另含 `share_sn`。限制：标题 40、简介 50、更新说明 1000、展示图最多 8 张。
+
+create/update 必须从 `/backup/list` 和 `/backup/detail` 选择。七组内容均从备份完整对象重建。`inner_version` 映射覆盖每个源条目：新条目为 1，已有条目保留当前值，只有用户在增量数组中显式标记的已有条目加 1。插件组非空时至少选择一个 WTF role；WA-only 不满足该规则的替代条件。
+
+切换 `backup_sn` 必须完整重选七组、WTF 和正式服配置。切换 WTF 账号必须清空 known/unknown WA。正式服 `retail_ui_config` 覆盖 `edit_mode`、`cool_down`、`enable_dd_setup_wizard`：编辑模式最多五个且选中项中恰有一个默认；每个 `spec_tag` 最多一个 cooldown。Python 从 live backup 恢复保留全部字段的完整对象。
+
+create 建立完整分享；update 只更新备份、七组内容、inner versions、WTF、正式服配置和更新公告；edit 只更新标题、描述、图片及允许的公共设置。update/edit 先 GET `/share/detail` 和绑定备份，再以完整 `/share/modify` payload 提交。
+
+## WA 动作和字段
+
+WA 字段完整覆盖 `name`、`game_version`、`brief_desc`、`display_imgs`、`category_ids`、`content`、`desc`、`update_desc`、`version`、`with_file`、`file_path`、`file_install_path`、`parse_wa_uid`、`parse_wa_id` 及公共字段；modify/delete 另含 `sn`。限制：名称 40、简介 50、数字版本输入长度 80、更新说明 1000、分类最多五项。
+
+每次 create/update/edit submit 都对 `!WA:2!` 内容调用官方 `WowUIInterface.parseWa({"waStr": content}) -> WaParser.parseWa(content)` 链重新解析，即使字符串未改变；兼容 `JsResult.toJson()`、成功 code `0/200` 和嵌套 `result.uid/result.id`。解析结果不匹配或缺失时停止。非 WA2 清空 parse 字段。`with_file=true` 要求材质 ZIP 和安装路径；`with_file=false` 按官方 builder 保留现有 `file_path/file_install_path`，不擅自清空。
+
+create 允许全部首次字段；outer usage mode 为 create-only。create/update 的新 version 输入只允许数字；update 按官方 `Number(new) > Number(current)` 语义严格递增，并允许历史数值版本如 `1.2` 升级到 `2`。edit 允许名称、版本归属、分类、说明、媒体和允许的公共设置。两者先 GET `/wa/detail` 和动态选项，再构建完整 `/wa/modify` payload。带 `assign_user_sn` 的插件和 WA 最终 form 只能保持 public scope。
+
+WA create 在合并用户明确选择前，按官方表单补齐 `share_code_life_type=seven_day`、`need_buy=false`、`buy_life_type=seven_day`、`category_ids=["ui_original"]`、`file_install_path=Interface/Addons`、`vip_levels=[]`、`version="0"`。`category_ids` 无论发现接口中的展示类型，都以字符串提交。该默认仅作用于 create；update/edit 对省略字段保留当前远端值。
+
+## 错误、读回与脱敏
+
+错误阶段固定为 `session`、`dependency_get`、`upload_authorize`、`object_put`、`mutation`、`readback`、`native_parser`。明确 HTTP/业务拒绝的 `verification_required=false`；登录、GET、schema、父子归属和上传前校验失败同样为 false。PUT 或 mutation 的 timeout/connection reset 且无法确认服务端处理时为 true；mutation 已接受而读回不确定时也为 true。
+
+错误保留 resource、operation、脱敏 endpoint、HTTP status、业务 code 和精简消息；native sidecar 失败还保留有界异常消息和 `code`/`error_code`。签名 URL query 内的 credential、signature 和 token 必须在 sidecar 返回前脱敏；CLI 输出不包含 token、Cookie、JWT、登录 code、clientNo、signed URL、原始 WA、raw backup 或完整 payload。写成功仅表示业务 code 接受，不等于审核通过。每次 create/update/edit/delete 后必须调用对应 detail/list/version 读回；读回使用有界短时 GET-only 轮询，期间不得重发 mutation。插件 update 以作者列表 `latest_version` 为成功判据，详情和版本历史只作补充；插件 edit 逐字段比较 detail 与同一 SN author item，两份官方投影都未反映提交字段时才是不确定结果。配置将官方 `need_buy=0/1` wire 值投影到详情 boolean 后比较，不放宽其他字段的类型合同。
+
+每次官方 API HTTP/业务拒绝都在当前 DD 安装版本目录的 `Fupload/logs` 追加一条 JSONL。记录包含脱敏后的实际请求 JSON/body、响应 JSON/body、HTTP status、原生业务 code（包括 falsy `0`）、endpoint、stage、字段校验提示、截断标记和时间；上传授权 endpoint 记为 `/file/upload`，对象 PUT 记为 `object-store-put`。认证 header、Cookie、JWT、clientNo/client_id、device proof、签名、签名 URL credential 等在结构化值和截断文本中递归替换。request/response body 有明确字节上限，超过时保存截断状态和原始长度。`urllib.error.HTTPError` 的 body 必须在官方 `UiApiClient` 调用 `read()` 时旁路捕获并原样返回相同 bytes，不能提前消费、改变异常消息或改变官方控制流。CLI 只返回安全摘要和 `log_path`。验证必须包含错误请求体捕获证据：至少一个受控 HTTP/业务拒绝或等价 sidecar HTTPError fixture，证明同一次调用的 sanitized request body、sanitized response body、HTTP status、业务 code、字段/校验提示、endpoint、stage、字节长度和 truncation 元数据都能从 `log_path` 读回；该证据不得依赖真实 token、signed URL、Cookie、clientNo、原始 WA 或原始备份。
+
+## 逐字段 wire 回归合同
+
+DD 发布实现必须维护一份可执行、可枚举、可双向校验的字段目录，完整覆盖 plugin、config、WA 的 create、update、edit 输入字段以及 delete 的 identifier/confirm。字段目录与 versioned schema 的动作字段集合必须双向相等：schema 新增字段而矩阵没有 case、矩阵引用不存在字段、字段被移动到其他动作却未更新矩阵，均直接使测试失败。
+
+回归基本单元为 `resource × action × field × state`。每个 case 使用稳定 ID，并至少记录输入、当前远端 projection、动态依赖 fixture、预期 schema 结果、预期 GET/native-parser/upload 调用、预期 endpoint、预期最终 JSON body、预期 mutation 次数、预期 readback 字段和不确定性分类。测试失败信息必须包含 case ID 和实际调用轨迹。
+
+每个字段必须覆盖其适用状态：omitted、正常有效值、替代有效值；布尔字段覆盖 true/false；数值字段覆盖 0、合法上下边界、越界和 bool 伪装；字符串覆盖空字符串、最大长度、超长和非法枚举；数组覆盖空数组、正常数组、最大项数、超项、非法元素及必要的顺序/去重语义；对象覆盖完整值、缺少子字段、未知子字段、非法 selector 和仅在官方支持时的 null。条件字段还必须覆盖父条件启用、父条件关闭但旧子字段存在、父项切换后旧 selector、子候选为空和跨父 selector。
+
+状态不适用时不得静默跳过；矩阵报告必须明确标记为“不适用”并给出合同原因。omitted 必须明确落入以下且仅以下一种结果：create 默认、update/edit 保留当前值、官方条件清空、wire 省略、schema 拒绝。`false`、`0`、空字符串、空数组、omitted 和 null 不得通过 truthiness 合并。
+
+每个 accepted case 必须捕获并断言最终 mutation body 的完整深度结构，而不是只检查字段集合或单字段存在。断言至少包括：字段是否存在、JSON 类型、精确值、未修改字段的保留值、条件字段的清空值、禁止字段确实缺失、null 与省略的差异，以及整个动作仅发送一次 mutation。preflight/schema/dependency/native parser/upload authorize 前的明确拒绝必须证明对象 PUT 和 mutation 都为零。
+
+request-capture harness 必须区分并按顺序记录：普通 GET、作为只读依赖的 POST、频道 GET、native WA parse、上传授权、对象 PUT、mutation、readback。条件关闭时必须断言无关 endpoint 未调用，例如 `jump_room=false` 不读取频道、`need_anchor_vip=false` 不读取 VIP、`with_associate=false` 不读取关联候选、未上传本地文件不调用 `/file/upload`。
+
+上传矩阵必须独立验证插件 ZIP、WA 材质 ZIP、plugin logo/detail images、config images 和 WA images。每类覆盖正常文件与包含空格、中文、括号、`+`、`#`、`%`、Unicode 的本地文件名；最终授权 descriptor 按资源断言 `file_type`、`business_id`、MIME 和 `file_name` 的固定值、显式空字符串或字段省略。对象 PUT 断言只存在合同 header、body 长度与 SHA-256 保持一致、非 200 和连接不确定的分类正确。
+
+plugin 字段矩阵覆盖元数据、分类、媒体、版本、包、商业、VIP、房间/频道、关联和创建声明。update 必须验证版本历史 preflight、latest-version/detail projection、`detail_url` 上传替换和所有版本字段；edit 必须证明 create-only/version-only 字段在 schema 层拒绝，且旧记录缺失字段时不注入 create 默认或 null。
+
+config 字段矩阵覆盖元数据、图片、商业字段、`backup_sn`、七组备份内容及各自增量数组、每项 `inner_version`、WTF role、known/unknown WA、正式服 edit mode/default/cooldown/setup wizard。切换 backup 必须使全部后代失效并要求完整重选；切换 WTF account 必须使两组 WA 失效。每个 selector case 必须证明 Python 在 mutation 前用同 session 最新 `/backup/detail` 恢复完整官方对象。
+
+WA 字段矩阵覆盖元数据、分类、版本、content、WA2 parse ID、`with_file`、材质上传、`file_path`、安装路径、商业、VIP、房间/频道和关联。create 默认必须逐字段断言；update/edit omitted 必须逐字段断言保留。所有 create/update/edit 对 WA2 都必须调用一次 native parser，非 WA2 必须清空 parse 字段；`with_file=false` 必须按官方 builder 保留已有材质路径。
+
+delete 矩阵覆盖三类资源的 schema confirm、identifier 类型、所有权/状态 GET、精确 endpoint body、单 mutation、删除后只读不存在和错误分类。任何 ownership、confirm 或 session 前置失败均不得发送 mutation。
+
+HTTP/业务错误矩阵至少覆盖 400/401/403/404/422/500、业务 code 0 与非零、JSON body、非 JSON body、超长 body、字段级提示和 signed URL 错误。日志必须保留脱敏 request/response body、HTTP status、业务 code、endpoint、stage、原始长度和截断状态；CLI 只返回安全摘要和 log_path。明确拒绝的 `verification_required=false`，连接不确定或 accepted-write 读回不确定才为 true；任何不确定 case 都不得自动重发 mutation。
+
+详细矩阵报告保存在不跟踪的 `analyze/dd-field-by-field-wire-regression-20260801.md`。每行至少包含 case ID、resource、action、field、state、schema 结果/path、依赖调用、上传调用、endpoint、wire 期望、mutation count、readback/错误期望、测试名和实际结果。报告汇总每个 action 的 schema 字段数、字段覆盖数、case 数、缺口数；缺口必须为零才能通过 Verify。
+
+## 验证
+
+合同测试覆盖全部 endpoint 参数、动作 allowlist、字段锁、父子依赖、上游切换、selector provenance、上传 descriptor、特殊文件名、错误阶段、错误请求/响应体捕获、脱敏和 readback。进程测试验证 GUI 冲突时零 relogin、一次 task 一次 relogin、并发串行、显式 logout、失败即停和空闲退出。
+
+逐字段 wire 矩阵是合同测试的强制组成部分。字段集合相等、单个综合 happy path、HTTP 2xx、业务 code 0、mock 未抛异常或 live 对象创建成功均不能替代最终 body 精确断言。每个允许字段至少有 wire-presence case，每个条件字段至少有 enabled/disabled/stale-child case，每个受限字段至少有 schema rejection case；矩阵与 schema 双向缺口为零。
+
+真实验证必须分别在官方客户端持久化的邮箱与手机登录态下执行。每种登录态都先证明自动分流选择唯一匹配的 flow、JWT ready、作者 API ready、单 broker/sidecar/登录和显式 logout；再按当前 DD 环境动态返回的全部非探索赛季 build 执行插件、配置、WA 的 create/update/edit/delete、二进制上传、写后读回和依赖顺序清理。两轮使用同一登录后业务代码和同一字段/wire 矩阵，但分别生成绑定最终 commit、DD 版本和资源哈希的脱敏证据。批量六插件测试记录 GUI 进程数、sidecar 数和原生登录次数。测试对象只按本次记录的 SN 清理，任何不确定删除先读回；验证结束必须确认无 sidecar、broker 进程或 live broker state。

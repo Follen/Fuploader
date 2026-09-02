@@ -245,6 +245,7 @@ class Sidecar:
         self.dd_dir, self.signature = discover_dd_info()
         self.process: Optional[subprocess.Popen[str]] = None
         self.counter = 0
+        self.credential_kind: Optional[str] = None
         self.lock_handle = None
         self.responses: queue.Queue[Any] = queue.Queue()
         self.reader_thread: Optional[threading.Thread] = None
@@ -276,6 +277,15 @@ class Sidecar:
                 kind="authentication_error",
                 stage="session",
             )
+        credential_kind = ready.get("credential_kind")
+        if credential_kind not in ("email", "mobile"):
+            self.close()
+            raise FuploadError(
+                "DD sidecar returned an invalid credential kind",
+                kind="sidecar_error",
+                stage="session",
+            )
+        self.credential_kind = credential_kind
         return self
 
     def _lock(self) -> None:

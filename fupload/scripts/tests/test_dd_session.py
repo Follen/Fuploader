@@ -25,6 +25,110 @@ import fupload_cli.dd_broker as dd_broker
 
 class DDSessionTests(unittest.TestCase):
 
+    @staticmethod
+    def _native_sidecar_module():
+        with mock.patch.dict(os.environ, {
+            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
+            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
+        }):
+            return importlib.import_module("fupload_cli.dd_sidecar")
+
+    @staticmethod
+    def _persisted_login(method, credential_type, modifier):
+        account = SimpleNamespace(
+            method=SimpleNamespace(name=method),
+            name="private-account@example.invalid",
+        )
+        credential = SimpleNamespace(
+            type=SimpleNamespace(name=credential_type),
+            modifier=SimpleNamespace(name=modifier),
+            value="private-persisted-token",
+        )
+        return account, credential
+
+    def test_native_relogin_uses_urs_flow_for_email_credential(self) -> None:
+        module = self._native_sidecar_module()
+        account, credential = self._persisted_login("urs", "urs_token", "normal")
+        urs_flow = mock.Mock(return_value=object())
+        mobile_flow = mock.Mock(side_effect=AssertionError("mobile flow must not run"))
+        dependencies = [object() for _ in range(4)]
+
+        result = module._create_relogin_flow(
+            account, credential, *dependencies, urs_flow, mobile_flow,
+        )
+
+        self.assertIs(result, urs_flow.return_value)
+        urs_flow.assert_called_once_with(
+            dependencies[0], dependencies[1], credential.value, account.name,
+        )
+        mobile_flow.assert_not_called()
+
+    def test_native_relogin_supports_both_mobile_credential_modifiers(self) -> None:
+        module = self._native_sidecar_module()
+        for modifier, is_password in (("mobile_password", True), ("mobile_uplink", False)):
+            with self.subTest(modifier=modifier):
+                account, credential = self._persisted_login(
+                    "mobile", "urs_mobile_token", modifier,
+                )
+                urs_flow = mock.Mock(side_effect=AssertionError("URS flow must not run"))
+                mobile_flow = mock.Mock(return_value=object())
+                dependencies = [object() for _ in range(4)]
+
+                result = module._create_relogin_flow(
+                    account, credential, *dependencies, urs_flow, mobile_flow,
+                )
+
+                self.assertIs(result, mobile_flow.return_value)
+                mobile_flow.assert_called_once_with(
+                    *dependencies, credential.value, is_password, account.name,
+                )
+                urs_flow.assert_not_called()
+
+    def test_native_relogin_reports_only_safe_credential_kind(self) -> None:
+        module = self._native_sidecar_module()
+        email = self._persisted_login("urs", "urs_token", "normal")
+        mobile_password = self._persisted_login(
+            "mobile", "urs_mobile_token", "mobile_password",
+        )
+        mobile_uplink = self._persisted_login(
+            "mobile", "urs_mobile_token", "mobile_uplink",
+        )
+
+        self.assertEqual(module._credential_kind(*email), "email")
+        self.assertEqual(module._credential_kind(*mobile_password), "mobile")
+        self.assertEqual(module._credential_kind(*mobile_uplink), "mobile")
+
+    def test_native_relogin_rejects_unknown_or_conflicting_state_before_flow(self) -> None:
+        module = self._native_sidecar_module()
+        combinations = (
+            ("urs", "urs_mobile_token", "normal"),
+            ("mobile", "urs_token", "mobile_password"),
+            ("urs", "urs_token", "mobile_password"),
+            ("mobile", "urs_mobile_token", "normal"),
+            ("private-method", "private-type", "private-modifier"),
+        )
+        for method, credential_type, modifier in combinations:
+            with self.subTest(
+                method=method, credential_type=credential_type, modifier=modifier,
+            ):
+                account, credential = self._persisted_login(method, credential_type, modifier)
+                urs_flow = mock.Mock()
+                mobile_flow = mock.Mock()
+
+                with self.assertRaisesRegex(RuntimeError, "unsupported credential combination") as raised:
+                    module._create_relogin_flow(
+                        account, credential, object(), object(), object(), object(),
+                        urs_flow, mobile_flow,
+                    )
+
+                message = str(raised.exception)
+                for private_value in (
+                    account.name, credential.value, method, credential_type, modifier,
+                ):
+                    self.assertNotIn(private_value, message)
+                urs_flow.assert_not_called()
+                mobile_flow.assert_not_called()
+
     def test_sidecar_requests_use_encoding_neutral_ascii_json(self) -> None:
         sidecar = Sidecar.__new__(Sidecar)
         sidecar.counter = 0
@@ -215,6 +319,7 @@ class DDSessionTests(unittest.TestCase):
         class FakeSidecar:
             dd_dir = Path("D:/Software/NetEaseDD/100128")
             signature = {"status": "Valid", "publisher": "NetEase"}
+            credential_kind = "email"
 
             def __enter__(self):
                 counters["enter"] += 1
@@ -263,7 +368,12 @@ class DDSessionTests(unittest.TestCase):
                 state = dd_broker._read_json(state_path)
                 session_id = state["session_id"]
 
-                self.assertTrue(dd_broker.status(session_id)["running"])
+                broker_status = dd_broker.status(session_id)
+                self.assertTrue(broker_status["running"])
+                self.assertEqual(broker_status["credential_kind"], "email")
+                self.assertEqual(broker_status["broker_count"], 1)
+                self.assertEqual(broker_status["sidecar_count"], 1)
+                self.assertEqual(broker_status["native_login_count"], 1)
                 self.assertEqual(
                     dd_broker.execute(session_id, "read", "plugin", "list", {"page": 1}),
                     {"read": "plugin"},
