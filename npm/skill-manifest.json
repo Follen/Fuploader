@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "0.0.16",
   "skill_version": "0.0.16",
-  "tree_sha256": "701e4721b3c44d2e925152a9da9e0cf2f21f440997fd442e1d4342baf605df73",
+  "tree_sha256": "aba774b14679854ac01a09711aa10b2f7266af2c43e8220cc67c64b9559bfb51",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -87,8 +87,8 @@
     },
     {
       "path": "references/dd.md",
-      "bytes": 19004,
-      "sha256": "018e8114b64716f97d4b0603304a9e8c83d4cb27242ec59e6c350b36fab0a1d0"
+      "bytes": 19727,
+      "sha256": "2804e4b77c000d0bd12ca3f69bbcd5720f759fd4e84b4127ea3461093bf5da7c"
     },
     {
       "path": "references/modus.md",
@@ -207,8 +207,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 27596,
-      "sha256": "d2c1bb7b78dc246b5829e336a903492ee78429b21b2a11196ae959123a9fa428"
+      "bytes": 28383,
+      "sha256": "2477e603ca826b9bd31533995f2217bfd9239c070adbaa2aa4b829fb6a89fb7f"
     }
   ]
 }
