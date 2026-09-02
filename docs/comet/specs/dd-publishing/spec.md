@@ -10,11 +10,13 @@ DD 写入契约必须从当前官方网页的编辑器打开投影、表单状�
 
 DD provider 仅支持 Windows 官方 DD 客户端。安装发现按显式 CLI 参数、已验证运行进程、卸载/安装注册信息、官方用户配置和已知安装根目录的版本子目录收集候选；每个候选都必须包含 `netease_dd.exe`、`ccvoicehub.res`、`ccsub64` 和所需原生模块，并在启动前通过 Windows Authenticode 链与源码维护的 NetEase 组织发布者允许集合。多个有效版本选择版本号最高者。无有效候选时停止，不执行同名伪造 binary。
 
-`dd session doctor` 只读取安装、版本、签名、进程冲突、受信 Known Folder 状态目录和 broker 状态，不启动 `MobileReLoginFlow`，不创建登录会话。稳定独立 `clientNo` 原子保存在受信 Roaming AppData 下的 `CCVoiceHub/Fupload/sidecar-device.json`；格式错误时停止，不输出、读取 GUI 值或静默轮换。
+`dd session doctor` 只读取安装、版本、签名、进程冲突、受信 Known Folder 状态目录和 broker 状态，不启动任何原生重登录流，不创建登录会话。稳定独立 `clientNo` 原子保存在受信 Roaming AppData 下的 `CCVoiceHub/Fupload/sidecar-device.json`；格式错误时停止，不输出、读取 GUI 值或静默轮换。
 
 `dd session start --confirm-close-gui` 只在调用方已经取得用户同意后执行。CLI 记录并再次验证官方 GUI 的 PID、启动时间、绝对路径、签名和发布者，先请求正常退出；限时后只可终止仍为同一身份的进程。身份变化、出现新的官方 GUI、关闭失败或仍有 GUI 会话时，必须在登录前停止。未提供确认标志时 sidecar 数和 relogin 数都保持为零。
 
-start 启动本地 task broker，由 broker 独占一个官方 `netease_dd.exe` sidecar 和一次 `MobileReLoginFlow`。broker 返回不含凭据的 opaque `session_id`；所有 DD 资源命令必须显式连接该 session，不能隐式创建 sidecar。broker 严格串行调度 GET、解析、上传、mutation 和读回；同一 Windows 用户只能有一个 Fupload DD session。十分钟空闲超时仅作崩溃兜底。
+start 启动本地 task broker，由 broker 独占一个官方 `netease_dd.exe` sidecar，并从官方 `AccountCredStorage` 读取 auto account 和 credential。原生重登录必须按官方枚举严格分流：`Account.method=urs + Cred.type=urs_token + Cred.modifier=normal` 使用 `UrsReLoginFlow(controller, sdk, token, username)`；`Account.method=mobile + Cred.type=urs_mobile_token + Cred.modifier=mobile_password|mobile_uplink` 使用 `MobileReLoginFlow(controller, sdk, cgi, netconfig, token, isPassword, username)`，其中 `isPassword` 仅在 modifier 为 `mobile_password` 时为 true。缺失、未知或相互矛盾的组合在调用任何 flow 前失败，不能根据账号字符串猜测类型，也不能在一条 flow 失败后尝试另一条 flow。
+
+两类 flow 成功后进入完全相同的 JWT 刷新、作者 API client、GET、解析、上传、mutation、读回和清理管线；不得复制 email/mobile 业务实现。broker 返回不含凭据的 opaque `session_id`；所有 DD 资源命令必须显式连接该 session，不能隐式创建 sidecar。broker 严格串行调度所有操作；同一 Windows 用户只能有一个 Fupload DD session，每个 task 只执行一次匹配的原生重登录。十分钟空闲超时仅作崩溃兜底。
 
 `dd session status` 只读 broker 状态，不登录。`dd session stop` 按官方退出链显式调用 message-center logout、泵送事件直到 stopped，再执行依赖释放和 Qt 退出；全部发布任务在 `finally` 中 stop。异常退出后，不重放可能已发送的 mutation，先在新 session 中读回。
 
@@ -108,7 +110,7 @@ WA create 在合并用户明确选择前，按官方表单补齐 `share_code_lif
 
 错误阶段固定为 `session`、`dependency_get`、`upload_authorize`、`object_put`、`mutation`、`readback`、`native_parser`。明确 HTTP/业务拒绝的 `verification_required=false`；登录、GET、schema、父子归属和上传前校验失败同样为 false。PUT 或 mutation 的 timeout/connection reset 且无法确认服务端处理时为 true；mutation 已接受而读回不确定时也为 true。
 
-错误保留 resource、operation、脱敏 endpoint、HTTP status、业务 code 和精简消息；native sidecar 失败还保留有界异常消息和 `code`/`error_code`。签名 URL query 内的 credential、signature 和 token 必须在 sidecar 返回前脱敏；CLI 输出不包含 token、Cookie、JWT、登录 code、clientNo、signed URL、原始 WA、raw backup 或完整 payload。写成功仅表示业务 code 接受，不等于审核通过。每次 create/update/edit/delete 后必须调用对应 detail/list/version 读回；读回使用有界短时 GET-only 轮询，期间不得重发 mutation。插件 update 以作者列表 `latest_version` 为成功判据，详情和版本历史只作补充；插件 edit 逐字段比较 detail 与同一 SN author item，两份官方投影都未反映提交字段时才是不确定结果。配置将官方 `need_buy=0/1` wire 值投影到详情 boolean 后比较，不放宽其他字段的类型合同。
+错误保留 resource、operation、脱敏 endpoint、HTTP status、业务 code 和精简消息；native sidecar 失败还保留有界异常消息和 `code`/`error_code`。签名 URL query 内的 credential、signature 和 token 必须在 sidecar 返回前脱敏；CLI 输出不包含 token、Cookie、JWT、登录 code、clientNo、signed URL、原始 WA、raw backup 或完整 payload。官方 client 对只读 GET 返回业务码 `409` 且消息精确为 `签名无效` 时，允许在同一 session 内重新签名并重试一次；第二次失败必须上抛，POST、上传及任何其他错误不得自动重放。写成功仅表示业务 code 接受，不等于审核通过。每次 create/update/edit/delete 后必须调用对应 detail/list/version 读回；读回使用有界短时 GET-only 轮询，期间不得重发 mutation。插件 update 以作者列表 `latest_version` 为成功判据，详情和版本历史只作补充；插件 edit 逐字段比较 detail 与同一 SN author item，两份官方投影都未反映提交字段时才是不确定结果。配置将官方 `need_buy=0/1` wire 值投影到详情 boolean 后比较；官方详情对空内容组、空 WTF 和空 VIP 等级返回 `null` 或省略字段时，只规范化为对应空结构，非空内容及错误类型不放宽。
 
 每次官方 API HTTP/业务拒绝都在当前 DD 安装版本目录的 `Fupload/logs` 追加一条 JSONL。记录包含脱敏后的实际请求 JSON/body、响应 JSON/body、HTTP status、原生业务 code（包括 falsy `0`）、endpoint、stage、字段校验提示、截断标记和时间；上传授权 endpoint 记为 `/file/upload`，对象 PUT 记为 `object-store-put`。认证 header、Cookie、JWT、clientNo/client_id、device proof、签名、签名 URL credential 等在结构化值和截断文本中递归替换。request/response body 有明确字节上限，超过时保存截断状态和原始长度。`urllib.error.HTTPError` 的 body 必须在官方 `UiApiClient` 调用 `read()` 时旁路捕获并原样返回相同 bytes，不能提前消费、改变异常消息或改变官方控制流。CLI 只返回安全摘要和 `log_path`。验证必须包含错误请求体捕获证据：至少一个受控 HTTP/业务拒绝或等价 sidecar HTTPError fixture，证明同一次调用的 sanitized request body、sanitized response body、HTTP status、业务 code、字段/校验提示、endpoint、stage、字节长度和 truncation 元数据都能从 `log_path` 读回；该证据不得依赖真实 token、signed URL、Cookie、clientNo、原始 WA 或原始备份。
 
@@ -146,4 +148,4 @@ HTTP/业务错误矩阵至少覆盖 400/401/403/404/422/500、业务 code 0 与�
 
 逐字段 wire 矩阵是合同测试的强制组成部分。字段集合相等、单个综合 happy path、HTTP 2xx、业务 code 0、mock 未抛异常或 live 对象创建成功均不能替代最终 body 精确断言。每个允许字段至少有 wire-presence case，每个条件字段至少有 enabled/disabled/stale-child case，每个受限字段至少有 schema rejection case；矩阵与 schema 双向缺口为零。
 
-真实验证在当前 DD 环境按动态返回的全部非探索赛季 build 执行插件、配置、WA 的 create/update/edit/delete 和读回。批量六插件测试记录 GUI 进程数、sidecar 数和原生登录次数。测试对象只按本次记录的 SN 清理，任何不确定删除先读回。
+邮箱与手机持久化登录态的自动分流必须由合同测试分别覆盖：每种受支持的官方枚举组合只选择唯一匹配的 flow，并验证构造参数、JWT/作者 API 共用管线、单 broker/sidecar/登录和显式 logout；不要求为真实验收切换官方客户端当前账号。真实验证只在官方客户端当前已持久化账号下执行，并记录安全 credential kind；按当前 DD 环境动态返回的全部非探索赛季 build 执行插件与 WA 的 create/update/edit/delete、二进制上传、写后读回和依赖顺序清理。配置对该账号 `/backup/list` 返回且 `/backup/detail` 可恢复合法选择的每个 build 执行相同的 create/update/edit/delete、图片上传、写后读回和清理；没有可用云备份的 build 必须在证据中明确标记为不适用并记录安全原因，不能静默跳过或伪造 backup selector。真实矩阵使用同一登录后业务代码和同一字段/wire 矩阵，生成绑定最终 commit、DD 版本和资源哈希的脱敏证据。批量六插件测试记录 GUI 进程数、sidecar 数和原生登录次数。测试对象只按本次记录的 SN 清理，任何不确定删除先读回；验证结束必须确认无 sidecar、broker 进程或 live broker state。
