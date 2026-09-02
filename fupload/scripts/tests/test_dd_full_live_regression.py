@@ -98,6 +98,13 @@ class DDLiveRegressionTests(unittest.TestCase):
         self.assertEqual(len(evidence["steps"]), 1)
         self.assertEqual(evidence["steps"][0]["exit_status"], 7)
 
+    def test_process_count_is_unavailable_off_windows(self) -> None:
+        with mock.patch.object(runner.sys, "platform", "linux"), mock.patch.object(
+            runner.subprocess, "run"
+        ) as run:
+            self.assertIsNone(runner._netease_dd_process_count())
+        run.assert_not_called()
+
     def test_execute_failure_still_cleans_up_and_stops_session(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

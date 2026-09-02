@@ -182,6 +182,8 @@ def _git_commit() -> str:
 
 
 def _netease_dd_process_count() -> Optional[int]:
+    if sys.platform != "win32":
+        return None
     completed = subprocess.run(
         ["tasklist", "/FI", "IMAGENAME eq netease_dd.exe", "/FO", "CSV", "/NH"],
         text=True, capture_output=True, encoding="utf-8", errors="replace",
