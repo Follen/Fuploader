@@ -1,9 +1,9 @@
 schema: comet.native.v4
 name: dd-email-mobile-session-reuse
 language: zh-CN
-phase: build
+phase: archive
 status: active
-state_version: 10
+state_version: 15
 brief: brief.md
 spec_changes:
   - capability: dd-publishing
@@ -13,20 +13,18 @@ workspace:
   isolation: worktree
   change_branch: comet/dd-email-mobile-session-reuse
   target_branch: main
-  finish: null
+  finish: merge
 loop:
-  stage: repairing
+  stage: archive-ready
   goal_cycle: 3
   iteration: 2
-  attempt: 0
+  attempt: 1
   retry_epoch: 0
   failed_iteration_count: 1
   no_progress_count: 0
   execution_failure_count: 0
-  previous_unresolved_ids:
-    - A8
-    - A81
-  next_action: repair-failed-acceptance
+  previous_unresolved_ids: []
+  next_action: archive
 acceptance:
   - id: A1
     source: brief.md
@@ -35,7 +33,8 @@ acceptance:
       session start` 自动使用 `UrsReLoginFlow`，邮箱登录完成后 JWT 和作者 API ready；不要求用户提供凭据。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 严格枚举分流实现将 urs+urs_token+normal 唯一映射到 UrsReLoginFlow；构造参数、JWT 刷新和作者 API
+        ready 均有合同测试。
       truncated: false
   - id: A2
     source: brief.md
@@ -44,7 +43,8 @@ acceptance:
       `MobileReLoginFlow` 并保持现有手机登录行为。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: mobile_password 与 mobile_uplink 均唯一映射到 MobileReLoginFlow，isPassword 分别为
+        true/false，现有手机路径测试通过。
       truncated: false
   - id: A3
     source: brief.md
@@ -52,7 +52,7 @@ acceptance:
       或 `clientNo`，也不自动尝试另一条登录流。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 缺失或不支持的枚举组合在 flow 构造前统一失败；冲突/未知矩阵证明两种 flow 均未调用且错误不含账号或凭据值。
       truncated: false
   - id: A4
     source: brief.md
@@ -60,7 +60,8 @@ acceptance:
       client、GET、上传、mutation、读回和 logout 管线，失败与超时均无遗留进程或 broker state。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 两类凭据进入同一 open_session 后半段和资源实现；broker 测试证明单
+        broker/sidecar/login、串行操作和完整退出，live 证据确认零残留。
       truncated: false
   - id: A5
     source: brief.md
@@ -68,7 +69,8 @@ acceptance:
       和隔离安装检查全部通过，且现有手机登录相关合同无回归。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: Runtime 全量门禁通过：370 个 Python 测试、26 个 Node
+        测试、compileall、manifest、版本、pack、隔离安装和 diff-check；47 个 DD session 测试通过。
       truncated: false
   - id: A6
     source: brief.md
@@ -77,7 +79,8 @@ acceptance:
       CRUD，并为无可用云备份的 build 记录明确的不适用原因。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 脱敏 live 证据覆盖 5 个非探索 build：插件和 WA 全 CRUD 全通过；配置在 3 个可用备份 build 通过，另 2
+        个明确记录安全 N/A；19 项清理全成功。
       truncated: false
   - id: A7
     source: brief.md
@@ -85,16 +88,17 @@ acceptance:
       版本、资源哈希与清理结果，不记录敏感凭据；邮箱和手机分流矩阵均由自动化测试通过，不要求切换当前持久化账号重复真实矩阵。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: live JSON 记录 email 安全类型、147 条命令及退出状态、读回/N/A、实现提交、DD 版本、资源哈希和清理结果；敏感值检查未发现
+        token/Cookie/JWT/clientNo 等字段。
       truncated: false
   - id: A8
     source: brief.md
     text: A8：DD Skill/reference 和完整 `dd-publishing` Spec
       明确说明自动邮箱/手机分流、支持矩阵、失败语义、共用登录后代码，以及仅对当前已持久化账号执行真实验证的边界。
-    result: failed
+    result: passed
     reason:
-      text: 正式 brief/Spec 已改为仅验证当前持久化账号，但 fupload/SKILL.md 与 fupload/references/dd.md
-        仍要求邮箱和手机各跑一次真实矩阵，文档边界矛盾。
+      text: fupload/SKILL.md、references/dd.md、brief 与完整 Spec
+        已一致说明邮箱/手机自动分流、失败语义、共用登录后代码及仅使用当前持久化账号执行 live 矩阵。
       truncated: false
   - id: A9
     source: specs/dd-publishing/spec.md
@@ -104,7 +108,7 @@ acceptance:
       descriptor、endpoint 和读回投影。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 逐字段报告记录三类资源四种动作的字段存在性、类型、状态、依赖、上传、endpoint、wire 与读回证据。
       truncated: false
   - id: A10
     source: specs/dd-publishing/spec.md
@@ -116,7 +120,7 @@ acceptance:
       provenance、readback 判据、对应测试和本轮结论；缺证字段不能标记为已对齐。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 1293 行报告包含逐动作请求体矩阵；live 矩阵覆盖动态 build，确定性矩阵覆盖 1247 个 case，未以单一成功或业务码替代验证。
       truncated: false
   - id: A11
     source: specs/dd-publishing/spec.md
@@ -127,7 +131,7 @@ acceptance:
       binary。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 安装发现、官方文件结构、Authenticode 发布者和最高版本选择由实现及 discovery 合同测试覆盖。
       truncated: false
   - id: A12
     source: specs/dd-publishing/spec.md
@@ -136,7 +140,7 @@ acceptance:
       `CCVoiceHub/Fupload/sidecar-device.json`；格式错误时停止，不输出、读取 GUI 值或静默轮换。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: doctor 只读测试确认不启动 sidecar/login；受信状态目录和稳定 clientNo 的错误处理由 session 测试覆盖。
       truncated: false
   - id: A13
     source: specs/dd-publishing/spec.md
@@ -145,7 +149,7 @@ acceptance:
       GUI 会话时，必须在登录前停止。未提供确认标志时 sidecar 数和 relogin 数都保持为零。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: GUI 确认、身份复核和未确认时零登录行为由 broker/session 测试覆盖。
       truncated: false
   - id: A14
     source: specs/dd-publishing/spec.md
@@ -160,7 +164,7 @@ acceptance:
       true。缺失、未知或相互矛盾的组合在调用任何 flow 前失败，不能根据账号字符串猜测类型，也不能在一条 flow 失败后尝试另一条 flow。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: AccountCredStorage 读取及三种受支持官方枚举组合的唯一 flow、精确构造参数和失败前置均已核对。
       truncated: false
   - id: A15
     source: specs/dd-publishing/spec.md
@@ -170,7 +174,7 @@ acceptance:
       session，每个 task 只执行一次匹配的原生重登录。十分钟空闲超时仅作崩溃兜底。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 实现只有一个公共 JWT、作者 API、GET、上传、mutation、读回和清理路径；资源层不存在 credential_kind 分支。
       truncated: false
   - id: A16
     source: specs/dd-publishing/spec.md
@@ -179,21 +183,21 @@ acceptance:
       stop。异常退出后，不重放可能已发送的 mutation，先在新 session 中读回。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: status 只读、显式 stop/logout、依赖释放、Qt 退出及不确定写不重放由实现和 session/readback 测试覆盖。
       truncated: false
   - id: A17
     source: specs/dd-publishing/spec.md
     text: DD GUI 通过父控件变化后再加载子控件；CLI 不得把这些联动改成静态 schema、硬编码枚举或猜测默认值。每次写入采用以下两阶段契约：
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 动态父子 GET 与两阶段写入合同由 schema、builder 和逐字段矩阵覆盖。
       truncated: false
   - id: A18
     source: specs/dd-publishing/spec.md
     text: Agent 在同一 task session 中读取目标详情和顶层候选，选择父项后再调用子项 GET。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 同 session 详情、顶层候选和子项 GET 顺序由 request-capture 合同测试覆盖。
       truncated: false
   - id: A19
     source: specs/dd-publishing/spec.md
@@ -201,21 +205,21 @@ acceptance:
       的依赖描述；不返回原始后端对象。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 安全显示字段、稳定 ID 和 opaque selector 投影由 builder/selector 测试覆盖。
       truncated: false
   - id: A20
     source: specs/dd-publishing/spec.md
     text: 上游选择改变时，Agent 丢弃所有下游选择并重新 GET。依赖闭合前不得生成写入 JSON。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 上游变化使下游 selector 失效且依赖闭合前零 mutation，由 stale-child 矩阵覆盖。
       truncated: false
   - id: A21
     source: specs/dd-publishing/spec.md
     text: 依赖闭合后只生成一次最终业务 JSON。JSON 同时保存父字段和子 ID/selector；名称可在发布计划中显示，但不作为提交值。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 最终 JSON 的父字段和子 ID/selector 结构由完整 wire body 断言覆盖。
       truncated: false
   - id: A22
     source: specs/dd-publishing/spec.md
@@ -223,7 +227,7 @@ acceptance:
       provenance。校验在任何文件上传或 mutation 前完成。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 写前在同 session 重复 live GET，并在上传/mutation 前校验 provenance，由调用顺序矩阵覆盖。
       truncated: false
   - id: A23
     source: specs/dd-publishing/spec.md
@@ -231,14 +235,14 @@ acceptance:
       ID、空的必需候选集或不再属于父项的子项时，以精确 JSON path 确定失败，`verification_required=false`。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 复制对象、跨父/过期 selector 和无效候选在精确路径失败且不要求不确定验证，由拒绝 case 覆盖。
       truncated: false
   - id: A24
     source: specs/dd-publishing/spec.md
     text: 依赖图至少包含：
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 完整依赖图的各分支均出现在 Spec、字段目录和确定性矩阵中。
       truncated: false
   - id: A25
     source: specs/dd-publishing/spec.md
@@ -246,14 +250,14 @@ acceptance:
       为上下文固定/create-only，版本可在允许动作中调整。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: game_type 到 game_versions 以及插件 create-only/build 编辑规则由矩阵覆盖。
       truncated: false
   - id: A26
     source: specs/dd-publishing/spec.md
     text: "`primary_category_id -> second_category_ids`；主分类改变即清空全部二级分类。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 主/二级分类父子归属和切换清空由 stale-child 与 builder 测试覆盖。
       truncated: false
   - id: A27
     source: specs/dd-publishing/spec.md
@@ -261,7 +265,7 @@ acceptance:
       中有效。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 房间到频道/频道类型的父子约束及关闭清空由条件矩阵覆盖。
       truncated: false
   - id: A28
     source: specs/dd-publishing/spec.md
@@ -269,7 +273,7 @@ acceptance:
       会按官方 builder 清空会员和同步相关值。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: scope 对有效期、VIP 和同步的投影及 private 清空由公共字段矩阵覆盖。
       truncated: false
   - id: A29
     source: specs/dd-publishing/spec.md
@@ -278,7 +282,7 @@ acceptance:
       后锁定，但付费对象的付费方式子项及其参数仍按 live 页面能力编辑。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: outer usage mode 锁定及付费子项可编辑规则由商业字段测试覆盖。
       truncated: false
   - id: A30
     source: specs/dd-publishing/spec.md
@@ -286,7 +290,7 @@ acceptance:
       `{sn,act_type}`。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 关联候选按 game_type 获取并只发送 sn/act_type，由 enrichment 和关闭分支测试覆盖。
       truncated: false
   - id: A31
     source: specs/dd-publishing/spec.md
@@ -294,21 +298,21 @@ acceptance:
       anchor VIP 保留已有等级；切为 private 或将 outer usage mode 切回 free 才清空等级。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: VIP 候选、空数组、保留与条件清空语义由专用 builder 测试覆盖。
       truncated: false
   - id: A32
     source: specs/dd-publishing/spec.md
     text: "`with_file -> WA material file/file_install_path`。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: WA with_file 与材质文件/安装路径条件由上传和 WA 编辑测试覆盖。
       truncated: false
   - id: A33
     source: specs/dd-publishing/spec.md
     text: "`backup_sn -> /backup/detail -> WTF account -> server -> role`。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: backup 到 WTF account/server/role 的绑定 selector 由配置选择测试覆盖。
       truncated: false
   - id: A34
     source: specs/dd-publishing/spec.md
@@ -316,7 +320,7 @@ acceptance:
       `backup.detail.extra.wa_account_info[account]`，切换备份或账号时两组 WA 全部失效。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 备份和账号切换使 known/unknown WA 失效，由账号映射及清空测试覆盖。
       truncated: false
   - id: A35
     source: specs/dd-publishing/spec.md
@@ -324,14 +328,14 @@ acceptance:
       绑定备份、section、account、index 和条目身份。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: retail_ui_config selector 绑定备份、section、account、index 和身份，由恢复/跨备份拒绝测试覆盖。
       truncated: false
   - id: A36
     source: specs/dd-publishing/spec.md
     text: "`game_type -> WA category_ids`，最多五项。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: WA 分类按 game_type 动态读取、字符串投影和最多五项限制由矩阵覆盖。
       truncated: false
   - id: A37
     source: specs/dd-publishing/spec.md
@@ -341,7 +345,8 @@ acceptance:
       和向导开关，永不输出或接收 `import_string`。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: WTF role、WA uid 和 retail opaque selector 的安全投影及禁止 import_string 由 builder
+        测试覆盖。
       truncated: false
   - id: A38
     source: specs/dd-publishing/spec.md
@@ -352,7 +357,7 @@ acceptance:
       `Authentication: <jwt>`。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 固定作者 API origin、签名登录、JWT 频道链与 header 合同由 sidecar/endpoint 测试覆盖。
       truncated: false
   - id: A39
     source: specs/dd-publishing/spec.md
@@ -366,7 +371,7 @@ acceptance:
       为主，`detail_v2` 是补充投影；空历史不能单独判定写入失败或触发重放。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 完整只读 endpoint、分页、条件读取、所有权和插件版本投影由 builder 合同测试覆盖。
       truncated: false
   - id: A40
     source: specs/dd-publishing/spec.md
@@ -376,7 +381,7 @@ acceptance:
       delete 前 GET 所有权/状态，在 delete 后 list/get 读回不存在状态。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 三类资源 create/modify/delete endpoint、动作白名单、删除前后读回由矩阵覆盖。
       truncated: false
   - id: A41
     source: specs/dd-publishing/spec.md
@@ -385,14 +390,14 @@ acceptance:
       仅按官方合同设置 `Content-Type` 和 `X-Amz-Acl: public-read`，字面 HTTP 200 才算成功。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 上传授权、对象 PUT、d_url 使用、maxSize、固定 header 和字面 200 要求由上传测试覆盖。
       truncated: false
   - id: A42
     source: specs/dd-publishing/spec.md
     text: "| 资源 | 扩展名/上限 | file_type | business_id | file_name | MIME |"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 五类上传资源的 descriptor 目录已完整枚举并进入测试矩阵。
       truncated: false
   - id: A43
     source: specs/dd-publishing/spec.md
@@ -400,7 +405,7 @@ acceptance:
       `application/x-zip-compressed` |"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 插件 ZIP 的 file_type、business_id、addon.zip 和 MIME 精确断言通过。
       truncated: false
   - id: A44
     source: specs/dd-publishing/spec.md
@@ -408,7 +413,7 @@ acceptance:
       `wa_materials.zip` | `application/x-zip-compressed` |"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: WA 材质 ZIP 的大小、wa_materials.zip、business_id 和 MIME 精确断言通过。
       truncated: false
   - id: A45
     source: specs/dd-publishing/spec.md
@@ -416,21 +421,21 @@ acceptance:
       `img` | 显式空字符串 | 按扩展名确定 |"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 插件 logo/详情图数量、大小、扩展名、MIME 与显式空 file_name 由矩阵覆盖。
       truncated: false
   - id: A46
     source: specs/dd-publishing/spec.md
     text: "| 配置展示图 | 同上；最多 8 张 | `a19-ui-media` | `img` | 省略 | 按扩展名确定 |"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 配置图片的数量、MIME 及省略 file_name 语义由矩阵覆盖。
       truncated: false
   - id: A47
     source: specs/dd-publishing/spec.md
     text: "| WA 展示图 | 同上；最多 8 张 | `a19-ui-media` | `img` | 省略 | 按扩展名确定 |"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: WA 图片的数量、MIME 及省略 file_name 语义由矩阵覆盖。
       truncated: false
   - id: A48
     source: specs/dd-publishing/spec.md
@@ -439,7 +444,7 @@ acceptance:
       文件名，且本地字节与 SHA-256 不变。"
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 固定/空/省略 file_name 三态、特殊文件名和字节 SHA-256 保持由上传测试覆盖。
       truncated: false
   - id: A49
     source: specs/dd-publishing/spec.md
@@ -448,7 +453,7 @@ acceptance:
       submit 接受 0，非零值范围为 10..20000 分。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 公共字段全集、布尔/零值和价格边界由 schema/catalog 双向矩阵覆盖。
       truncated: false
   - id: A50
     source: specs/dd-publishing/spec.md
@@ -459,7 +464,7 @@ acceptance:
       private 才提交它。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: private、房间、关联、免费/付费及各资源 lifetime 条件清空由完整 body 测试覆盖。
       truncated: false
   - id: A51
     source: specs/dd-publishing/spec.md
@@ -471,7 +476,7 @@ acceptance:
       create-only。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: outer usage mode 非 wire 字段、存量模式锁定和付费子开关编辑由专用合同测试覆盖。
       truncated: false
   - id: A52
     source: specs/dd-publishing/spec.md
@@ -481,7 +486,7 @@ acceptance:
       字符。字段覆盖不等于每个动作都可写。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 插件字段全集、长度限制和 modify/delete 标识符由字段目录与矩阵覆盖。
       truncated: false
   - id: A53
     source: specs/dd-publishing/spec.md
@@ -494,7 +499,7 @@ acceptance:
       和作者列表，再从 form model 构造完整 `/addon/modify` payload，禁止透传审核、统计和临时字段。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 插件 create/update/edit 独立白名单、description edit 拒绝及完整 modify 重建由测试覆盖。
       truncated: false
   - id: A54
     source: specs/dd-publishing/spec.md
@@ -507,7 +512,7 @@ acceptance:
       submit 实际执行的清空规则，不得调用会额外制造字段的通用归一化 helper。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 插件官方投影合并、latest_version fallback、分类尾项移除和不注入 create 默认由 builder 测试覆盖。
       truncated: false
   - id: A55
     source: specs/dd-publishing/spec.md
@@ -517,7 +522,7 @@ acceptance:
       1000、展示图最多 8 张。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 配置顶层字段、限制和 share_sn 动作字段由 schema/catalog 矩阵覆盖。
       truncated: false
   - id: A56
     source: specs/dd-publishing/spec.md
@@ -527,7 +532,7 @@ acceptance:
       不满足该规则的替代条件。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 备份完整对象重建、七组内容、inner_version 和 WTF 条件由配置测试覆盖。
       truncated: false
   - id: A57
     source: specs/dd-publishing/spec.md
@@ -537,7 +542,7 @@ acceptance:
       `spec_tag` 最多一个 cooldown。Python 从 live backup 恢复保留全部字段的完整对象。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 备份/账号切换失效、retail edit/default/cooldown 约束和完整对象恢复由 selector 测试覆盖。
       truncated: false
   - id: A58
     source: specs/dd-publishing/spec.md
@@ -546,7 +551,7 @@ acceptance:
       `/share/modify` payload 提交。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 配置 create/update/edit 白名单、详情与备份 GET、完整 share/modify body 由矩阵覆盖。
       truncated: false
   - id: A59
     source: specs/dd-publishing/spec.md
@@ -555,7 +560,7 @@ acceptance:
       及公共字段；modify/delete 另含 `sn`。限制：名称 40、简介 50、数字版本输入长度 80、更新说明 1000、分类最多五项。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: WA 字段全集、长度/数量限制和 sn 动作字段由字段矩阵覆盖。
       truncated: false
   - id: A60
     source: specs/dd-publishing/spec.md
@@ -567,7 +572,7 @@ acceptance:
       `file_path/file_install_path`，不擅自清空。'
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: WA2 三种写动作均调用原生 parser；嵌套结果、非 WA2 清空及材质保留由专用测试覆盖。
       truncated: false
   - id: A61
     source: specs/dd-publishing/spec.md
@@ -577,7 +582,7 @@ acceptance:
       `/wa/modify` payload。带 `assign_user_sn` 的插件和 WA 最终 form 只能保持 public scope。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: WA 动作白名单、数值版本递增、动态 GET 和 assigned public scope 由测试覆盖。
       truncated: false
   - id: A62
     source: specs/dd-publishing/spec.md
@@ -586,7 +591,7 @@ acceptance:
       无论发现接口中的展示类型，都以字符串提交。该默认仅作用于 create；update/edit 对省略字段保留当前远端值。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: WA create 默认逐字段断言，update/edit omitted 保留现值由 wire 矩阵覆盖。
       truncated: false
   - id: A63
     source: specs/dd-publishing/spec.md
@@ -597,7 +602,7 @@ acceptance:
       已接受而读回不确定时也为 true。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 固定错误阶段及 verification_required 分类由 HTTP、timeout 和 sidecar 测试覆盖。
       truncated: false
   - id: A64
     source: specs/dd-publishing/spec.md
@@ -614,7 +619,7 @@ acceptance:
       或省略字段时，只规范化为对应空结构，非空内容及错误类型不放宽。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 脱敏、精确 GET 409 签名无效仅重试一次、POST/上传不重放和读回规范化均有专项测试。
       truncated: false
   - id: A65
     source: specs/dd-publishing/spec.md
@@ -631,7 +636,7 @@ acceptance:
       读回；该证据不得依赖真实 token、signed URL、Cookie、clientNo、原始 WA 或原始备份。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: JSONL 错误日志的请求/响应、状态、业务码、字段提示、长度、截断和递归脱敏由 HTTPError fixture 覆盖。
       truncated: false
   - id: A66
     source: specs/dd-publishing/spec.md
@@ -640,7 +645,7 @@ acceptance:
       的动作字段集合必须双向相等：schema 新增字段而矩阵没有 case、矩阵引用不存在字段、字段被移动到其他动作却未更新矩阵，均直接使测试失败。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 可执行字段目录与 versioned schema 双向校验通过，195 个动作字段、零缺口。
       truncated: false
   - id: A67
     source: specs/dd-publishing/spec.md
@@ -650,7 +655,7 @@ acceptance:
       case ID 和实际调用轨迹。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 稳定 case ID 记录输入状态、依赖/上传调用、endpoint、完整 body、mutation 数和读回/错误预期。
       truncated: false
   - id: A68
     source: specs/dd-publishing/spec.md
@@ -661,7 +666,7 @@ acceptance:
       selector、子候选为空和跨父 selector。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 1247 个 case 覆盖 omitted、类型、边界、数组/对象、null 及条件父子状态。
       truncated: false
   - id: A69
     source: specs/dd-publishing/spec.md
@@ -670,7 +675,7 @@ acceptance:
       和 null 不得通过 truthiness 合并。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: N/A、omitted 五类结果以及 false/0/空值/null 区分均在报告和矩阵中明确。
       truncated: false
   - id: A70
     source: specs/dd-publishing/spec.md
@@ -681,7 +686,7 @@ acceptance:
       前的明确拒绝必须证明对象 PUT 和 mutation 都为零。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: accepted case 断言 JSON round-trip 后的完整深层 body、保留/清空/缺失字段及单 mutation。
       truncated: false
   - id: A71
     source: specs/dd-publishing/spec.md
@@ -691,7 +696,8 @@ acceptance:
       VIP、`with_associate=false` 不读取关联候选、未上传本地文件不调用 `/file/upload`。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: capture harness 区分并排序 GET、只读 POST、频道、parser、授权、PUT、mutation 和
+        readback，关闭分支断言零无关调用。
       truncated: false
   - id: A72
     source: specs/dd-publishing/spec.md
@@ -701,7 +707,7 @@ acceptance:
       断言只存在合同 header、body 长度与 SHA-256 保持一致、非 200 和连接不确定的分类正确。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 五类上传、特殊文件名、descriptor、header、长度、SHA-256 与失败分类由独立矩阵覆盖。
       truncated: false
   - id: A73
     source: specs/dd-publishing/spec.md
@@ -710,7 +716,7 @@ acceptance:
       必须证明 create-only/version-only 字段在 schema 层拒绝，且旧记录缺失字段时不注入 create 默认或 null。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 插件元数据至关联全字段矩阵、版本 preflight/readback、上传替换和受限字段拒绝均通过。
       truncated: false
   - id: A74
     source: specs/dd-publishing/spec.md
@@ -720,7 +726,7 @@ acceptance:
       Python 在 mutation 前用同 session 最新 `/backup/detail` 恢复完整官方对象。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 配置七组内容、增量、WTF/WA/retail selector 与切换失效均由完整矩阵覆盖。
       truncated: false
   - id: A75
     source: specs/dd-publishing/spec.md
@@ -731,7 +737,7 @@ acceptance:
       保留已有材质路径。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: WA 元数据、版本、解析、材质和商业字段矩阵完整，create 默认与 omitted 保留均通过。
       truncated: false
   - id: A76
     source: specs/dd-publishing/spec.md
@@ -740,7 +746,7 @@ acceptance:
       mutation。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 三类 delete 的 confirm、identifier、所有权 GET、精确 body、单 mutation 和删除后不存在读回均覆盖。
       truncated: false
   - id: A77
     source: specs/dd-publishing/spec.md
@@ -751,7 +757,7 @@ acceptance:
       case 都不得自动重发 mutation。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: HTTP 400/401/403/404/422/500、业务码、JSON/文本/超长 body、日志和不确定性分类由错误矩阵覆盖。
       truncated: false
   - id: A78
     source: specs/dd-publishing/spec.md
@@ -762,7 +768,8 @@ acceptance:
       字段数、字段覆盖数、case 数、缺口数；缺口必须为零才能通过 Verify。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 指定 analyze 报告存在，共 1293 行；汇总 195 个字段、1247 个 case，12 个 resource/action
+        组合缺口均为 0。
       truncated: false
   - id: A79
     source: specs/dd-publishing/spec.md
@@ -771,7 +778,7 @@ acceptance:
       task 一次 relogin、并发串行、显式 logout、失败即停和空闲退出。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 完整合同与进程测试覆盖 endpoint、白名单、依赖、上传、错误、脱敏、读回、GUI 冲突、串行、logout 和失败停止。
       truncated: false
   - id: A80
     source: specs/dd-publishing/spec.md
@@ -781,7 +788,8 @@ acceptance:
       schema 双向缺口为零。
     result: passed
     reason:
-      text: 独立核对实现、对应合同测试、Runtime 全量检查与真实当前账号证据后通过。
+      text: 逐字段矩阵包含 wire-presence、条件 enabled/disabled/stale-child 和受限字段
+        rejection；schema 双向缺口为零。
       truncated: false
   - id: A81
     source: specs/dd-publishing/spec.md
@@ -796,107 +804,27 @@ acceptance:
       矩阵，生成绑定最终 commit、DD 版本和资源哈希的脱敏证据。批量六插件测试记录 GUI 进程数、sidecar
       数和原生登录次数。测试对象只按本次记录的 SN 清理，任何不确定删除先读回；验证结束必须确认无 sidecar、broker 进程或 live
       broker state。
-    result: failed
+    result: passed
     reason:
-      text: 自动化分别覆盖 email/mobile flow 构造，但当前文字还要求按 credential kind 分别重复覆盖共用 JWT/API
-        与生命周期；现有测试对共用管线统一覆盖，未满足该过度细化措辞。
+      text: iteration 2 新测试分别覆盖 email、mobile_password、mobile_uplink 的唯一 flow、参数、JWT、作者
+        API 与显式 logout；email/mobile broker 测试覆盖单 broker/sidecar/login。当前 email
+        账号 live 矩阵 147/147 步骤、19/19 清理通过且零残留。
       truncated: false
 builder_handoff:
-  candidate_id: a25720ac-56b8-416a-9b35-c115fd8cef92
+  candidate_id: 8e5af59a-c421-47fd-9a0a-98fb416ed515
   identity_provider: skill-coordinated
-  builder_execution_ref: skill-coordinated:builder:95254358-4fa4-40c3-b7c8-5f8f10a6370d
-  iteration: 1
+  builder_execution_ref: skill-coordinated:builder:658bdbc4-c42c-49e9-8c0b-a4df2d9792e7
+  iteration: 2
   summary:
-    text: Candidate 8448750 adds deterministic persisted DD email/mobile session
-      dispatch with one shared post-login publishing pipeline, safe login-kind
-      output, exact one-time GET retry for transient 409 signature rejection,
-      stable current-account backup selection, and empty config readback
-      normalization. Formal acceptance now requires one full live matrix against
-      the currently persisted official account while automated contracts cover
-      both email and mobile flows. Release metadata is prepared as
-      @follenfang/fupload 0.0.16.
+    text: Iteration 2 aligns product documentation with the confirmed
+      current-persisted-account live-test boundary and adds unified tests
+      proving email, mobile password, and mobile uplink dispatch all enter the
+      same JWT, author API, resource lifecycle, broker/sidecar, and logout
+      pipeline. Candidate 35fb6b1 preserves the previously validated functional
+      implementation while closing A8 and A81.
     truncated: false
   addressed_acceptance_ids:
-    - A1
-    - A2
-    - A3
-    - A4
-    - A5
-    - A6
-    - A7
     - A8
-    - A9
-    - A10
-    - A11
-    - A12
-    - A13
-    - A14
-    - A15
-    - A16
-    - A17
-    - A18
-    - A19
-    - A20
-    - A21
-    - A22
-    - A23
-    - A24
-    - A25
-    - A26
-    - A27
-    - A28
-    - A29
-    - A30
-    - A31
-    - A32
-    - A33
-    - A34
-    - A35
-    - A36
-    - A37
-    - A38
-    - A39
-    - A40
-    - A41
-    - A42
-    - A43
-    - A44
-    - A45
-    - A46
-    - A47
-    - A48
-    - A49
-    - A50
-    - A51
-    - A52
-    - A53
-    - A54
-    - A55
-    - A56
-    - A57
-    - A58
-    - A59
-    - A60
-    - A61
-    - A62
-    - A63
-    - A64
-    - A65
-    - A66
-    - A67
-    - A68
-    - A69
-    - A70
-    - A71
-    - A72
-    - A73
-    - A74
-    - A75
-    - A76
-    - A77
-    - A78
-    - A79
-    - A80
     - A81
   checks:
     - name:
@@ -904,7 +832,14 @@ builder_handoff:
         truncated: false
       result: passed
       note:
-        text: 368 tests passed
+        text: 370 tests passed
+        truncated: false
+    - name:
+        text: dd-session-suite
+        truncated: false
+      result: passed
+      note:
+        text: 47 tests passed
         truncated: false
     - name:
         text: node-test-full
@@ -935,7 +870,7 @@ builder_handoff:
         truncated: false
       result: passed
       note:
-        text: 55 files, 176355 bytes packed
+        text: 55 files, 176839 bytes packed
         truncated: false
     - name:
         text: npm-test-install
@@ -955,9 +890,10 @@ builder_handoff:
         truncated: false
       result: passed
       note:
-        text: "email-full-live-6e86914.json: completed=true, credential_kind=email, zero
-          failed steps, 19 cleanup actions; implementation tree unchanged since
-          evidence commit"
+        text: "analyze/dd-email/email-full-live-6e86914.json: completed=true,
+          credential_kind=email, zero failed steps, 19 cleanup actions; later
+          commits change requirements, tests, version metadata, and Runtime
+          evidence only"
         truncated: false
     - name:
         text: residual-process-check
@@ -968,20 +904,21 @@ builder_handoff:
         truncated: false
   checks_truncated: false
   known_limits:
-    - text: npm registry authentication on this host currently returns E401; this does
-        not affect code verification but must be resolved before npm publish.
+    - text: Local npm authentication returns E401; release uses the repository's
+        existing GitHub Actions Trusted Publishing workflow triggered by
+        v0.0.16.
       truncated: false
   known_limits_truncated: false
-  submitted_at: 2026-09-02T08:27:47.978Z
+  submitted_at: 2026-09-02T09:05:30.963Z
 blockers: []
 verification:
-  candidate_id: a25720ac-56b8-416a-9b35-c115fd8cef92
+  candidate_id: 8e5af59a-c421-47fd-9a0a-98fb416ed515
   identity_provider: skill-coordinated
-  verifier_execution_ref: skill-coordinated:verifier:50ce232b-ffda-474c-b19b-883fd3020e76
-  iteration: 1
+  verifier_execution_ref: skill-coordinated:verifier:236cfac9-4514-4de8-8a8d-aa4f0c7f1009
+  iteration: 2
   attempt: 1
   assurance: skill-coordinated
-  verdict: fail
+  verdict: pass
   checks:
     - id: python-full
       name:
@@ -1004,7 +941,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 12881
+      duration_ms: 13202
     - id: node-full
       name:
         text: Node full test suite
@@ -1016,7 +953,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 101544
+      duration_ms: 76206
     - id: compileall
       name:
         text: Python compileall
@@ -1034,7 +971,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 92
+      duration_ms: 102
     - id: manifest
       name:
         text: Skill manifest consistency
@@ -1048,7 +985,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 575
+      duration_ms: 623
     - id: versions
       name:
         text: Release version consistency
@@ -1062,7 +999,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 541
+      duration_ms: 586
     - id: pack
       name:
         text: Npm tarball verification
@@ -1076,7 +1013,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 1254
+      duration_ms: 1374
     - id: install
       name:
         text: Isolated npm installation
@@ -1090,7 +1027,7 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 249664
+      duration_ms: 221740
     - id: diff-check
       name:
         text: Git whitespace validation
@@ -1106,20 +1043,19 @@ verification:
       cwd_ref: .
       status: passed
       exit_code: 0
-      duration_ms: 89
+      duration_ms: 91
   summary:
-    text: 79/81 项通过。Runtime 8 项门禁及当前邮箱账号全量真实矩阵均通过；A8 因产品文档边界未同步失败，A81 因验收文字过度要求按
-      credential kind 重复验证共用管线失败。
+    text: 独立只读复核完成，A1-A81 共 81 项全部通过，无遗漏或重复，无需追加 Runtime checks。A8 的产品文档边界已统一；A81
+      已补齐全部受支持登录组合的共用 JWT/作者 API/logout 与单 broker/sidecar/login 证据。
     truncated: false
   risks:
-    - text: 产品 DD 文档仍要求双账号真实矩阵，与已确认的当前账号验证边界冲突。
+    - text: 真实矩阵按已确认边界只使用当前持久化 email 账号；mobile 官方运行时兼容性由确定性合同测试保证，DD 客户端升级后仍需按文档重新验证。
       truncated: false
-    - text: npm 本机 token 为 E401；计划使用现有 GitHub Trusted Publishing tag workflow。
-      truncated: false
-    - text: 真实证据绑定功能实现提交 6e86914；8448750 仅修改正式需求、版本与 manifest，功能实现和测试文件未变化。
+    - text: live 证据绑定实现提交 6e86914；已确认 6e86914 到候选 35fb6b1 的 DD runtime
+        文件无差异，后续仅变更文档、测试、版本和 Runtime 产物。
       truncated: false
   risks_truncated: false
-  completed_at: 2026-09-02T08:47:39.213Z
+  completed_at: 2026-09-02T09:27:26.397Z
 history:
   - goal_cycle: 1
     iteration: 1
@@ -1155,6 +1091,16 @@ history:
         credential kind 重复验证共用管线失败。
       truncated: false
     completed_at: 2026-09-02T08:47:39.213Z
+  - goal_cycle: 3
+    iteration: 2
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: 独立只读复核完成，A1-A81 共 81 项全部通过，无遗漏或重复，无需追加 Runtime checks。A8 的产品文档边界已统一；A81
+        已补齐全部受支持登录组合的共用 JWT/作者 API/logout 与单 broker/sidecar/login 证据。
+      truncated: false
+    completed_at: 2026-09-02T09:27:26.397Z
 history_overflow:
   dropped_entries: 0
   first_dropped_at: null
@@ -1165,7 +1111,7 @@ history_overflow:
     blocked: 0
     execution-error: 0
     recovery: 0
-verification_result: fail
+verification_result: pass
 verification_report: verification.md
 archived: false
 created_at: 2026-09-02T05:11:52.888Z
