@@ -1791,6 +1791,13 @@ def config_readback_projection(value: Any) -> Mapping[str, Any]:
     projected = dict(value)
     if "need_buy" in projected:
         projected["need_buy"] = 1 if projected["need_buy"] else 0
+    for name in ("known_addon", "unknown_addon", "material", "font", "known_wa", "unknown_wa"):
+        if projected.get(name) is None:
+            projected[name] = {"items": [], "inner_version": {}}
+    if projected.get("wtf") is None:
+        projected["wtf"] = {"accounts": []}
+    if projected.get("vip_levels") is None:
+        projected["vip_levels"] = []
     return projected
 
 
