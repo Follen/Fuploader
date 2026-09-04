@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "0.0.16",
   "skill_version": "0.0.16",
-  "tree_sha256": "aba774b14679854ac01a09711aa10b2f7266af2c43e8220cc67c64b9559bfb51",
+  "tree_sha256": "cc1164935519b80035b3025d5748b27cc634f4ce30cf170a28a952f165ffaf7c",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -137,18 +137,18 @@
     },
     {
       "path": "scripts/fupload_cli/dd_broker.py",
-      "bytes": 27637,
-      "sha256": "1ba00dcaea80905769bb2e00a6e965f2a1e9bb46a33534d1e77a6564158605a8"
+      "bytes": 28188,
+      "sha256": "331b48716bde3b82ae72403707cfc57480d0be439e993f9c847eec212484bfbf"
     },
     {
       "path": "scripts/fupload_cli/dd_sidecar.py",
-      "bytes": 37603,
-      "sha256": "6ad1ab9e2145757f44b410d87d554485566812d9584820180ff3bb7b5bc7763a"
+      "bytes": 39150,
+      "sha256": "42791c82e5518838aedbe209823b94deb7de09b2f3eccb4fe563364f58becc6c"
     },
     {
       "path": "scripts/fupload_cli/dd.py",
-      "bytes": 113914,
-      "sha256": "31e349cfee243c1ae8afefd74acfe3f5d79771a1c23ed1892aaf9d8e9b416922"
+      "bytes": 114434,
+      "sha256": "cf808efdd4a93d80bddb533af4ac14696e889e0fd359acdacd58a7a49ce050b0"
     },
     {
       "path": "scripts/fupload_cli/errors.py",

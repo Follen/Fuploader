@@ -240,6 +240,20 @@ def state_dir() -> Path:
     return result
 
 
+def _sidecar_startup_error(error: Mapping[str, Any]) -> FuploadError:
+    message = str(error.get("message") or "DD sidecar failed to start")
+    return FuploadError(
+        message,
+        kind=str(error.get("kind") or "authentication_error"),
+        stage=str(error.get("stage") or "session"),
+        endpoint=error.get("endpoint"),
+        http_status=error.get("http_status"),
+        business_code=error.get("business_code"),
+        verification_required=bool(error.get("verification_required")),
+        details=error.get("details") if isinstance(error.get("details"), dict) else None,
+    )
+
+
 class Sidecar:
     def __init__(self) -> None:
         self.dd_dir, self.signature = discover_dd_info()
@@ -272,11 +286,8 @@ class Sidecar:
             raise
         if not ready.get("ready"):
             self.close()
-            raise FuploadError(
-                str((ready.get("error") or {}).get("message") or "DD sidecar failed to start"),
-                kind="authentication_error",
-                stage="session",
-            )
+            error = ready.get("error") if isinstance(ready.get("error"), dict) else {}
+            raise _sidecar_startup_error(error)
         credential_kind = ready.get("credential_kind")
         if credential_kind not in ("email", "mobile"):
             self.close()
