@@ -362,12 +362,13 @@ def _validation_details(probe):
     return result
 
 
-def install_response_probe(client):
+def install_response_probe(client, capture_success=False):
     """Capture response objects and HTTPError bodies without changing DD behavior."""
     session = getattr(client, "_session", None)
     restore = getattr(client, "_fupload_restore_response_probe", None)
     if callable(restore):
         restore()
+    client._fupload_capture_success = bool(capture_success)
     original_opener_open = urllib.request.OpenerDirector.open
 
     def opener_open(opener, *args, **kwargs):
@@ -400,6 +401,7 @@ def install_response_probe(client):
         if getattr(urllib.request.OpenerDirector, "open", None) is opener_open:
             urllib.request.OpenerDirector.open = original_opener_open
         client._fupload_restore_response_probe = None
+        client._fupload_capture_success = False
 
     client._fupload_restore_response_probe = restore_probe
     for method_name in ("get", "post"):
@@ -415,7 +417,7 @@ def install_response_probe(client):
                     status = int(getattr(response, "status_code", 0) or 0)
                 except (TypeError, ValueError):
                     status = 0
-                if status >= 400:
+                if status >= 400 or getattr(client, "_fupload_capture_success", False):
                     try:
                         body = str(getattr(response, "text", "") or "")
                     except Exception:
@@ -505,6 +507,59 @@ def failure_from_exception(exc, stage, response=None):
         verification_required=uncertain and not (status is not None and 400 <= status < 500),
         details=_validation_details(probe),
     )
+
+
+def author_login_failure(client):
+    probe = getattr(client, "_fupload_last_response_error", None)
+    return failure_from_exception(
+        RuntimeError("DD author API login failed"), "session", probe,
+    )
+
+
+def _last_response_payload(client):
+    probe = getattr(client, "_fupload_last_response_error", None)
+    if not isinstance(probe, dict) or not probe.get("body"):
+        return None
+    try:
+        payload = json.loads(probe["body"])
+    except (TypeError, ValueError):
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def login_author_client(client):
+    try:
+        if client.login():
+            return
+        if _retryable_get_signature_rejection(_last_response_payload(client)):
+            client._fupload_last_response_error = None
+            if client.login():
+                return
+        raise author_login_failure(client)
+    finally:
+        client._fupload_capture_success = False
+
+
+def author_session_or_cleanup(qt, container, flow, jwt_helper, client):
+    session = (qt, container, flow, jwt_helper, client)
+    try:
+        login_author_client(client)
+    except Exception:
+        try:
+            close_session(session)
+        except Exception:
+            pass
+        raise
+    return session
+
+
+def startup_error_payload(exc):
+    if isinstance(exc, SidecarFailure):
+        return exc.as_dict()
+    return {
+        "type": type(exc).__name__,
+        "message": safe_exception_message(exc)[:400],
+    }
 
 
 def bootstrap():
@@ -643,10 +698,8 @@ def open_session(timeout=45):
         raise RuntimeError("DD NEP module is not initialized")
     client = UiApiClient(nep, login_cookie=getattr(controller, "_cookie", None))
     client._session.headers["User-Agent"] = USER_AGENT
-    if not client.login():
-        raise RuntimeError("DD author API login failed")
-    install_response_probe(client)
-    return qt, container, flow, jwt_helper, client
+    install_response_probe(client, capture_success=True)
+    return author_session_or_cleanup(qt, container, flow, jwt_helper, client)
 
 
 def api_result(payload):
@@ -905,10 +958,7 @@ def main():
                         "error": error})
         return 0
     except Exception as exc:
-        output({"ready": False, "error": {
-            "type": type(exc).__name__,
-            "message": safe_exception_message(exc)[:400],
-        }})
+        output({"ready": False, "error": startup_error_payload(exc)})
         return 1
     finally:
         machine_data.clientNo = original

@@ -13,7 +13,7 @@ import time
 import uuid
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Mapping, Optional
 
 from .errors import FuploadError, redact
 from .trust import verify_dd_executable
@@ -406,6 +406,17 @@ def _send(value: Dict[str, Any], timeout: float = 300) -> Dict[str, Any]:
     return response.get("data")
 
 
+def _startup_error(pending: Mapping[str, Any]) -> FuploadError:
+    error = pending.get("error")
+    if isinstance(error, dict):
+        return FuploadError.from_dict(error)
+    return FuploadError(
+        str(error or "DD task session failed to start"),
+        kind="session_start_failed",
+        stage="session",
+    )
+
+
 def start(confirm_close_gui: bool) -> Dict[str, Any]:
     existing = _load_live_state()
     if existing:
@@ -447,7 +458,7 @@ def start(confirm_close_gui: bool) -> Dict[str, Any]:
         creationflags=flags,
     )
     deadline = time.time() + 90
-    last_error = ""
+    last_error: Any = ""
     while time.time() < deadline:
         state = _load_live_state()
         if state and state.get("startup_id") == startup_id:
@@ -465,7 +476,7 @@ def start(confirm_close_gui: bool) -> Dict[str, Any]:
         if startup.exists():
             try:
                 pending = _read_json(startup)
-                last_error = str(pending.get("error") or "")
+                last_error = pending.get("error") or ""
             except FuploadError:
                 pass
         if process.poll() is not None:
@@ -487,10 +498,11 @@ def start(confirm_close_gui: bool) -> Dict[str, Any]:
     try:
         pending = _read_json(startup)
         if pending.get("startup_id") == startup_id:
+            last_error = pending.get("error") or last_error
             startup.unlink()
     except (FuploadError, OSError):
         pass
-    raise FuploadError(last_error or "DD task session failed to start", kind="session_start_failed", stage="session")
+    raise _startup_error({"error": last_error})
 
 
 def status(session_id: Optional[str] = None) -> Dict[str, Any]:
@@ -655,9 +667,17 @@ def _serve(startup_id: str) -> int:
                 connection.sendall((json.dumps(response, ensure_ascii=False, separators=(",", ":")) + "\n").encode("utf-8"))
         return 0
     except Exception as exc:
+        if isinstance(exc, FuploadError):
+            error = exc.as_dict()
+        else:
+            error = FuploadError(
+                redact(str(exc))[:400] or "DD task session failed to start",
+                kind="session_start_failed",
+                stage="session",
+            ).as_dict()
         _atomic_json(startup_path, {
             "startup_id": startup_id,
-            "error": redact(str(exc))[:400],
+            "error": error,
         })
         return 1
     finally:

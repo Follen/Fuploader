@@ -1,9 +1,9 @@
 {
   "schema": "fupload.npm-skill-manifest.v1",
   "package_name": "@follenfang/fupload",
-  "package_version": "0.0.16",
-  "skill_version": "0.0.16",
-  "tree_sha256": "aba774b14679854ac01a09711aa10b2f7266af2c43e8220cc67c64b9559bfb51",
+  "package_version": "0.0.17",
+  "skill_version": "0.0.17",
+  "tree_sha256": "064aeb1a1291d240a3bea7e71458846395abe29c6e91f682d269ec0e684c4294",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -113,7 +113,7 @@
     {
       "path": "scripts/fupload_cli/__init__.py",
       "bytes": 50,
-      "sha256": "f0d2cbd76206a61d5fd78eef58ad808108f9538963da2c0ea67df79c8a41e104"
+      "sha256": "8e72acb94a18f173cf9cbbf0436b20f64e1991f54a3537b7e930b4196bab8439"
     },
     {
       "path": "scripts/fupload_cli/blackbox_web.py",
@@ -137,18 +137,18 @@
     },
     {
       "path": "scripts/fupload_cli/dd_broker.py",
-      "bytes": 27637,
-      "sha256": "1ba00dcaea80905769bb2e00a6e965f2a1e9bb46a33534d1e77a6564158605a8"
+      "bytes": 28248,
+      "sha256": "6bbae4ed7aef4feca552816d7dbefa6069dc3d1d9a39a4af35582a06db4ce2d5"
     },
     {
       "path": "scripts/fupload_cli/dd_sidecar.py",
-      "bytes": 37603,
-      "sha256": "6ad1ab9e2145757f44b410d87d554485566812d9584820180ff3bb7b5bc7763a"
+      "bytes": 39150,
+      "sha256": "42791c82e5518838aedbe209823b94deb7de09b2f3eccb4fe563364f58becc6c"
     },
     {
       "path": "scripts/fupload_cli/dd.py",
-      "bytes": 113914,
-      "sha256": "31e349cfee243c1ae8afefd74acfe3f5d79771a1c23ed1892aaf9d8e9b416922"
+      "bytes": 114434,
+      "sha256": "cf808efdd4a93d80bddb533af4ac14696e889e0fd359acdacd58a7a49ce050b0"
     },
     {
       "path": "scripts/fupload_cli/errors.py",
@@ -208,7 +208,7 @@
     {
       "path": "SKILL.md",
       "bytes": 28383,
-      "sha256": "2477e603ca826b9bd31533995f2217bfd9239c070adbaa2aa4b829fb6a89fb7f"
+      "sha256": "9aebce883e6d83f0e3c8b36f497e59eb6f4df5e1e4af231df60ca3299188fb86"
     }
   ]
 }
