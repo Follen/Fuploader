@@ -873,6 +873,20 @@ class BuilderTests(unittest.TestCase):
                 "channel_type": "text",
             })
 
+    def test_dd_plugin_version_update_does_not_revalidate_preserved_channel(self) -> None:
+        session = mock.MagicMock(wraps=ValidDDOptions())
+        DD()._validate_options(session, "plugin", {
+            "game_type": 10001,
+            "game_versions": ["12.1.0"],
+            "primary_category_id": 1,
+            "second_category_ids": [2],
+            "jump_room": True,
+            "room_id": "room",
+            "channel_id": "channel",
+            "channel_type": "text",
+        }, validate_optional_dependencies=False)
+        session.cc_get.assert_not_called()
+
     def test_dd_enabled_association_rejects_empty_live_options(self) -> None:
         with self.assertRaisesRegex(FuploadError, "association response"):
             DD()._validate_options(EmptyDDOptions(), "config", {

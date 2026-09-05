@@ -348,6 +348,19 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(json.loads(wire)["payload"]["name"], "中文公告")
         self.assertEqual(result["name"], "中文公告")
 
+    def test_sidecar_upload_waits_beyond_native_object_put_timeout(self) -> None:
+        sidecar = Sidecar.__new__(Sidecar)
+        sidecar.counter = 0
+        sidecar.process = mock.MagicMock()
+        sidecar.process.stdin = mock.MagicMock()
+        with mock.patch.object(sidecar, "_next_result", return_value={
+            "id": 1,
+            "ok": True,
+            "data": {"d_url": "https://cdn.invalid/object", "size": 1},
+        }) as next_result:
+            sidecar.call("upload", file="D:/addon.zip", meta={})
+        self.assertGreaterEqual(next_result.call_args.kwargs["timeout"], 660)
+
     def test_native_sidecar_results_use_encoding_neutral_ascii_json(self) -> None:
         with mock.patch.dict(os.environ, {
             "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
@@ -478,6 +491,11 @@ class DDSessionTests(unittest.TestCase):
             provider.execute_read("plugin", "list", SimpleNamespace())
         self.assertEqual(write_error.exception.kind, "session_required")
         self.assertEqual(read_error.exception.kind, "session_required")
+
+    def test_broker_write_waits_beyond_sidecar_upload_response_timeout(self) -> None:
+        with mock.patch.object(dd_broker, "_send", return_value={}) as send:
+            dd_broker.execute("session", "write", "plugin", "update", {})
+        self.assertGreaterEqual(send.call_args.kwargs["timeout"], 720)
 
     def test_doctor_only_discovers_installation_and_local_state(self) -> None:
         sidecar = mock.Mock(side_effect=AssertionError("doctor must not create Sidecar"))
@@ -1587,6 +1605,7 @@ class DDSessionTests(unittest.TestCase):
             self.assertEqual(request.full_url, signed_url)
             self.assertEqual(request.get_header("Content-type"), "application/x-zip-compressed")
             self.assertEqual(request.get_header("X-amz-acl"), "public-read")
+            self.assertGreaterEqual(opened.call_args.kwargs["timeout"], 600)
             self.assertEqual(result["size"], len(b"payload"))
 
             with mock.patch.object(module.urllib.request, "urlopen", return_value=Response(201)):
