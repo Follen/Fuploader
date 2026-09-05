@@ -498,6 +498,7 @@ def start(confirm_close_gui: bool) -> Dict[str, Any]:
     try:
         pending = _read_json(startup)
         if pending.get("startup_id") == startup_id:
+            last_error = pending.get("error") or last_error
             startup.unlink()
     except (FuploadError, OSError):
         pass

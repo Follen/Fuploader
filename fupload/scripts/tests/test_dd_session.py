@@ -409,6 +409,48 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(error.business_code, 411)
         self.assertEqual(error.details["server_message"], "author session rejected")
 
+    def test_broker_start_reads_error_written_as_process_exits(self) -> None:
+        error = {
+            "message": "DD author API login failed",
+            "kind": "platform_error",
+            "stage": "session",
+            "http_status": 200,
+            "business_code": 409,
+        }
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            startup = root / dd_broker.STARTUP_NAME
+
+            class ExitedProcess:
+                @staticmethod
+                def poll():
+                    pending = dd_broker._read_json(startup)
+                    dd_broker._atomic_json(startup, {
+                        "startup_id": pending["startup_id"],
+                        "error": error,
+                    })
+                    return 1
+
+            with mock.patch.object(
+                dd_broker, "_load_live_state", return_value=None,
+            ), mock.patch.object(
+                dd_broker, "running_dd_processes", return_value=[],
+            ), mock.patch.object(
+                dd_broker, "close_verified_gui",
+            ), mock.patch.object(
+                dd_broker, "_state_dir", return_value=root,
+            ), mock.patch.object(
+                dd_broker.subprocess, "Popen", return_value=ExitedProcess(),
+            ):
+                with self.assertRaises(FuploadError) as raised:
+                    dd_broker.start(False)
+
+        self.assertEqual(str(raised.exception), "DD author API login failed")
+        self.assertEqual(raised.exception.kind, "platform_error")
+        self.assertEqual(raised.exception.http_status, 200)
+        self.assertEqual(raised.exception.business_code, 409)
+
     def test_native_failure_keeps_message_and_business_code(self) -> None:
         class UiApiError(Exception):
             code = 4312
