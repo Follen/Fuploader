@@ -23,6 +23,7 @@ STATE_NAME = "broker.json"
 STARTUP_NAME = "broker.starting.json"
 MAX_REQUEST_BYTES = 64 * 1024 * 1024
 IDLE_SECONDS = 10 * 60
+BROKER_WRITE_TIMEOUT_SECONDS = 15 * 60
 
 
 def _dd_module():
@@ -545,7 +546,7 @@ def execute(session_id: str, kind: str, resource: str, action: str, payload: Dic
         "resource": resource,
         "action": action,
         "payload": payload,
-    })
+    }, timeout=BROKER_WRITE_TIMEOUT_SECONDS if kind == "write" else 300)
 
 
 def _read_request(connection: socket.socket) -> Dict[str, Any]:
