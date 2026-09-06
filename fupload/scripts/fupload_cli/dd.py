@@ -20,6 +20,8 @@ from .trust import trusted_local_dir, trusted_roaming_dir, verify_dd_executable
 
 
 EXPECTED_DD_VERSION = os.environ.get("FUPLOAD_DD_EXPECTED_VERSION", "any")
+SIDECAR_DEFAULT_RESPONSE_TIMEOUT_SECONDS = 180
+SIDECAR_UPLOAD_RESPONSE_TIMEOUT_SECONDS = 660
 LIFE_TYPES = [
     {"name": "7 days", "value": "seven_day"},
     {"name": "14 days", "value": "fourteen_day"},
@@ -326,7 +328,7 @@ class Sidecar:
             self.responses.put(FuploadError("DD sidecar exited without a result", kind="sidecar_error"))
 
     def _next_result(
-        self, *, timeout: float = 180, endpoint: Optional[str] = None,
+        self, *, timeout: float = SIDECAR_DEFAULT_RESPONSE_TIMEOUT_SECONDS, endpoint: Optional[str] = None,
         stage: Optional[str] = None,
         verification_required: bool = False,
     ) -> Dict[str, Any]:
@@ -377,6 +379,11 @@ class Sidecar:
         else:
             expected_stage, uncertain = "dependency_get", False
         response = self._next_result(
+            timeout=(
+                SIDECAR_UPLOAD_RESPONSE_TIMEOUT_SECONDS
+                if action == "upload"
+                else SIDECAR_DEFAULT_RESPONSE_TIMEOUT_SECONDS
+            ),
             endpoint=endpoint,
             stage=expected_stage,
             verification_required=uncertain,
@@ -1950,7 +1957,10 @@ class DD:
         if available and any(str(value) not in available for value in values):
             raise ValidationError("selection contains an unavailable live option", path=path)
 
-    def _validate_options(self, session: Sidecar, resource: str, form: Mapping[str, Any]) -> None:
+    def _validate_options(
+        self, session: Sidecar, resource: str, form: Mapping[str, Any], *,
+        validate_optional_dependencies: bool = True,
+    ) -> None:
         game_type = form.get("game_type")
         if resource == "plugin":
             versions = session.get("/game_versions/list", {"game_type": game_type})
@@ -1983,11 +1993,11 @@ class DD:
         if form.get("share_code_life_type"):
             self._validate_choices(LIFE_TYPES, [form.get("share_code_life_type")], ("value",), "$.share_code_life_type")
 
-        if form.get("need_anchor_vip"):
+        if validate_optional_dependencies and form.get("need_anchor_vip"):
             vip_levels = session.get("/anchor_vip/level/list", {"enrich_acts": "false"})
             self._validate_choices(vip_levels, form.get("vip_levels") or [], ("id", "level", "value"), "$.vip_levels")
 
-        if form.get("jump_room"):
+        if validate_optional_dependencies and form.get("jump_room"):
             channels = safe_channels(session.cc_get("https://api.cc.163.com/v1/mixteammsgproxy/channelList?source=pluginPublish"))
             if not channels["items"]:
                 raise FuploadError("live channel response contained no selectable values", kind="platform_data_error")
@@ -1996,7 +2006,7 @@ class DD:
             if wanted not in available:
                 raise ValidationError("room/channel selection is unavailable", path="$.channel_id")
 
-        if form.get("with_associate"):
+        if validate_optional_dependencies and form.get("with_associate"):
             references = self._associated_refs(session, game_type)
             if not references:
                 raise FuploadError("live association response contained no selectable values", kind="platform_data_error")
@@ -2105,7 +2115,14 @@ class DD:
         validate_locked_usage_mode(current, form, doc)
         normalize_commercial(form, "plugin", create=action == "create")
         validate_plugin_submission(form, doc)
-        self._validate_options(session, "plugin", form)
+        # A version-only update cannot change these optional metadata fields.
+        # Validate their live dependencies on create/edit, but do not block a
+        # release merely because an already-saved room, VIP, or association is
+        # temporarily absent from an auxiliary option endpoint.
+        self._validate_options(
+            session, "plugin", form,
+            validate_optional_dependencies=action != "update",
+        )
         validate_no_display_objects(form, "plugin")
         if doc.get("logo_file"):
             form["logo"] = session.upload(doc["logo_file"], "addon", file_name="", media=True, max_bytes=10 * 1024 * 1024)

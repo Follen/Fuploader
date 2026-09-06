@@ -42,6 +42,7 @@ _SENSITIVE_KEYS = {
     "presigneduri", "presigned_uri", "signature", "client_secret", "api_key", "auth_key", "password", "secret",
 }
 _MAX_LOG_BODY = 1024 * 1024
+OBJECT_PUT_TIMEOUT_SECONDS = 600
 _CONFIG_CONTENT_KEYS = {
     "known_addon", "unknown_addon", "wtf", "material", "font",
     "known_wa", "unknown_wa", "retail_ui_config",
@@ -831,7 +832,7 @@ def run_command(session, command):
                 request = urllib.request.Request(
                     info["url"], data=data, method="PUT", headers=headers,
                 )
-                with urllib.request.urlopen(request, timeout=180) as response:
+                with urllib.request.urlopen(request, timeout=OBJECT_PUT_TIMEOUT_SECONDS) as response:
                     if response.status != 200:
                         try:
                             response_body = response.read()
