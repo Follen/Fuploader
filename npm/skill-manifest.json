@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "0.0.18",
   "skill_version": "0.0.18",
-  "tree_sha256": "36d839247defb278814b13da703acef8766aeb4f01efb8bda4c3d104367ac13b",
+  "tree_sha256": "45fa4b3629d34d2c5f01964a80fcbfe5e8d78d9f32579777ef1e210a5c0c9f38",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -87,8 +87,8 @@
     },
     {
       "path": "references/dd.md",
-      "bytes": 19727,
-      "sha256": "2804e4b77c000d0bd12ca3f69bbcd5720f759fd4e84b4127ea3461093bf5da7c"
+      "bytes": 19822,
+      "sha256": "4ac0d2fd7b802fd61d1b51769286bbac4aa14dcefa2b3f85a877424ce806553c"
     },
     {
       "path": "references/modus.md",
@@ -142,8 +142,8 @@
     },
     {
       "path": "scripts/fupload_cli/dd_sidecar.py",
-      "bytes": 39206,
-      "sha256": "722038884c5b050c2c6030f5d4e7b1088c1fb9b614e99c3b241b539631cbc3e3"
+      "bytes": 39309,
+      "sha256": "fa0658f9cd4d5c85f4f1f84dd79bf7b33b5cafb74813107acc09fcf1f17d508c"
     },
     {
       "path": "scripts/fupload_cli/dd.py",
@@ -207,8 +207,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 28383,
-      "sha256": "512d6d5b7d34987009c12675e4cee4c540950e32ac808fbf4081d8db6c3157f0"
+      "bytes": 28390,
+      "sha256": "77b58adabdcdacc4b4bfa20dd4303f15a69b3eb7061c93a6c7953f1174487a68"
     }
   ]
 }

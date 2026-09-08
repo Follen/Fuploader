@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import itertools
 import io
 import json
 import os
@@ -63,9 +64,9 @@ class DDSessionTests(unittest.TestCase):
         )
         mobile_flow.assert_not_called()
 
-    def test_native_relogin_supports_both_mobile_credential_modifiers(self) -> None:
+    def test_native_relogin_supports_all_mobile_credential_modifiers(self) -> None:
         module = self._native_sidecar_module()
-        for modifier, is_password in (("mobile_password", True), ("mobile_uplink", False)):
+        for modifier, is_password in (("normal", False), ("mobile_password", True), ("mobile_uplink", False)):
             with self.subTest(modifier=modifier):
                 account, credential = self._persisted_login(
                     "mobile", "urs_mobile_token", modifier,
@@ -88,6 +89,7 @@ class DDSessionTests(unittest.TestCase):
         module = self._native_sidecar_module()
         combinations = (
             ("urs", "urs_token", "normal", "email", "urs"),
+            ("mobile", "urs_mobile_token", "normal", "mobile", "mobile"),
             ("mobile", "urs_mobile_token", "mobile_password", "mobile", "mobile"),
             ("mobile", "urs_mobile_token", "mobile_uplink", "mobile", "mobile"),
         )
@@ -283,6 +285,52 @@ class DDSessionTests(unittest.TestCase):
                 self.assertEqual(events.count("container-shutdown"), 1)
                 self.assertEqual(events.count("qt-shutdown"), 1)
 
+    def test_native_relogin_strict_enum_matrix(self) -> None:
+        module = self._native_sidecar_module()
+        supported = {
+            ("urs", "urs_token", "normal"): "email",
+            ("mobile", "urs_mobile_token", "normal"): "mobile",
+            ("mobile", "urs_mobile_token", "mobile_password"): "mobile",
+            ("mobile", "urs_mobile_token", "mobile_uplink"): "mobile",
+        }
+        for state in itertools.product(
+            ("urs", "mobile", "unknown", None),
+            ("urs_token", "urs_mobile_token", "unknown", None),
+            ("normal", "mobile_password", "mobile_uplink", "unknown", None),
+        ):
+            with self.subTest(state=state):
+                account, credential = self._persisted_login(*state)
+                urs_flow, mobile_flow = mock.Mock(), mock.Mock()
+                dependencies = [object() for _ in range(4)]
+                if state in supported:
+                    kind = supported[state]
+                    result = module._create_relogin_flow(
+                        account, credential, *dependencies, urs_flow, mobile_flow,
+                    )
+                    self.assertEqual(module._credential_kind(account, credential), kind)
+                    if kind == "email":
+                        self.assertIs(result, urs_flow.return_value)
+                        urs_flow.assert_called_once_with(
+                            *dependencies[:2], credential.value, account.name,
+                        )
+                        mobile_flow.assert_not_called()
+                    else:
+                        self.assertIs(result, mobile_flow.return_value)
+                        mobile_flow.assert_called_once_with(
+                            *dependencies, credential.value,
+                            state[2] == "mobile_password", account.name,
+                        )
+                        urs_flow.assert_not_called()
+                else:
+                    with self.assertRaisesRegex(RuntimeError, "unsupported credential combination"):
+                        module._create_relogin_flow(
+                            account, credential, *dependencies, urs_flow, mobile_flow,
+                        )
+                    with self.assertRaisesRegex(RuntimeError, "unsupported credential combination"):
+                        module._credential_kind(account, credential)
+                    urs_flow.assert_not_called()
+                    mobile_flow.assert_not_called()
+
     def test_native_relogin_reports_only_safe_credential_kind(self) -> None:
         module = self._native_sidecar_module()
         email = self._persisted_login("urs", "urs_token", "normal")
@@ -303,7 +351,7 @@ class DDSessionTests(unittest.TestCase):
             ("urs", "urs_mobile_token", "normal"),
             ("mobile", "urs_token", "mobile_password"),
             ("urs", "urs_token", "mobile_password"),
-            ("mobile", "urs_mobile_token", "normal"),
+            ("mobile", "urs_mobile_token", "unknown"),
             ("private-method", "private-type", "private-modifier"),
         )
         for method, credential_type, modifier in combinations:
