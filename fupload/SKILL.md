@@ -2,7 +2,7 @@
 name: fupload
 description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, Heybox Workshop, and ModUs.Creator, including local Creator login reuse and plugin ZIP publishing. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, ModUs, plugins, configurations, or WA.
 metadata:
-  version: "0.0.16"
+  version: "0.0.18"
 ---
 
 # Fupload
@@ -109,7 +109,7 @@ For ModUs, require all four `modus session doctor` booleans to be true before an
 
 Before any DD live GET or write, run `dd session doctor`. If it reports `gui_running=true`, tell the user that continuing will close the listed official DD GUI instances and ask for explicit consent. Without consent, do not run start, do not close a process, and do not issue a native login. After consent, run `dd session start --confirm-close-gui`; when no GUI is running, run `dd session start` without that flag.
 
-`dd session start` automatically selects the native relogin flow from the official `Account.method`, `Cred.type`, and `Cred.modifier` enums. `urs + urs_token + normal` uses `UrsReLoginFlow` for an email session; `mobile + urs_mobile_token + mobile_password|mobile_uplink` uses `MobileReLoginFlow` for a mobile session. Missing, unknown, or contradictory combinations fail before any flow runs. Never infer the account kind from its text, coerce an enum, or try the other flow after a failure.
+`dd session start` automatically selects the native relogin flow from the official `Account.method`, `Cred.type`, and `Cred.modifier` enums. `urs + urs_token + normal` uses `UrsReLoginFlow` for an email session; `mobile + urs_mobile_token + normal|mobile_password|mobile_uplink` uses `MobileReLoginFlow` for a mobile session. Missing, unknown, or contradictory combinations fail before any flow runs. Never infer the account kind from its text, coerce an enum, or try the other flow after a failure.
 
 Keep the returned opaque `session_id` only in task memory and pass it as `--session <id>` to every DD GET, write, readback, status, and delete. Reuse this one session for the complete task, serialize all commands, stop on the first failure, and never start one session per item in a batch. In a `finally` path, always run `dd session stop --session <id>` and require `cleanup_complete=true`; the ten-minute idle timeout is only an abnormal-exit fallback.
 

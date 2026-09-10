@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import itertools
 import io
 import json
 import os
@@ -18,7 +19,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from fupload_cli.dd import DD, Sidecar, _readback
+from fupload_cli.dd import DD, Sidecar, _readback, _sidecar_startup_error
 from fupload_cli.errors import FuploadError
 import fupload_cli.dd_broker as dd_broker
 
@@ -63,9 +64,9 @@ class DDSessionTests(unittest.TestCase):
         )
         mobile_flow.assert_not_called()
 
-    def test_native_relogin_supports_both_mobile_credential_modifiers(self) -> None:
+    def test_native_relogin_supports_all_mobile_credential_modifiers(self) -> None:
         module = self._native_sidecar_module()
-        for modifier, is_password in (("mobile_password", True), ("mobile_uplink", False)):
+        for modifier, is_password in (("normal", False), ("mobile_password", True), ("mobile_uplink", False)):
             with self.subTest(modifier=modifier):
                 account, credential = self._persisted_login(
                     "mobile", "urs_mobile_token", modifier,
@@ -88,6 +89,7 @@ class DDSessionTests(unittest.TestCase):
         module = self._native_sidecar_module()
         combinations = (
             ("urs", "urs_token", "normal", "email", "urs"),
+            ("mobile", "urs_mobile_token", "normal", "mobile", "mobile"),
             ("mobile", "urs_mobile_token", "mobile_password", "mobile", "mobile"),
             ("mobile", "urs_mobile_token", "mobile_uplink", "mobile", "mobile"),
         )
@@ -209,9 +211,11 @@ class DDSessionTests(unittest.TestCase):
                         self._token = "private-token"
                         clients.append(self)
 
-                    @staticmethod
-                    def login():
+                    def login(self):
                         events.append("author-login")
+                        self.login_was_probed = hasattr(
+                            self, "_fupload_restore_response_probe",
+                        )
                         return True
 
                     @staticmethod
@@ -272,6 +276,7 @@ class DDSessionTests(unittest.TestCase):
                         self.assertEqual(
                             clients[0]._session.headers["User-Agent"], module.USER_AGENT,
                         )
+                        self.assertTrue(clients[0].login_was_probed)
                     finally:
                         module.close_session(session)
 
@@ -279,6 +284,52 @@ class DDSessionTests(unittest.TestCase):
                 self.assertEqual(events.count("client-close"), 1)
                 self.assertEqual(events.count("container-shutdown"), 1)
                 self.assertEqual(events.count("qt-shutdown"), 1)
+
+    def test_native_relogin_strict_enum_matrix(self) -> None:
+        module = self._native_sidecar_module()
+        supported = {
+            ("urs", "urs_token", "normal"): "email",
+            ("mobile", "urs_mobile_token", "normal"): "mobile",
+            ("mobile", "urs_mobile_token", "mobile_password"): "mobile",
+            ("mobile", "urs_mobile_token", "mobile_uplink"): "mobile",
+        }
+        for state in itertools.product(
+            ("urs", "mobile", "unknown", None),
+            ("urs_token", "urs_mobile_token", "unknown", None),
+            ("normal", "mobile_password", "mobile_uplink", "unknown", None),
+        ):
+            with self.subTest(state=state):
+                account, credential = self._persisted_login(*state)
+                urs_flow, mobile_flow = mock.Mock(), mock.Mock()
+                dependencies = [object() for _ in range(4)]
+                if state in supported:
+                    kind = supported[state]
+                    result = module._create_relogin_flow(
+                        account, credential, *dependencies, urs_flow, mobile_flow,
+                    )
+                    self.assertEqual(module._credential_kind(account, credential), kind)
+                    if kind == "email":
+                        self.assertIs(result, urs_flow.return_value)
+                        urs_flow.assert_called_once_with(
+                            *dependencies[:2], credential.value, account.name,
+                        )
+                        mobile_flow.assert_not_called()
+                    else:
+                        self.assertIs(result, mobile_flow.return_value)
+                        mobile_flow.assert_called_once_with(
+                            *dependencies, credential.value,
+                            state[2] == "mobile_password", account.name,
+                        )
+                        urs_flow.assert_not_called()
+                else:
+                    with self.assertRaisesRegex(RuntimeError, "unsupported credential combination"):
+                        module._create_relogin_flow(
+                            account, credential, *dependencies, urs_flow, mobile_flow,
+                        )
+                    with self.assertRaisesRegex(RuntimeError, "unsupported credential combination"):
+                        module._credential_kind(account, credential)
+                    urs_flow.assert_not_called()
+                    mobile_flow.assert_not_called()
 
     def test_native_relogin_reports_only_safe_credential_kind(self) -> None:
         module = self._native_sidecar_module()
@@ -300,7 +351,7 @@ class DDSessionTests(unittest.TestCase):
             ("urs", "urs_mobile_token", "normal"),
             ("mobile", "urs_token", "mobile_password"),
             ("urs", "urs_token", "mobile_password"),
-            ("mobile", "urs_mobile_token", "normal"),
+            ("mobile", "urs_mobile_token", "unknown"),
             ("private-method", "private-type", "private-modifier"),
         )
         for method, credential_type, modifier in combinations:
@@ -345,6 +396,19 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(json.loads(wire)["payload"]["name"], "中文公告")
         self.assertEqual(result["name"], "中文公告")
 
+    def test_sidecar_upload_waits_beyond_native_object_put_timeout(self) -> None:
+        sidecar = Sidecar.__new__(Sidecar)
+        sidecar.counter = 0
+        sidecar.process = mock.MagicMock()
+        sidecar.process.stdin = mock.MagicMock()
+        with mock.patch.object(sidecar, "_next_result", return_value={
+            "id": 1,
+            "ok": True,
+            "data": {"d_url": "https://cdn.invalid/object", "size": 1},
+        }) as next_result:
+            sidecar.call("upload", file="D:/addon.zip", meta={})
+        self.assertGreaterEqual(next_result.call_args.kwargs["timeout"], 660)
+
     def test_native_sidecar_results_use_encoding_neutral_ascii_json(self) -> None:
         with mock.patch.dict(os.environ, {
             "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
@@ -369,6 +433,84 @@ class DDSessionTests(unittest.TestCase):
         with self.assertRaises(FuploadError) as raised:
             sidecar._next_result(timeout=0)
         self.assertEqual(str(raised.exception), "DD sidecar returned non-UTF-8 output")
+
+    def test_sidecar_startup_error_preserves_author_api_diagnostics(self) -> None:
+        error = _sidecar_startup_error({
+            "message": "DD author API login failed",
+            "kind": "platform_error",
+            "stage": "session",
+            "http_status": 200,
+            "business_code": 411,
+            "verification_required": False,
+            "details": {"server_message": "author session rejected"},
+        })
+
+        self.assertEqual(str(error), "DD author API login failed")
+        self.assertEqual(error.kind, "platform_error")
+        self.assertEqual(error.stage, "session")
+        self.assertEqual(error.http_status, 200)
+        self.assertEqual(error.business_code, 411)
+        self.assertEqual(error.details["server_message"], "author session rejected")
+
+    def test_broker_startup_error_preserves_sidecar_diagnostics(self) -> None:
+        error = dd_broker._startup_error({
+            "startup_id": "startup",
+            "error": {
+                "message": "DD author API login failed",
+                "kind": "platform_error",
+                "stage": "session",
+                "http_status": 200,
+                "business_code": 411,
+                "details": {"server_message": "author session rejected"},
+            },
+        })
+
+        self.assertEqual(str(error), "DD author API login failed")
+        self.assertEqual(error.http_status, 200)
+        self.assertEqual(error.business_code, 411)
+        self.assertEqual(error.details["server_message"], "author session rejected")
+
+    def test_broker_start_reads_error_written_as_process_exits(self) -> None:
+        error = {
+            "message": "DD author API login failed",
+            "kind": "platform_error",
+            "stage": "session",
+            "http_status": 200,
+            "business_code": 409,
+        }
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            startup = root / dd_broker.STARTUP_NAME
+
+            class ExitedProcess:
+                @staticmethod
+                def poll():
+                    pending = dd_broker._read_json(startup)
+                    dd_broker._atomic_json(startup, {
+                        "startup_id": pending["startup_id"],
+                        "error": error,
+                    })
+                    return 1
+
+            with mock.patch.object(
+                dd_broker, "_load_live_state", return_value=None,
+            ), mock.patch.object(
+                dd_broker, "running_dd_processes", return_value=[],
+            ), mock.patch.object(
+                dd_broker, "close_verified_gui",
+            ), mock.patch.object(
+                dd_broker, "_state_dir", return_value=root,
+            ), mock.patch.object(
+                dd_broker.subprocess, "Popen", return_value=ExitedProcess(),
+            ):
+                with self.assertRaises(FuploadError) as raised:
+                    dd_broker.start(False)
+
+        self.assertEqual(str(raised.exception), "DD author API login failed")
+        self.assertEqual(raised.exception.kind, "platform_error")
+        self.assertEqual(raised.exception.http_status, 200)
+        self.assertEqual(raised.exception.business_code, 409)
 
     def test_native_failure_keeps_message_and_business_code(self) -> None:
         class UiApiError(Exception):
@@ -397,6 +539,11 @@ class DDSessionTests(unittest.TestCase):
             provider.execute_read("plugin", "list", SimpleNamespace())
         self.assertEqual(write_error.exception.kind, "session_required")
         self.assertEqual(read_error.exception.kind, "session_required")
+
+    def test_broker_write_waits_beyond_sidecar_upload_response_timeout(self) -> None:
+        with mock.patch.object(dd_broker, "_send", return_value={}) as send:
+            dd_broker.execute("session", "write", "plugin", "update", {})
+        self.assertGreaterEqual(send.call_args.kwargs["timeout"], 720)
 
     def test_doctor_only_discovers_installation_and_local_state(self) -> None:
         sidecar = mock.Mock(side_effect=AssertionError("doctor must not create Sidecar"))
@@ -790,6 +937,163 @@ class DDSessionTests(unittest.TestCase):
             "body_truncated": False,
         })
         client._fupload_restore_response_probe()
+
+    def test_native_response_probe_can_capture_http_200_business_rejection(self) -> None:
+        module = self._native_sidecar_module()
+        response = SimpleNamespace(
+            status_code=200,
+            text='{"code":411,"message":"author session rejected"}',
+        )
+        client = SimpleNamespace(_session=SimpleNamespace(get=lambda *_args, **_kwargs: response))
+
+        module.install_response_probe(client, capture_success=True)
+        actual = client._session.get("/login/dflogin")
+
+        self.assertIs(actual, response)
+        self.assertEqual(client._fupload_last_response_error["status"], 200)
+        self.assertEqual(
+            json.loads(client._fupload_last_response_error["body"])["code"],
+            411,
+        )
+        client._fupload_restore_response_probe()
+
+    def test_native_author_login_failure_keeps_business_rejection_details(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(_fupload_last_response_error={
+            "status": 200,
+            "body": '{"code":411,"message":"author session rejected"}',
+            "body_bytes": 48,
+            "body_truncated": False,
+        })
+
+        failure = module.author_login_failure(client)
+
+        self.assertEqual(failure.stage, "session")
+        self.assertEqual(failure.http_status, 200)
+        self.assertEqual(failure.business_code, 411)
+        self.assertEqual(failure.details["server_message"], "author session rejected")
+        self.assertFalse(failure.verification_required)
+
+    def test_native_author_login_retries_one_invalid_signature_rejection(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(
+            _fupload_last_response_error=None,
+            login=mock.Mock(),
+        )
+
+        def login():
+            if client.login.call_count == 1:
+                client._fupload_last_response_error = {
+                    "status": 200,
+                    "body": '{"code":409,"msg":"签名无效"}',
+                }
+                return False
+            client._fupload_last_response_error = {
+                "status": 200,
+                "body": '{"code":0,"result":{}}',
+            }
+            return True
+
+        client.login.side_effect = login
+
+        module.login_author_client(client)
+
+        self.assertEqual(client.login.call_count, 2)
+        self.assertFalse(client._fupload_capture_success)
+
+    def test_native_author_login_does_not_retry_other_rejections(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(
+            _fupload_last_response_error={
+                "status": 200,
+                "body": '{"code":403,"msg":"not allowed"}',
+            },
+            login=mock.Mock(return_value=False),
+        )
+
+        with self.assertRaises(module.SidecarFailure) as raised:
+            module.login_author_client(client)
+
+        self.assertEqual(client.login.call_count, 1)
+        self.assertEqual(raised.exception.business_code, 403)
+
+    def test_native_author_login_retries_invalid_signature_only_once(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(login=mock.Mock(return_value=False))
+
+        def reject():
+            client._fupload_last_response_error = {
+                "status": 200,
+                "body": '{"code":409,"msg":"签名无效"}',
+            }
+            return False
+
+        client.login.side_effect = reject
+
+        with self.assertRaises(module.SidecarFailure) as raised:
+            module.login_author_client(client)
+
+        self.assertEqual(client.login.call_count, 2)
+        self.assertEqual(raised.exception.business_code, 409)
+
+    def test_native_author_login_disables_success_capture_when_login_raises(self) -> None:
+        module = self._native_sidecar_module()
+        client = SimpleNamespace(
+            _fupload_capture_success=True,
+            login=mock.Mock(side_effect=RuntimeError("login transport failed")),
+        )
+
+        with self.assertRaisesRegex(RuntimeError, "login transport failed"):
+            module.login_author_client(client)
+
+        self.assertFalse(client._fupload_capture_success)
+
+    def test_native_author_session_cleans_up_when_login_fails(self) -> None:
+        module = self._native_sidecar_module()
+        session = (object(), object(), object(), object(), object())
+        failure = module.SidecarFailure("login rejected", "session")
+
+        with mock.patch.object(
+            module, "login_author_client", side_effect=failure,
+        ), mock.patch.object(module, "close_session") as close_session:
+            with self.assertRaises(module.SidecarFailure) as raised:
+                module.author_session_or_cleanup(*session)
+
+        self.assertIs(raised.exception, failure)
+        close_session.assert_called_once_with(session)
+
+    def test_native_author_session_preserves_login_failure_when_cleanup_fails(self) -> None:
+        module = self._native_sidecar_module()
+        session = (object(), object(), object(), object(), object())
+        failure = module.SidecarFailure("login rejected", "session")
+
+        with mock.patch.object(
+            module, "login_author_client", side_effect=failure,
+        ), mock.patch.object(
+            module, "close_session", side_effect=RuntimeError("cleanup failed"),
+        ):
+            with self.assertRaises(module.SidecarFailure) as raised:
+                module.author_session_or_cleanup(*session)
+
+        self.assertIs(raised.exception, failure)
+
+    def test_native_startup_error_payload_preserves_safe_failure_fields(self) -> None:
+        module = self._native_sidecar_module()
+        failure = module.SidecarFailure(
+            "DD author API login failed",
+            "session",
+            http_status=200,
+            business_code=411,
+            details={"server_message": "author session rejected"},
+        )
+
+        payload = module.startup_error_payload(failure)
+
+        self.assertEqual(payload["message"], "DD author API login failed")
+        self.assertEqual(payload["stage"], "session")
+        self.assertEqual(payload["http_status"], 200)
+        self.assertEqual(payload["business_code"], 411)
+        self.assertEqual(payload["details"]["server_message"], "author session rejected")
 
     def test_native_response_probe_captures_http_error_read_and_restores_opener(self) -> None:
         with mock.patch.dict(os.environ, {
@@ -1349,6 +1653,7 @@ class DDSessionTests(unittest.TestCase):
             self.assertEqual(request.full_url, signed_url)
             self.assertEqual(request.get_header("Content-type"), "application/x-zip-compressed")
             self.assertEqual(request.get_header("X-amz-acl"), "public-read")
+            self.assertGreaterEqual(opened.call_args.kwargs["timeout"], 600)
             self.assertEqual(result["size"], len(b"payload"))
 
             with mock.patch.object(module.urllib.request, "urlopen", return_value=Response(201)):

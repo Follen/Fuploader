@@ -7,7 +7,7 @@ Run `dd session doctor` first. Doctor only discovers the installation, verifies 
 `start` closes only identity- and signature-verified official GUI processes, starts one task broker, and reads the official `AccountCredStorage` auto account and credential. It selects the native relogin flow only from this strict enum matrix:
 
 - `Account.method=urs`, `Cred.type=urs_token`, `Cred.modifier=normal`: run `UrsReLoginFlow(controller, sdk, token, username)` for the email login state.
-- `Account.method=mobile`, `Cred.type=urs_mobile_token`, `Cred.modifier=mobile_password|mobile_uplink`: run `MobileReLoginFlow(controller, sdk, cgi, netconfig, token, isPassword, username)` for the mobile login state. `isPassword` is true only for `mobile_password`.
+- `Account.method=mobile`, `Cred.type=urs_mobile_token`, `Cred.modifier=normal|mobile_password|mobile_uplink`: run `MobileReLoginFlow(controller, sdk, cgi, netconfig, token, isPassword, username)` for the mobile login state. `normal` is emitted by the official DD 100130 client for SMS/non-password mobile login. `isPassword` is true only for `mobile_password`.
 
 Missing, unknown, or contradictory enum combinations fail before either flow is called. Do not infer account kind from the account string, coerce a value, or fall back to the other flow after a login failure. Do not request or accept manual account names, passwords, tokens, credential values, or account-type overrides.
 
