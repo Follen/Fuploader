@@ -625,8 +625,9 @@ def _create_relogin_flow(
     if (
         method == "mobile"
         and credential_type == "urs_mobile_token"
-        and modifier in ("mobile_password", "mobile_uplink")
+        and modifier in ("normal", "mobile_password", "mobile_uplink")
     ):
+        # Official DD 100130 emits normal for SMS/non-password mobile credentials.
         return mobile_flow_class(
             controller, sdk, cgi, netconfig, credential.value,
             modifier == "mobile_password", account.name,
@@ -643,7 +644,7 @@ def _credential_kind(account, credential):
     if (
         method == "mobile"
         and credential_type == "urs_mobile_token"
-        and modifier in ("mobile_password", "mobile_uplink")
+        and modifier in ("normal", "mobile_password", "mobile_uplink")
     ):
         return "mobile"
     raise RuntimeError("DD persisted login state uses an unsupported credential combination")
