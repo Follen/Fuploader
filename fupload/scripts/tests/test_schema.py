@@ -45,7 +45,7 @@ class SchemaTests(unittest.TestCase):
         expected = {
             ("plugin", "create"): plugin_meta | plugin_version,
             ("plugin", "update"): {"sn"} | plugin_version,
-            ("plugin", "edit"): {"sn"} | commercial,
+            ("plugin", "edit"): {"sn", "description"} | commercial,
             ("config", "create"): config_meta | config_content,
             ("config", "update"): {"share_sn"} | config_content,
             ("config", "edit"): {"share_sn"} | config_meta,
@@ -235,8 +235,10 @@ class SchemaTests(unittest.TestCase):
         for field, invalid in (("addon_type", 2), ("creation_statement", "translated")):
             with self.subTest(field=field), self.assertRaises(ValidationError):
                 plugin.validate({**base, field: invalid})
-        with self.assertRaisesRegex(ValidationError, "unknown field"):
-            plugin.validate({**base, "description": "create-only"})
+        self.assertEqual(
+            plugin.validate({**base, "description": "Updated description"})["description"],
+            "Updated description",
+        )
         self.assertEqual(
             plugin.validate({**base, "scope": "private", "creation_statement": "original"})["scope"],
             "private",

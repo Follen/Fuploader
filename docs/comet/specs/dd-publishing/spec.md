@@ -82,7 +82,7 @@ DD GUI 通过父控件变化后再加载子控件；CLI 不得把这些联动改
 
 插件字段完整覆盖 `game_type`、`game_versions`、`addon_type`、`name`、`description`、`logo`、`detail_imgs`、`primary_category_id`、`second_category_ids`、`detail_url`、`release_type`、`version`、`html_desc`、`update_desc` 及公共字段；modify/delete 另含 `sn`。限制：名称/描述/版本各 80 字符，更新说明 1000 字符。字段覆盖不等于每个动作都可写。
 
-create 允许全部创建字段并建立首版；`game_type`、首版元数据和 outer usage mode 为 create-only。update 只允许新包、`version/game_versions/release_type/update_desc` 及官方版本页字段。edit 只允许官方已有记录的商业、关联、房间/频道和创建声明控件；`name`、`description`、`addon_type`、logo、详情图、分类、`html_desc` 以及所有版本字段不属于 edit allowlist。已验证的 `description` 传入 `/addon/modify` 可能被业务接受但远端保持原值，CLI 必须在 schema 层拒绝，避免假成功。update/edit 先 GET detail_v2/detail 和作者列表，再从 form model 构造完整 `/addon/modify` payload，禁止透传审核、统计和临时字段。
+create 允许全部创建字段并建立首版；`game_type`、首版元数据和 outer usage mode 为 create-only。update 只允许新包、`version/game_versions/release_type/update_desc` 及官方版本页字段。edit 允许 `description` 和官方已有记录的商业、关联、房间/频道及创建声明控件；`name`、`addon_type`、logo、详情图、分类、`html_desc` 以及所有版本字段不属于 edit allowlist。description 编辑在 POST 后必须通过 detail_v2/detail 和作者列表双投影回读验证；若 `/addon/modify` 接受请求但远端保持原值，CLI 必须返回 verification-required，避免假成功。update/edit 先 GET detail_v2/detail 和作者列表，再从 form model 构造完整 `/addon/modify` payload，禁止透传审核、统计和临时字段。
 
 插件 create 的官方初始默认值只在 create 表单中应用。update/edit 必须严格重放官方 `author item -> detail dialog projection -> editor pick -> submit` 路径：`detail_v2` 提供稳定详情字段和顶层 `game_versions`；同一 SN 作者列表项的 `latest_version` 只在详情中的版本占位为 null/缺失时补齐 `detail_url`、`release_type`、`version`，不得覆盖稳定元数据或顶层 build；`scope`、`price_fen` 和 `vip_levels` 按官方独立投影加入；尾部汇总分类按官方 `slice(0,-1)` 语义移除。存量记录中两个官方投影都缺失的 `buy_life_type` 等字段不得注入 create 默认值。公共条件字段只执行插件官方 submit 实际执行的清空规则，不得调用会额外制造字段的通用归一化 helper。
 

@@ -559,6 +559,7 @@ def execute(
                 _readback(harness, session_id, "plugin-%s-get-updated" % game_type, "plugin", plugin_ref)
                 _invoke_write(harness, inputs, session_id, "plugin-%s-edit" % game_type, "plugin", "edit", {
                     "schema": "fupload.v1.dd.plugin.edit", "sn": plugin_ref,
+                    "description": "Updated full live regression",
                     "share_code_life_type": "fourteen_day",
                 })
                 _readback(harness, session_id, "plugin-%s-get-edited" % game_type, "plugin", plugin_ref)

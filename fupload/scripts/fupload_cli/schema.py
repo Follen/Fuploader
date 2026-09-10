@@ -580,6 +580,7 @@ DD_PLUGIN_EDIT_META = {
     name: DD_COMMERCIAL[name]
     for name in DD_COMMERCIAL
 }
+DD_PLUGIN_EDIT_META["description"] = DD_PLUGIN_META["description"]
 DD_PLUGIN_VERSION = {
     "game_versions": f("array", nonempty=True), "detail_url": f("string"),
     "file": f("string", local_file=True), "release_type": f("integer", choices=(1, 2, 3)),

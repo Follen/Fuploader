@@ -604,7 +604,7 @@ class DDWireMatrixTests(unittest.TestCase):
                         else:
                             self.assertTrue(projected[key]["redacted"], (key, projected[key]))
                 count += 1
-        self.assertEqual(count, 195)
+        self.assertEqual(count, 196)
 
     def test_every_field_rejects_invalid_json_type_at_exact_path(self) -> None:
         wrong = {
