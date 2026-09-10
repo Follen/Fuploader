@@ -678,6 +678,21 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(result["reference"], "plugin-sn")
         self.assertEqual(session.post.call_args.args[1]["description"], "After")
 
+        # An accepted mutation is not success if both projections stay stale.
+        session.reset_mock()
+        with mock.patch.object(DD, "_fresh_detail", return_value=current), mock.patch(
+            "fupload_cli.dd.author_item", return_value=current
+        ), mock.patch.object(DD, "_validate_options"), mock.patch(
+            "fupload_cli.dd.detail", return_value=current
+        ), mock.patch("fupload_cli.dd.time.sleep"):
+            with self.assertRaises(FuploadError) as raised:
+                DD()._write_plugin(session, "edit", {
+                    "sn": "plugin-sn", "description": "After",
+                })
+        self.assertTrue(raised.exception.verification_required)
+        self.assertIn("description", str(raised.exception))
+        session.post.assert_called_once()
+
     def test_dd_assigned_plugin_rejects_private_final_scope_before_mutation(self) -> None:
         current = {
             "sn": "plugin-sn", "assign_user_sn": "assigned-user", "game_type": 10001,

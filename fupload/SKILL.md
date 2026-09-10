@@ -2,7 +2,7 @@
 name: fupload
 description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, Heybox Workshop, and ModUs.Creator, including local Creator login reuse and plugin ZIP publishing. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, ModUs, plugins, configurations, or WA.
 metadata:
-  version: "0.0.18"
+  version: "0.0.19"
 ---
 
 # Fupload
@@ -22,7 +22,7 @@ Map natural language consistently:
 
 - `create`: create the main record. If first content is a separate platform action, plan it as a following atomic step.
 - `update`: publish a plugin version, change selected configuration-backup content, or publish a WA/string version.
-- `edit`: change fields allowed by the target platform's action allowlist. For DD plugins, this is existing-record commercial, association, room/channel, and creation-statement settings; first-publication metadata, categories, media, and version fields are create/update-only.
+- `edit`: change fields allowed by the target platform's action allowlist. For DD plugins, this includes `description` and existing-record commercial, association, room/channel, and creation-statement settings; other first-publication metadata, categories, media, and version fields are create/update-only. Description edits read both detail and author-list projections; either may confirm the value, but if neither matches, report verification-required.
 - `delete`: delete one main record only. It never deletes an individual version, media object, or associated record.
 
 Never offer bulk delete, drafts, guides, messages, or GUI control automation. Heybox supports individual version deletion with asynchronous readback; whole-module deletion is not supported. The DD task-session command may close verified official GUI processes only after the consent flow below.
