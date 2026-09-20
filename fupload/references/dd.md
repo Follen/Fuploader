@@ -59,6 +59,14 @@ All three create/edit form models use `scope`, `share_code_life_type`, `need_buy
 
 Omission on edit preserves the remote value. Explicit false follows the field-specific official behavior: room and association children are cleared, while anchor VIP levels remain unless private scope or the outer free mode clears them.
 
+## Update description (`update_desc`)
+
+`update_desc` is rendered as HTML on the DD web and client surface, for plugins, configuration shares, and WA alike. The renderer collapses plain-text line feeds, so a multi-line changelog must use markup: `<p>first line</p><p>second line</p>`, or `<br>` between lines. A JSON string that contains only `\n` is stored intact but renders as a single line.
+
+The Python CLI copies the supplied string into the wire form unchanged and performs no HTML escaping, so callers may pass tags directly. The platform normalizes `\r\n` and `\n` to LF; the line-ending style itself has no effect on rendering. The 1000-character limit applies to the whole string, tags included.
+
+A published version's `update_desc` cannot be corrected through the CLI: `plugin edit`, `config edit`, and `wa edit` do not accept the field, and plugin version fields are not edit fields. Correct the format by writing the next version's `update_desc` properly.
+
 ## Plugin
 
 `plugin create` fields: `game_type`, `scope`, `addon_type`, `name`, `description`, `logo`/`logo_file`, `detail_imgs`/`detail_img_files`, `primary_category_id`, `second_category_ids`, `html_desc`, `game_versions`, `detail_url`/`file`, `release_type`, `version`, `update_desc`, and all shared fields. Name, description, and version are at most 80 characters; update description is at most 1000; detail images are at most 8.

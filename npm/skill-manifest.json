@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "0.0.19",
   "skill_version": "0.0.19",
-  "tree_sha256": "dd39f508a55b1b4fe50e5bd076d2a2cd85cb03c6864cdedcb4a7de521ea92197",
+  "tree_sha256": "7edadf63af9374c3a4a6529bbe84d8421f3f04a33e060ff9841f1831a3fa6eda",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -87,8 +87,8 @@
     },
     {
       "path": "references/dd.md",
-      "bytes": 19868,
-      "sha256": "79498778d5d9f9c6205b2343b382fc71981d3c3e2cacd7470b63ad18e3afb491"
+      "bytes": 20837,
+      "sha256": "583a3531cfabf6749c31088a88b3bbad2c516e1eae0b100433305f26894c153d"
     },
     {
       "path": "references/modus.md",
@@ -97,8 +97,8 @@
     },
     {
       "path": "references/newbee-official-cli.md",
-      "bytes": 24919,
-      "sha256": "f0ddeca7415f2351ca03cdb9a9f4cb7fd9f08d87a28b13003abe800e57c7f7dd"
+      "bytes": 25535,
+      "sha256": "2499add2a7a571ed85cc0cf1cfc31513dbbc57a6d001a47045087a48a646f080"
     },
     {
       "path": "references/newbee.md",
