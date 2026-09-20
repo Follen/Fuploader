@@ -191,6 +191,10 @@ CLI 全程非交互、支持 `-o json` 结构化输出，适合交给 AI 助手�
 
 直接给文本，或 `@CHANGELOG.md` 从文件读取；未指定时若 ncc.json 配置了 `changelog_file` 且文件存在则自动读取。
 
+**该字段按纯文本存储和展示，不渲染 Markdown**——注意这与插件详情不同，详情正文是 Markdown（见 `--description`）：`#`、`##`、`**`、`-` 等标记在这里会原样显示成符号。建议一行一条、行首用 `•`，行与行之间不留空行；换行符统一用 `\r\n`，文末保留一个换行。
+
+单个版本的日志只写该版本内容，不要把整份 `CHANGELOG.md` 直接传给 `--changelog`（会把全部历史带进这一条）。历史版本可用 `ncc wow addons changelog <file_id> --set @<文本文件>` 修正，改完回读核对字数与行数。
+
 ## ncc.json 配置说明
 
 ```jsonc
