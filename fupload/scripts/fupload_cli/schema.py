@@ -581,6 +581,10 @@ DD_PLUGIN_EDIT_META = {
     for name in DD_COMMERCIAL
 }
 DD_PLUGIN_EDIT_META["description"] = DD_PLUGIN_META["description"]
+# DD's modify form accepts the existing plugin's rich-text detail body as
+# metadata. Keep the other first-publication metadata (name, logo, images,
+# categories, etc.) create-only, but allow an explicit html_desc edit.
+DD_PLUGIN_EDIT_META["html_desc"] = DD_PLUGIN_META["html_desc"]
 DD_PLUGIN_VERSION = {
     "game_versions": f("array", nonempty=True), "detail_url": f("string"),
     "file": f("string", local_file=True), "release_type": f("integer", choices=(1, 2, 3)),

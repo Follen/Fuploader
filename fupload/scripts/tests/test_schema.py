@@ -45,7 +45,7 @@ class SchemaTests(unittest.TestCase):
         expected = {
             ("plugin", "create"): plugin_meta | plugin_version,
             ("plugin", "update"): {"sn"} | plugin_version,
-            ("plugin", "edit"): {"sn", "description"} | commercial,
+            ("plugin", "edit"): {"sn", "description", "html_desc"} | commercial,
             ("config", "create"): config_meta | config_content,
             ("config", "update"): {"share_sn"} | config_content,
             ("config", "edit"): {"share_sn"} | config_meta,

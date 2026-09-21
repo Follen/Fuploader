@@ -1465,10 +1465,11 @@ PLUGIN_CREATE_DEFAULTS = {
 
 # DD's modify form is not a second create form. The official edit page
 # rebuilds the payload from existing commercial/association controls. The
-# brief description is the supported metadata exception and is verified by
-# detail and author-list readback after every edit.
+# brief and rich-text detail descriptions are the supported metadata
+# exceptions and are verified by detail and author-list readback after every
+# edit. Other first-publication metadata remains create-only.
 PLUGIN_EDIT_FIELDS = (
-    "description",
+    "description", "html_desc",
     "scope", "share_code_life_type", "need_buy", "price_fen", "buy_life_type",
     "jump_room", "room_id", "channel_id", "channel_type", "sync_room",
     "creation_statement", "with_associate", "associated_acts", "need_anchor_vip",

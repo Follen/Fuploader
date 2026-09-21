@@ -693,6 +693,33 @@ class BuilderTests(unittest.TestCase):
         self.assertIn("description", str(raised.exception))
         session.post.assert_called_once()
 
+    def test_dd_plugin_edit_writes_and_verifies_html_description(self) -> None:
+        current = {
+            "sn": "plugin-sn", "game_type": 10001, "game_versions": ["12.1.0"],
+            "name": "Plugin", "description": "Description", "logo": "logo",
+            "detail_imgs": ["image"], "primary_category_id": 1,
+            "second_category_ids": [999], "html_desc": "<p>Before</p>",
+            "scope": "private", "share_code_life_type": "seven_day",
+            "need_buy": False, "need_anchor_vip": False,
+            "jump_room": False, "with_associate": False,
+            "creation_statement": "original",
+            "latest_version": {"file_path": "archive", "release_type": 1, "version": "1.0.0"},
+            "update_desc": "old",
+        }
+        updated = {**current, "html_desc": "<p>After</p>"}
+        session = mock.MagicMock()
+        session.post.return_value = {"code": 0, "result": {"sn": "plugin-sn"}}
+        with mock.patch.object(DD, "_fresh_detail", return_value=current), mock.patch(
+            "fupload_cli.dd.author_item", side_effect=[current, updated]
+        ), mock.patch.object(DD, "_validate_options"), mock.patch(
+            "fupload_cli.dd.detail", return_value=updated
+        ):
+            result = DD()._write_plugin(session, "edit", {
+                "sn": "plugin-sn", "html_desc": "<p>After</p>",
+            })
+        self.assertEqual(result["reference"], "plugin-sn")
+        self.assertEqual(session.post.call_args.args[1]["html_desc"], "<p>After</p>")
+
     def test_dd_assigned_plugin_rejects_private_final_scope_before_mutation(self) -> None:
         current = {
             "sn": "plugin-sn", "assign_user_sn": "assigned-user", "game_type": 10001,
