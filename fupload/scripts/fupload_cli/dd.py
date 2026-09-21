@@ -1486,13 +1486,15 @@ def plugin_form(
         if isinstance(author_value, Mapping) and isinstance(author_value.get("latest_version"), dict)
         else {}
     )
-    # Official detail dialog projection followed by the editor's pick list.
+    # The author list is the live publication projection. DD detail_v2 can
+    # retain an older latest_version, so an available author-list value wins
+    # over detail for the version/package fields used to rebuild modify form.
     source = {name: copy.deepcopy(value[name]) for name in PLUGIN_FIELDS if name in value}
     for name in ("detail_url", "release_type", "version"):
         latest_name = {"detail_url": "file_path"}.get(name, name)
-        projected = latest.get(latest_name)
+        projected = author_latest.get(latest_name)
         if projected is None:
-            projected = author_latest.get(latest_name)
+            projected = latest.get(latest_name)
         if projected is None:
             source.pop(name, None)
         else:
@@ -1517,22 +1519,29 @@ def plugin_form(
     return form
 
 
-def plugin_version_projection(value: Mapping[str, Any]) -> Dict[str, Any]:
+def plugin_version_projection(
+    value: Mapping[str, Any], author_value: Optional[Mapping[str, Any]] = None,
+) -> Dict[str, Any]:
     """Project version fields for readback without feeding them into modify."""
     latest = value.get("latest_version") if isinstance(value.get("latest_version"), dict) else {}
+    author_latest = (
+        author_value.get("latest_version")
+        if isinstance(author_value, Mapping) and isinstance(author_value.get("latest_version"), dict)
+        else {}
+    )
     projection: Dict[str, Any] = {}
     sources = {
-        "game_versions": (latest, "game_versions", value, "game_versions"),
-        "detail_url": (latest, "file_path", value, "detail_url"),
-        "release_type": (latest, "release_type", value, "release_type"),
-        "version": (latest, "version", value, "version"),
-        "update_desc": (latest, "update_desc", value, "update_desc"),
+        "game_versions": ((author_latest, "game_versions"), (latest, "game_versions"), (value, "game_versions")),
+        "detail_url": ((author_latest, "file_path"), (latest, "file_path"), (value, "detail_url")),
+        "release_type": ((author_latest, "release_type"), (latest, "release_type"), (value, "release_type")),
+        "version": ((author_latest, "version"), (latest, "version"), (value, "version")),
+        "update_desc": ((author_latest, "update_desc"), (latest, "update_desc"), (value, "update_desc")),
     }
-    for name, (preferred, preferred_name, fallback, fallback_name) in sources.items():
-        if preferred.get(preferred_name) is not None:
-            projection[name] = copy.deepcopy(preferred[preferred_name])
-        elif fallback.get(fallback_name) is not None:
-            projection[name] = copy.deepcopy(fallback[fallback_name])
+    for name, candidates in sources.items():
+        for source, source_name in candidates:
+            if source.get(source_name) is not None:
+                projection[name] = copy.deepcopy(source[source_name])
+                break
     return projection
 
 
@@ -2088,11 +2097,33 @@ class DD:
             apply_present(form, doc, PLUGIN_FIELDS)
         else:
             current = self._fresh_detail(session, "plugin", doc["sn"])
+            if current.get("assign_user_sn") and doc.get("scope") == "private":
+                raise ValidationError("assigned plugins can only use public scope", path="$.scope")
             game_type = current.get("game_type") or (current.get("game_types") or [None])[0]
             listing = author_item(
                 session, "plugin", str(doc["sn"]), str(current.get("name") or ""), game_type,
             )
-            form = plugin_form(current, listing)
+            if action == "edit":
+                if not listing:
+                    raise FuploadError(
+                        "DD author-list projection is required to preserve the published plugin version",
+                        kind="verification_required", stage="dependency_get", endpoint="/addon/list",
+                        verification_required=True,
+                    )
+                published_version = plugin_version_projection({}, listing)
+                missing_published = [
+                    name for name in ("detail_url", "release_type", "version")
+                    if name not in published_version
+                ]
+                if missing_published:
+                    raise FuploadError(
+                        "DD author-list projection is missing published plugin field(s): %s"
+                        % ", ".join(missing_published),
+                        kind="verification_required", stage="dependency_get", endpoint="/addon/list",
+                        verification_required=True,
+                        details={"fields": missing_published},
+                    )
+            form = plugin_form(current, listing) if action == "edit" else plugin_form(current)
             allowed = PLUGIN_EDIT_FIELDS if action == "edit" else ("game_versions", "detail_url", "release_type", "version", "update_desc")
             current_version = str(form.get("version") or "").strip()
             apply_present(form, doc, allowed)
@@ -2152,6 +2183,7 @@ class DD:
             "creation_statement", "need_buy",
             "price_fen", "buy_life_type", "jump_room", "room_id", "channel_id", "channel_type",
             "sync_room", "with_associate", "associated_acts", "need_anchor_vip", "vip_levels",
+            "game_versions", "detail_url", "release_type", "version",
         )
         if action != "update":
             raw_readback: Any = {}

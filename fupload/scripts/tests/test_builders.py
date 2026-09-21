@@ -464,7 +464,7 @@ class BuilderTests(unittest.TestCase):
         detail = {
             "game_types": [10001],
             "game_versions": ["12.0.7"],
-            "latest_version": {"file_path": None, "release_type": None, "version": None},
+            "latest_version": {"file_path": "stale-archive", "release_type": 3, "version": "0.2.1"},
         }
         author = {
             "latest_version": {
@@ -477,6 +477,21 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(form["release_type"], 1)
         self.assertEqual(form["version"], "2.0.0")
         self.assertEqual(form["game_versions"], ["12.0.7"])
+
+    def test_dd_plugin_form_prefers_author_latest_version_over_stale_detail(self) -> None:
+        form = plugin_form(
+            {
+                "game_types": [10001],
+                "game_versions": ["12.0.7"],
+                "latest_version": {"file_path": "old.zip", "release_type": 1, "version": "0.2.1"},
+            },
+            {
+                "latest_version": {"file_path": "current.zip", "release_type": 2, "version": "0.3.38"},
+            },
+        )
+        self.assertEqual(form["detail_url"], "current.zip")
+        self.assertEqual(form["release_type"], 2)
+        self.assertEqual(form["version"], "0.3.38")
 
     def test_dd_plugin_form_does_not_invent_null_fields_for_legacy_records(self) -> None:
         form = plugin_form({
@@ -719,6 +734,66 @@ class BuilderTests(unittest.TestCase):
             })
         self.assertEqual(result["reference"], "plugin-sn")
         self.assertEqual(session.post.call_args.args[1]["html_desc"], "<p>After</p>")
+
+    def test_dd_plugin_edit_preserves_author_version_when_detail_is_stale(self) -> None:
+        detail = {
+            "sn": "plugin-sn", "game_type": 10001, "game_versions": ["12.1.0"],
+            "name": "Plugin", "description": "Before", "logo": "logo",
+            "detail_imgs": ["image"], "primary_category_id": 1,
+            "second_category_ids": [999], "html_desc": "<p>Before</p>",
+            "scope": "public", "need_buy": False, "need_anchor_vip": False,
+            "jump_room": False, "with_associate": False, "creation_statement": "original",
+            "latest_version": {"file_path": "old.zip", "release_type": 1, "version": "0.2.1"},
+            "update_desc": "old",
+        }
+        author_before = {
+            **detail,
+            "latest_version": {"file_path": "current.zip", "release_type": 2, "version": "0.3.38"},
+        }
+        author_after = {
+            **author_before,
+            "description": "After", "html_desc": "<p>After</p>",
+        }
+        session = mock.MagicMock()
+        session.post.return_value = {"code": 0, "result": {"sn": "plugin-sn"}}
+        with mock.patch.object(DD, "_fresh_detail", return_value=detail), mock.patch(
+            "fupload_cli.dd.author_item", side_effect=[author_before, *([author_after] * 6)]
+        ), mock.patch.object(DD, "_validate_options"), mock.patch(
+            "fupload_cli.dd.detail", return_value=detail
+        ):
+            DD()._write_plugin(session, "edit", {
+                "sn": "plugin-sn", "description": "After", "html_desc": "<p>After</p>",
+            })
+        submitted = session.post.call_args.args[1]
+        self.assertEqual(submitted["detail_url"], "current.zip")
+        self.assertEqual(submitted["release_type"], 2)
+        self.assertEqual(submitted["version"], "0.3.38")
+
+    def test_dd_plugin_edit_rejects_changed_author_version_on_readback(self) -> None:
+        detail = {
+            "sn": "plugin-sn", "game_type": 10001, "game_versions": ["12.1.0"],
+            "name": "Plugin", "description": "Before", "logo": "logo",
+            "detail_imgs": ["image"], "primary_category_id": 1,
+            "second_category_ids": [999], "html_desc": "Details",
+            "scope": "public", "need_buy": False, "need_anchor_vip": False,
+            "jump_room": False, "with_associate": False, "creation_statement": "original",
+            "latest_version": {"file_path": "old.zip", "release_type": 1, "version": "0.2.1"},
+            "update_desc": "old",
+        }
+        author_before = {**detail, "latest_version": {"file_path": "current.zip", "release_type": 2, "version": "0.3.38"}}
+        author_after = {**author_before, "latest_version": {"file_path": "changed.zip", "release_type": 2, "version": "0.3.39"}}
+        session = mock.MagicMock()
+        session.post.return_value = {"code": 0, "result": {"sn": "plugin-sn"}}
+        with mock.patch.object(DD, "_fresh_detail", return_value=detail), mock.patch(
+            "fupload_cli.dd.author_item", side_effect=[author_before, *([author_after] * 6)]
+        ), mock.patch.object(DD, "_validate_options"), mock.patch(
+            "fupload_cli.dd.detail", return_value=detail
+        ), mock.patch("fupload_cli.dd.time.sleep"):
+            with self.assertRaisesRegex(FuploadError, "version"):
+                DD()._write_plugin(session, "edit", {
+                    "sn": "plugin-sn", "description": "After",
+                })
+        session.post.assert_called_once()
 
     def test_dd_assigned_plugin_rejects_private_final_scope_before_mutation(self) -> None:
         current = {
