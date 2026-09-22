@@ -136,7 +136,7 @@ PUT are separate stages.
 | `zip_size` | `zipSize` | non-negative integer | derived | local ZIP stat | must describe exact ZIP | metadata create/update | `zipSize` |
 | `unzip_size` | `unzipSize` | non-negative integer | derived | ZIP central directory | bounded by ZIP preflight | metadata create/update | `unzipSize` |
 | `path` | `path` | string, max 500 | metadata optional | Creator/object response | local path is never binary upload | metadata create/update | `path` |
-| `toc_version` | `tocVersion` | string, max 80 | derived | every ZIP `.toc` `Interface` | incompatible/missing/mixed values fail before write | metadata create/update | `tocVersion` |
+| `toc_version` | `tocVersion` | string, max 80 | derived | each addon `.toc` `Interface`; TOCs under a `Libs` directory are ignored | incompatible/missing/mixed addon values fail before write | metadata create/update | `tocVersion` |
 | `changelog` | `changelog` | string/null, max 10000 | optional | free text | omitted/empty behavior is action-specific | metadata create/update | `changelog` |
 | `file` | not in JSON; raw bytes | local path | create/upload required | local filesystem | valid ZIP, max 200 MiB; bytes PUT only after metadata/signature | signed URL from `GET .../upload/signature/{projectId}/{fileId}`, then HTTP `PUT` | object upload status plus release detail hashes/sizes |
 | `transaction_log` | not sent | local path string | optional | caller | redacted durable stage record | local record only | transaction JSON |
@@ -147,9 +147,9 @@ binary upload stages that ran; failed records include `failed_stage`, a redacted
 error, and whether the ZIP was retained. The transaction record is established
 before file-ID allocation and ZIP preflight, so those early failures are also
 durable. Binary-upload errors expose only a query-free endpoint identifier,
-status when available, and a bounded redacted response summary. The provider parses every ZIP `.toc`
+status when available, and a bounded redacted response summary. The provider parses each addon `.toc`
 `Interface` value to derive
-`toc_version` and `supported_game_versions`; explicit caller values must match.
+`toc_version` and `supported_game_versions`, and ignores TOCs under a `Libs` directory. Explicit caller values must match.
 The provider validates the ZIP, computes `md5`, `zip_size`, and `unzip_size`,
 registers metadata, obtains a signed URL, then uploads the ZIP bytes with HTTP
 `PUT` and `Content-Type: application/zip`. A local path is metadata only; it is
