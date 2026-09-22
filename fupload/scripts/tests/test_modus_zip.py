@@ -55,6 +55,25 @@ class ModusZipParserTests(unittest.TestCase):
         with self.assertRaisesRegex(ValidationError, "no Interface"):
             parse_modus_zip(make_zip(("Addon/Addon.toc", "## Title: Missing\n")))
 
+    def test_ignores_library_tocs_under_libs(self) -> None:
+        result = parse_modus_zip(
+            make_zip(
+                ("Addon/Addon.toc", "## Interface: 120100\n"),
+                ("Addon/Libs/Ace3.toc", "## Interface: 11508, 120000\n"),
+                ("Addon/libs/LibDeflate/LibDeflate.toc", "## Interface: 80300\n"),
+            )
+        )
+        self.assertEqual(result["toc_version"], "120100")
+        self.assertEqual(result["toc_files"], ["Addon/Addon.toc"])
+        self.assertEqual(
+            result["supported_game_versions"],
+            [{"gameVersion": "12.1.0", "server": "wow_retail"}],
+        )
+
+    def test_rejects_zip_with_only_library_tocs(self) -> None:
+        with self.assertRaisesRegex(ValidationError, "outside a Libs directory"):
+            parse_modus_zip(make_zip(("Addon/Libs/Ace3.toc", "## Interface: 120100\n")))
+
     def test_rejects_conflicting_tocs(self) -> None:
         with self.assertRaisesRegex(ValidationError, "ambiguous across files"):
             parse_modus_zip(

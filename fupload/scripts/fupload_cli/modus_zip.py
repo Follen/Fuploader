@@ -46,6 +46,17 @@ _INTERFACE_VALUE_RE = re.compile(r"^\d+$")
 _SOURCE = Union[str, os.PathLike[str], bytes, bytearray, memoryview, BinaryIO]
 
 
+def _is_library_toc(name: str) -> bool:
+    """Return whether ``name`` is an embedded library TOC.
+
+    Creator's release form reads the addon TOC.  Libraries such as Ace3 and
+    LibDeflate live under a ``Libs`` directory and declare their own Interface
+    values, so treating them as addons rejects packages the Creator accepts.
+    """
+    parts = name.replace("\\", "/").split("/")
+    return any(part.casefold() == "libs" for part in parts[:-1])
+
+
 def _read_source(source: _SOURCE) -> Tuple[bytes, str]:
     """Read a path, byte buffer, or seekable stream without leaking content."""
     if isinstance(source, (bytes, bytearray, memoryview)):
@@ -127,18 +138,26 @@ def _zip_entries(raw: bytes, source_name: str) -> Iterable[Tuple[str, bytes]]:
 def parse_modus_zip(source: _SOURCE) -> Dict[str, Any]:
     """Return ModUs metadata inferred from ``source``.
 
-    Every ``.toc`` in the archive must declare the same Interface set.  This
-    avoids choosing an arbitrary addon when a multi-addon archive contains
-    incompatible game versions.  Multiple Interface values in one TOC are
-    supported and become a deterministic comma-separated ``toc_version``.
+    Addon ``.toc`` files must declare the same Interface set.  This avoids
+    choosing an arbitrary addon when a multi-addon archive contains
+    incompatible game versions.  TOCs under a ``Libs`` directory are ignored.
+    Multiple Interface values in one TOC are supported and become a
+    deterministic comma-separated ``toc_version``.
 
     Returned keys are JSON-ready and use the exact snake_case names accepted
     by the Fupload ModUs schema.  ``interface_values`` and ``toc_files`` are
     diagnostic fields for callers and can be omitted from the wire request.
     """
     raw, source_name = _read_source(source)
+    addon_entries = [
+        (name, toc_raw)
+        for name, toc_raw in _zip_entries(raw, source_name)
+        if not _is_library_toc(name)
+    ]
+    if not addon_entries:
+        raise ValidationError("ZIP contains no addon .toc file outside a Libs directory", path="$.file")
     signatures: List[Tuple[str, Tuple[str, ...]]] = []
-    for name, toc_raw in _zip_entries(raw, source_name):
+    for name, toc_raw in addon_entries:
         values = tuple(_interface_values(_decode_toc(toc_raw, name), name))
         signatures.append((name, values))
     expected = signatures[0][1]
