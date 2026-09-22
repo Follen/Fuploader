@@ -83,6 +83,46 @@ class ModusZipParserTests(unittest.TestCase):
                 )
             )
 
+    def test_maps_current_classic_interface_codes(self) -> None:
+        result = parse_modus_zip(
+            make_zip(("Addon/Addon.toc", "## Interface: 11509, 20506, 38002, 40402, 50504\n"))
+        )
+        self.assertEqual(result["toc_version"], "11509,20506,38002,50504")
+        self.assertEqual(
+            result["supported_game_versions"],
+            [
+                {"gameVersion": "1.15.9", "server": "wow_classic_era"},
+                {"gameVersion": "2.5.6", "server": "wow_anniversary"},
+                {"gameVersion": "3.80.2", "server": "wow_classic_titan"},
+                {"gameVersion": "5.5.4", "server": "wow_classic"},
+            ],
+        )
+
+    def test_flavor_tocs_replace_the_unsuffixed_toc(self) -> None:
+        result = parse_modus_zip(
+            make_zip(
+                ("Addon/Addon.toc", "## Interface: 120100\n"),
+                ("Addon/Addon_Mists.toc", "## Interface: 50504\n"),
+                ("Addon/Addon_Vanilla.toc", "## Interface: 11509\n"),
+                ("Addon/Addon_Cata.toc", "## Interface: 40402\n"),
+            )
+        )
+        self.assertEqual(result["toc_files"], ["Addon/Addon_Cata.toc", "Addon/Addon_Mists.toc", "Addon/Addon_Vanilla.toc"])
+        self.assertEqual(result["toc_version"], "11509,50504")
+        self.assertEqual(
+            [item["gameVersion"] for item in result["supported_game_versions"]],
+            ["1.15.9", "5.5.4"],
+        )
+
+    def test_omits_forever_interface_when_retail_is_present(self) -> None:
+        result = parse_modus_zip(make_zip(("Addon/Addon.toc", "## Interface: 120100, 16001\n")))
+        self.assertEqual(result["toc_version"], "120100")
+        self.assertEqual(result["supported_game_versions"], [{"gameVersion": "12.1.0", "server": "wow_retail"}])
+
+    def test_rejects_toc_whose_only_interface_is_unlisted(self) -> None:
+        with self.assertRaisesRegex(ValidationError, "not offered by the current ModUs"):
+            parse_modus_zip(make_zip(("Addon/Addon.toc", "## Interface: 40402\n")))
+
     def test_rejects_unknown_interface(self) -> None:
         with self.assertRaisesRegex(ValidationError, "unsupported addon TOC Interface"):
             parse_modus_zip(make_zip(("Addon/Addon.toc", "## Interface: 999999\n")))

@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "0.0.23",
   "skill_version": "0.0.23",
-  "tree_sha256": "92ada2b43090f9d3d44c90da840fba1ed420e79ef8166275dc790c5a200d53db",
+  "tree_sha256": "ac6acf066b1464075157f0d7e3e3ef6de4a7fcd813e2b68fac24a67bcb7017c8",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -92,8 +92,8 @@
     },
     {
       "path": "references/modus.md",
-      "bytes": 37236,
-      "sha256": "396bf899cef28dfdd66558a555c37bc9af7afaa444f96b2b5b5b1f9b68508783"
+      "bytes": 37526,
+      "sha256": "b410bf18c61e33b8e5f90941e958d6dc11de2a2b6ce24f57a2b1b8a61cc79f8f"
     },
     {
       "path": "references/newbee-official-cli.md",
@@ -162,8 +162,8 @@
     },
     {
       "path": "scripts/fupload_cli/modus_zip.py",
-      "bytes": 8590,
-      "sha256": "6c3949d59356e3e28aa15458eb09019f64fdb0d383af26e7bb0c4c262b857559"
+      "bytes": 10543,
+      "sha256": "acd6613d3b6a6b95997ae938c35e9462ff060a8fb2d719c7da46fcfa86741694"
     },
     {
       "path": "scripts/fupload_cli/modus.py",

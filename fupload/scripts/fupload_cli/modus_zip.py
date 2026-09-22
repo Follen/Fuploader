@@ -23,11 +23,11 @@ from typing import Any, BinaryIO, Dict, Iterable, List, Mapping, Sequence, Tuple
 from .errors import ValidationError
 
 
-# These are the game-version labels loaded by Creator's
-# ReleaseFormPageViewModel.LoadDefaultGameVersions.  12.1.0 is also included
-# because it is the live ModUs response used by the integration fixture.
-# Classic values are the Interface values used by the corresponding WoW
-# clients; all entries remain explicit so a new client cannot be guessed.
+# Explicit Interface codes to ModUs game-version labels.  A numeric code is
+# not enough to infer a new client, so unknown values fail.  The current
+# dropdown (wow_builds) is retail 12.1.0, Mists 5.5.4, Era 1.15.9, Titan
+# 3.80.2, and Anniversary 2.5.6.  Older retail and Era codes stay so
+# previously parsed packages keep their labels.
 INTERFACE_GAME_VERSION_MAP: Mapping[str, Mapping[str, str]] = {
     "110000": {"gameVersion": "11.0.0", "server": "wow_retail"},
     "110002": {"gameVersion": "11.0.2", "server": "wow_retail"},
@@ -37,13 +37,33 @@ INTERFACE_GAME_VERSION_MAP: Mapping[str, Mapping[str, str]] = {
     "11506": {"gameVersion": "Classic Era", "server": "wow_classic_era"},
     "11507": {"gameVersion": "Classic Era", "server": "wow_classic_era"},
     "11508": {"gameVersion": "Classic Era", "server": "wow_classic_era"},
-    "40401": {"gameVersion": "Cataclysm Classic", "server": "wow_classic_cata"},
-    "40402": {"gameVersion": "Cataclysm Classic", "server": "wow_classic_cata"},
+    "11509": {"gameVersion": "1.15.9", "server": "wow_classic_era"},
+    "20506": {"gameVersion": "2.5.6", "server": "wow_anniversary"},
+    "38002": {"gameVersion": "3.80.2", "server": "wow_classic_titan"},
+    "50504": {"gameVersion": "5.5.4", "server": "wow_classic"},
 }
+
+# Shipped TOC codes for clients the current ModUs dropdown does not offer.
+# 40401/40402 are Cataclysm; 16001 is the forever/1.60.1 client.  They are
+# omitted when a current client is also declared, and rejected when alone.
+_UNLISTED_INTERFACE_CODES = frozenset({"40401", "40402", "16001"})
+_FLAVOR_SUFFIXES = ("_mainline", "_vanilla", "_tbc", "_wrath", "_cata", "_mists")
 
 _INTERFACE_RE = re.compile(r"^\s*##\s*Interface\s*:\s*(.*?)\s*$", re.IGNORECASE)
 _INTERFACE_VALUE_RE = re.compile(r"^\d+$")
 _SOURCE = Union[str, os.PathLike[str], bytes, bytearray, memoryview, BinaryIO]
+
+
+def _is_flavor_toc(name: str) -> bool:
+    """Return whether ``name`` is a client-specific WoW TOC.
+
+    Files such as ``Addon_Mists.toc`` replace ``Addon.toc`` on that client.
+    Their Interface values are a union.  The unsuffixed TOC is not consulted
+    once any flavor TOC is present, so a fallback retail code cannot relabel
+    a classic package.
+    """
+    stem = Path(name.replace("\\", "/")).stem.casefold()
+    return stem.endswith(_FLAVOR_SUFFIXES)
 
 
 def _is_library_toc(name: str) -> bool:
@@ -140,9 +160,13 @@ def parse_modus_zip(source: _SOURCE) -> Dict[str, Any]:
 
     Addon ``.toc`` files must declare the same Interface set.  This avoids
     choosing an arbitrary addon when a multi-addon archive contains
-    incompatible game versions.  TOCs under a ``Libs`` directory are ignored.
-    Multiple Interface values in one TOC are supported and become a
-    deterministic comma-separated ``toc_version``.
+    incompatible game versions.  Client flavor TOCs (``_Mists``, ``_Vanilla``
+    and the other standard suffixes) are the exception: their Interface values
+    are combined, and the unsuffixed TOC is ignored while any flavor TOC
+    exists.  TOCs under a ``Libs`` directory are ignored.  Interface codes for
+    clients absent from the current ModUs dropdown are omitted.  Multiple
+    Interface values in one TOC are supported and become a deterministic
+    comma-separated ``toc_version``.
 
     Returned keys are JSON-ready and use the exact snake_case names accepted
     by the Fupload ModUs schema.  ``interface_values`` and ``toc_files`` are
@@ -156,20 +180,33 @@ def parse_modus_zip(source: _SOURCE) -> Dict[str, Any]:
     ]
     if not addon_entries:
         raise ValidationError("ZIP contains no addon .toc file outside a Libs directory", path="$.file")
+    flavor_entries = [(name, toc_raw) for name, toc_raw in addon_entries if _is_flavor_toc(name)]
+    selected_entries = flavor_entries or addon_entries
     signatures: List[Tuple[str, Tuple[str, ...]]] = []
-    for name, toc_raw in addon_entries:
+    for name, toc_raw in selected_entries:
         values = tuple(_interface_values(_decode_toc(toc_raw, name), name))
         signatures.append((name, values))
-    expected = signatures[0][1]
-    mismatches = [name for name, values in signatures[1:] if values != expected]
-    if mismatches:
-        names = ", ".join([signatures[0][0], *mismatches])
-        raise ValidationError("addon TOC Interface values are ambiguous across files: %s" % names, path="$.file")
+    if not flavor_entries:
+        expected = signatures[0][1]
+        mismatches = [name for name, values in signatures[1:] if values != expected]
+        if mismatches:
+            names = ", ".join([signatures[0][0], *mismatches])
+            raise ValidationError("addon TOC Interface values are ambiguous across files: %s" % names, path="$.file")
+        ordered = expected
+    else:
+        ordered = tuple(dict.fromkeys(value for _, values in signatures for value in values))
+        ordered = tuple(sorted(ordered, key=lambda item: (int(item), item)))
 
-    unknown = [value for value in expected if value not in INTERFACE_GAME_VERSION_MAP]
+    unknown = [value for value in ordered if value not in INTERFACE_GAME_VERSION_MAP and value not in _UNLISTED_INTERFACE_CODES]
     if unknown:
         raise ValidationError(
             "unsupported addon TOC Interface value(s): %s" % ", ".join(unknown),
+            path="$.file",
+        )
+    expected = tuple(value for value in ordered if value in INTERFACE_GAME_VERSION_MAP)
+    if not expected:
+        raise ValidationError(
+            "addon TOC Interface values are not offered by the current ModUs client list",
             path="$.file",
         )
 
