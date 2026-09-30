@@ -735,6 +735,42 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(result["reference"], "plugin-sn")
         self.assertEqual(session.post.call_args.args[1]["html_desc"], "<p>After</p>")
 
+    def test_dd_plugin_edit_repairs_announcement_without_upload_or_version_change(self) -> None:
+        current = {
+            "sn": "plugin-sn", "game_type": 10001, "game_versions": ["12.1.0"],
+            "name": "Plugin", "description": "Description", "logo": "logo",
+            "detail_imgs": ["image"], "primary_category_id": 1,
+            "second_category_ids": [999], "html_desc": "<p>Details</p>",
+            "scope": "private", "share_code_life_type": "seven_day", "need_buy": False, "need_anchor_vip": False,
+            "jump_room": False, "with_associate": False, "creation_statement": "original",
+            "latest_version": {"file_path": "archive", "release_type": 1, "version": "4.2.3"},
+            "update_desc": "old",
+        }
+        notes = "<p>• [修复]公告换行</p>"
+        updated = {**current, "update_desc": notes}
+        for reflected in (True, False):
+            session = mock.MagicMock()
+            session.post.return_value = {"code": 0, "result": {"sn": "plugin-sn"}}
+            after = updated if reflected else current
+            with mock.patch.object(DD, "_fresh_detail", return_value=current), mock.patch(
+                "fupload_cli.dd.author_item", side_effect=[current] + [after] * 6
+            ), mock.patch.object(DD, "_validate_options"), mock.patch(
+                "fupload_cli.dd.detail", return_value=after
+            ), mock.patch("fupload_cli.dd.time.sleep"):
+                if reflected:
+                    DD()._write_plugin(session, "edit", {"sn": "plugin-sn", "update_desc": notes})
+                else:
+                    with self.assertRaises(FuploadError) as raised:
+                        DD()._write_plugin(session, "edit", {"sn": "plugin-sn", "update_desc": notes})
+                    self.assertTrue(raised.exception.verification_required)
+                    self.assertIn("update_desc", str(raised.exception))
+            session.post.assert_called_once()
+            body = session.post.call_args.args[1]
+            self.assertEqual(body["version"], "4.2.3")
+            self.assertEqual(body["detail_url"], "archive")
+            self.assertEqual(body["update_desc"], notes)
+            session.upload.assert_not_called()
+
     def test_dd_plugin_edit_preserves_author_version_when_detail_is_stale(self) -> None:
         detail = {
             "sn": "plugin-sn", "game_type": 10001, "game_versions": ["12.1.0"],

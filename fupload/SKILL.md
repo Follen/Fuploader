@@ -22,7 +22,7 @@ Map natural language consistently:
 
 - `create`: create the main record. If first content is a separate platform action, plan it as a following atomic step.
 - `update`: publish a plugin version, change selected configuration-backup content, or publish a WA/string version.
-- `edit`: change fields allowed by the target platform's action allowlist. For DD plugins, this includes `description`, `html_desc`, and existing-record commercial, association, room/channel, and creation-statement settings; other first-publication metadata, categories, media, and version fields are create/update-only. Description edits read both detail and author-list projections; either may confirm the value, but if neither matches, report verification-required.
+- `edit`: change fields allowed by the target platform's action allowlist. For DD plugins, this includes `description`, `html_desc`, `update_desc`, and existing-record commercial, association, room/channel, and creation-statement settings; other first-publication metadata, categories, media, and version fields are create/update-only. Announcement edits preserve the published version and package; this edits the current plugin announcement, not an arbitrary historical version. Edits read both detail and author-list projections; either may confirm the value, but if neither matches, report verification-required.
 - `delete`: delete one main record only. It never deletes an individual version, media object, or associated record.
 
 Never offer bulk delete, drafts, guides, messages, or GUI control automation. Heybox supports individual version deletion with asynchronous readback; whole-module deletion is not supported. The DD task-session command may close verified official GUI processes only after the consent flow below.

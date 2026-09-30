@@ -14,6 +14,7 @@ of being silently classified.
 from __future__ import annotations
 
 import io
+import json
 import os
 import re
 import zipfile
@@ -38,8 +39,16 @@ INTERFACE_GAME_VERSION_MAP: Mapping[str, Mapping[str, str]] = {
     "11507": {"gameVersion": "Classic Era", "server": "wow_classic_era"},
     "11508": {"gameVersion": "Classic Era", "server": "wow_classic_era"},
     "40401": {"gameVersion": "Cataclysm Classic", "server": "wow_classic_cata"},
-    "40402": {"gameVersion": "Cataclysm Classic", "server": "wow_classic_cata"},
+    "11509": {"gameVersion": "1.15.9", "server": "wow_classic_era"},
+    "20506": {"gameVersion": "2.5.6", "server": "wow_anniversary"},
+    "38002": {"gameVersion": "3.80.2", "server": "wow_classic_titan"},
+    "40402": {"gameVersion": "4.4.2", "server": "wow_classic_cata"},
+    "50504": {"gameVersion": "5.5.4", "server": "wow_classic"},
 }
+
+# Recognized WoW clients in universal ZIPs which currently have no Creator
+# server mapping. Preserve their Interface codes, without inventing wire keys.
+KNOWN_UNMAPPED_INTERFACES = {"16001", "30405"}
 
 _INTERFACE_RE = re.compile(r"^\s*##\s*Interface\s*:\s*(.*?)\s*$", re.IGNORECASE)
 _INTERFACE_VALUE_RE = re.compile(r"^\d+$")
@@ -138,7 +147,8 @@ def _zip_entries(raw: bytes, source_name: str) -> Iterable[Tuple[str, bytes]]:
 def parse_modus_zip(source: _SOURCE) -> Dict[str, Any]:
     """Return ModUs metadata inferred from ``source``.
 
-    Addon ``.toc`` files must declare the same Interface set.  This avoids
+    Each addon's base and recognized flavor TOCs form one Interface union.
+    Independent addons must declare the same union. This avoids
     choosing an arbitrary addon when a multi-addon archive contains
     incompatible game versions.  TOCs under a ``Libs`` directory are ignored.
     Multiple Interface values in one TOC are supported and become a
@@ -160,13 +170,20 @@ def parse_modus_zip(source: _SOURCE) -> Dict[str, Any]:
     for name, toc_raw in addon_entries:
         values = tuple(_interface_values(_decode_toc(toc_raw, name), name))
         signatures.append((name, values))
-    expected = signatures[0][1]
-    mismatches = [name for name, values in signatures[1:] if values != expected]
+    groups: Dict[str, set[str]] = {}
+    for name, values in signatures:
+        normalized = name.replace("\\", "/").casefold()
+        addon = re.sub(r"_(?:mainline|vanilla|classic|bcc|tbc|wrath|cata|mists)\.toc$", ".toc", normalized)
+        groups.setdefault(addon, set()).update(values)
+    first = next(iter(groups))
+    expected = tuple(sorted(groups[first], key=lambda item: (int(item), item)))
+    mismatches = [name for name, values in groups.items() if values != set(expected)]
     if mismatches:
-        names = ", ".join([signatures[0][0], *mismatches])
+        names = ", ".join([first, *mismatches])
         raise ValidationError("addon TOC Interface values are ambiguous across files: %s" % names, path="$.file")
 
-    unknown = [value for value in expected if value not in INTERFACE_GAME_VERSION_MAP]
+    unknown = [value for value in expected
+               if value not in INTERFACE_GAME_VERSION_MAP and value not in KNOWN_UNMAPPED_INTERFACES]
     if unknown:
         raise ValidationError(
             "unsupported addon TOC Interface value(s): %s" % ", ".join(unknown),
@@ -175,6 +192,8 @@ def parse_modus_zip(source: _SOURCE) -> Dict[str, Any]:
 
     games: List[Dict[str, str]] = []
     for interface in expected:
+        if interface in KNOWN_UNMAPPED_INTERFACES:
+            continue
         candidate = dict(INTERFACE_GAME_VERSION_MAP[interface])
         if candidate not in games:
             games.append(candidate)
@@ -183,6 +202,7 @@ def parse_modus_zip(source: _SOURCE) -> Dict[str, Any]:
         "supported_game_versions": games,
         "interface_values": list(expected),
         "toc_files": [name for name, _ in signatures],
+        "unmapped_interface_values": [value for value in expected if value in KNOWN_UNMAPPED_INTERFACES],
     }
 
 
@@ -191,4 +211,29 @@ def parse_modus_zip(source: _SOURCE) -> Dict[str, Any]:
 parse_zip_metadata = parse_modus_zip
 
 
-__all__ = ["INTERFACE_GAME_VERSION_MAP", "parse_modus_zip", "parse_zip_metadata"]
+def select_game_versions(derived: Sequence[Mapping[str, str]], config: Any,
+                         supplied: Any = None) -> List[Dict[str, str]]:
+    """Intersect known ZIP clients with live Creator choices and caller scope."""
+    rows = config if isinstance(config, list) else []
+    row = next((item for item in rows if isinstance(item, Mapping) and item.get("key") == "wow_builds"), None)
+    try:
+        builds = json.loads(row["value"]) if row and isinstance(row.get("value"), str) else None
+    except (ValueError, TypeError):
+        builds = None
+    if not isinstance(builds, Mapping) or not builds or any(
+        not isinstance(value, Mapping) or not isinstance(value.get("versions"), list)
+        or any(not isinstance(version, str) or not version.strip() for version in value["versions"])
+        for value in builds.values()
+    ):
+        raise ValidationError("live wow_builds config is missing or malformed", path="$.supported_game_versions")
+    available = [dict(item) for item in derived
+                 if item["server"] in builds and item["gameVersion"] in builds[item["server"]]["versions"]]
+    selected = available if supplied is None else supplied
+    if not isinstance(selected, list) or not selected or any(item not in available for item in selected):
+        raise ValidationError("supported_game_versions must be a nonempty subset of ZIP and live Creator choices", path="$.supported_game_versions")
+    if len({(item["server"], item["gameVersion"]) for item in selected}) != len(selected):
+        raise ValidationError("supported_game_versions must not contain duplicates", path="$.supported_game_versions")
+    return [dict(item) for item in selected]
+
+
+__all__ = ["INTERFACE_GAME_VERSION_MAP", "parse_modus_zip", "parse_zip_metadata", "select_game_versions"]

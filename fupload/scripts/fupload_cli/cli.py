@@ -400,7 +400,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             write_output(platform, operation, data)
             return 0
         modus_doctor = platform == "modus" and resource == "session" and action == "doctor"
-        modus_main_session = resource in ("addon", "plugin", "config", "wa", "builds") or (
+        modus_main_session = resource in ("addon", "config", "wa", "builds") or (
             modus_doctor and getattr(args, "client", "creator") == "main"
         )
         provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(authenticate=not modus_doctor, main_session=modus_main_session))))

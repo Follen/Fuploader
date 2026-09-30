@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "0.0.23",
   "skill_version": "0.0.23",
-  "tree_sha256": "92ada2b43090f9d3d44c90da840fba1ed420e79ef8166275dc790c5a200d53db",
+  "tree_sha256": "99a53c58358ce5c4c0a925a6147ed1db2daca295da553ff5d59b12378cf38689",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -87,13 +87,13 @@
     },
     {
       "path": "references/dd.md",
-      "bytes": 20837,
-      "sha256": "4a174fa9470a23aee5c607b85123575c157559570a2d3fd4caa9a0874f9ae934"
+      "bytes": 21111,
+      "sha256": "18895d95e5221b3c2243922bbfc6f2e826f9084a0d5d11c37c3eb923a9dd7547"
     },
     {
       "path": "references/modus.md",
-      "bytes": 37236,
-      "sha256": "396bf899cef28dfdd66558a555c37bc9af7afaa444f96b2b5b5b1f9b68508783"
+      "bytes": 37716,
+      "sha256": "f462731d05d786cdfd290eceaea9104b0f28814c9a5bd793358e4dc1a7abcdce"
     },
     {
       "path": "references/newbee-official-cli.md",
@@ -127,8 +127,8 @@
     },
     {
       "path": "scripts/fupload_cli/cli.py",
-      "bytes": 37420,
-      "sha256": "3a052ec53c29ca95eafc9ba845d448ef45e4bd0231bf41ec1906e55281aa1650"
+      "bytes": 37410,
+      "sha256": "97ce8e53f916f619a16351c636d90b9ddf4a64ebb301a2cf28da81d65522863d"
     },
     {
       "path": "scripts/fupload_cli/curseforge.py",
@@ -147,8 +147,8 @@
     },
     {
       "path": "scripts/fupload_cli/dd.py",
-      "bytes": 117372,
-      "sha256": "19a303e84ce08dd3af9a905d04d24f7224c3302f83f0d62f899618cf45fe0433"
+      "bytes": 117387,
+      "sha256": "01051273f0e03010c88590305583f404de9588e60fc708999222aa80263ebb31"
     },
     {
       "path": "scripts/fupload_cli/errors.py",
@@ -162,13 +162,13 @@
     },
     {
       "path": "scripts/fupload_cli/modus_zip.py",
-      "bytes": 8590,
-      "sha256": "6c3949d59356e3e28aa15458eb09019f64fdb0d383af26e7bb0c4c262b857559"
+      "bytes": 11445,
+      "sha256": "ddf603cb24d5e9758be0428446f134e02aa1a44a8be39f697b8985ac34463e2f"
     },
     {
       "path": "scripts/fupload_cli/modus.py",
-      "bytes": 74134,
-      "sha256": "9841ce7188083b62c1c217d89436b3c3ddc3ecf726719d3c44c0b83027172fac"
+      "bytes": 74167,
+      "sha256": "f4ac5820476593f3db0a621faac61cbed319b0a046fb35945f9a684f292d0e5f"
     },
     {
       "path": "scripts/fupload_cli/newbee_auth.py",
@@ -182,8 +182,8 @@
     },
     {
       "path": "scripts/fupload_cli/schema.py",
-      "bytes": 54911,
-      "sha256": "bede6cc93de8a9d766e463cab0acb8725745da781aebabba73744394b594b93c"
+      "bytes": 55131,
+      "sha256": "b651963c504896cfef46f65b61d5fb638884aacb14a8e09593162526e239133f"
     },
     {
       "path": "scripts/fupload_cli/state_machine.py",
@@ -207,8 +207,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 28582,
-      "sha256": "f150b547db8ce091c1d1e5493026f2c30fce8c9458042a76df33844bac214972"
+      "bytes": 28729,
+      "sha256": "0cca5b5f3090eef70cc029bbf0a573968dd50eb8c267e380aac5b378445dca93"
     }
   ]
 }

@@ -131,12 +131,12 @@ PUT are separate stages.
 | `file_id` | `fileId` | positive integer | update/edit/delete required; upload allocates | `GET /game/data/author/project/fileId/{projectId}` | allocated ID is used by signature; create metadata omits it | update/delete/signature | `id`/`fileId` in release detail |
 | `version` | `version` | non-empty string, max 120 | create/upload required after ZIP preflight | ZIP `.toc` plus caller label | caller value preserved | metadata create/update | `version` |
 | `type` | `type` | non-empty string, max 40 | create/upload required | Creator release-type choices/API | must be a server-supported value | metadata create/update | `type` |
-| `supported_game_versions` | `supportedGameVersionsReqs[]` | non-empty object array | required; ZIP-derived | installed `.toc` `Interface` values and game config | each entry requires string `gameVersion` and `server`; explicit caller value must match ZIP | metadata create/update | `supportedGameVersionsReqs`/version compatibility rows |
+| `supported_game_versions` | `supportedGameVersionsReqs[]` | non-empty object array | required; ZIP-derived | installed `.toc` `Interface` values and game config | each entry requires string `gameVersion` and `server`; explicit caller value must be a nonempty subset of ZIP and live `wow_builds` choices | metadata create/update | `supportedGameVersionsReqs`/version compatibility rows |
 | `md5` | `md5` | hex string, max 64 | derived from exact ZIP bytes | local ZIP preflight | must describe bytes later PUT | metadata create/update | `md5` |
 | `zip_size` | `zipSize` | non-negative integer | derived | local ZIP stat | must describe exact ZIP | metadata create/update | `zipSize` |
 | `unzip_size` | `unzipSize` | non-negative integer | derived | ZIP central directory | bounded by ZIP preflight | metadata create/update | `unzipSize` |
 | `path` | `path` | string, max 500 | metadata optional | Creator/object response | local path is never binary upload | metadata create/update | `path` |
-| `toc_version` | `tocVersion` | string, max 80 | derived | each addon `.toc` `Interface`; TOCs under a `Libs` directory are ignored | incompatible/missing/mixed addon values fail before write | metadata create/update | `tocVersion` |
+| `toc_version` | `tocVersion` | string, max 80 | derived | each addon `.toc` `Interface`; TOCs under a `Libs` directory are ignored | recognized flavor TOCs form an addon union; missing values and conflicting independent addons fail before write | metadata create/update | `tocVersion` |
 | `changelog` | `changelog` | string/null, max 10000 | optional | free text | omitted/empty behavior is action-specific | metadata create/update | `changelog` |
 | `file` | not in JSON; raw bytes | local path | create/upload required | local filesystem | valid ZIP, max 200 MiB; bytes PUT only after metadata/signature | signed URL from `GET .../upload/signature/{projectId}/{fileId}`, then HTTP `PUT` | object upload status plus release detail hashes/sizes |
 | `transaction_log` | not sent | local path string | optional | caller | redacted durable stage record | local record only | transaction JSON |
@@ -149,7 +149,7 @@ before file-ID allocation and ZIP preflight, so those early failures are also
 durable. Binary-upload errors expose only a query-free endpoint identifier,
 status when available, and a bounded redacted response summary. The provider parses each addon `.toc`
 `Interface` value to derive
-`toc_version` and `supported_game_versions`, and ignores TOCs under a `Libs` directory. Explicit caller values must match.
+`toc_version` and `supported_game_versions`, and ignores TOCs under a `Libs` directory. Explicit `toc_version` must match. Known clients absent from live `wow_builds` are excluded from automatic selection; unknown Interface codes still fail. Explicit `supported_game_versions` may narrow selection to a product's supported scope, but must be a nonempty subset of both ZIP and live choices. Creator `plugin get/versions` uses the Creator session; main-client addon reads retain their separate session.
 The provider validates the ZIP, computes `md5`, `zip_size`, and `unzip_size`,
 registers metadata, obtains a signed URL, then uploads the ZIP bytes with HTTP
 `PUT` and `Content-Type: application/zip`. A local path is metadata only; it is

@@ -24,7 +24,7 @@ from typing import Any, Dict, Mapping, Optional
 
 from .errors import FuploadError, ValidationError, redact
 from .state_machine import COMPLETE, ProjectStateMachine
-from .modus_zip import parse_modus_zip
+from .modus_zip import parse_modus_zip, select_game_versions
 from .transport import json_request, multipart_request
 
 
@@ -1289,14 +1289,17 @@ class ModUs:
                 supplied_games = doc.get("supported_game_versions")
                 if supplied_toc is not None and str(supplied_toc) != derived["toc_version"]:
                     raise ValidationError("toc_version does not match the ZIP Interface field", path="$.toc_version")
-                if supplied_games is not None and _supported_game_versions(supplied_games) != derived["supported_game_versions"]:
-                    raise ValidationError("supported_game_versions does not match the ZIP Interface field", path="$.supported_game_versions")
+                selected_games = select_game_versions(
+                    derived["supported_game_versions"],
+                    self.options("game-versions", keys=["wow_builds"]),
+                    _supported_game_versions(supplied_games) if supplied_games is not None else None,
+                )
                 metadata.update({
                     "md5": md5,
                     "zip_size": size,
                     "unzip_size": unzip_size,
                     "toc_version": derived["toc_version"],
-                    "supported_game_versions": derived["supported_game_versions"],
+                    "supported_game_versions": selected_games,
                     "path": doc.get("path") or archive.name,
                 })
             current_stage = "release_metadata_update" if update else "release_metadata"
