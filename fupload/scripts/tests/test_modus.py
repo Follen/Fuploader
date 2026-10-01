@@ -250,7 +250,9 @@ class ModusTests(unittest.TestCase):
             _FakeConnection.instances = []
             with mock.patch.object(provider, "_request", side_effect=fake_request), mock.patch(
                 "fupload_cli.modus.http.client.HTTPSConnection", _FakeConnection
-            ):
+            ), mock.patch.object(provider, "options", return_value=[{
+                "key": "wow_builds", "value": '{"wow_retail":{"versions":["11.0.0"]}}'
+            }]):
                 result = provider.publish(
                     {
                         "project_id": 42,
@@ -400,6 +402,14 @@ class ModusTests(unittest.TestCase):
             self.assertEqual(code, 0, output.getvalue())
             self.assertTrue(json.loads(output.getvalue())["dry_run"])
             provider.assert_not_called()
+
+    def test_creator_release_reads_do_not_require_main_client_login(self):
+        for argv in (["modus", "plugin", "versions", "--project-id", "42"],
+                     ["modus", "plugin", "get", "--project-id", "42", "--file-id", "9"]):
+            with mock.patch("fupload_cli.cli._modus_provider") as provider, contextlib.redirect_stdout(io.StringIO()):
+                provider.return_value.execute_read.return_value = {}
+                self.assertEqual(main(argv), 0)
+                self.assertFalse(provider.call_args.kwargs["main_session"])
 
 
 if __name__ == "__main__":

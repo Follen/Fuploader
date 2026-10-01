@@ -45,7 +45,7 @@ class SchemaTests(unittest.TestCase):
         expected = {
             ("plugin", "create"): plugin_meta | plugin_version,
             ("plugin", "update"): {"sn"} | plugin_version,
-            ("plugin", "edit"): {"sn", "description", "html_desc"} | commercial,
+            ("plugin", "edit"): {"sn", "description", "html_desc", "update_desc"} | commercial,
             ("config", "create"): config_meta | config_content,
             ("config", "update"): {"share_sn"} | config_content,
             ("config", "edit"): {"share_sn"} | config_meta,
@@ -232,6 +232,10 @@ class SchemaTests(unittest.TestCase):
     def test_dd_contract_enums_limits_and_counts(self) -> None:
         plugin = get_schema("dd", "plugin", "edit")
         base = {"schema": plugin.name, "sn": "plugin"}
+        self.assertEqual(plugin.validate({**base, "update_desc": "<p>[修复]日志</p>"})["update_desc"], "<p>[修复]日志</p>")
+        for invalid in ("", "x" * 1001):
+            with self.assertRaises(ValidationError):
+                plugin.validate({**base, "update_desc": invalid})
         for field, invalid in (("addon_type", 2), ("creation_statement", "translated")):
             with self.subTest(field=field), self.assertRaises(ValidationError):
                 plugin.validate({**base, field: invalid})

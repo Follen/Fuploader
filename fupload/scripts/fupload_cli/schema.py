@@ -591,6 +591,9 @@ DD_PLUGIN_VERSION = {
     "version": f("string", nonempty=True, max_length=80),
     "update_desc": f("string", nonempty=True, max_length=1000),
 }
+# The official existing-plugin editor includes the update announcement in
+# its /addon/modify payload. Editing it does not require a new ZIP/version.
+DD_PLUGIN_EDIT_META["update_desc"] = DD_PLUGIN_VERSION["update_desc"]
 
 DD_CONFIG_META = {
     "scope": DD_COMMERCIAL["scope"], "title": f("string", nonempty=True, max_length=40),
