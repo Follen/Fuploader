@@ -45,7 +45,7 @@ class SchemaTests(unittest.TestCase):
         expected = {
             ("plugin", "create"): plugin_meta | plugin_version,
             ("plugin", "update"): {"sn"} | plugin_version,
-            ("plugin", "edit"): {"sn", "description", "html_desc", "update_desc"} | commercial,
+            ("plugin", "edit"): {"sn", "name", "description", "html_desc", "update_desc"} | commercial,
             ("config", "create"): config_meta | config_content,
             ("config", "update"): {"share_sn"} | config_content,
             ("config", "edit"): {"share_sn"} | config_meta,
@@ -61,6 +61,20 @@ class SchemaTests(unittest.TestCase):
                 set(get_schema("dd", resource, "delete").fields),
                 {"sn", "confirm_delete"},
             )
+
+    def test_dd_plugin_edit_name_limits_and_action_boundary(self) -> None:
+        edit = get_schema("dd", "plugin", "edit")
+        base = {"schema": edit.name, "sn": "plugin-sn"}
+        for name in ("EXBOSS-Rurutia 露露语音包", "露" * 80):
+            edit.validate({**base, "name": name})
+        for name in ("", "露" * 81, 123, None):
+            with self.subTest(name=name), self.assertRaises(ValidationError):
+                edit.validate({**base, "name": name})
+        edit.validate(base)
+        update = get_schema("dd", "plugin", "update")
+        with self.assertRaises(ValidationError):
+            update.validate({"schema": update.name, "sn": "plugin-sn", "name": "Changed",
+                             "game_versions": ["12.1.0"], "version": "2", "update_desc": "notes"})
 
     def test_unknown_field_is_rejected(self) -> None:
         schema = get_schema("newbee", "plugin", "edit")
