@@ -185,7 +185,7 @@ def _dd_tree(platforms: argparse._SubParsersAction) -> None:
             leaf.add_argument("--game-type", type=_positive, required=True)
 
     plugin = groups.add_parser("plugin", help="DD plugin create, version update, metadata edit, and reads").add_subparsers(dest="action_command", required=True)
-    for action, text in (("create", "Create a DD plugin with its first selected version."), ("update", "Publish a DD plugin version while preserving first-publication metadata."), ("edit", "Edit DD plugin commercial, association, room/channel, and creation-statement settings."), ("delete", "Delete one explicitly confirmed DD plugin record.")):
+    for action, text in (("create", "Create a DD plugin with its first selected version."), ("update", "Publish a DD plugin version while preserving first-publication metadata."), ("edit", "Edit DD plugin name, descriptions, announcement, commercial, association, room/channel, and creation-statement settings."), ("delete", "Delete one explicitly confirmed DD plugin record.")):
         _write_leaf(plugin, "dd", "plugin", action, text)
     leaf = _read_leaf(plugin, "list", "List plugins owned by the current DD author account.", platform="dd", resource="plugin", action="list"); _list_flags(leaf, game_type=True)
     leaf = _read_leaf(plugin, "get", "Read one DD plugin detail by share SN.", platform="dd", resource="plugin", action="get"); leaf.add_argument("--sn", required=True)

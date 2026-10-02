@@ -666,6 +666,51 @@ class BuilderTests(unittest.TestCase):
         self.assertEqual(result["reference"], "plugin-sn")
         self.assertEqual(session.post.call_args.args[1]["share_code_life_type"], "fourteen_day")
 
+    def test_dd_plugin_rename_preserves_version_and_requires_matching_readback(self) -> None:
+        current = {
+            "sn": "plugin-sn", "game_type": 10001, "game_versions": ["12.1.0"],
+            "name": "Before", "description": "Description", "logo": "logo",
+            "detail_imgs": ["image"], "primary_category_id": 1,
+            "second_category_ids": [999], "html_desc": "Details",
+            "scope": "private", "share_code_life_type": "seven_day",
+            "need_buy": False, "need_anchor_vip": False, "jump_room": False,
+            "with_associate": False, "creation_statement": "original",
+            "latest_version": {"file_path": "archive", "release_type": 1, "version": "1.0.0"},
+            "update_desc": "old",
+        }
+        renamed = {**current, "name": "EXBOSS-Rurutia 露露语音包"}
+        for case in ("detail", "author", "neither", "omitted"):
+            session = mock.MagicMock()
+            session.post.return_value = {"code": 0, "result": {"sn": "plugin-sn"}}
+            document = {"sn": "plugin-sn"}
+            if case != "omitted":
+                document["name"] = renamed["name"]
+            with self.subTest(case=case), mock.patch.object(DD, "_fresh_detail", return_value=current), mock.patch(
+                "fupload_cli.dd.author_item", side_effect=lambda *args: (
+                    current if not session.post.called or case != "author" else renamed
+                )
+            ), mock.patch.object(DD, "_validate_options"), mock.patch(
+                "fupload_cli.dd.detail", return_value=renamed if case == "detail" else current
+            ), mock.patch("fupload_cli.dd.time.sleep"):
+                if case == "neither":
+                    with self.assertRaises(FuploadError) as raised:
+                        DD()._write_plugin(session, "edit", document)
+                    self.assertTrue(raised.exception.verification_required)
+                    self.assertIn("name", raised.exception.details["fields"])
+                else:
+                    result = DD()._write_plugin(session, "edit", document)
+                    self.assertEqual(result["reference"], "plugin-sn")
+                session.post.assert_called_once()
+                endpoint, form = session.post.call_args.args
+                self.assertEqual(endpoint, "/addon/modify")
+                self.assertEqual(form["name"], current["name"] if case == "omitted" else renamed["name"])
+                self.assertEqual(form["version"], "1.0.0")
+                self.assertEqual(form["detail_url"], "archive")
+                self.assertEqual(form["release_type"], 1)
+                for field in ("description", "html_desc", "logo", "detail_imgs", "primary_category_id", "update_desc"):
+                    self.assertEqual(form[field], current[field])
+                session.upload.assert_not_called()
+
     def test_dd_plugin_edit_writes_and_verifies_description(self) -> None:
         current = {
             "sn": "plugin-sn", "game_type": 10001, "game_versions": ["12.1.0"],

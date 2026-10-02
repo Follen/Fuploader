@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "0.0.24",
   "skill_version": "0.0.24",
-  "tree_sha256": "53bc8cdcaab317ddace896026d8668614dfaeb19f421cf0195fe4846f6e9933c",
+  "tree_sha256": "acfaeb113b0433695cf49f4ac2b4c87b1e2745fe48ed1c1fdfbefba2df5d7572",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -87,8 +87,8 @@
     },
     {
       "path": "references/dd.md",
-      "bytes": 21111,
-      "sha256": "18895d95e5221b3c2243922bbfc6f2e826f9084a0d5d11c37c3eb923a9dd7547"
+      "bytes": 21271,
+      "sha256": "8252930e69831296b97fd445416736421917d19f2ce9adeff8472fd488aa3366"
     },
     {
       "path": "references/modus.md",
@@ -127,8 +127,8 @@
     },
     {
       "path": "scripts/fupload_cli/cli.py",
-      "bytes": 37410,
-      "sha256": "97ce8e53f916f619a16351c636d90b9ddf4a64ebb301a2cf28da81d65522863d"
+      "bytes": 37444,
+      "sha256": "0169cafc993becbec7d251db65e9986aa97b9d7d7290f55db793236459cbfe59"
     },
     {
       "path": "scripts/fupload_cli/curseforge.py",
@@ -147,8 +147,8 @@
     },
     {
       "path": "scripts/fupload_cli/dd.py",
-      "bytes": 117387,
-      "sha256": "01051273f0e03010c88590305583f404de9588e60fc708999222aa80263ebb31"
+      "bytes": 117401,
+      "sha256": "dab92382a5275e4440bfe375c8a303d8ad124ac4ad5623f55bb04c1997b48e28"
     },
     {
       "path": "scripts/fupload_cli/errors.py",
@@ -182,8 +182,8 @@
     },
     {
       "path": "scripts/fupload_cli/schema.py",
-      "bytes": 55131,
-      "sha256": "b651963c504896cfef46f65b61d5fb638884aacb14a8e09593162526e239133f"
+      "bytes": 55178,
+      "sha256": "5dda73c91c168dc00d502ebf86fcc2c4d8790c53da7a4abae4df0cc8d8b3c9d2"
     },
     {
       "path": "scripts/fupload_cli/state_machine.py",
@@ -207,8 +207,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 28729,
-      "sha256": "9625fb102b1fcc347978d0b9fe73a51703ec8296d344550938e8a2dbe593565f"
+      "bytes": 28737,
+      "sha256": "13aec7296d8952fd85f90b1f295ac141f06730fcfac75895a1e5376cbc684f7f"
     }
   ]
 }
