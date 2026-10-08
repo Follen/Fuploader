@@ -126,3 +126,9 @@ Each DD native/API failure appends one ASCII JSON line to `<DD version directory
 After an accepted mutation, detail readback uses a short bounded GET-only poll and never resends the mutation. Plugin edit/version confirmation also checks the matching author-list projection because the official UI opens the modify dialog from that item while `detail_v2` can remain stale or contain null latest-version placeholders. Configuration readback compares its official integer `need_buy` wire value with the boolean detail projection through a resource-specific conversion.
 
 The parent process and native sidecar exchange ASCII-only JSONL, and Fuploader's final JSON output follows the same rule. Non-ASCII request, response, and output text is represented with JSON Unicode escapes so Chinese titles, descriptions, announcements, and URLs do not depend on either Windows process code page. JSON consumers recover original UTF-8 strings through normal parsing.
+
+## DD 100130 WA parser contract
+
+The JSONL sidecar must call the synchronous native `WaParser(None).parseWa(content)` and unwrap its completed `JsResult`. `WowUIInterface.parseWa(params)` is decorated with `async_task` and returns a FakePromise, not the parsed UID/ID. Do not interpret that Promise as a parser rejection or rewrite a game-validated string to work around it. On a native_parser failure, confirm the remote revision is unchanged before retrying the corrected call.
+
+For WA readback only, `vip_levels=null` is equivalent to `[]` when `need_anchor_vip` is explicitly false; enabled or unknown restriction states remain strict. WA content summaries include UTF-8 SHA-256 for read-only full-content equality without exposing the string. After an accepted-write/readback error, compare that digest and revision before any retry.

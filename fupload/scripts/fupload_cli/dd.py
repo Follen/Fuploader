@@ -1247,6 +1247,15 @@ def safe_associated_acts(session: Sidecar, game_type: Any) -> Dict[str, Any]:
     return {"total": len(result_items), "items": result_items}
 
 
+def wa_readback_projection(value: Mapping[str, Any]) -> Dict[str, Any]:
+    projected = dict(value)
+    # DD 100130 returns null for an explicitly disabled VIP restriction.
+    # Do not normalize missing/enabled flags or nonempty lists.
+    if projected.get("need_anchor_vip") is False and projected.get("vip_levels") is None:
+        projected["vip_levels"] = []
+    return projected
+
+
 def safe_detail(kind: str, value: Dict[str, Any]) -> Dict[str, Any]:
     result_value = copy.deepcopy(value)
     if kind == "config" and "retail_ui_config" in result_value:
@@ -1259,6 +1268,8 @@ def safe_detail(kind: str, value: Dict[str, Any]) -> Dict[str, Any]:
                 if key.lower() in sensitive_keys:
                     if isinstance(item, str):
                         cleaned[key + "_summary"] = {"length": len(item)}
+                        if kind == "wa" and key == "content":
+                            cleaned[key + "_summary"]["sha256"] = hashlib.sha256(item.encode("utf-8")).hexdigest()
                     elif isinstance(item, list):
                         cleaned[key + "_summary"] = {"items": len(item)}
                     else:
@@ -2427,7 +2438,7 @@ class DD:
         )
         raw_readback, _actual = _readback_until_fields(
             lambda: detail(session, "wa", reference),
-            lambda value: value,
+            wa_readback_projection,
             form,
             stable_fields,
             "/wa/detail",

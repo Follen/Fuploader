@@ -1373,24 +1373,52 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(record["http_status"], 422)
         self.assertEqual(record["business_code"], 42201)
 
-    def test_native_wa_parser_uses_official_bridge_and_nested_result(self) -> None:
-        with mock.patch.dict(os.environ, {
-            "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
-            "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
-        }):
-            module = importlib.import_module("fupload_cli.dd_sidecar")
-
+    def test_native_wa_parser_uses_sync_parser_not_async_ui_bridge(self) -> None:
+        module = self._native_sidecar_module()
         class NativeResult:
             def toJson(self):
-                return json.dumps({"code": 200, "result": {"uid": "wa-uid", "id": "wa-id"}})
+                return json.dumps({"code": 200, "result": {"uid": "wa-uid", "id": "中文 WA"}})
+        parser_module = ModuleType("components.wow_ui.wa.wa_parser")
+        parser_module.WaParser = mock.Mock()
+        parser_module.WaParser.return_value.parseWa.return_value = NativeResult()
+        container = mock.Mock()
+        container.get_instance.side_effect = AssertionError("UI bridge returns FakePromise")
+        with mock.patch.dict(sys.modules, {parser_module.__name__: parser_module}):
+            result = module.parse_native_wa((None, container, None, None, None), "!WA:2!content")
+        parser_module.WaParser.assert_called_once_with(None)
+        parser_module.WaParser.return_value.parseWa.assert_called_once_with("!WA:2!content")
+        container.get_instance.assert_not_called()
+        self.assertEqual(result, {"parse_wa_uid": "wa-uid", "parse_wa_id": "中文 WA"})
 
-        interface = mock.MagicMock()
-        interface.parseWa.return_value = NativeResult()
-        container = mock.MagicMock()
-        container.get_instance.return_value = interface
-        result = module.parse_native_wa((None, container, None, None, None), "!WA:2!content")
-        interface.parseWa.assert_called_once_with({"waStr": "!WA:2!content"})
-        self.assertEqual(result, {"parse_wa_uid": "wa-uid", "parse_wa_id": "wa-id"})
+    def test_native_wa_parser_rejects_errors_and_missing_ids(self) -> None:
+        module = self._native_sidecar_module()
+        for result in ({"code": 500, "msg": "rejected"}, {"code": 200, "result": {}}, object()):
+            with self.subTest(result_type=type(result).__name__), self.assertRaises(RuntimeError):
+                module._native_wa_ids(result)
+
+    def test_wa_readback_normalizes_only_disabled_vip_null(self) -> None:
+        from fupload_cli.dd import wa_readback_projection, _verify_fields
+        original = {"need_anchor_vip": False, "vip_levels": None}
+        actual = wa_readback_projection(original)
+        self.assertIsNone(original["vip_levels"])
+        _verify_fields({"need_anchor_vip": False, "vip_levels": []}, actual,
+                       ("need_anchor_vip", "vip_levels"), "/wa/detail")
+        for value in ({"need_anchor_vip": True, "vip_levels": None}, {"vip_levels": None},
+                      {"need_anchor_vip": False, "vip_levels": [3]}):
+            self.assertEqual(wa_readback_projection(value), value)
+            with self.assertRaises(FuploadError):
+                _verify_fields({"vip_levels": []}, wa_readback_projection(value), ("vip_levels",), "/wa/detail")
+
+    def test_wa_content_digest_does_not_expose_content(self) -> None:
+        import hashlib
+        from fupload_cli.dd import safe_detail
+        content = "中文 fixture"
+        actual = safe_detail("wa", {"content": content})
+        self.assertNotIn("content", actual)
+        self.assertEqual(actual["content_summary"], {
+            "length": len(content), "sha256": hashlib.sha256(content.encode("utf-8")).hexdigest(),
+        })
+        self.assertNotIn("sha256", safe_detail("config", {"content": content})["content_summary"])
 
     def test_native_business_error_is_logged_and_returns_log_path(self) -> None:
         with mock.patch.dict(os.environ, {
