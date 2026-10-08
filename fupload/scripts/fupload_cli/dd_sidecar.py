@@ -747,24 +747,14 @@ def _native_wa_ids(value):
 
 
 def parse_native_wa(session, content):
-    """Follow the installed DD bridge and parser chain; never synthesize IDs."""
-    container = session[1]
-    try:
-        interface = container.get_instance("WowUIInterface")
-    except Exception:
-        interface = None
-    bridge = getattr(interface, "parseWa", None)
-    if callable(bridge):
-        return _native_wa_ids(bridge({"waStr": content}))
-
+    """Use DD's synchronous parser, not the async Qt UI Promise bridge."""
     try:
         from components.wow_ui.wa.wa_parser import WaParser
-        parser = WaParser(None)
-        return _native_wa_ids(parser.parseWa(content))
     except ImportError:
-        pass
-
-    raise RuntimeError("installed DD runtime does not expose a native WA parser")
+        raise RuntimeError("installed DD runtime does not expose a synchronous native WA parser")
+    # WowUIInterface.parseWa is decorated with async_task and returns a
+    # FakePromise. The JSONL sidecar needs the completed native parse result.
+    return _native_wa_ids(WaParser(None).parseWa(content))
 
 
 def run_command(session, command):
