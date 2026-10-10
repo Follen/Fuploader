@@ -40,6 +40,7 @@ INTERFACE_GAME_VERSION_MAP: Mapping[str, Mapping[str, str]] = {
     "11508": {"gameVersion": "Classic Era", "server": "wow_classic_era"},
     "40401": {"gameVersion": "Cataclysm Classic", "server": "wow_classic_cata"},
     "11509": {"gameVersion": "1.15.9", "server": "wow_classic_era"},
+    "16001": {"gameVersion": "1.60.1", "server": "wow_forever"},
     "20506": {"gameVersion": "2.5.6", "server": "wow_anniversary"},
     "38002": {"gameVersion": "3.80.2", "server": "wow_classic_titan"},
     "40402": {"gameVersion": "4.4.2", "server": "wow_classic_cata"},
@@ -48,7 +49,7 @@ INTERFACE_GAME_VERSION_MAP: Mapping[str, Mapping[str, str]] = {
 
 # Recognized WoW clients in universal ZIPs which currently have no Creator
 # server mapping. Preserve their Interface codes, without inventing wire keys.
-KNOWN_UNMAPPED_INTERFACES = {"16001", "30405"}
+KNOWN_UNMAPPED_INTERFACES = {"30405"}
 
 _INTERFACE_RE = re.compile(r"^\s*##\s*Interface\s*:\s*(.*?)\s*$", re.IGNORECASE)
 _INTERFACE_VALUE_RE = re.compile(r"^\d+$")
@@ -213,7 +214,7 @@ parse_zip_metadata = parse_modus_zip
 
 def select_game_versions(derived: Sequence[Mapping[str, str]], config: Any,
                          supplied: Any = None) -> List[Dict[str, str]]:
-    """Intersect known ZIP clients with live Creator choices and caller scope."""
+    """Default to exact TOC builds; allow explicit live builds on ZIP clients."""
     rows = config if isinstance(config, list) else []
     row = next((item for item in rows if isinstance(item, Mapping) and item.get("key") == "wow_builds"), None)
     try:
@@ -228,9 +229,16 @@ def select_game_versions(derived: Sequence[Mapping[str, str]], config: Any,
         raise ValidationError("live wow_builds config is missing or malformed", path="$.supported_game_versions")
     available = [dict(item) for item in derived
                  if item["server"] in builds and item["gameVersion"] in builds[item["server"]]["versions"]]
+    # An explicit build is the author's compatibility declaration, like the
+    # Creator dropdown. It must still belong to a client present in the ZIP
+    # and be offered by the live service. Never opt into newer builds by default.
+    clients = {item["server"] for item in derived}
+    live_choices = [{"server": server, "gameVersion": version}
+                    for server in builds if server in clients
+                    for version in builds[server]["versions"]]
     selected = available if supplied is None else supplied
-    if not isinstance(selected, list) or not selected or any(item not in available for item in selected):
-        raise ValidationError("supported_game_versions must be a nonempty subset of ZIP and live Creator choices", path="$.supported_game_versions")
+    if not isinstance(selected, list) or not selected or any(item not in live_choices for item in selected):
+        raise ValidationError("supported_game_versions must be a nonempty subset of ZIP client branches and live Creator choices", path="$.supported_game_versions")
     if len({(item["server"], item["gameVersion"]) for item in selected}) != len(selected):
         raise ValidationError("supported_game_versions must not contain duplicates", path="$.supported_game_versions")
     return [dict(item) for item in selected]
