@@ -105,7 +105,7 @@ class ModusZipParserTests(unittest.TestCase):
         })}]
         available = select_game_versions(result["supported_game_versions"], config)
         self.assertEqual(len(available), 5)
-        self.assertEqual(result["unmapped_interface_values"], ["16001", "30405"])
+        self.assertEqual(result["unmapped_interface_values"], ["30405"])
         retail = [{"gameVersion": "12.1.0", "server": "wow_retail"}]
         self.assertEqual(select_game_versions(result["supported_game_versions"], config, retail), retail)
         for supplied in ([], [available[0], available[0]], [{"gameVersion": "1.60.1", "server": "wow_forever"}],
@@ -119,6 +119,39 @@ class ModusZipParserTests(unittest.TestCase):
     def test_rejects_malformed_interface(self) -> None:
         with self.assertRaisesRegex(ValidationError, "decimal codes"):
             parse_modus_zip(make_zip(("Addon/Addon.toc", "## Interface: retail\n")))
+
+    def test_forever_live_build_and_explicit_newer_retail_build(self) -> None:
+        import json
+        result = parse_modus_zip(make_zip(("Addon/Addon.toc", "## Interface: 16001,120100\n")))
+        retail = {"server": "wow_retail", "gameVersion": "12.1.0"}
+        newer = {"server": "wow_retail", "gameVersion": "12.1.5"}
+        forever = {"server": "wow_forever", "gameVersion": "1.60.1"}
+        config = [{"key": "wow_builds", "value": json.dumps({
+            "wow_retail": {"versions": ["12.1.5", "12.1.0"]},
+            "wow_forever": {"versions": ["1.60.1"]},
+            "wow_classic": {"versions": ["5.5.4"]},
+        })}]
+        self.assertEqual(result["toc_version"], "16001,120100")
+        self.assertEqual(result["unmapped_interface_values"], [])
+        self.assertEqual(select_game_versions(result["supported_game_versions"], config), [forever, retail])
+        self.assertEqual(select_game_versions(result["supported_game_versions"], config, [newer, forever]), [newer, forever])
+        for supplied in ([{"server": "wow_classic", "gameVersion": "5.5.4"}],
+                         [{"server": "wow_retail", "gameVersion": "12.2.0"}],
+                         [newer, newer], [], [None]):
+            with self.assertRaises(ValidationError):
+                select_game_versions(result["supported_game_versions"], config, supplied)
+
+    def test_forever_only_requires_live_support_and_does_not_add_retail(self) -> None:
+        import json
+        result = parse_modus_zip(make_zip(("Addon/Addon.toc", "## Interface: 16001\n")))
+        forever = {"server": "wow_forever", "gameVersion": "1.60.1"}
+        config = [{"key": "wow_builds", "value": json.dumps({"wow_forever": {"versions": ["1.60.1"]}})}]
+        self.assertEqual(select_game_versions(result["supported_game_versions"], config), [forever])
+        config[0]["value"] = json.dumps({"wow_retail": {"versions": ["12.1.0"]}})
+        with self.assertRaises(ValidationError):
+            select_game_versions(result["supported_game_versions"], config)
+        with self.assertRaises(ValidationError):
+            select_game_versions(result["supported_game_versions"], config, [{"server": "wow_retail", "gameVersion": "12.1.0"}])
 
     def test_accepts_path_and_bytes_and_rejects_bad_zip(self) -> None:
         raw = make_zip(("Addon/Addon.toc", "\ufeff## Interface: 120100\n"))
