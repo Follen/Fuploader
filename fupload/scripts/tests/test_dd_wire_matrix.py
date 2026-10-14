@@ -7,6 +7,7 @@ import os
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional, Tuple
 from unittest import mock
@@ -208,7 +209,8 @@ class WireFixtures:
         self.wa_zip = root / "WA 材质(1)+#%.zip"
         self.image = root / "展示 图(1)+#%.png"
         self.image_alt = root / "展示 图(2)+#%.jpg"
-        self.plugin_zip.write_bytes(b"plugin-zip-bytes")
+        with zipfile.ZipFile(self.plugin_zip, "w") as archive:
+            archive.writestr("Example/Example.toc", "## Interface: 120000\n")
         self.wa_zip.write_bytes(b"wa-zip-bytes")
         self.image.write_bytes(b"png-bytes")
         self.image_alt.write_bytes(b"jpg-bytes")

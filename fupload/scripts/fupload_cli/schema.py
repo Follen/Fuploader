@@ -3,11 +3,39 @@
 from __future__ import annotations
 
 import os
+import struct
 import zipfile
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Tuple
 
 from .errors import ValidationError
+
+
+def _validate_dd_plugin_zip(path: str) -> None:
+    """Inspect stored paths before Windows ZipInfo normalizes separators."""
+    try:
+        with open(path, "rb") as source, zipfile.ZipFile(source) as archive:
+            for info in archive.infolist():
+                if "\\" in info.orig_filename:
+                    raise ValidationError(
+                        "DD plugin ZIP contains backslash paths; rebuild the ZIP with forward-slash (/) entry names",
+                        path="$.file",
+                    )
+                source.seek(info.header_offset)
+                header = source.read(30)
+                if len(header) != 30 or header[:4] != b"PK\x03\x04":
+                    raise zipfile.BadZipFile("invalid local file header")
+                name_length = struct.unpack_from("<H", header, 26)[0]
+                name = source.read(name_length)
+                if len(name) != name_length:
+                    raise zipfile.BadZipFile("truncated local entry name")
+                if b"\\" in name:
+                    raise ValidationError(
+                        "DD plugin ZIP contains backslash paths in a local file header; rebuild the ZIP with forward-slash (/) entry names",
+                        path="$.file",
+                    )
+    except (OSError, zipfile.BadZipFile) as exc:
+        raise ValidationError("file must be a valid ZIP archive", path="$.file") from exc
 
 
 JSON_TYPES = {
@@ -308,6 +336,8 @@ class Schema:
             ):
                 scalar_array(name, (str,), "array must contain nonempty strings")
         if self.name.startswith("fupload.v1.dd"):
+            if self.name.startswith("fupload.v1.dd.plugin.") and "file" in value:
+                _validate_dd_plugin_zip(value["file"])
             object_array("associated_acts", {"sn", "act_type"}, ("sn", "act_type"))
             for name in ("second_category_ids", "vip_levels"):
                 if name in value and any(isinstance(item, bool) or not isinstance(item, int) for item in value[name]):

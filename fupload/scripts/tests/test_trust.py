@@ -26,6 +26,16 @@ TEST_POWERSHELL = "/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
 
 
 class TrustBoundaryTests(unittest.TestCase):
+    def test_dd_signature_powershell_does_not_create_console(self) -> None:
+        completed = subprocess.CompletedProcess([], 0, stdout=json.dumps({
+            "Status": "Valid", "Subject": 'CN=NetEase, O="NetEase (Hangzhou) Network Co., Ltd"',
+        }))
+        with mock.patch.object(trust, "_powershell_path", return_value=TEST_POWERSHELL), mock.patch.object(
+            trust.subprocess, "run", return_value=completed,
+        ) as run:
+            verify_dd_executable(Path("C:/official/netease_dd.exe"))
+        self.assertEqual(run.call_args.kwargs.get("creationflags"), getattr(subprocess, "CREATE_NO_WINDOW", 0))
+
     def test_generic_transport_keeps_standard_urlopen_path(self) -> None:
         response = mock.MagicMock()
         response.__enter__.return_value.status = 200

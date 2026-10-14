@@ -1,9 +1,9 @@
 {
   "schema": "fupload.npm-skill-manifest.v1",
   "package_name": "@follenfang/fupload",
-  "package_version": "0.0.25",
-  "skill_version": "0.0.25",
-  "tree_sha256": "a90fdc7fc77bec86d92215bd4adc50d3aef7eb48b6e9cfac1f20051e5eb3a3e5",
+  "package_version": "0.0.26",
+  "skill_version": "0.0.26",
+  "tree_sha256": "4af4e44df9949daa9432d47bc5d7913d6dd58442e8436981c22922a1e365b63f",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -87,8 +87,8 @@
     },
     {
       "path": "references/dd.md",
-      "bytes": 21111,
-      "sha256": "18895d95e5221b3c2243922bbfc6f2e826f9084a0d5d11c37c3eb923a9dd7547"
+      "bytes": 21542,
+      "sha256": "2bff00091259535980e42fac12f9765f9e51f8beea43dee9bff377c67fa2bce3"
     },
     {
       "path": "references/modus.md",
@@ -113,7 +113,7 @@
     {
       "path": "scripts/fupload_cli/__init__.py",
       "bytes": 50,
-      "sha256": "33eefade5f5f7a8d274c5106873503d86397e994c0b22a0fad6d27bacd7960de"
+      "sha256": "8affb4fcf748b4f6b76907e88051a6a4aa5110146ea5adbe56231509962b1de4"
     },
     {
       "path": "scripts/fupload_cli/blackbox_web.py",
@@ -182,8 +182,8 @@
     },
     {
       "path": "scripts/fupload_cli/schema.py",
-      "bytes": 55131,
-      "sha256": "b651963c504896cfef46f65b61d5fb638884aacb14a8e09593162526e239133f"
+      "bytes": 56696,
+      "sha256": "9d690fea8fe7b249c089a24a6c59d783f83d2ffd0215def770cd9849d09e52f8"
     },
     {
       "path": "scripts/fupload_cli/state_machine.py",
@@ -197,8 +197,8 @@
     },
     {
       "path": "scripts/fupload_cli/trust.py",
-      "bytes": 9392,
-      "sha256": "83298b6aaf63144381451b9e486469215aa5fa5fbde115a20c376d5daf4cef11"
+      "bytes": 9462,
+      "sha256": "79d31833a16d71ec132612a4a2fd2f015770df469e7db06933b3ea530022c97d"
     },
     {
       "path": "scripts/fupload.py",
@@ -208,7 +208,7 @@
     {
       "path": "SKILL.md",
       "bytes": 28729,
-      "sha256": "24c423a3f33cafc5d98e7efc5be199147088d268673ea03d121bbbc850a5f90e"
+      "sha256": "863223ca2e78adb854511a18fea9c9bead7238d5014b229a0ea21a335409fc90"
     }
   ]
 }

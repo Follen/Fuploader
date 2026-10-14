@@ -7,6 +7,7 @@ import json
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -332,7 +333,8 @@ class CLITests(unittest.TestCase):
         }
         with tempfile.TemporaryDirectory() as directory:
             local_file = Path(directory) / "local.zip"
-            local_file.write_bytes(b"example")
+            with zipfile.ZipFile(local_file, "w") as archive:
+                archive.writestr("Example/Example.toc", "## Interface: 120000\n")
             for name, command in examples.items():
                 with self.subTest(example=name):
                     document = json.loads((root / "examples" / name).read_text(encoding="utf-8"))
