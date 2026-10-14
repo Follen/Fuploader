@@ -25,8 +25,8 @@ from .errors import ValidationError
 
 
 # These are the game-version labels loaded by Creator's
-# ReleaseFormPageViewModel.LoadDefaultGameVersions.  12.1.0 is also included
-# because it is the live ModUs response used by the integration fixture.
+# ReleaseFormPageViewModel.LoadDefaultGameVersions, supplemented with builds
+# confirmed by the live ModUs wow_builds response (including 12.1.5).
 # Classic values are the Interface values used by the corresponding WoW
 # clients; all entries remain explicit so a new client cannot be guessed.
 INTERFACE_GAME_VERSION_MAP: Mapping[str, Mapping[str, str]] = {
@@ -35,6 +35,7 @@ INTERFACE_GAME_VERSION_MAP: Mapping[str, Mapping[str, str]] = {
     "111000": {"gameVersion": "11.1.0", "server": "wow_retail"},
     "111005": {"gameVersion": "11.1.5", "server": "wow_retail"},
     "120100": {"gameVersion": "12.1.0", "server": "wow_retail"},
+    "120105": {"gameVersion": "12.1.5", "server": "wow_retail"},
     "11506": {"gameVersion": "Classic Era", "server": "wow_classic_era"},
     "11507": {"gameVersion": "Classic Era", "server": "wow_classic_era"},
     "11508": {"gameVersion": "Classic Era", "server": "wow_classic_era"},
