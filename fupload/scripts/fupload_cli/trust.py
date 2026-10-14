@@ -191,6 +191,7 @@ def verify_dd_executable(executable: Path) -> Dict[str, str]:
             [powershell, "-NoProfile", "-NonInteractive", "-Command", script],
             capture_output=True, text=True, encoding="utf-8", errors="strict",
             timeout=20, check=False, env=environment,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
         if completed.returncode != 0:
             raise FuploadError("DD Authenticode verification process failed", kind="trust_boundary")
