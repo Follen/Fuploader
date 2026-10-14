@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import json
 import sys
 import tempfile
 import unittest
@@ -23,6 +24,40 @@ def make_zip(*toc_entries: tuple[str, str]) -> bytes:
 
 
 class ModusZipParserTests(unittest.TestCase):
+    def test_retail_1215_interface_is_recognized(self) -> None:
+        result = parse_modus_zip(make_zip(("Addon/Addon.toc", "## Interface: 120105\n")))
+        self.assertEqual(result["toc_version"], "120105")
+        self.assertEqual(result["supported_game_versions"], [
+            {"gameVersion": "12.1.5", "server": "wow_retail"},
+        ])
+
+    def test_retail_transition_tocs_preserve_both_interfaces(self) -> None:
+        result = parse_modus_zip(make_zip(
+            ("Addon/Addon.toc", "## Interface: 120105, 120100, 120105\n"),
+            ("Addon/Addon_Mainline.toc", "## Interface: 120105\n"),
+        ))
+        older = {"gameVersion": "12.1.0", "server": "wow_retail"}
+        newer = {"gameVersion": "12.1.5", "server": "wow_retail"}
+        self.assertEqual(result["toc_version"], "120100,120105")
+        self.assertEqual(result["supported_game_versions"], [older, newer])
+        config = [{"key": "wow_builds", "value": json.dumps({
+            "wow_retail": {"versions": ["12.1.5", "12.1.0"]},
+        })}]
+        self.assertEqual(select_game_versions(result["supported_game_versions"], config), [older, newer])
+        self.assertEqual(select_game_versions(result["supported_game_versions"], config, [newer]), [newer])
+
+    def test_retail_1215_still_requires_live_build_and_zip_client(self) -> None:
+        result = parse_modus_zip(make_zip(("Addon/Addon.toc", "## Interface: 120105\n")))
+        newer = {"gameVersion": "12.1.5", "server": "wow_retail"}
+        classic = {"gameVersion": "5.5.4", "server": "wow_classic"}
+        config = [{"key": "wow_builds", "value": json.dumps({
+            "wow_retail": {"versions": ["12.1.0"]},
+            "wow_classic": {"versions": ["5.5.4"]},
+        })}]
+        for supplied in (None, [newer], [classic]):
+            with self.subTest(supplied=supplied), self.assertRaises(ValidationError):
+                select_game_versions(result["supported_game_versions"], config, supplied)
+
     def test_derives_retail_metadata_from_creator_interface(self) -> None:
         result = parse_modus_zip(make_zip(("Addon/Addon.toc", "## Interface: 110000\n")))
         self.assertEqual(result["toc_version"], "110000")
