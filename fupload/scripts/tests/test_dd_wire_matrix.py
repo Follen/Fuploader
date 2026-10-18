@@ -606,7 +606,7 @@ class DDWireMatrixTests(unittest.TestCase):
                         else:
                             self.assertTrue(projected[key]["redacted"], (key, projected[key]))
                 count += 1
-        self.assertEqual(count, 198)
+        self.assertEqual(count, 200)
 
     def test_every_field_rejects_invalid_json_type_at_exact_path(self) -> None:
         wrong = {
@@ -953,6 +953,7 @@ class DDWireMatrixTests(unittest.TestCase):
     def test_upload_wire_filename_states_and_special_local_names(self) -> None:
         cases = (
             ("plugin", "create", "logo_file", "", True, "addon"),
+            ("plugin", "edit", "logo_file", "", True, "addon"),
             ("plugin", "create", "detail_img_files", "", True, "addon"),
             ("plugin", "update", "file", "addon.zip", False, "addon"),
             ("config", "create", "display_img_files", "omitted", True, "share"),

@@ -1465,11 +1465,11 @@ PLUGIN_CREATE_DEFAULTS = {
 
 # DD's modify form is not a second create form. The official edit page
 # rebuilds the payload from existing commercial/association controls. The
-# brief and rich-text detail descriptions are the supported metadata
+# logo, brief and rich-text detail descriptions are supported metadata
 # exceptions and are verified by detail and author-list readback after every
 # edit. Other first-publication metadata remains create-only.
 PLUGIN_EDIT_FIELDS = (
-    "description", "html_desc", "update_desc",
+    "description", "html_desc", "update_desc", "logo",
     "scope", "share_code_life_type", "need_buy", "price_fen", "buy_life_type",
     "jump_room", "room_id", "channel_id", "channel_type", "sync_room",
     "creation_statement", "with_associate", "associated_acts", "need_anchor_vip",
@@ -2278,7 +2278,14 @@ class DD:
                         },
                     },
                 )
-        return {"result": response, "reference": reference, "readback": safe_detail("plugin", raw_readback) if reference else None}
+        output = {"result": response, "reference": reference, "readback": safe_detail("plugin", raw_readback) if reference else None}
+        if action == "edit" and ("logo" in doc or "logo_file" in doc):
+            # The detail cache may lag while the author list already reflects
+            # the edit. Report the actual matching projection explicitly.
+            source = "detail_v2" if _same_readback(form["logo"], raw_readback.get("logo")) else "author_list"
+            verified = raw_readback if source == "detail_v2" else author
+            output["logo_readback"] = {"logo": verified["logo"], "source": source}
+        return output
 
     def _backup(self, session: Sidecar, backup_sn: str) -> Dict[str, Any]:
         listing = session.get("/backup/list", {})
