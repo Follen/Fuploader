@@ -179,11 +179,11 @@ The wire mapping is `slug`, optional `projectID`, and `type` inside `relations.p
 
 ## Plan, dry-run, and confirmation
 
-Create `publish/<YYYYMMDD-HHmmss>-curseforge-plugin-upload/01-upload.json`. Store only non-secret business fields and local file paths. Never store the API key or upload token.
+Prepare the upload JSON in the project's established release location, a suitable temporary file, or standard input. Store only non-secret business fields and local file paths. Never store the API key or upload token.
 
-Run `--dry-run` before confirmation. It validates strict JSON, field values, relation structure, and local file existence without authenticating, querying remote permissions, or uploading.
+Run `--dry-run` before upload. It validates strict JSON, field values, relation structure, and local file existence without authenticating, querying remote permissions, or uploading.
 
-Present one complete plan containing:
+Resolve the following before uploading, and ask about any consequential choice that remains unclear:
 
 - author ID and public project name plus project ID;
 - ZIP path and inspected filename;
@@ -192,7 +192,7 @@ Present one complete plan containing:
 - the exact `fupload curseforge plugin upload --input ...` command;
 - the effects boundary: acceptance is not approval, release, or public visibility.
 
-Obtain one explicit confirmation for that exact plan. If any project, file, version, parent, relation, release type, or manual-release choice changes, present and confirm the changed plan. After confirmation, issue only one upload request.
+The user's request authorizes the identified upload; do not repeat the confirmation. If a change exceeds the request or a consequential choice remains ambiguous, ask before proceeding. Issue only one upload request.
 
 ## Success, visibility, and verification
 

@@ -1,9 +1,9 @@
 {
   "schema": "fupload.npm-skill-manifest.v1",
   "package_name": "@follenfang/fupload",
-  "package_version": "1.0.1",
-  "skill_version": "1.0.1",
-  "tree_sha256": "afbb45d7b046121ad0e74988b10c909ce2d049127c99ffaf724caea61b5f528f",
+  "package_version": "1.0.2",
+  "skill_version": "1.0.2",
+  "tree_sha256": "9ebbf3f32c915314e83922dd01a1f988178b14e3af485161d73264bd3240c51d",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -82,13 +82,13 @@
     },
     {
       "path": "references/curseforge.md",
-      "bytes": 11917,
-      "sha256": "2dd0a2429a37af30c4f85a884c2e8ea6fcdb1691c34ccc0c34925890e4e60d92"
+      "bytes": 11991,
+      "sha256": "83ecdc058ed63f97d66977a3a0695c4c7766ddd1accd99a3370ca6104230e62e"
     },
     {
       "path": "references/dd.md",
-      "bytes": 23000,
-      "sha256": "38e3ba40360d55b9a69bd1d3362189b4ddc88bb9197671cc2513ab4f4ab64ca3"
+      "bytes": 23096,
+      "sha256": "e41b075cfee96c15eb19ef1ec128e4a937ca85afc8ae8cdd01824196dfc9ae3f"
     },
     {
       "path": "references/modus.md",
@@ -107,13 +107,13 @@
     },
     {
       "path": "references/workflow.md",
-      "bytes": 6454,
-      "sha256": "a45bc79248754022620d78f79858611d88795ca75b080b743eca3b2a63d8835d"
+      "bytes": 6034,
+      "sha256": "b3eeca2e9b8926aab79c9dc75362bc6461285ac6072c3495f76b231df0e4f4a6"
     },
     {
       "path": "scripts/fupload_cli/__init__.py",
       "bytes": 49,
-      "sha256": "bcea25b04a35d91488369b27009563af29d80dc041236a9bb0a00979775db0fa"
+      "sha256": "802b7319bdb1fc63e17e5090021848fc1215a74ce370e1b0476d485a5c1b2551"
     },
     {
       "path": "scripts/fupload_cli/blackbox_web.py",
@@ -207,8 +207,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 28830,
-      "sha256": "d7dceeaf449f30eb2ff324b3c60e8f90aa5f11c27afcfd7c5f160ac00bc30cea"
+      "bytes": 27838,
+      "sha256": "6f75ecaf69889875d4a4d4f8f04a7e3f77dfe3363334cdbd876084fcf8aeb09d"
     }
   ]
 }
