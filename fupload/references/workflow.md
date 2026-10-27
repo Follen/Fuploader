@@ -3,8 +3,8 @@
 ## Channel selection
 
 DD always uses the bundled Python CLI. NewBeeBox uses official `ncc` by default when installed unless the
-user explicitly requests Fupload's third-party Python management tool. If `ncc` is absent, ask before
-installing it. A missing or unsupported official capability does not silently select Python; the user must
+user explicitly requests Fupload's third-party Python management tool. If `ncc` is absent, install it when
+authorized or necessary for the requested task; otherwise ask. A missing or unsupported official capability does not silently select Python; the user must
 explicitly choose the third-party channel, after which remote state and the write plan are rebuilt.
 
 ## Command shape
@@ -32,13 +32,9 @@ Output is one JSON object with `schema=fupload.output.v1`, `platform`, `operatio
 
 ## Project publishing records
 
-Before a write plan, create a new directory in the target project at `publish/<YYYYMMDD-HHmmss>-<platform>-<resource>-<action>/`. This path is relative to the project being published, not the Fuploader Skill installation. Resolve collisions by appending `-2`, `-3`, and so on.
+Use the user's or project's existing release directory and conventions when available; otherwise choose a suitable project or temporary location. Python inputs may also be passed using `--input -`. Retain a redacted record when requested or useful for recovery, and do not put project release files in the installed Skill.
 
-Store the plan's atomic write inputs in execution order as `01-<action>.json`, `02-<action>.json`, and so on. Material changes to the not-yet-executed plan update those files in the same directory. Retries and readback verification also refer to that directory; a separate publishing plan creates a new one. Keep the files after completion and do not add or change project ignore rules without an explicit user request.
-
-For Python these files are executable schema inputs. For official `ncc` they are redacted plan records with
-the channel, working directory, argument vector, non-secret business inputs, local file references, and
-expected readback. Do not store tokens, raw WA strings, raw configuration content, cookies, signed URLs, or
+Python inputs use the leaf schema; official `ncc` uses its documented arguments. Do not store tokens, raw WA strings, raw configuration content, cookies, signed URLs, or
 other replayable authentication material. Use content file references instead. Only run `--dry-run` when the
 official leaf documents it; `ncc wow addons push --dry-run` is the primary supported preflight.
 
@@ -60,7 +56,7 @@ In official `ncc`, follow the installed docs for create/init/push/edit ordering 
 network failure after a write starts, read back before retrying. Do not loop on `quota_exceeded` or treat a
 submitted/under-review result as public approval.
 
-Python NewBeeBox delete inputs require one `id` and literal `confirm: "DELETE"`; DD delete inputs require one `sn` and literal `confirm_delete: true`. The provider reads the exact target before deletion and verifies absence from the author list afterward. Never batch, retry an uncertain delete, or treat deletion of a main record as deletion of its versions or uploaded media. Official `ncc` currently marks plugin, WA, and configuration main-record deletion as web-only; wait for an explicit third-party selection before using Python delete.
+Python NewBeeBox delete inputs require one `id` and literal `confirm: "DELETE"`; DD delete inputs require one `sn` and literal `confirm_delete: true`. The provider reads the exact target before deletion and verifies absence from the author list afterward. For multiple authorized targets, handle each individually. Do not retry an uncertain delete or treat deletion of a main record as deletion of its versions or uploaded media. Official `ncc` currently marks plugin, WA, and configuration main-record deletion as web-only; wait for an explicit third-party selection before using Python delete.
 
 ## Local artifact checklist
 
