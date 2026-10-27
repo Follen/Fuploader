@@ -458,7 +458,7 @@ def execute(
             doctor = harness.invoke("session-doctor", ["dd", "session", "doctor"]).output
             evidence["dd_resource"] = _resource_fingerprint(doctor)
             evidence["process_count_before"] = _netease_dd_process_count()
-            start = harness.invoke("session-start", ["dd", "session", "start", "--confirm-close-gui"]).output
+            start = harness.invoke("session-start", ["dd", "session", "start"]).output
             session_id = _session_id(start)
             status = harness.invoke("session-status", ["dd", "session", "status", "--session", session_id]).output
             reported = _reported_credential_kind(start, status)

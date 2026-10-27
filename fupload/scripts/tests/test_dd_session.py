@@ -569,25 +569,31 @@ class DDSessionTests(unittest.TestCase):
         self.assertFalse(result["broker_running"])
         sidecar.assert_not_called()
 
-    def test_start_requires_confirmation_before_closing_running_gui(self) -> None:
+    def test_start_keeps_running_gui_open_with_or_without_legacy_flag(self) -> None:
         process = {
             "pid": 42,
             "dd_dir": "D:/Software/NetEaseDD/100128",
             "windows": [100],
             "signature": {"status": "Valid", "publisher": "NetEase"},
         }
-        with mock.patch.object(
-            dd_broker, "_load_live_state", return_value=None
-        ), mock.patch.object(
-            dd_broker, "running_dd_processes", return_value=[process]
-        ), mock.patch.object(
-            dd_broker, "close_verified_gui"
-        ) as close, mock.patch.object(dd_broker.subprocess, "Popen") as popen:
-            with self.assertRaises(FuploadError) as raised:
-                dd_broker.start(False)
-        self.assertEqual(raised.exception.kind, "gui_close_confirmation_required")
-        close.assert_not_called()
-        popen.assert_not_called()
+        for legacy_flag in (False, True):
+            state = {"startup_id": "test-id", "session_id": "session", "credential_kind": "email"}
+            with self.subTest(legacy_flag=legacy_flag), tempfile.TemporaryDirectory() as directory, mock.patch.object(
+                dd_broker, "_load_live_state", side_effect=[None, state]
+            ), mock.patch.object(
+                dd_broker, "running_dd_processes", return_value=[process]
+            ), mock.patch.object(
+                dd_broker, "close_verified_gui"
+            ) as close, mock.patch.object(
+                dd_broker, "_state_dir", return_value=Path(directory)
+            ), mock.patch.object(
+                dd_broker.uuid, "uuid4", return_value=SimpleNamespace(hex="test-id")
+            ), mock.patch.object(dd_broker.subprocess, "Popen") as popen:
+                result = dd_broker.start(legacy_flag)
+                self.assertTrue(result["running"])
+                self.assertEqual(result["closed_gui_processes"], 0)
+                close.assert_not_called()
+                popen.assert_called_once()
 
     def test_broker_disconnect_after_write_send_requires_readback(self) -> None:
         state = {"session_id": "session", "auth_key": "auth", "port": 1234}

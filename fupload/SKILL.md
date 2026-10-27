@@ -25,7 +25,7 @@ Map natural language consistently:
 - `edit`: change fields allowed by the target platform's action allowlist. For DD plugins, this includes `description`, `html_desc`, `update_desc`, `logo`/`logo_file`, and existing-record commercial, association, room/channel, and creation-statement settings; other first-publication metadata, categories, detail images, and version fields are create/update-only. Logo and announcement edits preserve the published version and package; announcement edits affect the current plugin announcement, not an arbitrary historical version. Edits read both detail and author-list projections; either may confirm the value, but if neither matches, report verification-required. For Logo edits, use the returned `logo_readback` value and source to distinguish a verified change from stale raw detail data. See `references/dd.md` for the input example and existing-record preflight limits.
 - `delete`: delete one main record only. It never deletes an individual version, media object, or associated record.
 
-Never offer bulk delete, drafts, guides, messages, or GUI control automation. Heybox supports individual version deletion with asynchronous readback; whole-module deletion is not supported. The DD task-session command may close verified official GUI processes only after the consent flow below.
+Never offer bulk delete, drafts, guides, messages, or GUI control automation. Heybox supports individual version deletion with asynchronous readback; whole-module deletion is not supported. DD task sessions leave the official GUI running.
 
 CurseForge cannot create a project or enumerate private, draft, or pending-review projects. Direct project creation to the Authors website; use the Core API list only as the public-project view for one numeric author ID.
 
@@ -107,7 +107,7 @@ For ModUs, require all four `modus session doctor` booleans to be true before an
 
 ## Own one DD task session
 
-Before any DD live GET or write, run `dd session doctor`. If it reports `gui_running=true`, tell the user that continuing will close the listed official DD GUI instances and ask for explicit consent. Without consent, do not run start, do not close a process, and do not issue a native login. After consent, run `dd session start --confirm-close-gui`; when no GUI is running, run `dd session start` without that flag.
+Before any DD live GET or write, run `dd session doctor`, then `dd session start`. DD can remain open: the task starts its own native session using the stored credentials and does not close or attach to the GUI process. The old `--confirm-close-gui` option is retained for compatibility but never closes the GUI.
 
 `dd session start` automatically selects the native relogin flow from the official `Account.method`, `Cred.type`, and `Cred.modifier` enums. `urs + urs_token + normal` uses `UrsReLoginFlow` for an email session; `mobile + urs_mobile_token + normal|mobile_password|mobile_uplink` uses `MobileReLoginFlow` for a mobile session. Missing, unknown, or contradictory combinations fail before any flow runs. Never infer the account kind from its text, coerce an enum, or try the other flow after a failure.
 

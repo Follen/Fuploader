@@ -419,6 +419,7 @@ def _startup_error(pending: Mapping[str, Any]) -> FuploadError:
 
 
 def start(confirm_close_gui: bool) -> Dict[str, Any]:
+    # Retain the legacy argument for callers of older CLIs, but never close DD.
     existing = _load_live_state()
     if existing:
         active = status(str(existing["session_id"]))
@@ -433,14 +434,6 @@ def start(confirm_close_gui: bool) -> Dict[str, Any]:
             "credential_kind": active.get("credential_kind"),
         }
     processes = running_dd_processes()
-    if processes and not confirm_close_gui:
-        raise FuploadError(
-            "DD GUI is running; explicit close confirmation is required before native login",
-            kind="gui_close_confirmation_required",
-            stage="session",
-            details={"processes": [_public_process(process) for process in processes]},
-        )
-    close_verified_gui(processes)
     root = _state_dir()
     startup = root / STARTUP_NAME
     startup_id = uuid.uuid4().hex
@@ -472,7 +465,8 @@ def start(confirm_close_gui: bool) -> Dict[str, Any]:
                 "sidecar_count": state.get("sidecar_count", 1),
                 "native_login_count": state.get("native_login_count", 1),
                 "credential_kind": state.get("credential_kind"),
-                "closed_gui_processes": len(processes),
+                "closed_gui_processes": 0,
+                "gui_running_at_start": bool(processes),
             }
         if startup.exists():
             try:
