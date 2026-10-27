@@ -125,14 +125,14 @@ class CLITests(unittest.TestCase):
         self.assertIn("Authenticode-valid executable", skill)
         self.assertIn("Do not set endpoint, credential-directory", skill)
 
-    def test_skill_owns_one_confirmed_dd_task_session(self) -> None:
+    def test_skill_owns_one_dd_task_session(self) -> None:
         root = Path(__file__).resolve().parents[2]
         skill = (root / "SKILL.md").read_text(encoding="utf-8")
         workflow = (root / "references" / "workflow.md").read_text(encoding="utf-8")
         dd_reference = (root / "references" / "dd.md").read_text(encoding="utf-8")
         for text in (skill, workflow, dd_reference):
             self.assertIn("dd session doctor", text)
-            self.assertIn("dd session start --confirm-close-gui", text)
+            self.assertIn("dd session start", text)
             self.assertIn("dd session stop --session <id>", text)
             self.assertIn("finally", text)
         self.assertIn("never start one session per item", skill)

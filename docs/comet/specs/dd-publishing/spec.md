@@ -10,9 +10,9 @@ DD 写入契约必须从当前官方网页的编辑器打开投影、表单状�
 
 DD provider 仅支持 Windows 官方 DD 客户端。安装发现按显式 CLI 参数、已验证运行进程、卸载/安装注册信息、官方用户配置和已知安装根目录的版本子目录收集候选；每个候选都必须包含 `netease_dd.exe`、`ccvoicehub.res`、`ccsub64` 和所需原生模块，并在启动前通过 Windows Authenticode 链与源码维护的 NetEase 组织发布者允许集合。多个有效版本选择版本号最高者。无有效候选时停止，不执行同名伪造 binary。
 
-`dd session doctor` 只读取安装、版本、签名、进程冲突、受信 Known Folder 状态目录和 broker 状态，不启动任何原生重登录流，不创建登录会话。稳定独立 `clientNo` 原子保存在受信 Roaming AppData 下的 `CCVoiceHub/Fupload/sidecar-device.json`；格式错误时停止，不输出、读取 GUI 值或静默轮换。
+`dd session doctor` 只读取安装、版本、签名、GUI 运行状态、受信 Known Folder 状态目录和 broker 状态，不启动任何原生重登录流，不创建登录会话。稳定独立 `clientNo` 原子保存在受信 Roaming AppData 下的 `CCVoiceHub/Fupload/sidecar-device.json`；格式错误时停止，不输出、读取 GUI 值或静默轮换。
 
-`dd session start --confirm-close-gui` 只在调用方已经取得用户同意后执行。CLI 记录并再次验证官方 GUI 的 PID、启动时间、绝对路径、签名和发布者，先请求正常退出；限时后只可终止仍为同一身份的进程。身份变化、出现新的官方 GUI、关闭失败或仍有 GUI 会话时，必须在登录前停止。未提供确认标志时 sidecar 数和 relogin 数都保持为零。
+`dd session start` 在官方 GUI 运行时也可启动，不关闭或终止 GUI。它使用本机保存的凭据启动独立原生会话，并非接入 GUI 进程内的同一个会话；`--confirm-close-gui` 仅作为兼容旧调用的参数保留，不执行关闭。验证覆盖 GUI 保持在线时的会话启动、作者列表读取、插件 ZIP 上传与下载核对，以及任务会话结束后的 GUI 状态。
 
 start 启动本地 task broker，由 broker 独占一个官方 `netease_dd.exe` sidecar，并从官方 `AccountCredStorage` 读取 auto account 和 credential。原生重登录必须按官方枚举严格分流：`Account.method=urs + Cred.type=urs_token + Cred.modifier=normal` 使用 `UrsReLoginFlow(controller, sdk, token, username)`；`Account.method=mobile + Cred.type=urs_mobile_token + Cred.modifier=mobile_password|mobile_uplink` 使用 `MobileReLoginFlow(controller, sdk, cgi, netconfig, token, isPassword, username)`，其中 `isPassword` 仅在 modifier 为 `mobile_password` 时为 true。缺失、未知或相互矛盾的组合在调用任何 flow 前失败，不能根据账号字符串猜测类型，也不能在一条 flow 失败后尝试另一条 flow。
 

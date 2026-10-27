@@ -2,7 +2,7 @@
 
 ## Task session
 
-Run `dd session doctor` first. Doctor only discovers the installation, verifies the Authenticode publisher, reports official DD processes and reads local broker state; it does not login or run either native relogin flow. When `gui_running=true`, explain that the official DD GUI must close and obtain explicit user consent. Only then run `dd session start --confirm-close-gui`. When `gui_running=false`, run `dd session start` without the confirmation flag.
+Run `dd session doctor` first. Doctor only discovers the installation, verifies the Authenticode publisher, reports official DD processes and reads local broker state; it does not login or run either native relogin flow. Run `dd session start` whether or not the DD GUI is running. The task starts a separate native session using stored credentials; it does not close or attach to the GUI. The legacy `--confirm-close-gui` option is accepted but never closes the GUI.
 
 `start` closes only identity- and signature-verified official GUI processes, starts one task broker, and reads the official `AccountCredStorage` auto account and credential. It selects the native relogin flow only from this strict enum matrix:
 
