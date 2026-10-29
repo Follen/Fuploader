@@ -20,6 +20,8 @@ DD live commands additionally require one opaque `--session <id>`. Run local-onl
 
 Output is one JSON object with `schema=fupload.output.v1`, `platform`, `operation`, `success`, and either `data` or `error`. Exit code `0` means success; `2` means validation, session, platform, or verification failure. A DD native/API error may include `details.log_path` pointing to the matching sanitized JSONL record under `<DD version directory>/Fupload/logs/`; read only that record for response JSON/body, HTTP status, native business code, and field hints.
 
+Successful output preserves complete editable public HTML in `desc` and `html_desc`, including nested readbacks. Credential redaction still applies throughout those strings. Diagnostic/error strings remain bounded; raw configuration, WA, and other protected content remain summarized. Use the full returned HTML for partial text edits so content after the first 1000 characters is not lost.
+
 ## Python input semantics
 
 - Use the exact `schema` printed by leaf help.

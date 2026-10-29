@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "1.0.2",
   "skill_version": "1.0.2",
-  "tree_sha256": "9ebbf3f32c915314e83922dd01a1f988178b14e3af485161d73264bd3240c51d",
+  "tree_sha256": "39b53b5669add813fc01d31957ef01c3007e9d55d045c68f350b8e66f1d08e42",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -107,8 +107,8 @@
     },
     {
       "path": "references/workflow.md",
-      "bytes": 6034,
-      "sha256": "b3eeca2e9b8926aab79c9dc75362bc6461285ac6072c3495f76b231df0e4f4a6"
+      "bytes": 6426,
+      "sha256": "37fc33e987b99294a126cfb61029df21f4aae4dfe92db21a236e4110ae096d3c"
     },
     {
       "path": "scripts/fupload_cli/__init__.py",
@@ -152,13 +152,13 @@
     },
     {
       "path": "scripts/fupload_cli/errors.py",
-      "bytes": 3854,
-      "sha256": "6608a78e2fdc5e2ed9e5b329ce7dbed78d6c1dd9fc2144b6c9bc488c5c366a05"
+      "bytes": 3897,
+      "sha256": "af24601d50e35b1d082fdf78daef937db02a3dafb105a6b746b147fcdd9c2c59"
     },
     {
       "path": "scripts/fupload_cli/io.py",
-      "bytes": 5436,
-      "sha256": "4e5929f80223493057244613caf23575275c5838bf6505da0f3b01c5bae791da"
+      "bytes": 5912,
+      "sha256": "1d0a50cd9e54c316f7684700cd859cd274686cac911b73a3e28b9ddde6d2b2fd"
     },
     {
       "path": "scripts/fupload_cli/modus_zip.py",

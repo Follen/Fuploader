@@ -82,13 +82,13 @@ def write_output(platform: str, operation: str, data: Any, *, dry_run: bool = Fa
         "operation": operation,
         "success": True,
         "dry_run": bool(dry_run),
-        "data": sanitize_output(data),
+        "data": sanitize_output(data, preserve_public_text=True),
     }
     # Stable ASCII JSON avoids inheriting a Windows console code-page contract.
     print(json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":"), allow_nan=False))
 
 
-def sanitize_output(value: Any) -> Any:
+def sanitize_output(value: Any, *, preserve_public_text: bool = False) -> Any:
     if isinstance(value, dict):
         result: Dict[str, Any] = {}
         for key, item in value.items():
@@ -120,11 +120,15 @@ def sanitize_output(value: Any) -> Any:
                     "sha256": hashlib.sha256(content).hexdigest(),
                     "source_encoding": encoding,
                 }
+            elif preserve_public_text and normalized in {"desc", "html_desc"} and isinstance(item, str):
+                # Editable public HTML must survive GET -> edit unchanged.
+                # Keep all credential redaction, but not the diagnostic length cap.
+                result[key] = redact(item, max_length=None)
             else:
-                result[key] = sanitize_output(item)
+                result[key] = sanitize_output(item, preserve_public_text=preserve_public_text)
         return result
     if isinstance(value, list):
-        return [sanitize_output(item) for item in value]
+        return [sanitize_output(item, preserve_public_text=preserve_public_text) for item in value]
     if isinstance(value, str):
         return redact(value)
     return value

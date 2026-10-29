@@ -24,7 +24,7 @@ _TOKEN_PAIR = re.compile(
 )
 
 
-def redact(value: str) -> str:
+def redact(value: str, *, max_length: Optional[int] = 1000) -> str:
     value = _BEARER.sub("Bearer [REDACTED]", str(value))
     value = _JWT.sub("[REDACTED_JWT]", value)
     value = _WA_VALUE.sub("[REDACTED_WA]", value)
@@ -32,7 +32,7 @@ def redact(value: str) -> str:
     value = _SIGNED_TOKEN.sub(r"\1[REDACTED]", value)
     value = _URL_TOKEN.sub(r"\1[REDACTED]", value)
     value = _COOKIE.sub(r"\1\2[REDACTED]", value)
-    return _TOKEN_PAIR.sub(r"\1[REDACTED]", value)[:1000]
+    return _TOKEN_PAIR.sub(r"\1[REDACTED]", value)[:max_length]
 
 
 class FuploadError(Exception):
