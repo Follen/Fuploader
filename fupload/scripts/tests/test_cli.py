@@ -32,6 +32,48 @@ def parser_leaves(parser, prefix=()):
 
 
 class CLITests(unittest.TestCase):
+    def test_public_html_round_trip_preserves_tail_and_formatting(self) -> None:
+        html = '<p>版本号：<b>10.23.1</b></p>' + '<p>完整介绍 &amp; 格式</p>' * 250 + '<p>结尾</p>'
+        for field in ("desc", "html_desc"):
+            with self.subTest(field=field):
+                stream = io.StringIO()
+                with contextlib.redirect_stdout(stream):
+                    write_output("dd", "config.get", {"readback": [{field: html}]})
+                received = json.loads(stream.getvalue())["data"]["readback"][0][field]
+                self.assertEqual(received, html)
+                self.assertEqual(received.replace("10.23.1", "10.29.1"),
+                                 html.replace("10.23.1", "10.29.1"))
+
+    def test_full_public_html_still_redacts_secrets_past_length_cap(self) -> None:
+        html = '<p>介绍</p>' * 250 + ' token=private-test-value !WA:2!private-wa <p>结尾</p>'
+        stream = io.StringIO()
+        with contextlib.redirect_stdout(stream):
+            write_output("dd", "config.get", {"desc": html, "token": "private-token",
+                                               "raw_wtf": "private-config"})
+        output = stream.getvalue()
+        for secret in ("private-test-value", "private-wa", "private-token", "private-config"):
+            self.assertNotIn(secret, output)
+        data = json.loads(output)["data"]
+        self.assertTrue(data["desc"].endswith('<p>结尾</p>'))
+        self.assertIn("raw_wtf_summary", data)
+        self.assertNotIn("raw_wtf", data)
+
+    def test_error_html_and_unrelated_strings_remain_bounded(self) -> None:
+        from fupload_cli.errors import FuploadError, redact
+        long_text = "x" * 5000
+        self.assertEqual(len(redact(long_text)), 1000)
+        self.assertEqual(len(sanitize_output({"desc": long_text})["desc"]), 1000)
+        stream = io.StringIO()
+        with contextlib.redirect_stdout(stream):
+            write_error("dd", "config.edit", FuploadError(long_text, details={"desc": long_text}))
+        error = json.loads(stream.getvalue())["error"]
+        self.assertEqual(len(error["message"]), 1000)
+        self.assertEqual(len(error["details"]["desc"]), 1000)
+        stream = io.StringIO()
+        with contextlib.redirect_stdout(stream):
+            write_output("dd", "config.get", {"unrelated": long_text})
+        self.assertEqual(len(json.loads(stream.getvalue())["data"]["unrelated"]), 1000)
+
     def test_root_help_lists_all_platforms(self) -> None:
         text = build_parser().format_help()
         self.assertIn("newbee", text)
