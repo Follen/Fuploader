@@ -60,4 +60,6 @@ Python NewBeeBox delete inputs require one `id` and literal `confirm: "DELETE"`;
 
 ## Local artifact checklist
 
-For plugins, inspect TOC interface/build declarations, title/notes/version, addon folders, README, changelog, release archive, logo, and screenshots. For WA, inspect string mode, version, changelog, cover/images, categories, and optional material ZIP/install path. For configurations, select an existing cloud backup, all included/ignored content, roles, and incremental-update items.
+For plugins, inspect TOC interface/build declarations, title/notes/version, addon folders, README, changelog, release archive, logo, and screenshots. For WA, inspect string mode, version, changelog, cover/images, categories, and optional material ZIP/install path. For configurations, select an existing cloud backup or prepare one with the platform's backup scan/generate/upload commands, then select included/ignored content, roles, and incremental-update items.
+
+Cloud-backup deletion uses a separate `backup delete-preview` read and an explicit `backup_ids` write with `confirm_delete:true`. Preview filters do not authorize deleting newly matching records. Every platform checks all owned configuration-share references before deletion and again before each item; referenced backups remain protected and unknown references stop the operation. Record each result and verify absence after deletion. An uncertain result requires readback, never an automatic repeat.

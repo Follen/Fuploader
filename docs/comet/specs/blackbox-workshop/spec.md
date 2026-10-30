@@ -6,7 +6,7 @@ Fuploader exposes the `blackbox plugin` resource with read leaves `list`, `get`,
 
 ## Authentication and transport
 
-The provider reads the signed-in Heybox desktop profile from the current Windows user's roaming application data. It accepts no caller-supplied cookie, token, signature, profile path, API endpoint, or COS credential. Workshop requests use the fixed official HTTPS API origin, the client identity fields available in the profile, and the client-compatible request signature. Outputs and errors redact credential and signature fields.
+The provider uses the explicit HTTP login and per-use renewal contract in [blackbox-client-session](../blackbox-client-session/spec.md). Current field mappings, config/cloud-backup actions and protocol evidence are maintained in the [platform catalog](../../../../fupload/references/platform-fields.md#blackbox). No caller-supplied cookie, token, signature, profile path, API endpoint or COS credential is accepted.
 
 ZIP upload uses the official `cos-python-sdk-v5` package from the npm-managed Fuploader Python runtime and temporary credentials returned by the Workshop COS token endpoint. The provider uploads the existing archive as read-only input, returns its byte count and SHA-256 internally, and submits the resulting object URL to the version API. A missing COS SDK is reported as an environment error with `fupload update` as the repair command; users are never directed to install it into the system Python.
 
@@ -24,7 +24,7 @@ Version create requires `module_id`, `name`, `type`, `game_versions`, and a loca
 
 ## Version deletion
 
-Version deletion requires `module_id` and `version_id`. It invokes the version-delete endpoint and polls until the row is absent or reports `auditState=4`. After the initial delete settles, the provider retries once only when the same row has returned to a non-deleted audit state, then verifies the final readback. It never deletes the module itself.
+Version deletion requires `module_id` and `version_id`. It invokes the version-delete endpoint and polls until the row is absent or reports `auditState=4`. If the row becomes active again, the provider returns verification_required without repeating the deletion. It never deletes the module itself.
 
 ## Validation and compatibility
 

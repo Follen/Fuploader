@@ -21,11 +21,12 @@ _SENSITIVE_KEYS = {
     "credential", "signature", "x_amz_credential", "x_amz_signature",
     "x_amz_security_token", "signed_url", "upload_url", "presigneduri", "presigned_uri",
     "api_key", "auth_key", "password", "secret",
+    "pkey", "user_pkey", "phone", "phone_num", "phone_number", "mobile",
+    "sms_code", "verification_code", "login_code", "oauth_code", "wx_code",
 }
 _RAW_CONTENT_KEYS = {
-    "content", "wa_str", "t_wa_str", "raw_wtf", "wtf_zip", "download_url",
+    "content", "wa_str", "t_wa_str", "raw_wtf", "wtf_zip",
     "import_string", "content_text", "contenttext", "code_text", "codetext",
-    "description", "changelog", "license_content", "licensecontent",
 }
 _BASE64_CONTENT_KEYS = {"base64", "logo_base64", "screenshot_base64s"}
 
@@ -76,19 +77,24 @@ def read_json(path: str) -> Dict[str, Any]:
 
 
 def write_output(platform: str, operation: str, data: Any, *, dry_run: bool = False) -> None:
+    public_text_keys = frozenset()
+    if platform == "newbee" and operation.startswith("config."):
+        public_text_keys = frozenset({"content"})
+    elif platform == "modus" and operation.startswith(("config.", "wa.")):
+        public_text_keys = frozenset({"content", "content_text", "contenttext"})
     payload = {
         "schema": OUTPUT_SCHEMA,
         "platform": platform,
         "operation": operation,
         "success": True,
         "dry_run": bool(dry_run),
-        "data": sanitize_output(data),
+        "data": sanitize_output(data, public_text_keys=public_text_keys),
     }
     # Stable ASCII JSON avoids inheriting a Windows console code-page contract.
     print(json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":"), allow_nan=False))
 
 
-def sanitize_output(value: Any) -> Any:
+def sanitize_output(value: Any, *, public_text_keys: frozenset[str] = frozenset()) -> Any:
     if isinstance(value, dict):
         result: Dict[str, Any] = {}
         for key, item in value.items():
@@ -102,7 +108,9 @@ def sanitize_output(value: Any) -> Any:
                 for marker in ("token", "cookie", "credential", "signature", "password", "secret")
             ):
                 result[key] = "[REDACTED]"
-            elif normalized in _RAW_CONTENT_KEYS:
+            elif normalized == "code" and isinstance(item, str) and item.isdigit() and 4 <= len(item) <= 8:
+                result[key] = "[REDACTED]"
+            elif normalized in _RAW_CONTENT_KEYS and normalized not in public_text_keys:
                 text = str(item or "").encode("utf-8")
                 result[str(key) + "_summary"] = {
                     "bytes": len(text),
@@ -121,12 +129,12 @@ def sanitize_output(value: Any) -> Any:
                     "source_encoding": encoding,
                 }
             else:
-                result[key] = sanitize_output(item)
+                result[key] = sanitize_output(item, public_text_keys=public_text_keys)
         return result
     if isinstance(value, list):
-        return [sanitize_output(item) for item in value]
+        return [sanitize_output(item, public_text_keys=public_text_keys) for item in value]
     if isinstance(value, str):
-        return redact(value)
+        return redact(value, limit=None)
     return value
 
 

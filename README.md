@@ -1,21 +1,21 @@
 # Fuploader
 
-Fuploader 是一个面向 Agent 的《魔兽世界》作者发布 Skill 和 CLI。npm 安装后统一使用 `fupload` 命令；命令内部运行随 Skill 分发的纯 Python 实现。新手盒子（NewBeeBox）默认优先使用官方 `ncc` CLI，用户显式要求第三方管理工具时才使用 Fuploader 通道；网易 DD 使用 Fuploader 调用官方无头客户端；CurseForge 使用 Core API 查询作者公开项目，并使用 Authors Upload API 上传插件 ZIP；Heybox Workshop 复用本机客户端登录态管理插件元数据和版本。
+Fuploader 是面向 Agent 的《魔兽世界》作者发布 Skill 和 CLI，统一使用 `fupload` 命令。新手盒子默认优先使用官方 `ncc`，用户显式选择后可用第三方 Python 通道；DD 在客户端运行时借用现有会话；黑盒支持短信、微信分步登录和纯 HTTP 会话复用；ModUs 分别接主客户端与 Creator；CurseForge 使用官方公开查询及作者上传 API。
 
 项目强调显式调用、完整字段收集、写入前确认和写入后读回验证。CLI 只负责单次原子读写，业务选择、执行计划和异常恢复由 Agent 在对话中完成。
 
 ## 功能
 
-- 支持新手盒子官方 `ncc`、第三方 Python 管理通道、网易 DD、CurseForge 和 Heybox Workshop。
+- 支持新手盒子官方 `ncc`、第三方 Python 通道、网易 DD、黑盒工坊、ModUs 主客户端/Creator 和 CurseForge；各动作的具体范围见[平台字段总表](fupload/references/platform-fields.md)。
 - CurseForge 支持按作者 ID 查询 WoW 公开项目、读取上传用游戏版本，以及向已有项目上传插件 ZIP；不创建 Project，也不枚举私有、草稿或待审 Project。
 - 支持插件、配置分享、WA/字符串的创建、内容更新与元数据编辑。
 - 官方通道严格采用已安装 `ncc` 暴露的能力；第三方 Python 通道覆盖版本、游戏分支、分类、媒体、可见性、审核、商业设置、频道、关联内容和配置备份选择等页面字段。
 - 第三方 Python 以 Creator Center 网页的请求和表单状态为基准，编辑和更新采用 `GET -> 动态选项查询 -> presence-aware patch -> 写入 -> 读回`；关联作者/内容在主记录读回后替换并再次读回。官方通道采用 `ncc` 文档规定的只读查询、写入和读回命令。
 - 第三方 Python 写入使用严格 JSON Schema：未知字段、重复键、`NaN` 和 `Infinity` 均会被拒绝；官方 `ncc` 使用参数和 `-o json` 结构化输出。
 - 新手盒子官方通道复用本机 `ncc login` 或预先注入的 `NCC_TOKEN`，第三方通道复用桌面客户端登录状态；不接收或输出 token、cookie、JWT、签名 URL、DD `clientNo`、原始 WA 字符串或原始配置内容。
-- DD 通过已安装官方客户端的无头运行环境完成原生登录、签名和官方 `WowUIInterface.parseWa` WA2 解析；一次发布任务只建立一个串行会话，任务结束立即退出。
+- DD 使用已安装官方运行环境进行签名和 WA2 解析。GUI 运行时借用其网页 Cookie，不再执行第二次桌面登录；GUI 未运行时才走保存凭据登录。一个任务复用一个串行会话，结束只清理自己的运行环境。
 - DD 写入前按官方网页的详情投影和表单校验重建完整请求；可选 VIP/频道依赖只在启用时查询，插件版本历史遍历分页，WA 新版本只接受纯数字。4xx/业务错误会在 DD 版本目录的 `Fupload/logs` 保存经过递归脱敏且按 UTF-8 字节限长的请求与响应记录。
-- DD 回归以 `resource × action × field × state` 表驱动矩阵覆盖 195 个 create/update/edit/delete 输入字段；每个字段校验正常值、替代值、遗漏、null、非法类型及适用的 false/0/空值/边界，并捕获 JSON 序列化后的最终 endpoint、请求体、上传和 mutation 次数。
+- 字段回归检查正常值、遗漏、null、非法类型及 false/0/空值/边界；协议测试捕获最终接口和请求字段。字段数量、条件和来源统一由[总表](fupload/references/platform-fields.md)及其生成检查维护。
 
 ## 目录
 
@@ -40,7 +40,7 @@ fupload/
 - 新手盒子官方通道：Windows、macOS 或 Linux，Node.js >= 18、官方 `ncc` CLI 与本机登录态
 - 新手盒子第三方 Python 通道：Windows、Python 3、已安装并登录新手盒子桌面客户端
 - 网易 DD：Windows、Python 3、已安装并登录官方客户端
-- Heybox Workshop：Windows、Python 3、已安装并登录 Heybox 桌面客户端
+- Heybox Workshop：Windows、Python 3，使用 Fupload 的短信或微信登录；短信风控可读取本机官方客户端已有设备凭据，已存会话续期和微信登录不要求桌面账号在线
 
 npm 安装和 `fupload update` 会在用户状态目录中创建 Fuploader 专用 Python venv，优先使用可用的 `uv` 向其中安装固定版本依赖，并自动安装 Heybox ZIP 上传所需的腾讯官方 COS SDK；未安装 `uv` 时回退到 venv 自带的 pip，不会修改系统 Python。使用 `npm --ignore-scripts` 安装时，首次运行实际 CLI 命令会校验并补齐该 runtime。
 
@@ -134,15 +134,15 @@ fupload blackbox plugin list
 fupload blackbox plugin get --module-id 101149612
 ```
 
-DD doctor 不会登录。若输出 `gui_running=true`，需先取得用户同意，随后关闭已验证的官方 GUI 并建立一个任务会话：
+DD doctor 不会登录。建立一个任务会话；GUI 正在运行时借用它的现有网页会话：
 
 ```powershell
-fupload dd session start --confirm-close-gui
+fupload dd session start
 fupload dd options game-types --session <session-id>
 fupload dd session stop --session <session-id>
 ```
 
-GUI 未运行时，`session start` 不加 `--confirm-close-gui`。后续 DD 的动态查询、写入和读回都传同一个 `--session`，并在 `finally` 中 stop。
+GUI 未运行时使用本机保存凭据的原生登录流程。后续 DD 的动态查询、写入和读回都传同一个 `--session`，并在 `finally` 中 stop。`--confirm-close-gui` 只是旧调用兼容参数，不会关闭客户端。
 
 读取当前游戏分支：
 
@@ -173,6 +173,18 @@ fupload uninstall
 
 npm 7 及以上不执行卸载 lifecycle，因此直接运行 `npm uninstall -g @follenfang/fupload` 只删除 npm 包和 CLI，可能留下 Skill；它不属于完整卸载流程。
 
+## 云备份
+
+新手盒子 Python 通道、黑盒、ModUs 和 DD 均提供 `backup` 命令：扫描本机内容、按明确选择生成、上传、查询、改名、删除预览及删除。WTF 选择包含账号、服务器和角色，生成时只收集选中的内容。各平台的字段和文件格式以命令 `--help` 为准。
+
+例如先用 `fupload newbee backup delete-preview --backup-ids 123` 查看引用关系，再通过 JSON 执行删除：
+
+```json
+{"schema":"fupload.v1.newbee.backup.delete","backup_ids":[123],"confirm_delete":true}
+```
+
+将 JSON 保存为本地文件后，执行 `fupload newbee backup delete --input <文件路径>`。单条删除使用一个 ID，批量删除使用多个 ID；确认参数不能绕过配置分享引用保护。分页或关联查询失败会停止删除，结果不明时先查询，不自动重发。DD 的远程命令还需传入同一个任务 `--session`。
+
 ## 工作流约束
 
 1. 写入前先运行目标 leaf command 的 `--help`，以运行时 Schema 为准。
@@ -185,17 +197,20 @@ npm 7 及以上不执行卸载 lifecycle，因此直接运行 `npm uninstall -g 
 
 完整契约见：
 
+- [平台字段总表：类型、条件、接口映射、已知缺口](fupload/references/platform-fields.md)
 - [工作流与 CLI 契约](fupload/references/workflow.md)
 - [新手盒子官方 CLI 完整参考](fupload/references/newbee-official-cli.md)
 - [新手盒子第三方 Python 字段参考](fupload/references/newbee.md)
 - [网易 DD 字段参考](fupload/references/dd.md)
 - [CurseForge API、字段与上传参考](fupload/references/curseforge.md)
 - [Heybox Workshop 黑盒字段与版本参考](fupload/references/blackbox.md)
+- [ModUs 主客户端与 Creator 操作](fupload/references/modus.md)
 
 ## 测试
 
 ```powershell
 npm test
+npm run check:fields
 npm run check:manifest
 npm run test:pack
 npm run test:install
@@ -221,7 +236,7 @@ python fupload\scripts\tests\generate_dd_wire_matrix_report.py > analyze\dd-fiel
 - `fupload/scripts/fupload_cli/__init__.py` 的 `__version__`
 - `npm/skill-manifest.json` 的包版本与 Skill 版本
 
-当前版本为 `0.0.2`，对应 tag `v0.0.2`。`.github/workflows/publish-npm.yml` 在 pull request、`main` push 和 `v*` tag 上运行 Windows/Linux CI；只有 tag CI 全部通过时才通过 npm Trusted Publishing/OIDC 发布，不使用长期 `NPM_TOKEN`。
+当前版本为 `1.1.0`，对应 tag `v1.1.0`。`.github/workflows/publish-npm.yml` 在 pull request、`main` push 和 `v*` tag 上运行 Windows 测试；只有 tag CI 全部通过时才通过 npm Trusted Publishing/OIDC 发布，不使用长期 `NPM_TOKEN`。
 
 发布前在 npm 包设置中绑定 Trusted Publisher：
 
@@ -234,9 +249,9 @@ python fupload\scripts\tests\generate_dd_wire_matrix_report.py > analyze\dd-fiel
 
 ```powershell
 npm run check:versions
-npm run check:release -- v0.0.2
-git tag -a v0.0.2 -m "Fuploader 0.0.2"
-git push origin v0.0.2
+npm run check:release -- v1.1.0
+git tag -a v1.1.0 -m "Fuploader 1.1.0"
+git push origin v1.1.0
 ```
 
 npm 对首次创建的包可能要求先由账号所有者完成一次 bootstrap 发布；该步骤只用于建立包身份，正式 `latest` 由版本 tag workflow 发布。需要人工处理时，不要把 npm token 写入仓库或 GitHub Secret。

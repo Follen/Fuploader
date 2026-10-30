@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import sys
 import tempfile
 import unittest
@@ -76,6 +77,15 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
         cls.modus_archive = root / "modus" / "addon.zip"
         with zipfile.ZipFile(cls.modus_archive, "w") as archive:
             archive.writestr("Addon/Addon.toc", "## Interface: 110000\n")
+        cls.backup_game = root / "backup-game"
+        for relative in ("Interface/AddOns/Chosen", "Interface/Textures", "Fonts", "WTF/Account/Account/Realm/Role"):
+            (cls.backup_game / relative).mkdir(parents=True, exist_ok=True)
+        (cls.backup_game / "Fonts/font.ttf").write_bytes(b"font")
+        cls.backup_packages = {}
+        for platform, package_schema in (("newbee", "fupload.newbee.backup-bundle.v1"), ("dd", "fupload.dd.backup-bundle.v1"), ("modus", "config-backup.v2"), ("blackbox", "fupload.blackbox.backup-package.v1")):
+            path = root / (platform + "-backup.json")
+            path.write_text(json.dumps({"schemaVersion" if platform == "modus" else "schema": package_schema}), encoding="utf-8")
+            cls.backup_packages[platform] = str(path)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -83,6 +93,8 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
 
     def _document(self, key: Tuple[str, str, str]) -> Dict[str, Any]:
         platform, resource, action = key
+        if resource == "backup":
+            return self._backup_document(platform, action)
         if platform == "dd":
             return self.dd.document(resource, action)
         if platform == "curseforge":
@@ -96,7 +108,14 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
             }
         if platform == "blackbox":
             base = {"schema": "fupload.v1.blackbox.%s.%s" % (resource, action)}
-            if resource == "plugin" and action == "edit":
+            if resource == "session":
+                if action == "login-start":
+                    base["method"] = "wechat"
+                elif action == "login-submit":
+                    base.update({"login_id": "a" * 32, "code": "123456"})
+                elif action == "forget":
+                    base["confirm_forget"] = True
+            elif resource == "plugin" and action == "edit":
                 base.update({"id": 101149612})
             elif resource == "plugin" and action == "update":
                 base.update({"module_id": 101149612, "name": "TapTool", "type": 1,
@@ -106,27 +125,37 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                              "type": 1, "game_versions": ["11.2.0"]})
             elif resource == "version" and action == "delete":
                 base.update({"version_id": 191150996, "module_id": 101149612})
+            elif resource == "config":
+                if action == "delete":
+                    base.update({"share_id": "share", "confirm_delete": True})
+                elif action == "create":
+                    base.update({"backup_id": "backup", "configuration": {"Title": "Fixture", "Article": "<p>Original</p>", "Open": False,
+                                 "KnownAddons": [], "UnknownAddons": {"Files": []}, "WTFList": [], "Materials": {"Files": []},
+                                 "Fonts": {"Files": []}, "ThumbList": [], "SubscribeLevel": 0}})
+                else:
+                    base.update({"share_id": "share", "configuration": {"Article": "<p>Changed</p>", "KnownAddons": [],
+                                 "UnknownAddons": {"Files": []}, "WTFList": [], "Materials": {"Files": []}, "Fonts": {"Files": []}}})
             return base
         if platform == "modus":
             base = {"schema": "fupload.v1.modus.%s.%s" % (resource, action)}
             if resource == "project" and action == "create":
                 base["project_state"] = self._modus_project_state()
             elif resource == "project" and action == "edit":
-                base.update({"project_id": 1, "project_state": self._modus_project_state()})
+                base.update({"project_id": 200000001, "project_state": self._modus_project_state()})
             elif resource == "project" and action == "delete":
-                base.update({"project_id": 1, "confirm": "DELETE"})
+                base.update({"project_id": 200000001, "confirm": "DELETE"})
             elif resource == "plugin" and action in ("create", "upload"):
-                base.update({"project_id": 1, "file": str(self.modus_archive), "version": "1.0.0",
+                base.update({"project_id": 200000001, "file": str(self.modus_archive), "version": "1.0.0",
                              "type": "release", "supported_game_versions": [
                                  {"gameVersion": "12.1.0", "server": "wow_retail"}
                              ]})
             elif resource == "plugin" and action in ("update", "edit"):
-                base.update({"project_id": 1, "file_id": 2, "version": "1.0.1",
+                base.update({"project_id": 200000001, "file_id": 2, "version": "1.0.1",
                              "type": "release", "supported_game_versions": [
                                  {"gameVersion": "12.1.0", "server": "wow_retail"}
                              ]})
             elif resource == "plugin" and action == "delete":
-                base.update({"project_id": 1, "file_id": 2, "confirm": "DELETE"})
+                base.update({"project_id": 200000001, "file_id": 2, "confirm": "DELETE"})
             elif resource == "config":
                 if action in ("create", "update", "edit"):
                     base.update({"share_id": "1000000000000001", "addons_id": "1,2", "backup_id": 1,
@@ -154,8 +183,33 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                     base.update({"import_id": 1, "version": "2.0", "code_text": "SAMPLE", "changelog": "notes"})
                 elif action == "version-delete":
                     base.update({"version_id": 1, "confirm": "DELETE"})
+            if action == "create" and resource in {"config", "wa"}:
+                base.pop("share_id" if resource == "config" else "import_id", None)
             return base
         return self.newbee.document(resource, action)
+
+    def _backup_document(self, platform: str, action: str) -> Dict[str, Any]:
+        base = {"schema": "fupload.v1.%s.backup.%s" % (platform, action)}
+        package_field = "manifest_file" if platform == "modus" else "file" if platform == "blackbox" else "bundle_file"
+        if action == "upload":
+            return {**base, package_field: self.backup_packages[platform]}
+        if action == "delete":
+            return {**base, "backup_ids": [1 if platform in ("newbee", "modus") else "opaque"], "confirm_delete": True}
+        if action == "rename":
+            identity = {"newbee": "id", "dd": "sn", "modus": "backup_id", "blackbox": "backup_id"}[platform]
+            return {**base, identity: 1 if platform in ("newbee", "modus") else "opaque", "backup_name" if platform == "modus" else "name": "Fixture"}
+        base["output_dir"] = str(Path(self.temp.name) / (platform + "-output"))
+        if platform == "modus":
+            return {**base, "game_root": str(self.backup_game), "backup_name": "Fixture", "server_type": 0,
+                    "addon_names": ["Chosen"], "font_names": ["font.ttf"], "material_names": ["Textures"],
+                    "roles": [{"account": "Account", "server": "Realm", "role": "Role"}]}
+        if platform == "blackbox":
+            return {**base, "game_dir": str(self.backup_game), "strappid": "wowretail", "unknown_addons": ["Chosen"],
+                    "fonts": ["font.ttf"], "materials": ["Textures"],
+                    "wtf_accounts": [{"name": "Account", "characters": [{"realm": "Realm", "player": "Role"}]}]}
+        return {**base, "game_dir": str(self.backup_game), "game_version_id" if platform == "newbee" else "game_type": 1,
+                "unknown_plugins" if platform == "newbee" else "addon_names": ["Chosen"], "fonts": ["font.ttf"], "materials": ["Textures"],
+                "wtf_accounts": [{"account": "Account", "include_common": False, "roles": [{"server": "Realm", "name": "Role"}]}]}
 
     @staticmethod
     def _modus_project_state() -> Dict[str, Any]:
@@ -361,6 +415,14 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
     def _add_alternative(self, key: Tuple[str, str, str], doc: Dict[str, Any], field: str) -> None:
         platform, resource, action = key
         if action != "create":
+            return
+        if resource == "backup" and platform != "modus" and field not in doc and field not in ("bundle_file", "file"):
+            # Create has two explicit input modes. An optional generation field
+            # may be omitted when an already generated package is selected.
+            for generation_field in tuple(doc):
+                if generation_field not in ("schema", "name"):
+                    doc.pop(generation_field)
+            doc["file" if platform == "blackbox" else "bundle_file"] = self.backup_packages[platform]
             return
         alternatives = {
             ("newbee", "plugin", "logo"): ("logo_file", str(self.newbee.image)),

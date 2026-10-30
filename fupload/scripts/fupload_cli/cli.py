@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Sequence, Tuple
@@ -51,6 +52,12 @@ def _positive(value: str) -> int:
     return number
 
 
+def _blackbox_login_id(value: str) -> str:
+    if not re.fullmatch(r"[a-f0-9]{32}", value):
+        raise argparse.ArgumentTypeError("must contain 32 lowercase hexadecimal characters")
+    return value
+
+
 def _page_flags(parser: argparse.ArgumentParser, *, offset: bool = False) -> None:
     if offset:
         parser.add_argument("--offset", type=int, default=0, help="Zero-based result offset (technical default: 0).")
@@ -83,7 +90,7 @@ def _write_leaf(parent: argparse._SubParsersAction, platform: str, resource: str
 def _read_leaf(parent: argparse._SubParsersAction, name: str, summary: str, **defaults: Any) -> argparse.ArgumentParser:
     leaf = parent.add_parser(name, help=summary, description=summary + "\n\nThis is a read-only command and emits stable JSON.")
     leaf.set_defaults(handler="read", **defaults)
-    if defaults.get("platform") == "dd" and defaults.get("resource") != "session":
+    if defaults.get("platform") == "dd" and defaults.get("resource") != "session" and not (defaults.get("resource") == "backup" and defaults.get("action") == "scan"):
         leaf.add_argument("--session", help="Opaque task session ID returned by `dd session start`; required for this live DD read.")
     return leaf
 
@@ -112,9 +119,51 @@ def _newbee_relationship_tree(parent: argparse.ArgumentParser, resource: str, la
     _write_leaf(references, "newbee", resource + "-reference", "set", "Replace the complete %s reference list; an empty array clears it." % label)
 
 
+def _backup_tree(groups: argparse._SubParsersAction, platform: str) -> None:
+    backup = groups.add_parser("backup", help="Generate, upload, inspect, and protect cloud backups").add_subparsers(dest="action_command", required=True)
+    for action, text in (
+        ("generate", "Generate a local backup containing only explicit content selections."),
+        ("upload", "Upload one generated backup package and verify its cloud record."),
+        ("create", "Generate and upload one explicitly selected cloud backup."),
+        ("rename", "Rename one cloud backup and verify the result."),
+        ("delete", "Delete explicit unused cloud backups; configuration-share references always block deletion."),
+    ):
+        _write_leaf(backup, platform, "backup", action, text)
+    for action, text in (
+        ("list", "List cloud backups."),
+        ("get", "Read one cloud backup and its selectable content."),
+        ("scan", "List local backup content choices without reading configuration content."),
+        ("delete-preview", "Preview explicit or filtered backup candidates and mandatory reference protection."),
+    ):
+        leaf = _read_leaf(backup, action, text, platform=platform, resource="backup", action=action)
+        if platform == "modus":
+            _modus_server_flag(leaf)
+        if action == "get":
+            if platform == "newbee":
+                leaf.add_argument("--id", "--backup-id", dest="id", type=_positive, required=True)
+            elif platform == "dd":
+                leaf.add_argument("--sn", "--backup-sn", dest="sn", required=True)
+            else:
+                leaf.add_argument("--backup-id", type=_positive if platform == "modus" else str, required=True)
+        if action == "scan":
+            leaf.add_argument("--game-root" if platform == "modus" else "--game-dir", required=True)
+            if platform == "blackbox":
+                leaf.add_argument("--strappid", required=True)
+        if action == "delete-preview":
+            leaf.add_argument("--backup-ids", nargs="+", type=_positive if platform in ("newbee", "modus") else str)
+            if platform == "blackbox":
+                leaf.add_argument("--backup-id")
+            leaf.add_argument("--name-contains")
+            leaf.add_argument("--name-equals")
+            leaf.add_argument("--created-before", type=int if platform == "blackbox" else str)
+            leaf.add_argument("--created-after", type=int if platform == "blackbox" else str)
+
+
 def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
     root = platforms.add_parser("newbee", help="NewBeeBox Creator operations", description="Reuse the signed-in NewBeeBox desktop auth-store; no token input is accepted.")
     groups = root.add_subparsers(dest="resource_command", required=True)
+
+    _backup_tree(groups, "newbee")
 
     session = groups.add_parser("session", help="Authentication diagnostics").add_subparsers(dest="action_command", required=True)
     _read_leaf(session, "doctor", "Verify Windows Known Folder credentials, fixed official origins, and the Creator token exchange.", platform="newbee", resource="session", action="doctor")
@@ -170,6 +219,7 @@ def _newbee_tree(platforms: argparse._SubParsersAction) -> None:
 def _dd_tree(platforms: argparse._SubParsersAction) -> None:
     root = platforms.add_parser("dd", help="NetEase DD author operations", description="Use DD's official netease_dd.exe, credentials, native login, and NEP signer. No token input is accepted.")
     groups = root.add_subparsers(dest="resource_command", required=True)
+    _backup_tree(groups, "dd")
     session = groups.add_parser("session", help="Installation and task-session lifecycle").add_subparsers(dest="action_command", required=True)
     _read_leaf(session, "doctor", "Discover DD, verify its official Authenticode publisher, and diagnose GUI/broker state without logging in.", platform="dd", resource="session", action="doctor")
     leaf = _read_leaf(session, "start", "Start one task-scoped native login session while leaving the DD GUI running.", platform="dd", resource="session", action="start")
@@ -225,10 +275,31 @@ def _curseforge_tree(platforms: argparse._SubParsersAction) -> None:
 def _blackbox_tree(platforms: argparse._SubParsersAction) -> None:
     root = platforms.add_parser(
         "blackbox",
-        help="Heybox Workshop plugin management",
-        description="Use a managed Heybox Workshop web session; an interactive browser opens when login is required.",
+        help="Heybox Workshop sessions, cloud backups, configurations, and plugins",
+        description="Use the managed HTTP login state. Start authentication explicitly through the step-by-step JSON session commands.",
     )
     groups = root.add_subparsers(dest="resource_command", required=True)
+    session = groups.add_parser("session", help="Non-interactive, explicit JSON authentication steps").add_subparsers(dest="action_command", required=True)
+    _read_leaf(session, "doctor", "Read managed-login status without sending SMS or opening a browser.", platform="blackbox", resource="session", action="doctor")
+    leaf = _read_leaf(session, "login-status", "Check one pending login once; no background polling is started.", platform="blackbox", resource="session", action="login-status")
+    leaf.add_argument("--login-id", type=_blackbox_login_id, required=True, help="Opaque 32-character lowercase hexadecimal ID returned by login-start.")
+    for action, text in (
+        ("login-start", "Explicitly start one SMS or WeChat login from JSON; phone is accepted only in SMS input JSON."),
+        ("login-submit", "Submit one SMS code from JSON; use --input - to keep the code off the command line."),
+        ("renew", "Restore and verify the saved login state without starting a new login or sending SMS."),
+        ("forget", "Explicitly forget local active and pending login state without remote logout."),
+    ):
+        _write_leaf(session, "blackbox", "session", action, text)
+    options = groups.add_parser("options", help="Read Heybox Workshop business choices").add_subparsers(dest="option_action", required=True)
+    _read_leaf(options, "game-types", "Read game branches and their strappid values.", platform="blackbox", resource="options", action="game-types")
+    _backup_tree(groups, "blackbox")
+    config = groups.add_parser("config", help="Configuration shares with preserved content and backup selections").add_subparsers(dest="action_command", required=True)
+    for action in ("create", "update", "edit", "delete"):
+        _write_leaf(config, "blackbox", "config", action, "%s one configuration share and verify the result." % action.capitalize())
+    leaf = _read_leaf(config, "list", "List the current author's configuration shares for a game branch.", platform="blackbox", resource="config", action="list")
+    leaf.add_argument("--strappid", required=True)
+    leaf = _read_leaf(config, "get", "Read one complete configuration-share detail.", platform="blackbox", resource="config", action="get")
+    leaf.add_argument("--share-id", required=True)
     plugin = groups.add_parser("plugin", help="Heybox Workshop plugin metadata and versions").add_subparsers(dest="action_command", required=True)
     _read_leaf(plugin, "list", "List plugins managed by the current Heybox Workshop account.", platform="blackbox", resource="plugin", action="list")
     leaf = _read_leaf(plugin, "get", "Read one Heybox Workshop plugin and its versions.", platform="blackbox", resource="plugin", action="get")
@@ -247,6 +318,7 @@ def _modus_tree(platforms: argparse._SubParsersAction) -> None:
         description="Reuse the local ModUs.Creator Windows login state; token and signed upload material are never accepted as input.",
     )
     groups = root.add_subparsers(dest="resource_command", required=True)
+    _backup_tree(groups, "modus")
     session = groups.add_parser("session", help="Local authentication diagnostics").add_subparsers(dest="action_command", required=True)
     doctor = _read_leaf(session, "doctor", "Check one local ModUs token store, DPAPI decryption, and authenticated API readiness without exposing credentials.", platform="modus", resource="session", action="doctor")
     doctor.add_argument(
@@ -279,6 +351,10 @@ def _modus_tree(platforms: argparse._SubParsersAction) -> None:
     game_versions = _read_leaf(options, "game-versions", "List supported ModUs game versions.", platform="modus", resource="options", action="game-versions")
     game_versions.add_argument("--key", dest="keys", action="append", required=True, help="Request one game config key; repeatable.")
     _read_leaf(options, "subscription-tiers", "List author subscription tiers returned by ModUs.", platform="modus", resource="options", action="subscription-tiers")
+    _read_leaf(options, "subscription-game-types", "Read official gameCode values used by season subscriptions.", platform="modus", resource="options", action="subscription-game-types")
+    leaf = _read_leaf(options, "season-subscription", "Read one author's season subscription candidate for an explicit gameCode.", platform="modus", resource="options", action="season-subscription")
+    leaf.add_argument("--game-type", required=True, help="Official gameCode from subscription-game-types, such as wow_retail.")
+    leaf.add_argument("--author-id", type=_positive, help="Author ID; omitted uses the current logged-in account.")
     _read_leaf(options, "config-tags", "List configuration-share tag choices from the official ModUs client data.", platform="modus", resource="options", action="config-tags")
     _read_leaf(options, "wa-tags", "List string tag choices from the official ModUs client data.", platform="modus", resource="options", action="wa-tags")
     _read_leaf(options, "wa-support-addons", "List applicable-addon choices from the official ModUs client data.", platform="modus", resource="options", action="wa-support-addons")
@@ -387,7 +463,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if args.dry_run:
                 write_output(platform, operation, _dry_run_data(doc, schema.name), dry_run=True)
                 return 0
-            provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(main_session=resource in ("media", "config", "wa")))))
+            provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(authenticate=not (resource == "backup" and action == "generate"), main_session=resource in ("media", "config", "wa", "backup")))))
             try:
                 if platform == "dd":
                     data = provider.execute_write(resource, action, doc, getattr(args, "session", None))
@@ -400,10 +476,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             write_output(platform, operation, data)
             return 0
         modus_doctor = platform == "modus" and resource == "session" and action == "doctor"
-        modus_main_session = resource in ("addon", "config", "wa", "builds") or (
+        modus_main_session = resource in ("addon", "config", "wa", "builds", "backup") or (
             modus_doctor and getattr(args, "client", "creator") == "main"
         )
-        provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(authenticate=not modus_doctor, main_session=modus_main_session))))
+        provider = NewBee() if platform == "newbee" else (DD() if platform == "dd" else (Blackbox() if platform == "blackbox" else (CurseForge() if platform == "curseforge" else _modus_provider(authenticate=not (modus_doctor or resource == "backup" and action == "scan"), main_session=modus_main_session or resource == "options" and action in {"season-subscription", "subscription-game-types"}))))
         try:
             if platform == "dd":
                 data = provider.execute_read(resource, action, args, getattr(args, "session", None))

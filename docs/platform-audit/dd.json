@@ -1,0 +1,1339 @@
+{
+  "platform": "dd",
+  "source_version": "DD100130",
+  "fields": {
+    "plugin.create.game_type": {
+      "wire": "game_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "插件create上下文固定；用game-types查询；不要混同游戏版本字符串"
+    },
+    "plugin.create.scope": {
+      "wire": "scope",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "private会规范化商业/频道/VIP字段；assign_user_sn对象只能public"
+    },
+    "plugin.create.addon_type": {
+      "wire": "addon_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.name": {
+      "wire": "name",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.description": {
+      "wire": "description",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.logo": {
+      "wire": "logo",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.logo_file": {
+      "wire": "logo",
+      "stage": "本地文件先经/file/upload授权及对象PUT，最终提交返回URL/路径；数组媒体追加现有图片",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.detail_imgs": {
+      "wire": "detail_imgs",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.detail_img_files": {
+      "wire": "detail_imgs",
+      "stage": "本地文件先经/file/upload授权及对象PUT，最终提交返回URL/路径；数组媒体追加现有图片",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.primary_category_id": {
+      "wire": "primary_category_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.second_category_ids": {
+      "wire": "second_category_ids",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "先查询primary下候选；最终提交规范化后的子分类ID数组，不透传显示对象"
+    },
+    "plugin.create.html_desc": {
+      "wire": "html_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.share_code_life_type": {
+      "wire": "share_code_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "public插件/WA固定forever；public配置不发该字段；private从选项查询"
+    },
+    "plugin.create.need_buy": {
+      "wire": "need_buy",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定"
+    },
+    "plugin.create.price_fen": {
+      "wire": "price_fen",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "单位分；0或10..20000；不是元；免费create归零"
+    },
+    "plugin.create.buy_life_type": {
+      "wire": "buy_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.jump_room": {
+      "wire": "jump_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+    },
+    "plugin.create.room_id": {
+      "wire": "room_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.channel_id": {
+      "wire": "channel_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.channel_type": {
+      "wire": "channel_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.sync_room": {
+      "wire": "sync_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "true时需要jump_room与有效频道；private强制false"
+    },
+    "plugin.create.creation_statement": {
+      "wire": "creation_statement",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "提交编辑器要求非空；取用户真实声明，不自动编造"
+    },
+    "plugin.create.with_associate": {
+      "wire": "with_associate",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "true时associated_acts至少一项；false清空关联"
+    },
+    "plugin.create.associated_acts": {
+      "wire": "associated_acts",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "数组项仅sn:string、act_type:addon|share|wa；先查询候选"
+    },
+    "plugin.create.need_anchor_vip": {
+      "wire": "need_anchor_vip",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "true时vip_levels非空；private强制false"
+    },
+    "plugin.create.vip_levels": {
+      "wire": "vip_levels",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.game_versions": {
+      "wire": "game_versions",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "当前game_type下的build字符串数组"
+    },
+    "plugin.create.detail_url": {
+      "wire": "detail_url",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.file": {
+      "wire": "detail_url",
+      "stage": "本地文件先经/file/upload授权及对象PUT，最终提交返回URL/路径；数组媒体追加现有图片",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.create.release_type": {
+      "wire": "release_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "版本上传类型需当前动态候选，编辑元数据保留旧值"
+    },
+    "plugin.create.version": {
+      "wire": "version",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "WA必须数字字符串；插件重复版本在上传前拒绝"
+    },
+    "plugin.create.update_desc": {
+      "wire": "update_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.update.sn": {
+      "wire": "sn",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.update.game_versions": {
+      "wire": "game_versions",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "当前game_type下的build字符串数组"
+    },
+    "plugin.update.detail_url": {
+      "wire": "detail_url",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.update.file": {
+      "wire": "detail_url",
+      "stage": "本地文件先经/file/upload授权及对象PUT，最终提交返回URL/路径；数组媒体追加现有图片",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.update.release_type": {
+      "wire": "release_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "版本上传类型需当前动态候选，编辑元数据保留旧值"
+    },
+    "plugin.update.version": {
+      "wire": "version",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "WA必须数字字符串；插件重复版本在上传前拒绝"
+    },
+    "plugin.update.update_desc": {
+      "wire": "update_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.edit.sn": {
+      "wire": "sn",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.edit.scope": {
+      "wire": "scope",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "private会规范化商业/频道/VIP字段；assign_user_sn对象只能public"
+    },
+    "plugin.edit.share_code_life_type": {
+      "wire": "share_code_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "public插件/WA固定forever；public配置不发该字段；private从选项查询"
+    },
+    "plugin.edit.need_buy": {
+      "wire": "need_buy",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定"
+    },
+    "plugin.edit.price_fen": {
+      "wire": "price_fen",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "单位分；0或10..20000；不是元；免费create归零"
+    },
+    "plugin.edit.buy_life_type": {
+      "wire": "buy_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.edit.jump_room": {
+      "wire": "jump_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+    },
+    "plugin.edit.room_id": {
+      "wire": "room_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.edit.channel_id": {
+      "wire": "channel_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.edit.channel_type": {
+      "wire": "channel_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.edit.sync_room": {
+      "wire": "sync_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "true时需要jump_room与有效频道；private强制false"
+    },
+    "plugin.edit.creation_statement": {
+      "wire": "creation_statement",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "提交编辑器要求非空；取用户真实声明，不自动编造"
+    },
+    "plugin.edit.with_associate": {
+      "wire": "with_associate",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "true时associated_acts至少一项；false清空关联"
+    },
+    "plugin.edit.associated_acts": {
+      "wire": "associated_acts",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "数组项仅sn:string、act_type:addon|share|wa；先查询候选"
+    },
+    "plugin.edit.need_anchor_vip": {
+      "wire": "need_anchor_vip",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "true时vip_levels非空；private强制false"
+    },
+    "plugin.edit.vip_levels": {
+      "wire": "vip_levels",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.edit.description": {
+      "wire": "description",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.edit.logo": {
+      "wire": "logo",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.edit.logo_file": {
+      "wire": "logo",
+      "stage": "本地文件先经/file/upload授权及对象PUT，最终提交返回URL/路径；数组媒体追加现有图片",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.edit.html_desc": {
+      "wire": "html_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.edit.update_desc": {
+      "wire": "update_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "config.create.scope": {
+      "wire": "scope",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "private会规范化频道/VIP；配置当前实现没有插件/WA的assign_user_sn限制"
+    },
+    "config.create.title": {
+      "wire": "title",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.brief_desc": {
+      "wire": "brief_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.desc": {
+      "wire": "desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.display_imgs": {
+      "wire": "display_imgs",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.display_img_files": {
+      "wire": "display_imgs",
+      "stage": "本地文件先经/file/upload授权及对象PUT，最终提交返回URL/路径；数组媒体追加现有图片",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.share_code_life_type": {
+      "wire": "share_code_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "public插件/WA固定forever；public配置不发该字段；private从选项查询"
+    },
+    "config.create.need_buy": {
+      "wire": "need_buy",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定；配置wire为整数0/1，detail投影可为boolean"
+    },
+    "config.create.price_fen": {
+      "wire": "price_fen",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "单位分；0或10..20000；不是元；免费create归零"
+    },
+    "config.create.buy_life_type": {
+      "wire": "buy_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.jump_room": {
+      "wire": "jump_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+    },
+    "config.create.room_id": {
+      "wire": "room_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.channel_id": {
+      "wire": "channel_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.channel_type": {
+      "wire": "channel_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.sync_room": {
+      "wire": "sync_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "true时需要jump_room与有效频道；private强制false"
+    },
+    "config.create.creation_statement": {
+      "wire": "creation_statement",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "提交编辑器要求非空；取用户真实声明，不自动编造"
+    },
+    "config.create.with_associate": {
+      "wire": "with_associate",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "true时associated_acts至少一项；false清空关联"
+    },
+    "config.create.associated_acts": {
+      "wire": "associated_acts",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "数组项仅sn:string、act_type:addon|share|wa；先查询候选"
+    },
+    "config.create.need_anchor_vip": {
+      "wire": "need_anchor_vip",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "true时vip_levels非空；private强制false"
+    },
+    "config.create.vip_levels": {
+      "wire": "vip_levels",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.backup_sn": {
+      "wire": "backup_sn",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.update_desc": {
+      "wire": "update_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.known_addon_ids": {
+      "wire": "known_addon.items[]（按addon_id选中并复制完整候选）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.create.known_addon_update_ids": {
+      "wire": "known_addon.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.create.unknown_addon_ids": {
+      "wire": "unknown_addon.items[]（标量按自身；对象按name，缺失才按id）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.create.unknown_addon_update_ids": {
+      "wire": "unknown_addon.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.create.wtf_role_ids": {
+      "wire": "wtf.accounts[].servers[].items",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.create.material_names": {
+      "wire": "material.items[]（按name选择完整候选）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.create.material_update_names": {
+      "wire": "material.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.create.font_names": {
+      "wire": "font.items[]（标量按自身；对象按name或id）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.create.font_update_names": {
+      "wire": "font.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.create.known_wa_ids": {
+      "wire": "known_wa.items[]（按uid选择完整候选）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.create.known_wa_update_ids": {
+      "wire": "known_wa.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.create.unknown_wa_ids": {
+      "wire": "unknown_wa.items[]（按uid选择，id按选中WTF账号映射替换）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.create.unknown_wa_update_ids": {
+      "wire": "unknown_wa.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.create.retail_ui_config": {
+      "wire": "retail_ui_config.edit_mode[account][] / cool_down[account][] / enable_dd_setup_wizard",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:resolve_retail_ui_config",
+      "condition": "输入仅稳定selector；本地查备份后wire发送原生对象，edit_mode补is_default；正式服切备份需重选"
+    },
+    "config.update.share_sn": {
+      "wire": "share_sn",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.update.backup_sn": {
+      "wire": "backup_sn",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.update.update_desc": {
+      "wire": "update_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.update.known_addon_ids": {
+      "wire": "known_addon.items[]（按addon_id选中并复制完整候选）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.update.known_addon_update_ids": {
+      "wire": "known_addon.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.update.unknown_addon_ids": {
+      "wire": "unknown_addon.items[]（标量按自身；对象按name，缺失才按id）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.update.unknown_addon_update_ids": {
+      "wire": "unknown_addon.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.update.wtf_role_ids": {
+      "wire": "wtf.accounts[].servers[].items",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.update.material_names": {
+      "wire": "material.items[]（按name选择完整候选）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.update.material_update_names": {
+      "wire": "material.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.update.font_names": {
+      "wire": "font.items[]（标量按自身；对象按name或id）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.update.font_update_names": {
+      "wire": "font.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.update.known_wa_ids": {
+      "wire": "known_wa.items[]（按uid选择完整候选）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.update.known_wa_update_ids": {
+      "wire": "known_wa.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.update.unknown_wa_ids": {
+      "wire": "unknown_wa.items[]（按uid选择，id按选中WTF账号映射替换）",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group"
+    },
+    "config.update.unknown_wa_update_ids": {
+      "wire": "unknown_wa.inner_version[选择键]",
+      "stage": "从选定备份重建完整嵌套分组，不把选择ID数组原样透传",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:selected_group/_key/CONFIG_GROUPS/selected_wa_group",
+      "condition": "必须为已选内容子集；已有非零版本标记更新则+1，其余保留，初始为1；WA键是uid，不是内部id"
+    },
+    "config.update.retail_ui_config": {
+      "wire": "retail_ui_config.edit_mode[account][] / cool_down[account][] / enable_dd_setup_wizard",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:resolve_retail_ui_config",
+      "condition": "输入仅稳定selector；本地查备份后wire发送原生对象，edit_mode补is_default；正式服切备份需重选"
+    },
+    "config.edit.share_sn": {
+      "wire": "share_sn",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.edit.scope": {
+      "wire": "scope",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "private会规范化频道/VIP；配置当前实现没有插件/WA的assign_user_sn限制"
+    },
+    "config.edit.title": {
+      "wire": "title",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.edit.brief_desc": {
+      "wire": "brief_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.edit.desc": {
+      "wire": "desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.edit.display_imgs": {
+      "wire": "display_imgs",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.edit.display_img_files": {
+      "wire": "display_imgs",
+      "stage": "本地文件先经/file/upload授权及对象PUT，最终提交返回URL/路径；数组媒体追加现有图片",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.edit.share_code_life_type": {
+      "wire": "share_code_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "public插件/WA固定forever；public配置不发该字段；private从选项查询"
+    },
+    "config.edit.need_buy": {
+      "wire": "need_buy",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定；配置wire为整数0/1，detail投影可为boolean"
+    },
+    "config.edit.price_fen": {
+      "wire": "price_fen",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "单位分；0或10..20000；不是元；免费create归零"
+    },
+    "config.edit.buy_life_type": {
+      "wire": "buy_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.edit.jump_room": {
+      "wire": "jump_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+    },
+    "config.edit.room_id": {
+      "wire": "room_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.edit.channel_id": {
+      "wire": "channel_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.edit.channel_type": {
+      "wire": "channel_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.edit.sync_room": {
+      "wire": "sync_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "true时需要jump_room与有效频道；private强制false"
+    },
+    "config.edit.creation_statement": {
+      "wire": "creation_statement",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "提交编辑器要求非空；取用户真实声明，不自动编造"
+    },
+    "config.edit.with_associate": {
+      "wire": "with_associate",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "true时associated_acts至少一项；false清空关联"
+    },
+    "config.edit.associated_acts": {
+      "wire": "associated_acts",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "数组项仅sn:string、act_type:addon|share|wa；先查询候选"
+    },
+    "config.edit.need_anchor_vip": {
+      "wire": "need_anchor_vip",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "true时vip_levels非空；private强制false"
+    },
+    "config.edit.vip_levels": {
+      "wire": "vip_levels",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "wa.create.game_type": {
+      "wire": "game_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "插件create上下文固定；用game-types查询；不要混同游戏版本字符串"
+    },
+    "wa.create.scope": {
+      "wire": "scope",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "private会规范化商业/频道/VIP字段；assign_user_sn对象只能public"
+    },
+    "wa.create.name": {
+      "wire": "name",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.game_version": {
+      "wire": "game_version",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.brief_desc": {
+      "wire": "brief_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.display_imgs": {
+      "wire": "display_imgs",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.display_img_files": {
+      "wire": "display_imgs",
+      "stage": "本地文件先经/file/upload授权及对象PUT，最终提交返回URL/路径；数组媒体追加现有图片",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.category_ids": {
+      "wire": "category_ids",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.desc": {
+      "wire": "desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.share_code_life_type": {
+      "wire": "share_code_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "public插件/WA固定forever；public配置不发该字段；private从选项查询"
+    },
+    "wa.create.need_buy": {
+      "wire": "need_buy",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定"
+    },
+    "wa.create.price_fen": {
+      "wire": "price_fen",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "单位分；0或10..20000；不是元；免费create归零"
+    },
+    "wa.create.buy_life_type": {
+      "wire": "buy_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.jump_room": {
+      "wire": "jump_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+    },
+    "wa.create.room_id": {
+      "wire": "room_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.channel_id": {
+      "wire": "channel_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.channel_type": {
+      "wire": "channel_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.sync_room": {
+      "wire": "sync_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时需要jump_room与有效频道；private强制false"
+    },
+    "wa.create.creation_statement": {
+      "wire": "creation_statement",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "提交编辑器要求非空；取用户真实声明，不自动编造"
+    },
+    "wa.create.with_associate": {
+      "wire": "with_associate",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时associated_acts至少一项；false清空关联"
+    },
+    "wa.create.associated_acts": {
+      "wire": "associated_acts",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "数组项仅sn:string、act_type:addon|share|wa；先查询候选"
+    },
+    "wa.create.need_anchor_vip": {
+      "wire": "need_anchor_vip",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时vip_levels非空；private强制false"
+    },
+    "wa.create.vip_levels": {
+      "wire": "vip_levels",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.content": {
+      "wire": "content",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "!WA:2!由官方解析器生成parse_wa_uid/id；输入不接受这两个内部字段"
+    },
+    "wa.create.update_desc": {
+      "wire": "update_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.version": {
+      "wire": "version",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "WA必须数字字符串；插件重复版本在上传前拒绝"
+    },
+    "wa.create.with_file": {
+      "wire": "with_file",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时需ZIP及安装路径，update省略可保留已有附件；false按官方表单保留内部路径"
+    },
+    "wa.create.file": {
+      "wire": "file_path",
+      "stage": "本地文件先经/file/upload授权及对象PUT，最终提交返回URL/路径；数组媒体追加现有图片",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.create.file_install_path": {
+      "wire": "file_install_path",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.update.sn": {
+      "wire": "sn",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.update.content": {
+      "wire": "content",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "!WA:2!由官方解析器生成parse_wa_uid/id；输入不接受这两个内部字段"
+    },
+    "wa.update.update_desc": {
+      "wire": "update_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.update.version": {
+      "wire": "version",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "WA必须数字字符串；插件重复版本在上传前拒绝"
+    },
+    "wa.update.with_file": {
+      "wire": "with_file",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时需ZIP及安装路径，update省略可保留已有附件；false按官方表单保留内部路径"
+    },
+    "wa.update.file": {
+      "wire": "file_path",
+      "stage": "本地文件先经/file/upload授权及对象PUT，最终提交返回URL/路径；数组媒体追加现有图片",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.update.file_install_path": {
+      "wire": "file_install_path",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.sn": {
+      "wire": "sn",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.game_type": {
+      "wire": "game_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "插件create上下文固定；用game-types查询；不要混同游戏版本字符串"
+    },
+    "wa.edit.scope": {
+      "wire": "scope",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "private会规范化商业/频道/VIP字段；assign_user_sn对象只能public"
+    },
+    "wa.edit.name": {
+      "wire": "name",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.game_version": {
+      "wire": "game_version",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.brief_desc": {
+      "wire": "brief_desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.display_imgs": {
+      "wire": "display_imgs",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.display_img_files": {
+      "wire": "display_imgs",
+      "stage": "本地文件先经/file/upload授权及对象PUT，最终提交返回URL/路径；数组媒体追加现有图片",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.category_ids": {
+      "wire": "category_ids",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.desc": {
+      "wire": "desc",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.share_code_life_type": {
+      "wire": "share_code_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "public插件/WA固定forever；public配置不发该字段；private从选项查询"
+    },
+    "wa.edit.need_buy": {
+      "wire": "need_buy",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定"
+    },
+    "wa.edit.price_fen": {
+      "wire": "price_fen",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "单位分；0或10..20000；不是元；免费create归零"
+    },
+    "wa.edit.buy_life_type": {
+      "wire": "buy_life_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.jump_room": {
+      "wire": "jump_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+    },
+    "wa.edit.room_id": {
+      "wire": "room_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.channel_id": {
+      "wire": "channel_id",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.channel_type": {
+      "wire": "channel_type",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.edit.sync_room": {
+      "wire": "sync_room",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时需要jump_room与有效频道；private强制false"
+    },
+    "wa.edit.creation_statement": {
+      "wire": "creation_statement",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "提交编辑器要求非空；取用户真实声明，不自动编造"
+    },
+    "wa.edit.with_associate": {
+      "wire": "with_associate",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时associated_acts至少一项；false清空关联"
+    },
+    "wa.edit.associated_acts": {
+      "wire": "associated_acts",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "数组项仅sn:string、act_type:addon|share|wa；先查询候选"
+    },
+    "wa.edit.need_anchor_vip": {
+      "wire": "need_anchor_vip",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "true时vip_levels非空；private强制false"
+    },
+    "wa.edit.vip_levels": {
+      "wire": "vip_levels",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "plugin.delete.sn": {
+      "wire": "sn",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "plugin.delete.confirm_delete": {
+      "wire": "仅本机删除确认，不发接口",
+      "stage": "写前校验",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+    },
+    "config.delete.sn": {
+      "wire": "sn",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "config.delete.confirm_delete": {
+      "wire": "仅本机删除确认，不发接口",
+      "stage": "写前校验",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+    },
+    "wa.delete.sn": {
+      "wire": "sn",
+      "stage": "最终JSON表单",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "wa.delete.confirm_delete": {
+      "wire": "仅本机删除确认，不发接口",
+      "stage": "写前校验",
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+    },
+    "backup.generate.game_dir": {
+      "wire": "仅本机选定游戏分支根目录",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.generate.game_type": {
+      "wire": "pre_create.game_type",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.generate.output_dir": {
+      "wire": "仅本机输出目录",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.generate.addon_names": {
+      "wire": "pre_create.known_addon.items[].{name,modified,dirs}",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.generate.unknown_addons": {
+      "wire": "pre_create.unknown_addon.items",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.generate.materials": {
+      "wire": "pre_create.material.items[].{name,desc}",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.generate.fonts": {
+      "wire": "pre_create.font.items",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.generate.include_wtf_root": {
+      "wire": "本地WTF根文件选择，进入wtf ZIP",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.generate.wtf_accounts": {
+      "wire": "pre_create.wtf.accounts[].{name,servers:[{name,items}]}及对应ZIP",
+      "stage": "本地/备份管线",
+      "condition": "账号项仅account/include_common/roles；角色项仅server/name",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.create.game_dir": {
+      "wire": "仅本机选定游戏分支根目录",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.create.game_type": {
+      "wire": "pre_create.game_type",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.create.output_dir": {
+      "wire": "仅本机输出目录",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.create.addon_names": {
+      "wire": "pre_create.known_addon.items[].{name,modified,dirs}",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.create.unknown_addons": {
+      "wire": "pre_create.unknown_addon.items",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.create.materials": {
+      "wire": "pre_create.material.items[].{name,desc}",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.create.fonts": {
+      "wire": "pre_create.font.items",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.create.include_wtf_root": {
+      "wire": "本地WTF根文件选择，进入wtf ZIP",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.create.wtf_accounts": {
+      "wire": "pre_create.wtf.accounts[].{name,servers:[{name,items}]}及对应ZIP",
+      "stage": "本地/备份管线",
+      "condition": "账号项仅account/include_common/roles；角色项仅server/name",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.create.bundle_file": {
+      "wire": "仅本机读取、校验manifest和分组ZIP",
+      "stage": "本地/备份管线",
+      "condition": "必须含与账号/角色树及 ZIP 内容一致的本地 selection；不上传 selection。旧实验包缺失时需重新生成，拒绝猜测原选择。",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.create.name": {
+      "wire": "modify_name.name（创建完成后明确改名）",
+      "stage": "本地/备份管线",
+      "condition": "备份名称最多14字符",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.upload.bundle_file": {
+      "wire": "仅本机读取、校验manifest和分组ZIP",
+      "stage": "本地/备份管线",
+      "condition": "必须含与账号/角色树及 ZIP 内容一致的本地 selection；不上传 selection。旧实验包缺失时需重新生成，拒绝猜测原选择。",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.upload.name": {
+      "wire": "modify_name.name（创建完成后明确改名）",
+      "stage": "本地/备份管线",
+      "condition": "备份名称最多14字符",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.rename.sn": {
+      "wire": "modify_name.sn",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.rename.name": {
+      "wire": "modify_name.name（创建完成后明确改名）",
+      "stage": "本地/备份管线",
+      "condition": "备份名称最多14字符",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.delete.backup_ids": {
+      "wire": "delete.sn（逐项）",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    },
+    "backup.delete.confirm_delete": {
+      "wire": "仅本机确认，不发接口",
+      "stage": "本地/备份管线",
+      "condition": "",
+      "evidence": "fupload/scripts/fupload_cli/dd_backup.py:generate_backup/DDBackupMixin"
+    }
+  },
+  "actions": {
+    "plugin.create": {
+      "endpoint": "POST /addon/create",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "plugin.update": {
+      "endpoint": "POST /addon/modify",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "plugin.edit": {
+      "endpoint": "POST /addon/modify",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "config.create": {
+      "endpoint": "POST /share/create",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "config.update": {
+      "endpoint": "POST /share/modify",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "config.edit": {
+      "endpoint": "POST /share/modify",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "wa.create": {
+      "endpoint": "POST /wa/create",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "wa.update": {
+      "endpoint": "POST /wa/modify",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "wa.edit": {
+      "endpoint": "POST /wa/modify",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "plugin.delete": {
+      "endpoint": "POST /addon/delete",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "config.delete": {
+      "endpoint": "POST /share/delete",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "wa.delete": {
+      "endpoint": "POST /wa/delete",
+      "condition": "edit/update先读detail及作者列表，省略字段由实际重建表单保留；create按必填及条件收集。删除只发一次并读回。",
+      "evidence": "fupload/scripts/fupload_cli/dd.py; tests/test_dd_wire_matrix.py"
+    },
+    "backup.generate": {
+      "endpoint": "本机生成，不请求服务器",
+      "condition": "只使用明确内容选择；create可复用bundle或生成后上传；删除前完整关联检查并逐项重查。",
+      "evidence": "DD100130 components.wow_ui.wow_ui_interface / frontend modules51154,58778; fupload/scripts/fupload_cli/dd_backup.py"
+    },
+    "backup.create": {
+      "endpoint": "POST /backup/pre_create → 选中组对象PUT → POST /backup/finish_create；可再POST /backup/modify_name",
+      "condition": "只使用明确内容选择；create可复用bundle或生成后上传；删除前完整关联检查并逐项重查。",
+      "evidence": "DD100130 components.wow_ui.wow_ui_interface / frontend modules51154,58778; fupload/scripts/fupload_cli/dd_backup.py"
+    },
+    "backup.upload": {
+      "endpoint": "POST /backup/pre_create → 选中组对象PUT → POST /backup/finish_create；可再POST /backup/modify_name",
+      "condition": "只使用明确内容选择；create可复用bundle或生成后上传；删除前完整关联检查并逐项重查。",
+      "evidence": "DD100130 components.wow_ui.wow_ui_interface / frontend modules51154,58778; fupload/scripts/fupload_cli/dd_backup.py"
+    },
+    "backup.rename": {
+      "endpoint": "POST /backup/modify_name",
+      "condition": "只使用明确内容选择；create可复用bundle或生成后上传；删除前完整关联检查并逐项重查。",
+      "evidence": "DD100130 components.wow_ui.wow_ui_interface / frontend modules51154,58778; fupload/scripts/fupload_cli/dd_backup.py"
+    },
+    "backup.delete": {
+      "endpoint": "POST /backup/delete（逐项）",
+      "condition": "只使用明确内容选择；create可复用bundle或生成后上传；删除前完整关联检查并逐项重查。",
+      "evidence": "DD100130 components.wow_ui.wow_ui_interface / frontend modules51154,58778; fupload/scripts/fupload_cli/dd_backup.py"
+    }
+  }
+}

@@ -2,7 +2,7 @@
 name: fupload
 description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, Heybox Workshop, and ModUs.Creator, including local Creator login reuse and plugin ZIP publishing. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, ModUs, plugins, configurations, or WA.
 metadata:
-  version: "1.0.2"
+  version: "1.1.0"
 ---
 
 # Fupload
@@ -16,14 +16,14 @@ When installed from npm, interpret `<fupload-cli>` as `fupload`. Only while main
 When the user has not already stated both dimensions, ask in one short message:
 
 1. Platform: NewBeeBox, DD, CurseForge, Heybox Workshop, or ModUs.
-2. Resource and action: plugin/configuration/WA, then create/content update/metadata edit/delete. CurseForge supports public project listing and uploading a plugin ZIP to an existing project only.
+2. Resource and action: plugin/configuration/WA/cloud backup, then the requested read, generate, upload, create, update, rename, or delete action. CurseForge supports public project listing and uploading a plugin ZIP to an existing project only.
 
 Map natural language consistently:
 
 - `create`: create the main record. If first content is a separate platform action, plan it as a following atomic step.
 - `update`: publish a plugin version, change selected configuration-backup content, or publish a WA/string version.
 - `edit`: change fields allowed by the target platform's action allowlist. For DD plugins, this includes `description`, `html_desc`, `update_desc`, `logo`/`logo_file`, and existing-record commercial, association, room/channel, and creation-statement settings; other first-publication metadata, categories, detail images, and version fields are create/update-only. Logo and announcement edits preserve the published version and package; announcement edits affect the current plugin announcement, not an arbitrary historical version. Edits read both detail and author-list projections; either may confirm the value, but if neither matches, report verification-required. For Logo edits, use the returned `logo_readback` value and source to distinguish a verified change from stale raw detail data. See `references/dd.md` for the input example and existing-record preflight limits.
-- `delete`: delete one main record only. It never deletes an individual version, media object, or associated record.
+- `delete`: delete the explicitly selected record. Cloud backups support a single ID or an explicit batch of IDs; deletion never cascades to configuration shares or uploaded media.
 
 Process multiple explicitly requested records as individual operations. Heybox supports individual version deletion with asynchronous readback; whole-module deletion is not supported. DD task sessions leave the official GUI running.
 
@@ -35,7 +35,7 @@ For DD, use the bundled Python CLI.
 
 For CurseForge, use the bundled Python CLI. Do not substitute direct HTTP calls or the CurseForge for Studios API for uploads: public project lookup uses the Core API, while game-version lookup and upload use the separate Upload API and credential.
 
-For ModUs, use the bundled Python CLI and the local ModUs.Creator login state. Do not use browser cookies, accept a caller-supplied token, or handcraft API requests.
+For ModUs, use the bundled Python CLI. Plugin projects/releases use the local ModUs.Creator login; configurations, WA, backups and main-client discovery use the local main-client login. Do not use browser cookies, accept a caller-supplied token, or handcraft API requests.
 
 For NewBeeBox, apply this order exactly:
 
@@ -56,7 +56,9 @@ For CurseForge, use `~/.fupload/curseforge.env`, created idempotently by npm ins
 
 For DD, use `dd session start` to reuse the running official client's browser session. When DD is not running, it uses the official client's stored auto account and credential. Never request or accept an email address, mobile number, password, token, cookie, credential value, or account-type override. Account and credential values must not appear in CLI output, plans, logs, tests, or analysis evidence; only the safe session source and credential kind may be retained for diagnosis and verification.
 
-For ModUs, authentication comes only from `%LOCALAPPDATA%\ModUs.Creator\auth\token.dat` under the current Windows user. `modus session doctor` reports only token presence, DPAPI decryption, nonempty plaintext, and authenticated API readiness. Never print, copy, hash, or persist the token, ciphertext, Bearer header, or signed upload URL.
+For ModUs.Creator, authentication comes from `%LOCALAPPDATA%\ModUs.Creator\auth\token.dat` under the current Windows user. Main-client commands read only the current official session from its active Local Storage records. Diagnose the matching source with `modus session doctor --client creator|main`; never print, copy, hash, or persist tokens, ciphertext, authorization headers, or signed URLs.
+
+For Heybox, start with `blackbox session doctor`. Existing encrypted HTTP sessions renew on use; never start a browser or send an SMS implicitly. If login is required, use the explicit JSON `session login-start` action for the user's selected sms/wechat method. For sms, ask for the code only after the CLI reports it sent, then use `login-submit` with `--input -`. For wechat, display `image_file` and query `login-status --login-id <id>` after phone confirmation. Phone/code values stay transient and out of argv, plans, and logs. After an uncertain code submission, query status instead of resubmitting the OTP. Pending sessions may be resumed across CLI calls; only a fully verified login replaces the active account. Renewal runs on demand; background scheduling requires a separate user request.
 
 If a token is pasted into the conversation, do not repeat or use it. Tell the user to revoke or regenerate it at its provider and configure the replacement locally. Check only whether the expected field is present, never its length, prefix, hash, or value.
 
@@ -75,7 +77,8 @@ For npm package maintenance, use `fupload update` to update the CLI, managed Pyt
 - Read [references/newbee.md](references/newbee.md) only when the user explicitly selected the third-party Python NewBeeBox channel.
 - Read [references/dd.md](references/dd.md) only for DD.
 - Read [references/curseforge.md](references/curseforge.md) for every CurseForge lookup or upload.
-- Read [references/blackbox.md](references/blackbox.md) for Heybox Workshop plugin list/detail, metadata edit, version upload/edit/delete, and managed web-session authentication.
+- Use [references/platform-fields.md](references/platform-fields.md) as the single field/type/wire reference. Search only the selected platform/action section rather than loading the whole catalog.
+- Read [references/blackbox.md](references/blackbox.md) for Heybox HTTP login steps, plugin/version operations, configuration shares and cloud backups.
 - Read [references/modus.md](references/modus.md) for every ModUs project, addon discovery, release, upload, update, or delete workflow.
 - For Python, run the exact leaf command with `--help` before creating its input. Treat help as the executable schema contract.
 
@@ -95,15 +98,15 @@ For DD, use the one active task session to read game types/builds and the resour
 
 For every existing DD update or edit, GET the detail first and rebuild the official full form before preparing the write. If a legacy record lacks a field now required by the official submit validator, such as `creation_statement`, stop before upload and collect that value. When the missing field belongs to a different action allowlist, perform the prerequisite edit if authorized, read it back, then run the content update; otherwise ask for the missing authorization. Do not send `null`, create defaults, or guessed values to bypass the missing field.
 
-For Heybox Workshop, use Fuploader's managed Chromium web profile. If the profile is missing or the creator API reports an expired session, Fuploader opens the Workshop login page visibly for the user to complete login, then reuses the same profile headlessly for signed protocol requests. Never read the desktop client config or import another browser profile, and never accept a caller-supplied profile, cookie, token, signature, or endpoint. `blackbox plugin list`, `get`, and `versions` are read-only; `plugin edit` preserves omitted module fields by reading the complete module first; `plugin update` and `version-edit` upload or reuse a ZIP URL and verify the version readback; `version-delete` waits for asynchronous soft deletion and retries once when the audit state temporarily returns active. Do not print cookies, tokens, signatures, or temporary COS credentials, and do not delete a whole module.
+For Heybox Workshop, use the encrypted pure HTTP session and explicit SMS/WeChat login steps. No browser profile or desktop account Cookie is imported as the active identity. Login may reuse the official client's device-risk field only; it is not an account credential. Never accept caller-supplied cookies, pkey, tokens, signatures, API URLs, or profile paths. Plugin/version reads and configuration/backup reads resolve current candidates. Metadata edits preserve omitted values; version updates upload or reuse a ZIP URL and verify the final version. Version deletion waits for asynchronous soft deletion, but never automatically sends a second delete when state returns active. Do not print authentication/COS material or delete a whole module.
 
-For ModUs, run `modus session doctor`, then read account info, project list/detail, categories, `game-versions --key wow_builds`, subscription tiers, and the target's release list/detail before writing. Project create/edit requires a completed persisted state in the order `choose_game -> basic_info -> license -> complete`. Publish targets are a nonempty multi-select: ModUs and BigFoot may coexist; ModUs-only, BigFoot-only, and both derive synchronization values 1, 2, and 3. Category `998` is BigFoot-only. Use the returned category IDs. When subscription tiers returns `[]`, “none” is the complete choice and `required_tier_id` remains null.
+For ModUs, run `modus session doctor`, then read account info, project list/detail, categories, `game-versions --key wow_builds`, subscription tiers, and the target's release list/detail before writing. Project create/edit requires a completed persisted state in the order `choose_game -> basic_info -> license -> complete`. Publish targets are a nonempty multi-select: ModUs and BigFoot may coexist; ModUs-only, BigFoot-only, and both derive synchronization values 1, 2, and 3. Category `998` is BigFoot-only. Use the returned category IDs. For non-season projects, an empty subscription-tiers result leaves only “none”, with `required_tier_id` null. For season subscriptions, query `modus options subscription-game-types` and `modus options season-subscription --game-type <returned-code>` for the relevant author. Ordinary tiers cannot substitute for an enabled, unfinished season subscription.
 
 For DD WA create, resolve the required choices before generating JSON, then let the Python CLI supply only the official create defaults for omitted form values: seven-day share and purchase lifetimes, `need_buy=false`, category `ui_original`, `Interface/Addons`, empty VIP levels, and version `0`. Submit category IDs as strings even when a discovery response represents them numerically. WA create/update versions contain digits only; update must be numerically greater than the current remote value. Every `!WA:2!` create/update/edit is reparsed by the installed official `WowUIInterface.parseWa` chain, including unchanged edit content. Do not carry create defaults into WA update/edit; omitted existing fields preserve their remote value.
 
 For official NewBeeBox, use only `ncc whoami -o json` to verify authentication; do not inspect its credential files. For third-party Python NewBeeBox, run `newbee session doctor`; credentials must come from the Windows Known Folder auth-store and all authenticated requests must use fixed official HTTPS origins. For DD, run `dd session doctor`; discovery must accept only an Authenticode-valid executable from an allowed official NetEase publisher. Doctor is local-only and must not start a native login. Do not set endpoint, credential-directory, or DD executable-path environment overrides.
 
-For ModUs, require all four `modus session doctor` booleans to be true before an authenticated read or write. A false result means the local Creator session must be repaired in ModUs.Creator; do not ask for or accept token input.
+For ModUs, require all four doctor booleans for the matching `--client creator|main` to be true before an authenticated read or write. A false result means that client session must be repaired; do not ask for or accept token input.
 
 ## Own one DD task session
 
@@ -117,7 +120,9 @@ Email and mobile differ only during native relogin; borrowed desktop cookies use
 
 For every DD configuration, first list backups, select `backup_sn`, then run `dd config backup-get --sn <backup>`. Select a WTF account/server/role before presenting that account's known/unknown WA choices. For a retail configuration, present the safe edit-mode and cooldown selector metadata. Send only stable IDs and returned selectors; never request, display, store, or reconstruct raw backup objects or retail import strings.
 
-For a configuration, require a cloud backup already uploaded by the matching desktop client. If none exists, ask the user to upload one in the client and stop before writing.
+For a configuration, select an existing cloud backup or generate and upload one through the selected platform's `backup` commands. Use `backup scan` to discover local candidates, then select the game branch, plugins, materials, fonts, and exact WTF account/server/characters. Do not default to every account or character. `generate` only prepares local artifacts; `upload` sends an existing artifact, and `create` combines generation and upload. Read back the new backup before using it in a share. The platform references define different artifact formats and selection fields. When official NewBeeBox `ncc` lacks the requested backup action, explain the boundary and ask once whether to use the Python channel; preserve that choice for the task.
+
+For cloud-backup deletion, run `backup delete-preview` with explicit IDs or the requested name/date filters. Present names, IDs, references, and the exact deletable selection; use those IDs in `backup delete` with `confirm_delete:true`. A referenced backup is always protected, even after confirmation. Incomplete pagination, missing share details, or unknown associations block deletion. Recheck references immediately before each delete and report individual results; never retry an uncertain mutation automatically. Keep backup deletion separate from configuration-share deletion.
 
 ## Resolve business choices
 
@@ -165,4 +170,4 @@ For ModUs `plugin create|upload|update`, require the success transaction to reco
 
 Stop on the first failure. Report completed steps, retained IDs/SNs or media references, the redacted failure stage, whether verification is required, and the smallest safe retry. Explicit DD HTTP/business rejection has `verification_required=false`; interrupted PUT/mutation or failed readback after an accepted write has `verification_required=true`. Native DD failures may include a bounded message, HTTP status, native business code, field validation hints, and `details.log_path`. When `log_path` is present, read only the referenced Fuploader JSONL record under the DD version directory; do not inspect DD's other logs or any credential files. The Fuploader record contains sanitized request and response JSON/body plus byte counts and truncation flags, with signed URLs, cookies, JWTs, credentials, client identifiers, signatures, and tokens recursively redacted. Read back after an uncertain write before resending it. Official NewBeeBox exit codes are `0` success, `1` business error, `2` authentication failure, and `3` network error. Never loop on `quota_exceeded`.
 
-Never print or persist tokens, cookies, JWTs, signed URLs, DD `clientNo`, raw WA strings, or raw configuration backup contents.
+Never print or persist tokens, cookies, JWTs, signed URLs, or DD `clientNo`. Keep raw WA strings and configuration contents out of conversation, logs, and plan records. Selected local backup artifacts may contain the files being uploaded; report their paths and selection summaries instead of their contents.

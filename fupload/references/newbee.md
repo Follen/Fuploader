@@ -1,80 +1,29 @@
-# NewBeeBox third-party Python field and workflow reference
+# 新手盒子 Python 通道操作
 
-Load this reference only after the user explicitly selects Fupload's third-party Python management tool.
-When official `ncc` is installed and the user has not requested the third-party channel, use
-[newbee-official-cli.md](newbee-official-cli.md) and the installed `ncc docs`/leaf help instead.
+此页适用于用户明确选择的第三方 Python 管理通道。官方 ncc 已安装时默认走官方通道，不静默改用 Python。两套通道字段不能互换。
 
-## Session and dynamic reads
+完整 Python 字段与协议映射见[平台字段总表](platform-fields.md#newbee)。官方 ncc 0.1.29 的运行时文档见[官方 CLI 参考](newbee-official-cli.md)，升级后以 ncc docs 和叶子 --help 为准。
 
-Use `newbee session doctor`. Authentication is taken from the Windows Known Folder Roaming AppData path `NewBeeBox/auth-store`. Creator, auth, metadata, next-API, and upload origins are fixed official HTTPS values; environment variables cannot replace them or the credential directory. Never request a token.
+## 登录与读取
 
-- Shared dynamic choices: `options content-origins`, `options subscribe-plans`, `options time-ranges`. Read each before writing its corresponding `content_origin`, nonzero `subscribe_plan_level`, or nonempty `time_range`; an empty response is an error.
-- Plugin choices: `plugin categories`, `plugin game-versions`.
-- Plugin state: `plugin list|get|versions`, `plugin changelog list|get`.
-- Configuration choices: `config backups`, then `config backup-get --id <cloud_id>`.
-- Configuration state: `config list|get`.
-- WA choices: `wa categories --game-version-id`, `wa attachment-paths`.
-- Relationship state: each `plugin`, `config`, and `wa` group exposes `co-author search|list` and `reference search|list`.
+Python 复用当前 Windows 用户官方桌面 auth-store，通过固定官方服务交换 Creator 资源凭据。桌面备份 API 使用桌面 access token；Creator 资源凭据不能代替它。程序不接受用户提交 Cookie、token、域名或本地凭据路径。
 
-Game-version parent IDs distinguish retail, classic, Titan Reforged, and later branches. Always show the live list. Plugin update uses the nested build strings, while WA uses its live numeric game-version ID. Season of Discovery is excluded from live mutation tests.
+先执行 newbee session doctor。分类、游戏分支/build、内容来源、订阅档位及期限均先查询。插件版本兼容使用 build 字符串；WA 的游戏版本用返回的数值 ID，二者不能混用。
 
-## Plugin
+## 创建与更新
 
-`plugin create` fields:
+插件先创建私密记录，上传并读回首版本后，才执行用户明确要求的公开审核。已有更新不能暗改可见性。public 与 submit_for_review 的配对条件见总表。
 
-| Field | Requirement and meaning |
-| --- | --- |
-| `name` | Required name. |
-| `mod_categories` | Required array of at most 5 IDs selected from live categories. |
-| `content_origin` | Required origin selection. |
-| `content_format` | Required description format. |
-| `intro`, `description` | Required short and full descriptions. |
-| `logo` or `logo_file` | One required; remote reference or local upload. |
-| `screenshots`, `screenshot_files` | At least one existing reference or local upload is required by the webpage. |
-| `public` | Required visibility choice; new records may remain private. |
-| `submit_for_review` | Required as `true` when `public=true`. |
-| `subscribe_plan_level`, `link_to_channel`, `co_authors`, `references` | Optional plan/channel choices and complete relation replacements. |
+插件元数据、版本上传、历史 changelog 是不同动作；配置的正文编辑和备份内容更新也分开。edit/update 先读当前值，只覆盖明确字段。公开配置正文 content 是 HTML/Markdown 描述，不是原始 WTF；读取时完整保留，WA 导入串仍做摘要。
 
-`plugin update` publishes one immutable version. Required: `mod_id`, `version`, `game_version_list`, `file`. `game_version_list` contains the live build strings such as `"3.80.2"`, not the parent branch IDs returned as `game_versions[*].id`. Optional: `changelog`, `link_to_channel`. Packages are `.zip`, `.rar`, or `.7z`, at most 300 MB. Existing versions are rejected before upload, and the post-upload readback must confirm both the new file and at least one game-version binding.
+协作者与引用使用各自 set 动作替换完整关系；空数组表示清空。主记录成功读回后才处理关系；失败不盲目重发 create。
 
-`plugin edit` requires `id`; every create metadata field is optional and presence-aware. `public=true` requires `submit_for_review=true` and an existing version. Explicit empty descriptions/screenshots clear only where the platform accepts them.
+## 配置与云备份
 
-Version logs use `plugin changelog edit`: `file_id` and present `changelog`; empty string or null explicitly clears the log.
+配置先选择 cloud_id，再检查插件、被忽略内容和 roleid；不要把客户端角色名称猜成 Creator 角色 ID。更换备份时重新核对所有子选择。
 
-Wire endpoints: `/creator/wow/mod/create|edit`, `/creator/wow/mod_file/upload_mod_file`, and changelog endpoints. Plugin create always sends private `share_state=0` and `link_to_channel=false`. A requested public plugin is a three-step plan: create private, upload/read back the first version, then edit with `public=true` and `submit_for_review=true`.
+backup scan 列出本机候选，generate 按明确账号、服务器、角色与 include_common 生成本地包；upload/create 上传并读回。账号公共配置与每个角色分别打包。字体通过官方 nbb-core 上传选中文件，不接受调用者提供模块路径或接口地址。
 
-## Configuration share
+删除必须先 delete-preview；写入只接受明确 backup_ids 和 confirm_delete=true。任何配置分享引用、缺失详情或不完整分页都拒删；每项前重查，删除后核对列表缺失，模糊结果不重发。
 
-`config create` fields:
-
-| Group | Fields |
-| --- | --- |
-| Backup content | Required `cloud_id`, `linked_mods`, `ignored_unknown_mods`, `ignored_materials`, `ignored_fronts`, `roleid`. |
-| Metadata | Required `title`, `content`, `content_format`, `content_origin`; optional `intro`. |
-| Media | At least one of `picture_urls` or `picture_files`. |
-| Visibility | Required `public`; `submit_for_review=true` when public. |
-| Commercial/channel | Optional `subscribe_plan_level`, `price` (fen), `time_range`, `link_to_channel`, `co_authors`, `references`. |
-
-Each `linked_mods` object supports `mod_id`, `mod_name`, `mod_file_id`, `mod_version`, `display_name`, and `update_type`. Choose these from `backup-get`; do not guess missing file/version values.
-
-`config update` requires `id` and only changes backup content: `cloud_id`, `linked_mods`, the three ignored arrays, and `roleid`. When `cloud_id` is present, all other backup selections are required and must come from that backup.
-
-`config edit` requires `id` and only changes metadata/media/visibility/commercial/channel fields. It cannot change `cloud_id`. Both update and edit GET the current detail and call `/creator/wow/share_config/update` with a complete allowlisted payload. Visibility wire values are `sharing=0/1`. A private record always sends `link_to_channel=false`; `price=0` clears `time_range` before submission.
-
-## WA/string
-
-`wa create` metadata fields: required `game_version_id`, `name`, nonempty `description`, `content_format`, `category_id_list`, `content_origin`, `public`; optional `intro`, `images`, `image_files`, `subscribe_plan_level`, `price` (fen), `time_range`, `link_to_channel`, `attachments`, `co_authors`, `references`. `category_id_list` contains at most 5 live IDs. One of `thumbnail` or `thumbnail_file` is required. `submit_for_review=true` is required when public. A private record always sends `link_to_channel=false`; `price=0` clears `time_range` before submission.
-
-First-version fields are required `wa_str`, `wa_log`, and `string_mode` (`single` or `collection`); `wa_str_titles` is required for collection mode and must follow string order. `wa changelog edit` accepts the log `id`, `wa_log`, and optional `wa_id` for immediate list readback. `wa share-code set` accepts a `module_id` and reads the resulting WA record.
-
-Each attachment object has exactly `name`, `install_type`, `install_path`, `value`, `is_compressed`, and optional `timestamp`. Select install values from `attachment-paths`. `value` is the uploaded attachment index code. `wa media upload` accepts `file`, `kind`, `install_type`, and `install_path`; with `kind=attachment` it follows the production uploadserver v3 prepare, object PUT with callback, and index readback chain, then returns an `attachment` object. Include install values if you want that object to be directly pasteable into `attachments[]`. Use `kind=image` for Creator image media.
-
-`wa update` requires `id`, `wa_str`, `wa_log`; optional `version`, `wa_str_titles`, `link_to_channel`. The provider GETs the next version when omitted and calls `update_wa_str` without metadata changes.
-
-`wa edit` requires `id`; all metadata fields above are optional/presence-aware and it never includes string-version fields. Visibility wire values are private `share_state=2`, public/review `share_state=1`.
-
-Relationship replacement is available both in the main create/edit JSON and as `plugin|config|wa co-author set` or `plugin|config|wa reference set`. Co-author replacement requires `content_id` and `co_authors`; each item is `{user_id,share_percent}` and the total is at most `1`. Reference replacement requires `source_id` and `references`; each item is `{type,id}`. Empty arrays explicitly clear the respective complete relationship. The webpage namespaces are plugin co-author/reference `1/1`, configuration `4/3`, and WA `3/2`. The provider performs the main write first, then replaces each present relation and verifies the matching list endpoint before reporting success. WA-specific attached actions remain `wa media upload`, `wa changelog edit`, and `wa share-code set`.
-
-## Delete
-
-`plugin delete`, `config delete`, and `wa delete` each accept only a positive numeric `id` and `confirm` set to literal `"DELETE"`. The provider reads the target first, invokes the resource-specific main-record endpoint, then verifies the ID is absent from the author list. These commands do not delete one version or uploaded media.
+官方 ncc 的 cloudbackup 当前只有 list/info。Python 的生成、上传、改名和删除不意味着官方 CLI 也提供这些命令；官方独有的 home-page 等字段也不意味着 Python 已接受。

@@ -1,6 +1,6 @@
 {
   "name": "@follenfang/fupload",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Install and run the Fuploader Agent Skill and Python CLI.",
   "type": "module",
   "bin": {
@@ -20,6 +20,8 @@
     "README.md"
   ],
   "scripts": {
+    "build:fields": "python tools/build_platform_fields.py",
+    "check:fields": "python tools/build_platform_fields.py --check --strict",
     "build:manifest": "node npm/scripts/build-skill-manifest.mjs",
     "check:manifest": "node npm/scripts/build-skill-manifest.mjs --check",
     "check:versions": "node npm/scripts/check-release-version.mjs",

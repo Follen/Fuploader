@@ -28,6 +28,8 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Check package and Skill versions
         run: npm run check:versions
+      - name: Check platform field catalog
+        run: npm run check:fields
       - name: Check release tag
         if: startsWith(github.ref, 'refs/tags/v')
         run: npm run check:release

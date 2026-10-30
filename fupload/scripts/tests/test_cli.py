@@ -32,6 +32,47 @@ def parser_leaves(parser, prefix=()):
 
 
 class CLITests(unittest.TestCase):
+    def test_config_public_body_is_full_while_wa_and_auth_secrets_stay_hidden(self) -> None:
+        html = "<p>公开配置说明</p>" * 200
+        for platform in ("newbee", "modus"):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                write_output(platform, "config.get", {"content": html, "contentText": html,
+                                                      "codeText": "!WA:2!private-import", "pkey": "private-auth",
+                                                      "phone": "fixture-phone", "code": "0042", "business_code": 200})
+            data = json.loads(out.getvalue())["data"]
+            self.assertEqual(data["content"], html)
+            if platform == "modus":
+                self.assertEqual(data["contentText"], html)
+            self.assertIn("codeText_summary", data)
+            self.assertEqual(data["pkey"], "[REDACTED]")
+            self.assertEqual(data["phone"], "[REDACTED]")
+            self.assertEqual(data["code"], "[REDACTED]")
+            self.assertEqual(data["business_code"], 200)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            write_output("dd", "wa.get", {"content": "private-import", "codeText": "private-import"})
+        self.assertNotIn("private-import", out.getvalue())
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            write_output("modus", "wa.get", {"content": html, "contentText": html, "codeText": "private-import"})
+        data = json.loads(out.getvalue())["data"]
+        self.assertEqual(data["content"], html)
+        self.assertEqual(data["contentText"], html)
+        self.assertNotIn("private-import", out.getvalue())
+
+    def test_public_html_and_metadata_are_complete_but_secrets_redacted(self) -> None:
+        html = '<p>' + '完整正文<img src="https://example.com/image.png">' * 100 + '</p>'
+        safe = sanitize_output({"Article": html, "description": html,
+                                "changelog": html, "license_content": html,
+                                "nested": {"access_token": "private"}})
+        for key in ("Article", "description", "changelog", "license_content"):
+            self.assertEqual(safe[key], html)
+        self.assertEqual(safe["nested"]["access_token"], "[REDACTED]")
+        from fupload_cli.errors import redact
+        self.assertEqual(len(redact("x" * 3000)), 1000)
+        self.assertNotIn("private", sanitize_output("x" * 3000 + " Bearer private"))
+
     def test_root_help_lists_all_platforms(self) -> None:
         text = build_parser().format_help()
         self.assertIn("newbee", text)
@@ -89,7 +130,8 @@ class CLITests(unittest.TestCase):
     def test_every_schema_field_is_in_platform_reference(self) -> None:
         root = Path(__file__).resolve().parents[2]
         references = {
-            platform: (root / "references" / (platform + ".md")).read_text(encoding="utf-8")
+            platform: (root / "references" / (platform + ".md")).read_text(encoding="utf-8") +
+                      (root / "references" / "platform-fields.md").read_text(encoding="utf-8")
             for platform in ("newbee", "dd", "curseforge", "blackbox", "modus")
         }
         for (platform, resource, action), schema in sorted(SCHEMAS.items()):
@@ -144,7 +186,7 @@ class CLITests(unittest.TestCase):
         self.assertIn("ncc community post", official)
         self.assertIn("## ncc.json 配置说明", official)
         self.assertIn("NCC_TOKEN", official)
-        self.assertIn("## 错误码参考", official)
+        self.assertIn("## 错误码枚举", official)
 
     def test_skill_keeps_newbee_token_out_of_agent_commands(self) -> None:
         root = Path(__file__).resolve().parents[2]
@@ -251,13 +293,11 @@ class CLITests(unittest.TestCase):
         safe = sanitize_output({
             "codeText": "!WA:2!private",
             "contentText": "private article",
-            "changelog": "private change",
             "logo_base64": "AAEC",
         })
         self.assertNotIn("private", repr(safe))
         self.assertEqual(safe["codeText_summary"]["bytes"], len("!WA:2!private".encode("utf-8")))
         self.assertEqual(safe["contentText_summary"]["bytes"], len("private article".encode("utf-8")))
-        self.assertEqual(safe["changelog_summary"]["bytes"], len("private change".encode("utf-8")))
         self.assertEqual(safe["logo_base64_summary"]["bytes"], 3)
         self.assertEqual(safe["logo_base64_summary"]["source_encoding"], "base64")
 

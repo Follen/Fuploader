@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import contextlib
+import io
+import json
+import tempfile
 import unittest
 from pathlib import Path
 import sys
@@ -193,6 +197,91 @@ class ModusProjectSchemaTests(unittest.TestCase):
         self.assertEqual(document["name"], "Fixture project")
         self.assertEqual(document["publish_platforms"], ["modus", "bigfoot"])
         self.assertEqual(document["license"]["type"], "All Rights Reserved")
+
+    def test_top_level_license_and_platform_conflicts_are_rejected(self) -> None:
+        for override in ({"license": {"type": "MIT"}}, {"publish_platforms": ["modus"]}):
+            for action in ("create", "edit"):
+                with self.subTest(override=override, action=action):
+                    provider = ModUs("TOKEN", authenticate=False)
+                    document = self._document(**override)
+                    if action == "edit":
+                        document["project_id"] = 9
+                    with mock.patch.object(provider, "options") as options, mock.patch.object(provider, "_request") as request:
+                        with self.assertRaisesRegex(ValidationError, "conflicts with project_state"):
+                            provider.execute_write("project", action, document)
+                    options.assert_not_called()
+                    request.assert_not_called()
+
+    def test_top_level_equivalent_license_and_platforms_remain_compatible(self) -> None:
+        document = self._document()
+        license_value = document["project_state"]["license"]
+        document.update({
+            "license": {"template": license_value["type"], "copyrightHolder": license_value["holder"],
+                        "copyrightYear": license_value["year"], "licenseContent": license_value["content"]},
+            "publish_platforms": ["bigfoot", "modus"],
+        })
+        result = _project_document(document)
+        self.assertEqual(result["license"], license_value)
+        self.assertEqual(result["publish_platforms"], ["modus", "bigfoot"])
+        self.assertEqual(_project_wire(result)["synchronizationType"], 3)
+
+    def test_top_level_effective_metadata_is_revalidated_by_snapshot_rules(self) -> None:
+        for override, message in (({"required_tier_id": 12}, "must be null"),
+                                  ({"categories": [998]}, "category 998"),
+                                  ({"categories": [1, 2, 3, 4, 5, 6]}, "at most five"),
+                                  ({"synchronization_type": 1}, "must match")):
+            with self.subTest(override=override):
+                with self.assertRaisesRegex(ValidationError, message):
+                    _project_document(self._document(**override))
+
+    def test_top_level_valid_metadata_overrides_remain_effective(self) -> None:
+        document = self._document_with_basic_info(publish_platforms=["modus"])
+        document.update({"name": "Updated project", "summary": "Updated summary", "categories": [1801],
+                         "required_tier_id": 12, "repo_url": "https://example.invalid/new", "description": None,
+                         "images": 0, "image_ops": [{"op": "delete", "name": "1.webp"}]})
+        result = _project_document(document)
+        for field in ("name", "summary", "categories", "required_tier_id", "repo_url", "description", "images", "image_ops"):
+            self.assertEqual(result[field], document[field])
+        self.assertEqual(_project_wire(result)["requiredTierId"], "12")
+
+    def test_schema_and_cli_dry_run_reject_effective_project_conflicts(self) -> None:
+        from fupload_cli.cli import main
+
+        for action in ("create", "edit"):
+            schema = get_schema("modus", "project", action)
+            for override in ({"license": {"type": "MIT"}}, {"publish_platforms": ["modus"]},
+                             {"required_tier_id": 12}, {"categories": [998]}):
+                with self.subTest(action=action, override=override):
+                    document = self._document(**override)
+                    document["schema"] = schema.name
+                    if action == "edit":
+                        document["project_id"] = 9
+                    with self.assertRaises(ValidationError):
+                        schema.validate(document)
+                    with tempfile.TemporaryDirectory() as directory:
+                        source = Path(directory) / "project.json"
+                        source.write_text(json.dumps(document), encoding="utf-8")
+                        output = io.StringIO()
+                        with mock.patch("fupload_cli.cli._modus_provider") as provider, contextlib.redirect_stdout(output):
+                            status = main(["modus", "project", action, "--input", str(source), "--dry-run"])
+                        self.assertEqual(status, 2)
+                        provider.assert_not_called()
+                        self.assertFalse(json.loads(output.getvalue())["success"])
+
+    def test_valid_project_metadata_dry_run_does_not_construct_provider(self) -> None:
+        from fupload_cli.cli import main
+
+        document = self._document(name="Updated", license=self._document()["project_state"]["license"],
+                                  publish_platforms=["bigfoot", "modus"])
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "project.json"
+            source.write_text(json.dumps(document), encoding="utf-8")
+            output = io.StringIO()
+            with mock.patch("fupload_cli.cli._modus_provider") as provider, contextlib.redirect_stdout(output):
+                status = main(["modus", "project", "create", "--input", str(source), "--dry-run"])
+            self.assertEqual(status, 0)
+            provider.assert_not_called()
+            self.assertTrue(json.loads(output.getvalue())["data"]["schema_valid"])
 
     def test_project_create_requires_completed_state_snapshot(self) -> None:
         with self.assertRaisesRegex(ValidationError, "field is required"):

@@ -103,33 +103,57 @@ class CurseForge:
     def project_list(self, author_id: Optional[int]) -> Dict[str, Any]:
         _required(self.config, "CURSEFORGE_API_KEY")
         selected = _author_id(author_id if author_id is not None else self.config.get("CURSEFORGE_AUTHOR_ID"))
-        query = urllib.parse.urlencode({"gameId": 1, "authorId": selected, "index": 0, "pageSize": 50})
-        url = CORE_BASE + "/v1/mods/search?" + query
-        payload = json_request(url, headers={"x-api-key": self.config["CURSEFORGE_API_KEY"]})
-        if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
-            raise FuploadError("CurseForge project response did not contain a data array", kind="platform_data_error", endpoint=url)
-        pagination = payload.get("pagination") if isinstance(payload.get("pagination"), dict) else {}
-        projects = []
-        for item in payload["data"]:
-            if not isinstance(item, dict):
-                raise FuploadError("CurseForge project response contained a non-object item", kind="platform_data_error", endpoint=url)
-            projects.append({
-                "id": item.get("id"),
-                "name": item.get("name"),
-                "slug": item.get("slug"),
-                "status": item.get("status"),
-                "dateCreated": item.get("dateCreated"),
-                "dateModified": item.get("dateModified"),
-            })
-        total_count = pagination.get("totalCount")
-        if isinstance(total_count, bool) or not isinstance(total_count, int) or total_count < 0:
-            total_count = len(projects)
+        projects, seen = [], set()
+        index, pages, total_count, pagination = 0, 0, None, {}
+        while index < 10000:
+            page_size = min(50, 10000 - index)
+            query = urllib.parse.urlencode({"gameId": 1, "authorId": selected, "index": index, "pageSize": page_size})
+            url = CORE_BASE + "/v1/mods/search?" + query
+            payload = json_request(url, headers={"x-api-key": self.config["CURSEFORGE_API_KEY"]})
+            if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
+                raise FuploadError("CurseForge project response did not contain a data array", kind="platform_data_error", endpoint=url)
+            rows = payload["data"]
+            current = payload.get("pagination") if isinstance(payload.get("pagination"), dict) else {}
+            count = current.get("totalCount")
+            if "totalCount" in current:
+                if type(count) is not int or count < 0 or count > 10000:
+                    raise FuploadError("CurseForge project total is invalid or exceeds the 10000-result API limit", kind="platform_data_error", endpoint=url)
+                if total_count is not None and count != total_count:
+                    raise FuploadError("CurseForge project total changed during pagination", kind="platform_data_error", endpoint=url)
+                total_count = count
+            if len(rows) > page_size or "index" in current and (type(current["index"]) is not int or current["index"] != index) or "resultCount" in current and (type(current["resultCount"]) is not int or current["resultCount"] != len(rows)):
+                raise FuploadError("CurseForge project pagination does not match the requested page", kind="platform_data_error", endpoint=url)
+            if "pageSize" in current and (type(current["pageSize"]) is not int or current["pageSize"] < 0 or current["pageSize"] == 0 and rows or current["pageSize"] > 50):
+                raise FuploadError("CurseForge project response exceeds the page-size contract", kind="platform_data_error", endpoint=url)
+            if pages == 0:
+                pagination = dict(current)
+            pages += 1
+            for item in rows:
+                if not isinstance(item, dict) or type(item.get("id")) is not int or item["id"] <= 0 or item["id"] in seen:
+                    raise FuploadError("CurseForge project pagination contains a missing or repeated project ID", kind="platform_data_error", endpoint=url)
+                seen.add(item["id"])
+                projects.append({key: item.get(key) for key in ("id", "name", "slug", "status", "dateCreated", "dateModified")})
+            if total_count is not None:
+                if len(projects) > total_count or not rows and len(projects) < total_count:
+                    raise FuploadError("CurseForge project pagination is incomplete", kind="platform_data_error", endpoint=url)
+                if len(projects) == total_count:
+                    break
+            elif not rows:
+                total_count = len(projects)
+                break
+            index += len(rows)
+        else:
+            raise FuploadError("CurseForge project pagination reached the 10000-result API limit before completion", kind="platform_data_error")
+        pagination.update({"totalCount": total_count, "resultCount": len(projects)})
         return {
             "author_id": selected,
             "game_id": 1,
             "total_count": total_count,
             "projects": projects,
             "pagination": pagination,
+            "pages": pages,
+            "complete": True,
+            "author_scope": "member",
         }
 
     def game_versions(self) -> Any:

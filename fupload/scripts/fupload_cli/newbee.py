@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import http.client
 import json
@@ -17,6 +18,7 @@ from .errors import FuploadError, ValidationError
 from .transport import json_request, multipart_request
 from .newbee_auth import API_BASE, API_ORIGIN, auth_store_dir, creator_headers
 from .trust import NEWBEE_ORIGINS
+from .newbee_backup import NewBeeBackupMixin, generate_backup, scan_backup
 
 
 METADATA_URL = NEWBEE_ORIGINS["metadata"] + "/modconfig.json"
@@ -112,6 +114,16 @@ def _selected_names(value: Any) -> List[str]:
         else:
             raise FuploadError("remote selected-name item was not a nonempty string", kind="platform_data_error")
     return found
+
+
+def _selected_layouts(value: Any) -> List[Any]:
+    """Preserve server-owned layout objects without guessing their item schema."""
+    decoded = _decode(value)
+    if decoded is None:
+        return []
+    if not isinstance(decoded, list):
+        raise FuploadError("remote selected_eml field was not an array", kind="platform_data_error")
+    return copy.deepcopy(decoded)
 
 
 def _version_greater(candidate: Any, current: Any) -> bool:
@@ -261,7 +273,7 @@ def _wa_summary(item: Mapping[str, Any]) -> Dict[str, Any]:
     }
 
 
-class NewBee:
+class NewBee(NewBeeBackupMixin):
     platform = "newbee"
 
     def __init__(self) -> None:
@@ -411,7 +423,7 @@ class NewBee:
                         for role in _list((server or {}).get("roleList")):
                             roles.append({
                                 "account": (account or {}).get("account"), "server": (server or {}).get("serverName"),
-                                "name": (role or {}).get("name"), "role_id": (role or {}).get("role_id"),
+                                "name": (role or {}).get("name"), "role_id": str((role or {}).get("role_id") or ""),
                             })
                 return {
                     "cloud_id": cloud_id, "name": item.get("t_name"), "linked_mods": linked,
@@ -498,6 +510,7 @@ class NewBee:
             "ignored_materials": _list(_pick(detail, "t_ignored_materials", "ignored_materials", default=[])),
             "ignored_fronts": _list(_pick(detail, "t_ignored_fronts", "ignored_fronts", default=[])),
             "roleid": str(_pick(detail, "t_roleid", "roleid", "role_id", default="")),
+            "selected_eml": _selected_layouts(_pick(detail, "t_selected_eml", "selected_eml", default=[])),
         }
 
     def list_was(self, keyword: str, offset: int, size: int) -> Any:
@@ -971,7 +984,7 @@ class NewBee:
         return result
 
     def _config_form(self, ident: int, detail: Dict[str, Any]) -> Dict[str, Any]:
-        return {
+        form = {
             "tid": ident, "cloud_id": int(_pick(detail, "t_cloudblackid", "cloud_id", default=0) or 0),
             "title": str(_pick(detail, "t_title", "title", default="")),
             "content": str(_pick(detail, "t_content", "content", default="")),
@@ -990,6 +1003,11 @@ class NewBee:
             "ignored_fronts": _selected_names(_pick(detail, "t_ignored_fronts", "ignored_fronts", default=[])),
             "roleid": str(_pick(detail, "t_roleid", "roleid", "role_id", default="")),
         }
+        # Native config updates carry this field. It is not a caller mutation
+        # field: retain the exact existing objects, including unknown keys.
+        if "t_selected_eml" in detail or "selected_eml" in detail:
+            form["selected_eml"] = _selected_layouts(_pick(detail, "t_selected_eml", "selected_eml", default=[]))
+        return form
 
     def create_config(self, doc: Dict[str, Any]) -> Any:
         backup = self.get_backup(int(doc["cloud_id"]))
@@ -1075,6 +1093,8 @@ class NewBee:
             expected["public"] = bool(form["sharing"])
         if doc.get("picture_files"):
             expected["picture_urls"] = form["pic_url"]
+        if "selected_eml" in form:
+            expected["selected_eml"] = form["selected_eml"]
         _require_readback(expected, readback, "/creator/wow/share_config/details_aps")
         relationships = self._replace_relationships("config", ident, doc)
         return {"result": result, "review_intent": bool(doc.get("public") and doc.get("submit_for_review")), "readback": readback, "relationships": relationships}
@@ -1295,6 +1315,15 @@ class NewBee:
                 raise ValidationError("install type/path is not in the current platform options", path=path + ".install_path")
 
     def execute_write(self, resource: str, action: str, doc: Dict[str, Any]) -> Any:
+        if resource == "backup":
+            if action == "generate": return generate_backup(doc)
+            if action in ("upload", "create"):
+                if "bundle_file" not in doc:
+                    generated = generate_backup(doc)
+                    doc = dict(doc, bundle_file=generated["bundle_file"])
+                return self.upload_backup(doc)
+            if action == "rename": return self.rename_backup(doc)
+            if action in ("delete", "delete-many"): return self.delete_backups(doc)
         if action == "delete" and resource in ("plugin", "config", "wa"):
             return self.delete(resource, doc)
         if (resource, action) == ("plugin", "create"): return self.create_plugin(doc)
@@ -1369,6 +1398,11 @@ class NewBee:
         return {"result": response, "deleted": True, "id": ident, "before": before, "readback": {"present": False}}
 
     def execute_read(self, resource: str, action: str, args: Any) -> Any:
+        if resource == "backup":
+            if action == "list": return self.cloud_backups()
+            if action == "get": return self.cloud_backup(args.id)
+            if action == "scan": return scan_backup(args.game_dir)
+            if action == "delete-preview": return self.backup_preview_selection(args)
         if resource == "session" and action == "doctor":
             self.headers
             return {

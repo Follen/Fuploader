@@ -2,20 +2,24 @@
 from __future__ import annotations
 import hashlib, json, time, zipfile
 from pathlib import Path
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import parse_qsl, urlsplit, urlunsplit
 from typing import Any, Mapping
 from .errors import FuploadError, ValidationError
-from .blackbox_web import API_ORIGIN, BlackboxWebSession
+from .blackbox_web import API_ORIGIN
+from .blackbox_http import BlackboxHttpSession
+from .blackbox_auth import BlackboxAuth
+from .blackbox_config import BlackboxConfigMixin
+from .blackbox_backup import BlackboxBackupMixin
 
 API_MISC_BASE = "https://api.xiaoheihe.cn"
 API_BASE = API_ORIGIN
 
-class Blackbox:
+class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin):
     def __init__(self, config: Mapping[str, Any] | None = None, transport=None, *, web_session=None, web_session_factory=None):
         self.config = dict(config or {})
         self._transport = transport
         self._web_session = web_session
-        self._web_session_factory = web_session_factory or BlackboxWebSession
+        self._web_session_factory = web_session_factory or BlackboxHttpSession
 
     def close(self):
         if self._web_session is not None:
@@ -41,6 +45,26 @@ class Blackbox:
     @staticmethod
     def _result(payload): return payload.get("result") or {}
     def execute_read(self, resource: str, action: str, args: Any):
+        if resource == "session":
+            return BlackboxAuth().execute_read(action, args)
+        def argument(name):
+            return args.get(name) if isinstance(args, Mapping) else getattr(args, name, None)
+        if resource == "options" and action == "game-types":
+            result = self._result(self._request("GET", "/wow/v2/dynamic_conf/"))
+            rows = result.get("strappidInfos") if isinstance(result, dict) else None
+            if not isinstance(rows, list) or not rows or not all(isinstance(row, dict) for row in rows):
+                raise FuploadError("Heybox dynamic game branches are incomplete", kind="protocol_error")
+            return {"items": self._redact(rows)}
+        if resource == "config":
+            if action == "list": return self.config_list(argument("strappid"))
+            if action == "get": return self.config_get(argument("share_id"))
+        if resource == "backup":
+            if action == "scan":
+                return self.backup_scan({key: argument(key) for key in ("game_dir", "strappid")})
+            if action == "list": return self.backup_list()
+            if action == "get": return self.backup_get(argument("backup_id"))
+            if action == "delete-preview":
+                return self.backup_delete_preview({key: argument(key) for key in ("backup_id", "backup_ids", "name_contains", "name_equals", "created_before", "created_after") if argument(key) is not None})
         if resource == "plugin" and action in ("list", "get", "versions"):
             if action == "list": return self.plugin_list()
             module_id = getattr(args,"module_id",None) if not isinstance(args,Mapping) else args.get("module_id")
@@ -48,6 +72,18 @@ class Blackbox:
             return result["versions"] if action == "versions" else result
         raise ValidationError("unsupported blackbox read operation")
     def execute_write(self, resource: str, action: str, doc: Mapping[str,Any]):
+        if resource == "session":
+            return BlackboxAuth().execute_write(action, doc)
+        if resource == "config":
+            if action in ("create", "update", "edit"): return self.config_upsert(doc, create=action == "create")
+            if action == "delete": return self.config_delete(doc)
+        if resource == "backup":
+            if action == "generate": return self.backup_generate(doc)
+            if action == "create": return self.backup_create(doc)
+            if action == "upload": return self.backup_upload(doc)
+            if action == "rename": return self.backup_rename(doc)
+            if action == "delete-preview": return self.backup_delete_preview(doc)
+            if action == "delete": return self.backup_delete(doc)
         if doc.get("dry_run"): return {"dry_run":True,"operation":f"{resource}.{action}","fields":sorted(k for k in doc if k not in {"dry_run","schema"})}
         if resource == "plugin" and action == "edit": return self.module_edit(doc)
         if resource == "plugin" and action == "update": return self.version_upsert(doc)
@@ -125,13 +161,7 @@ class Blackbox:
             time.sleep(settle)
             current = self._find_version(int(module_id), int(version_id))
             if current is not None and current.get("auditState") != 4:
-                retry = True
-                response = self._request("POST","/wow/open_platform/module_version/delete/",body={"versionId":int(version_id),"moduleId":int(module_id)})
-                found = self._wait_version(int(module_id),int(version_id),None,deleted=True)
-                time.sleep(settle)
-                current = self._find_version(int(module_id), int(version_id))
-                if current is not None and current.get("auditState") != 4:
-                    raise FuploadError("version delete did not remain stable",kind="verification_required",verification_required=True)
+                raise FuploadError("version delete did not remain stable; read back before another delete",kind="verification_required",verification_required=True)
         return {"accepted":True,"verified":True,"module_id":int(module_id),"version_id":int(version_id),"audit_state":found.get("auditState") if found else None,"retry":retry,"response":self._redact(response)}
     def _version_rows(self,module_id):
         limit = int(self.config.get("version_page_size", 100))
@@ -196,7 +226,10 @@ class Blackbox:
         if isinstance(value,(list,tuple)): return [Blackbox._redact(v) for v in value]
         if isinstance(value,str):
             parsed=urlsplit(value)
-            if parsed.scheme in {"http","https"} and parsed.netloc and parsed.query:
+            if parsed.scheme in {"http","https"} and parsed.netloc and parsed.query and any(
+                any(marker in key.lower() for marker in ("signature", "credential", "token", "key-time", "accesskeyid", "hkey", "pkey", "authorization"))
+                for key, _ in parse_qsl(parsed.query)
+            ):
                 return urlunsplit((parsed.scheme,parsed.netloc,parsed.path,"<redacted>",parsed.fragment))
         return value
 

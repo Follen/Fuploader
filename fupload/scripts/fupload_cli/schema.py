@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import os
+import re
+import json
+from pathlib import Path
 import struct
 import zipfile
 from dataclasses import dataclass, field
@@ -127,6 +130,22 @@ class Schema:
         return checked
 
     def _validate_conditionals(self, value: Dict[str, Any]) -> None:
+        if self.name.startswith("fupload.v1.blackbox.session."):
+            action = self.name.rsplit(".", 1)[1]
+            if action == "login-start":
+                if value.get("method") == "sms":
+                    if not isinstance(value.get("phone"), str) or not re.fullmatch(r"1[3-9][0-9]{9}", value["phone"]):
+                        raise ValidationError("SMS login requires a mainland China mobile number in input JSON", path="$.phone")
+                elif "phone" in value:
+                    raise ValidationError("phone must be omitted for WeChat login", path="$.phone")
+            if "login_id" in value and not re.fullmatch(r"[a-f0-9]{32}", value["login_id"]):
+                raise ValidationError("login_id must be 32 lowercase hexadecimal characters", path="$.login_id")
+            if "code" in value and not re.fullmatch(r"[0-9]{4,8}", value["code"]):
+                raise ValidationError("SMS code must contain 4 to 8 digits in input JSON", path="$.code")
+        if ".backup." in self.name:
+            _validate_backup_document(self.name, value)
+        if self.name.startswith("fupload.v1.blackbox.config."):
+            _validate_blackbox_configuration(self.name, value)
         if self.name.startswith("fupload.v1.modus.config"):
             exclude = value.get("exclude_wtf")
             if exclude == 1 and (value.get("account_name") or value.get("role_name")):
@@ -174,22 +193,16 @@ class Schema:
                     path="$.synchronization_type",
                 )
         if self.name in ("fupload.v1.modus.project.create", "fupload.v1.modus.project.edit"):
-            snapshot = value.get("project_state")
-            if snapshot is None:
-                raise ValidationError(
-                    "completed project_state is required; submit choose_game, basic_info, then license",
-                    path="$.project_state",
-                )
-            # Keep the persisted form contract in one place. Restoring the
-            # snapshot validates every completed prerequisite and its order.
-            from .state_machine import COMPLETE, ProjectStateMachine
+            # Share effective-form validation with execution. The import is
+            # local to validation; modus has no dependency on schema and this
+            # helper performs no authentication or network requests.
+            from .modus import _project_document
 
-            machine = ProjectStateMachine.from_snapshot(snapshot)
-            if machine.state != COMPLETE:
-                raise ValidationError(
-                    "project state must be complete before submission",
-                    path="$.project_state.state",
-                )
+            _project_document(value)
+        if self.name == "fupload.v1.modus.project.delete" or self.name.startswith("fupload.v1.modus.plugin."):
+            from .modus import _full_project_id
+
+            _full_project_id(value["project_id"])
         for name in ("id", "project_id", "mod_id", "file_id", "content_id", "source_id", "module_id", "version_id", "game_version_id", "cloud_id"):
             if name in value and isinstance(value[name], int) and value[name] <= 0:
                 raise ValidationError("must be greater than zero", path="$.%s" % name)
@@ -448,7 +461,7 @@ class Schema:
             scalar_array("core_folders", (str,), "array must contain nonempty folder names")
             if "core_folders" in value and any(not item.strip() for item in value["core_folders"]):
                 raise ValidationError("array must contain nonempty folder names", path="$.core_folders")
-            if "file" in value and not zipfile.is_zipfile(value["file"]):
+            if self.name.startswith(("fupload.v1.blackbox.plugin.", "fupload.v1.blackbox.version.")) and "file" in value and not zipfile.is_zipfile(value["file"]):
                 raise ValidationError("file must be a valid ZIP archive", path="$.file")
         if self.name.startswith("fupload.v1.modus"):
             object_array(
@@ -532,6 +545,192 @@ class Schema:
                     raise ValidationError("must not be empty", path="$.%s" % name)
             if self.name.startswith("fupload.v1.modus.plugin") and "file" in value and not zipfile.is_zipfile(value["file"]):
                 raise ValidationError("file must be a valid ZIP archive", path="$.file")
+
+
+def _strict_object(value: Any, allowed: set[str], required_keys: set[str], path: str) -> Mapping[str, Any]:
+    if not isinstance(value, dict):
+        raise ValidationError("expected object", path=path)
+    if set(value) - allowed:
+        raise ValidationError("unknown nested field(s): " + ", ".join(sorted(set(value) - allowed)), path=path)
+    if required_keys - set(value):
+        raise ValidationError("missing nested field(s): " + ", ".join(sorted(required_keys - set(value))), path=path)
+    return value
+
+
+def _backup_name(value: Any, path: str) -> str:
+    if not isinstance(value, str) or not value.strip() or value in (".", "..") or re.search(r'[\\/:*?"<>|\x00-\x1f]', value):
+        raise ValidationError("expected a plain file or directory name", path=path)
+    return value
+
+
+def _positive_integer(value: Any, path: str) -> None:
+    if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+        raise ValidationError("expected a positive integer", path=path)
+
+
+def _validate_backup_document(schema_name: str, value: Mapping[str, Any]) -> None:
+    platform, action = schema_name.split(".")[2], schema_name.rsplit(".", 1)[1]
+    if "backup_ids" in value:
+        ids = value["backup_ids"]
+        if not ids or len(ids) != len({str(item) for item in ids}):
+            raise ValidationError("backup_ids must be nonempty and unique", path="$.backup_ids")
+        for item in ids:
+            if platform in ("newbee", "modus"):
+                _positive_integer(item, "$.backup_ids")
+            elif not isinstance(item, str) or not item.strip():
+                raise ValidationError("backup_ids must contain nonempty strings", path="$.backup_ids")
+    package_field = {"newbee": "bundle_file", "dd": "bundle_file", "blackbox": "file"}.get(platform)
+    if platform == "modus":
+        package_field = "manifest_file"
+    if package_field and package_field in value:
+        try:
+            package = json.loads(Path(value[package_field]).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            raise ValidationError("backup package must be a readable JSON object", path="$." + package_field) from exc
+        expected_schema = {"newbee": "fupload.newbee.backup-bundle.v1", "dd": "fupload.dd.backup-bundle.v1", "blackbox": "fupload.blackbox.backup-package.v1", "modus": "config-backup.v2"}.get(platform)
+        if not isinstance(package, dict) or expected_schema is not None and package.get("schemaVersion" if platform == "modus" else "schema") != expected_schema:
+            raise ValidationError("unrecognized backup package schema", path="$." + package_field)
+    if action not in ("generate", "create"):
+        return
+    if package_field and package_field in value:
+        generation_fields = {"game_dir", "game_type", "game_version_id", "output_dir", "strappid", "known_plugins", "unknown_plugins", "materials", "fonts", "wtf_accounts", "include_wtf_root", "addon_names", "unknown_addons", "known_addons", "strategies"}
+        if set(value) & generation_fields:
+            raise ValidationError("a package file cannot be combined with generation fields", path="$." + package_field)
+        return
+    root_field = "game_root" if platform == "modus" else "game_dir"
+    for field_name in (root_field, "output_dir"):
+        if not isinstance(value.get(field_name), str) or not value[field_name].strip():
+            raise ValidationError("field is required for generation", path="$." + field_name)
+    if not os.path.isdir(value[root_field]):
+        raise ValidationError("game directory does not exist", path="$." + root_field)
+    if os.path.exists(value["output_dir"]) and (platform != "newbee" or not os.path.isdir(value["output_dir"]) or os.listdir(value["output_dir"])):
+        raise ValidationError("output_dir must not already exist", path="$.output_dir")
+    root, output = os.path.realpath(value[root_field]), os.path.realpath(value["output_dir"])
+    try:
+        nested = os.path.commonpath((root, output)) == root
+    except ValueError:
+        nested = False
+    if nested:
+        raise ValidationError("output_dir must be outside the game directory", path="$.output_dir")
+    if platform in ("newbee", "dd"):
+        _positive_integer(value.get("game_version_id" if platform == "newbee" else "game_type"), "$.game_version_id" if platform == "newbee" else "$.game_type")
+    if platform == "blackbox" and (not isinstance(value.get("strappid"), str) or not re.fullmatch(r"wow[a-z0-9_]+", value["strappid"])):
+        raise ValidationError("strappid must identify a WoW game branch", path="$.strappid")
+    if platform == "blackbox" and not {"unknown_addons", "materials", "fonts", "wtf_accounts"}.issubset(value):
+        raise ValidationError("generation requires explicit unknown_addons, materials, fonts and wtf_accounts arrays")
+    string_arrays = ("addon_names", "font_names", "material_names") if platform == "modus" else (("unknown_plugins", "materials", "fonts") if platform == "newbee" else (("unknown_addons", "materials", "fonts") if platform == "blackbox" else ("addon_names", "unknown_addons", "materials", "fonts")))
+    for field_name in string_arrays:
+        names = value.get(field_name, [])
+        for index, item in enumerate(names):
+            _backup_name(item, "$.%s[%d]" % (field_name, index))
+        if len({item.casefold() for item in names}) != len(names):
+            raise ValidationError("selection contains duplicate names", path="$." + field_name)
+        prefix = ("Interface", "AddOns") if field_name in ("addon_names", "unknown_addons", "unknown_plugins") else (("Fonts",) if field_name in ("fonts", "font_names") else ("Interface",))
+        for item in names:
+            source = Path(value[root_field]).joinpath(*prefix, item)
+            if not source.exists() or not source.resolve().is_relative_to(Path(root)):
+                raise ValidationError("selected backup source is missing or outside the game directory", path="$." + field_name)
+            if field_name in ("materials", "material_names") and item.casefold() == "addons":
+                raise ValidationError("select addon directories through the addon field", path="$." + field_name)
+    if platform == "modus":
+        seen = set()
+        for index, role in enumerate(value.get("roles", [])):
+            path = "$.roles[%d]" % index
+            _strict_object(role, {"account", "server", "role"}, {"account", "server", "role"}, path)
+            key = tuple(_backup_name(role[field_name], path + "." + field_name).casefold() for field_name in ("account", "server", "role"))
+            if key in seen:
+                raise ValidationError("duplicate role selection", path=path)
+            seen.add(key)
+            if not Path(value[root_field], "WTF", "Account", role["account"], role["server"], role["role"]).is_dir():
+                raise ValidationError("selected WTF role directory does not exist", path=path)
+    else:
+        seen_accounts = set()
+        for index, account in enumerate(value.get("wtf_accounts", [])):
+            path = "$.wtf_accounts[%d]" % index
+            if platform == "blackbox":
+                _strict_object(account, {"name", "characters"}, {"name", "characters"}, path)
+                name = _backup_name(account["name"], path + ".name")
+                roles, fields = account["characters"], ("realm", "player")
+            else:
+                _strict_object(account, {"account", "include_common", "roles"}, {"account", "include_common", "roles"}, path)
+                name = _backup_name(account["account"], path + ".account")
+                if not isinstance(account["include_common"], bool):
+                    raise ValidationError("include_common must be a boolean", path=path + ".include_common")
+                roles, fields = account["roles"], ("server", "name")
+            if name.casefold() in seen_accounts:
+                raise ValidationError("duplicate WTF account", path=path)
+            seen_accounts.add(name.casefold())
+            if not Path(value[root_field], "WTF", "Account", name).is_dir():
+                raise ValidationError("selected WTF account directory does not exist", path=path)
+            if not isinstance(roles, list) or (platform == "blackbox" and not roles):
+                raise ValidationError("expected an explicit role array", path=path)
+            seen_roles = set()
+            for role_index, role in enumerate(roles):
+                role_path = path + ".roles[%d]" % role_index
+                _strict_object(role, set(fields), set(fields), role_path)
+                key = tuple(_backup_name(role[field_name], role_path + "." + field_name).casefold() for field_name in fields)
+                if key in seen_roles:
+                    raise ValidationError("duplicate WTF role", path=role_path)
+                seen_roles.add(key)
+                if not Path(value[root_field], "WTF", "Account", name, role[fields[0]], role[fields[1]]).is_dir():
+                    raise ValidationError("selected WTF role directory does not exist", path=role_path)
+    for index, plugin in enumerate(value.get("known_plugins", [])):
+        path = "$.known_plugins[%d]" % index
+        fields = {"name", "id", "fileName", "fileUrl", "mod_version", "display_name", "mod_file_id", "updateType"}
+        _strict_object(plugin, fields, fields, path)
+        if not isinstance(plugin["name"], str) or not plugin["name"].strip():
+            raise ValidationError("plugin name must be nonempty", path=path + ".name")
+        for key in ("id", "updateType"):
+            _positive_integer(plugin[key], path + "." + key)
+        if plugin["mod_file_id"] is not None:
+            _positive_integer(plugin["mod_file_id"], path + ".mod_file_id")
+        for key in ("fileName", "fileUrl", "mod_version", "display_name"):
+            if plugin[key] is not None and not isinstance(plugin[key], str):
+                raise ValidationError("expected string or null", path=path + "." + key)
+    for index, addon in enumerate(value.get("known_addons", [])):
+        path = "$.known_addons[%d]" % index
+        _strict_object(addon, {"ID", "Name", "Strategy", "VersionID", "VersionName", "LockVersion"}, {"ID", "Name", "Strategy", "VersionID"}, path)
+        if not isinstance(addon["Name"], str) or not addon["Name"].strip() or isinstance(addon["Strategy"], bool) or addon["Strategy"] not in (1, 2, 3, 4, 5) or not addon["ID"] or not addon["VersionID"]:
+            raise ValidationError("invalid known addon brief", path=path)
+    if len({item["id"] for item in value.get("known_plugins", [])}) != len(value.get("known_plugins", [])):
+        raise ValidationError("duplicate known plugin ID", path="$.known_plugins")
+    if any(not isinstance(item, dict) for item in value.get("strategies", [])):
+        raise ValidationError("strategies must contain official strategy objects", path="$.strategies")
+    selected = sum(len(value.get(field_name, [])) for field_name in (*string_arrays, "known_plugins", "known_addons", "roles", "wtf_accounts"))
+    if not selected and not value.get("include_wtf_root"):
+        raise ValidationError("select at least one backup content item")
+
+
+def _validate_blackbox_configuration(schema_name: str, value: Mapping[str, Any]) -> None:
+    if "configuration" not in value:
+        return
+    config = value["configuration"]
+    allowed = {"Title", "Article", "Open", "UpdateLog", "KnownAddons", "UnknownAddons", "WTFList", "Materials", "Fonts", "ThumbList", "SubscribeLevel", "ClearKnownAddons", "ClearUnknownAddons", "ClearMaterials", "ClearFonts", "NeedsPush", "ChatInviteCode"}
+    selection = {"KnownAddons", "UnknownAddons", "WTFList", "Materials", "Fonts"}
+    required_keys = {"Title", "Article", "Open", "ThumbList", "SubscribeLevel"} | selection if schema_name.endswith(".create") else set()
+    _strict_object(config, allowed, required_keys, "$.configuration")
+    if not config:
+        raise ValidationError("configuration must contain a changed field", path="$.configuration")
+    if "backup_id" in value and not schema_name.endswith(".create") and not selection.issubset(config):
+        raise ValidationError("backup_id requires explicit selections for all five content categories", path="$.configuration")
+    for key in ("Title", "Article", "UpdateLog", "ChatInviteCode"):
+        if key in config and (not isinstance(config[key], str) or key == "Title" and not config[key].strip()):
+            raise ValidationError("expected string" + (" with a nonempty title" if key == "Title" else ""), path="$.configuration." + key)
+    for key in ("Open", "ClearKnownAddons", "ClearUnknownAddons", "ClearMaterials", "ClearFonts", "NeedsPush"):
+        if key in config and not isinstance(config[key], bool):
+            raise ValidationError("expected boolean", path="$.configuration." + key)
+    for key in ("KnownAddons", "WTFList"):
+        if key in config and (not isinstance(config[key], list) or any(not isinstance(item, dict) for item in config[key])):
+            raise ValidationError("expected array of objects", path="$.configuration." + key)
+    if "ThumbList" in config and (not isinstance(config["ThumbList"], list) or any(not isinstance(item, str) for item in config["ThumbList"])):
+        raise ValidationError("expected image reference array", path="$.configuration.ThumbList")
+    if "SubscribeLevel" in config and (isinstance(config["SubscribeLevel"], bool) or not isinstance(config["SubscribeLevel"], int) or config["SubscribeLevel"] < 0):
+        raise ValidationError("expected nonnegative integer", path="$.configuration.SubscribeLevel")
+    for key in ("UnknownAddons", "Materials", "Fonts"):
+        if key in config:
+            _strict_object(config[key], {"Files"}, {"Files"}, "$.configuration." + key)
+            if not isinstance(config[key]["Files"], list) or any(not isinstance(item, dict) for item in config[key]["Files"]):
+                raise ValidationError("Files must contain objects selected from the backup", path="$.configuration." + key)
 
 
 def f(type_name: str, **kwargs: Any) -> Field:
@@ -761,7 +960,7 @@ MODUS_PROJECT_COMMON = {
     "alt_name": f("string", max_length=120),
     "summary": f("string", nonempty=True, max_length=500),
     "categories": f("array", nonempty=True, max_items=5),
-    "license": f("object", nullable=True),
+    "license": f("object", nonempty=True),
     "repo_url": f("string", max_length=500),
     "required_tier_id": f("integer", nullable=True, minimum=1),
     "publish_platforms": f("array", nonempty=True),
@@ -797,13 +996,13 @@ MODUS_RELEASE = {
 MODUS_BUILD_ID = f("integer", minimum=0, maximum=4)
 MODUS_SHARE = {
     "share_id": f("identifier", nonempty=True), "addons_id": f("string", max_length=10000),
-    "account_name": f("string", nullable=True, max_length=120), "backup_id": f("integer", minimum=1),
+    "account_name": f("string", max_length=120), "backup_id": f("integer", minimum=1),
     "content": f("string", nonempty=True), "content_text": f("string", nonempty=True),
     "image_url": f("string", nonempty=True, max_length=1000), "is_paid": f("integer", choices=(0, 1)),
     "is_public": f("integer", choices=(0, 1)), "price": f("number", minimum=0),
     "share_type": f("integer", minimum=0), "tags": f("string", nonempty=True, max_length=1000),
     "title": f("string", nonempty=True, max_length=120), "exclude_wtf": f("integer", choices=(0, 1)),
-    "role_name": f("string", nullable=True, max_length=120), "required_tier_id": f("integer", nullable=True, minimum=1),
+    "role_name": f("string", max_length=120), "required_tier_id": f("integer", nullable=True, minimum=1),
     "sub_type": f("integer", choices=(0, 1)), "platform": f("integer", choices=(1, 3)),
     "synchronization_type": f("integer", choices=(1, 3)), "server_type": MODUS_BUILD_ID,
 }
@@ -828,13 +1027,13 @@ register("modus", "plugin", "update", required(MODUS_RELEASE, ("project_id", "fi
 register("modus", "plugin", "edit", required(MODUS_RELEASE, ("project_id", "file_id")))
 register("modus", "plugin", "delete", required({"project_id": f("integer", minimum=1), "file_id": f("integer", minimum=1), "confirm": f("string", choices=("DELETE",))}, ("project_id", "file_id", "confirm")))
 register("modus", "media", "upload", required({"file": f("string", local_file=True)}, ("file",)))
-register("modus", "config", "create", required(MODUS_SHARE, ("addons_id", "backup_id", "content", "content_text", "image_url", "tags", "title", "exclude_wtf")))
+register("modus", "config", "create", required({k: v for k, v in MODUS_SHARE.items() if k != "share_id"}, ("addons_id", "backup_id", "content", "content_text", "image_url", "tags", "title", "exclude_wtf")))
 register("modus", "config", "update", required(MODUS_SHARE, ("share_id",)))
 register("modus", "config", "edit", required(MODUS_SHARE, ("share_id",)))
 register("modus", "config", "delete", required({"share_id": f("identifier", nonempty=True), "confirm": f("string", choices=("DELETE",)), "server_type": MODUS_BUILD_ID}, ("share_id", "confirm")))
 register("modus", "config", "backup-edit", required({"backup_id": f("integer", minimum=1), "backup_name": f("string", nonempty=True, max_length=200), "server_type": MODUS_BUILD_ID}, ("backup_id", "backup_name")))
 register("modus", "config", "backup-delete", required({"backup_id": f("integer", minimum=1), "confirm": f("string", choices=("DELETE",)), "server_type": MODUS_BUILD_ID}, ("backup_id", "confirm")))
-register("modus", "wa", "create", required(MODUS_IMPORT, ("code_text", "content", "addons_id", "content_text", "image_url", "support_addon", "tags", "title", "version")))
+register("modus", "wa", "create", required({k: v for k, v in MODUS_IMPORT.items() if k != "import_id"}, ("code_text", "content", "addons_id", "content_text", "image_url", "support_addon", "tags", "title", "version")))
 register("modus", "wa", "update", required(MODUS_IMPORT, ("import_id",)))
 register("modus", "wa", "edit", required(MODUS_IMPORT, ("import_id",)))
 register("modus", "wa", "delete", required({"import_id": f("identifier", nonempty=True), "confirm": f("string", choices=("DELETE",)), "server_type": MODUS_BUILD_ID}, ("import_id", "confirm")))
@@ -857,6 +1056,72 @@ register("blackbox", "version", "edit", required({
 register("blackbox", "version", "delete", required({
     "version_id": f("integer"), "module_id": f("integer"),
 }, ("version_id", "module_id")))
+register("blackbox", "session", "login-start", required({
+    "method": f("string", choices=("sms", "wechat")),
+    "phone": f("string", nonempty=True, max_length=11, description="SMS only; mainland China mobile number, supplied through input JSON."),
+}, ("method",)))
+register("blackbox", "session", "login-submit", required({
+    "login_id": f("string", nonempty=True, max_length=32, description="Opaque ID from login-start; 32 lowercase hexadecimal characters."),
+    "code": f("string", nonempty=True, max_length=8, description="4-8 digit SMS code, supplied through --input PATH|-; never an argv flag."),
+}, ("login_id", "code")))
+register("blackbox", "session", "renew", {})
+register("blackbox", "session", "forget", required({"confirm_forget": f("boolean", choices=(True,))}, ("confirm_forget",)))
+
+# Cloud backup packages keep their platform wire identities and selection
+# objects distinct. Only explicit IDs can reach a delete write schema.
+BACKUP_CONFIRM = f("boolean", choices=(True,))
+NB_BACKUP_GENERATE = {
+    "game_dir": f("string", nonempty=True), "game_version_id": f("integer", minimum=1),
+    "output_dir": f("string", nonempty=True), "known_plugins": f("array"),
+    "unknown_plugins": f("array"), "materials": f("array"), "fonts": f("array"),
+    "wtf_accounts": f("array", description="[{account,include_common,roles:[{server,name}]}]; exact role choices"),
+}
+DD_BACKUP_GENERATE = {
+    "game_dir": f("string", nonempty=True), "game_type": f("integer", minimum=1),
+    "output_dir": f("string", nonempty=True), "addon_names": f("array"), "unknown_addons": f("array"),
+    "materials": f("array"), "fonts": f("array"), "include_wtf_root": f("boolean"),
+    "wtf_accounts": f("array", description="[{account,include_common,roles:[{server,name}]}]; exact role choices"),
+}
+MODUS_BACKUP_GENERATE = {
+    "game_root": f("string", nonempty=True), "output_dir": f("string", nonempty=True),
+    "backup_name": f("string", nonempty=True, max_length=80), "server_type": MODUS_BUILD_ID,
+    "addon_names": f("array"), "font_names": f("array"), "material_names": f("array"),
+    "roles": f("array", description="[{account,server,role}]; exact WTF role choices"),
+}
+BLACKBOX_BACKUP_GENERATE = {
+    "game_dir": f("string", nonempty=True), "output_dir": f("string", nonempty=True),
+    "strappid": f("string", nonempty=True), "unknown_addons": f("array"),
+    "materials": f("array"), "fonts": f("array"), "known_addons": f("array"), "strategies": f("array"),
+    "wtf_accounts": f("array", description="[{name,characters:[{realm,player}]}]; every account requires explicit characters"),
+}
+for _platform, _generation, _required in (
+    ("newbee", NB_BACKUP_GENERATE, ("game_dir", "game_version_id", "output_dir")),
+    ("dd", DD_BACKUP_GENERATE, ("game_dir", "game_type", "output_dir")),
+    ("modus", MODUS_BACKUP_GENERATE, ("game_root", "output_dir", "backup_name")),
+    ("blackbox", BLACKBOX_BACKUP_GENERATE, ("game_dir", "output_dir", "strappid", "unknown_addons", "materials", "fonts", "wtf_accounts")),
+):
+    register(_platform, "backup", "generate", required(_generation, _required))
+    if _platform == "modus":
+        register(_platform, "backup", "create", required(_generation, _required))
+        register(_platform, "backup", "upload", required({"manifest_file": f("string", local_file=True), "server_type": MODUS_BUILD_ID}, ("manifest_file",)))
+        register(_platform, "backup", "rename", required({"backup_id": f("integer", minimum=1), "backup_name": f("string", nonempty=True, max_length=80), "server_type": MODUS_BUILD_ID}, ("backup_id", "backup_name")))
+    elif _platform == "blackbox":
+        register(_platform, "backup", "create", {**_generation, "file": f("string", local_file=True)})
+        register(_platform, "backup", "upload", required({"file": f("string", local_file=True)}, ("file",)))
+        register(_platform, "backup", "rename", required({"backup_id": f("string", nonempty=True), "name": f("string", nonempty=True, max_length=200)}, ("backup_id", "name")))
+    else:
+        _name_limit = 14 if _platform == "dd" else 200
+        register(_platform, "backup", "create", {**_generation, "bundle_file": f("string", local_file=True), "name": f("string", nonempty=True, max_length=_name_limit)})
+        register(_platform, "backup", "upload", required({"bundle_file": f("string", local_file=True), "name": f("string", nonempty=True, max_length=_name_limit)}, ("bundle_file",)))
+        register(_platform, "backup", "rename", required({"id" if _platform == "newbee" else "sn": f("integer", minimum=1) if _platform == "newbee" else f("string", nonempty=True), "name": f("string", nonempty=True, max_length=_name_limit)}, ("id" if _platform == "newbee" else "sn", "name")))
+    register(_platform, "backup", "delete", required({"backup_ids": f("array", nonempty=True, max_items=1000), "confirm_delete": BACKUP_CONFIRM,
+                                                    **({"server_type": MODUS_BUILD_ID} if _platform == "modus" else {})}, ("backup_ids", "confirm_delete")))
+
+BLACKBOX_CONFIG_FIELDS = {"backup_id": f("string", nonempty=True), "configuration": f("object", nonempty=True)}
+register("blackbox", "config", "create", required(BLACKBOX_CONFIG_FIELDS, ("backup_id", "configuration")))
+for _action in ("update", "edit"):
+    register("blackbox", "config", _action, required({**BLACKBOX_CONFIG_FIELDS, "share_id": f("string", nonempty=True)}, ("share_id", "configuration")))
+register("blackbox", "config", "delete", required({"share_id": f("string", nonempty=True), "confirm_delete": BACKUP_CONFIRM}, ("share_id", "confirm_delete")))
 
 
 def get_schema(platform: str, resource: str, action: str) -> Schema:

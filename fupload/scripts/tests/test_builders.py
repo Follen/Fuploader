@@ -1354,6 +1354,18 @@ class BuilderTests(unittest.TestCase):
             {"need_buy": False, "need_anchor_vip": True},
         )
 
+    def test_dd_scope_edit_cannot_clear_a_locked_vip_paid_mode(self) -> None:
+        material = {"items": [{"name": "Probe"}], "inner_version": {}}
+        current = {"scope": "public", "need_buy": False, "need_anchor_vip": True,
+                   "vip_levels": [1], "material": material}
+        with self.assertRaisesRegex(ValidationError, "outer free/paid"):
+            config_form(current, {"material": material}, {"scope": "private"})
+        for resource in ("plugin", "wa"):
+            form = dict(current, scope="private")
+            normalize_commercial(form, resource)
+            with self.subTest(resource=resource), self.assertRaisesRegex(ValidationError, "outer free/paid"):
+                validate_locked_usage_mode(current, form, {"scope": "private"})
+
     def test_dd_wa_edit_reparses_unchanged_wa2_and_preserves_material_paths(self) -> None:
         current = {
             "sn": "wa-sn",

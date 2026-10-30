@@ -66,6 +66,46 @@ class _FakeConnection:
 
 
 class ModusTests(unittest.TestCase):
+    def test_creator_auth_matches_official_bearer_header_without_duplicate_prefix(self):
+        cases = ((False, "fixture", "Bearer fixture"), (False, "Bearer fixture", "Bearer fixture"),
+                 (False, "bEaReR fixture", "bEaReR fixture"), (True, "fixture", "fixture"))
+        for main_session, token, expected in cases:
+            with self.subTest(main_session=main_session, token=token):
+                provider = ModUs(token, main_session=main_session)
+                response = mock.MagicMock()
+                response.__enter__.return_value = response
+                response.status = 200
+                response.read.return_value = b'{"code":200,"data":{}}'
+                with mock.patch("fupload_cli.modus.urllib.request.urlopen", return_value=response) as request:
+                    provider._request("GET", "system/user/getInfo")
+                self.assertEqual(request.call_args.args[0].get_header("Authorization"), expected)
+
+    def test_metadata_only_release_update_preserves_all_supplied_wire_fields_and_null_clear(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            provider = ModUs("fixture")
+            doc = {"project_id": 200000042, "file_id": 9, "md5": "a" * 32, "zip_size": 12, "unzip_size": 24,
+                   "changelog": None, "transaction_log": str(Path(temporary) / "transaction.json")}
+            with mock.patch.object(provider, "_request", return_value={"code": 200}) as request:
+                result = provider.publish(doc, update=True)
+            self.assertIsNone(result["upload"])
+            self.assertEqual(request.call_args.args[:2], ("POST", "game/data/author/project/file/update"))
+            self.assertEqual(request.call_args.args[2], {"projectId": 200000042, "fileId": 9, "md5": "a" * 32,
+                                                       "zipSize": 12, "unzipSize": 24, "changelog": None})
+
+    def test_release_zip_rejects_conflicting_supplied_digest_and_sizes_before_metadata(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            archive = Path(temporary) / "addon.zip"
+            write_zip(archive)
+            for field, value in (("md5", "0" * 32), ("zip_size", 0), ("unzip_size", 0)):
+                with self.subTest(field=field):
+                    provider = ModUs("fixture")
+                    doc = {"project_id": 200000042, "file_id": 9, "file": str(archive), field: value,
+                           "transaction_log": str(Path(temporary) / (field + ".json"))}
+                    with mock.patch.object(provider, "_request") as request, self.assertRaises(ValidationError) as failure:
+                        provider.publish(doc, update=True)
+                    self.assertEqual(failure.exception.details["path"], "$." + field)
+                    request.assert_not_called()
+
     def test_dependency_query_uses_creator_name_and_project_id_shapes(self):
         self.assertEqual(_dependency_query_wire(" Details! "), {"name": "Details!"})
         self.assertEqual(_dependency_query_wire(42), {"projectIds": [42]})
@@ -119,7 +159,7 @@ class ModusTests(unittest.TestCase):
             write_zip(archive)
             document = {
                 "schema": schema.name,
-                "project_id": 42,
+                "project_id": 200000042,
                 "file": str(archive),
                 "version": "1.0.0",
                 "type": "release",
@@ -129,7 +169,7 @@ class ModusTests(unittest.TestCase):
                 "path": "Demo-1.0.0.zip",
             }
             validated = schema.validate(document)
-            self.assertEqual(validated["project_id"], 42)
+            self.assertEqual(validated["project_id"], 200000042)
             self.assertEqual(validated["file"], str(archive))
             with self.assertRaises(ValidationError):
                 schema.validate({**document, "unexpected": True})
@@ -239,11 +279,11 @@ class ModusTests(unittest.TestCase):
 
             def fake_request(method, path, body=None):
                 requests.append((method, path, body))
-                if path == "game/data/author/project/fileId/42":
+                if path == "game/data/author/project/fileId/200000042":
                     return {"data": {"fileId": 9}}
                 if path == "game/data/author/project/upload":
                     return {"data": {"fileId": 9, "status": "pending"}}
-                if path == "game/data/author/project/file/upload/signature/42/9":
+                if path == "game/data/author/project/file/upload/signature/200000042/9":
                     return {"data": {"signedUrl": "https://upload.modus.test/signed?token=fixture"}}
                 raise AssertionError("unexpected request: %r" % (method, path))
 
@@ -255,7 +295,7 @@ class ModusTests(unittest.TestCase):
             }]):
                 result = provider.publish(
                     {
-                        "project_id": 42,
+                        "project_id": 200000042,
                         "file": str(archive),
                         "version": "1.0.0",
                         "type": "release",
@@ -268,12 +308,12 @@ class ModusTests(unittest.TestCase):
                 )
 
             self.assertEqual([item[:2] for item in requests], [
-                ("GET", "game/data/author/project/fileId/42"),
+                ("GET", "game/data/author/project/fileId/200000042"),
                 ("POST", "game/data/author/project/upload"),
-                ("GET", "game/data/author/project/file/upload/signature/42/9"),
+                ("GET", "game/data/author/project/file/upload/signature/200000042/9"),
             ])
             metadata = requests[1][2]
-            self.assertEqual(metadata["projectId"], 42)
+            self.assertEqual(metadata["projectId"], 200000042)
             self.assertNotIn("fileId", metadata)
             self.assertEqual(metadata["supportedGameVersionsReqs"], [{"gameVersion": "11.0.0", "server": "wow_retail"}])
             self.assertEqual(metadata["md5"], hashlib.md5(raw).hexdigest())
@@ -304,7 +344,7 @@ class ModusTests(unittest.TestCase):
                 side_effect=FuploadError("allocation failed", endpoint="https://app.modus.cool/api/fileId", stage="file_id"),
             ), self.assertRaises(FuploadError):
                 provider.publish({
-                    "project_id": 42,
+                    "project_id": 200000042,
                     "file": str(archive),
                     "transaction_log": str(transaction_path),
                 })
@@ -317,7 +357,7 @@ class ModusTests(unittest.TestCase):
 
             with mock.patch.object(provider, "release_file_id", return_value=9), self.assertRaises(ValidationError) as raised:
                 provider.publish({
-                    "project_id": 42,
+                    "project_id": 200000042,
                     "file": str(archive),
                     "transaction_log": str(transaction_path),
                 })
@@ -385,7 +425,7 @@ class ModusTests(unittest.TestCase):
             input_path.write_text(
                 json.dumps({
                     "schema": "fupload.v1.modus.plugin.upload",
-                    "project_id": 42,
+                    "project_id": 200000042,
                     "file": str(archive),
                     "version": "1.0.0",
                     "type": "release",

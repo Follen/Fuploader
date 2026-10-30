@@ -17,6 +17,7 @@ import urllib.parse
 
 from .errors import FuploadError, ValidationError
 from .trust import trusted_local_dir, trusted_roaming_dir, verify_dd_executable
+from .dd_backup import DDBackupMixin, generate_backup as generate_cloud_backup, scan_backup as scan_cloud_backup
 
 
 EXPECTED_DD_VERSION = os.environ.get("FUPLOAD_DD_EXPECTED_VERSION", "any")
@@ -490,6 +491,19 @@ class Sidecar:
         return str(result["d_url"])
 
     def cc_get(self, url: str) -> Any:
+        if self.session_source == "desktop-cookie":
+            from .dd_channel import CHANNEL_URL, read_desktop_channels
+
+            if url != CHANNEL_URL:
+                raise FuploadError("borrowed DD channel access supports only the fixed channel-list read", kind="unsupported_operation", stage="dependency_get")
+            # This is the host Python process, not the native sidecar. The JWT
+            # never enters the sidecar or broker protocol response.
+            choices = read_desktop_channels(expected_dd_dir=self.dd_dir, task_broker=True)
+            # Preserve cc_get's native response shape for the existing strict
+            # selection validator; callers cannot supply their own candidates.
+            return {"code": "OK", "data": [{"teamId": item["room_id"], "teamName": item["room_name"],
+                                             "channelId": item["channel_id"], "channelName": item["channel_name"],
+                                             "channelType": item["channel_type"]} for item in choices["items"]]}
         return self.call("cc_get", url=url)
 
     def close(self) -> None:
@@ -1448,7 +1462,7 @@ def normalize_commercial(
 
 
 def validate_locked_usage_mode(current: Mapping[str, Any], form: Mapping[str, Any], doc: Mapping[str, Any]) -> None:
-    if not current or not any(name in doc for name in ("need_buy", "need_anchor_vip")):
+    if not current or not any(name in doc for name in ("need_buy", "need_anchor_vip", "scope")):
         return
     current_paid = bool(current.get("need_buy") or current.get("need_anchor_vip"))
     requested_paid = bool(form.get("need_buy") or form.get("need_anchor_vip"))
@@ -1827,8 +1841,8 @@ def config_form(current: Mapping[str, Any], backup: Mapping[str, Any], doc: Mapp
     content_groups = ("known_addon", "unknown_addon", "wtf", "material", "font")
     if not any(form.get(name, {}).get("items") or form.get(name, {}).get("accounts") for name in content_groups):
         raise ValidationError("DD configuration content cannot contain only WA selections", path="$.known_addon_ids")
-    validate_locked_usage_mode(current, form, doc)
     normalize_commercial(form, "config", create=not bool(current))
+    validate_locked_usage_mode(current, form, doc)
     return form
 
 
@@ -1939,7 +1953,7 @@ def validate_wa_submission(form: Mapping[str, Any], doc: Mapping[str, Any]) -> N
     validate_commercial_submission(form, "wa")
 
 
-class DD:
+class DD(DDBackupMixin):
     platform = "dd"
 
     @staticmethod
@@ -2063,6 +2077,8 @@ class DD:
         return references
 
     def execute_write(self, resource: str, action: str, doc: Dict[str, Any], session_id: Optional[str] = None) -> Any:
+        if resource == "backup" and action == "generate":
+            return generate_cloud_backup(doc)
         if not session_id:
             raise FuploadError("DD live writes require --session from `dd session start`", kind="session_required", stage="session")
         from .dd_broker import execute
@@ -2070,6 +2086,15 @@ class DD:
         return execute(session_id, "write", resource, action, doc)
 
     def execute_write_on(self, session: Sidecar, resource: str, action: str, doc: Dict[str, Any]) -> Any:
+        if resource == "backup":
+            if action == "generate": return generate_cloud_backup(doc)
+            if action in ("upload", "create"):
+                if "bundle_file" not in doc:
+                    generated = generate_cloud_backup(doc)
+                    doc = dict(doc, bundle_file=generated["bundle_file"])
+                return self.upload_backup(session, doc)
+            if action == "rename": return self.rename_backup(session, doc)
+            if action in ("delete", "delete-many"): return self.delete_backups(session, doc)
         if action == "delete" and resource in ("plugin", "config", "wa"):
             return self._delete(session, resource, doc)
         if resource == "plugin":
@@ -2163,8 +2188,8 @@ class DD:
                     raise ValidationError("version already exists; overwrite is not allowed", path="$.version")
         if doc.get("file"):
             self._archive(doc["file"], (".zip",))
-        validate_locked_usage_mode(current, form, doc)
         normalize_commercial(form, "plugin", create=action == "create")
+        validate_locked_usage_mode(current, form, doc)
         validate_plugin_submission(form, doc)
         # A version-only update cannot change these optional metadata fields.
         # Validate their live dependencies on create/edit, but do not block a
@@ -2419,8 +2444,8 @@ class DD:
                 )
             form["parse_wa_uid"] = parsed["parse_wa_uid"]
             form["parse_wa_id"] = parsed["parse_wa_id"]
-        validate_locked_usage_mode(current, form, doc)
         normalize_commercial(form, "wa", create=action == "create")
+        validate_locked_usage_mode(current, form, doc)
         form["category_ids"] = [str(category_id) for category_id in (form.get("category_ids") or [])]
         validate_wa_submission(form, doc)
         self._validate_options(session, "wa", form)
@@ -2460,6 +2485,8 @@ class DD:
         return {"result": response, "reference": reference, "readback": readback}
 
     def execute_read(self, resource: str, action: str, args: Any, session_id: Optional[str] = None) -> Any:
+        if resource == "backup" and action == "scan":
+            return scan_cloud_backup(args.game_dir)
         if resource == "session":
             from . import dd_broker
 
@@ -2477,6 +2504,21 @@ class DD:
             raise FuploadError("DD live reads require --session from `dd session start`", kind="session_required", stage="session")
         from .dd_broker import execute
 
+        if resource == "options" and action == "channels":
+            from . import dd_broker
+
+            status = dd_broker.status(session_id)
+            if not status.get("running") or status.get("session_id") != session_id:
+                raise FuploadError("DD channels require the matching active task session", kind="session_mismatch", stage="session")
+            if status.get("session_source") == "desktop-cookie":
+                # Execute in the caller process: an existing broker can have a
+                # lower integrity level than this explicitly elevated CLI.
+                from .dd_channel import read_desktop_channels
+
+                return read_desktop_channels(expected_dd_dir=status.get("dd_dir"))
+            if status.get("session_source") != "native-login":
+                raise FuploadError("DD task session has an unknown authentication source", kind="session_mismatch", stage="session")
+
         payload = {
             key: value for key, value in vars(args).items()
             if key not in {"handler", "platform", "resource", "action", "input", "dry_run", "session"}
@@ -2484,6 +2526,11 @@ class DD:
         return execute(session_id, "read", resource, action, payload)
 
     def execute_read_on(self, session: Sidecar, resource: str, action: str, args: Any) -> Any:
+        if resource == "backup":
+            if action == "list": return self.backup_list(session)
+            if action == "get": return self.backup_get(session, args.sn)
+            if action == "scan": return scan_cloud_backup(args.game_dir)
+            if action == "delete-preview": return self.backup_preview_selection(session, args)
         if resource == "plugin":
             if action == "list": return readable_author_list(session, "plugin", args.keyword, args.game_type, args.page, args.page_size)
             if action == "get": return safe_detail("plugin", detail(session, "plugin", args.sn))
@@ -2503,7 +2550,12 @@ class DD:
             if action == "categories": return safe_wa_categories(session.get("/wa/categories", {"game_type": args.game_type}), args.game_type)
         if resource == "options":
             if action == "game-types": return safe_game_types(session.get("/game_type/list", {}))
-            if action == "channels": return safe_channels(session.cc_get("https://api.cc.163.com/v1/mixteammsgproxy/channelList?" + urllib.parse.urlencode({"source": "pluginPublish"})))
+            if action == "channels":
+                if getattr(session, "session_source", "native-login") == "desktop-cookie":
+                    from .dd_channel import read_desktop_channels
+
+                    return read_desktop_channels(expected_dd_dir=getattr(session, "dd_dir", None))
+                return safe_channels(session.cc_get("https://api.cc.163.com/v1/mixteammsgproxy/channelList?" + urllib.parse.urlencode({"source": "pluginPublish"})))
             if action == "life-types": return {"total": len(LIFE_TYPES), "items": list(LIFE_TYPES), "source": "NetEase DD official client enum"}
             if action == "vip-levels": return session.get("/anchor_vip/level/list", {"enrich_acts": "false"})
             if action == "associated-acts": return safe_associated_acts(session, args.game_type)
