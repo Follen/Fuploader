@@ -92,22 +92,25 @@
       "wire": "jump_room",
       "stage": "最终JSON表单",
       "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
-      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "plugin.create.room_id": {
       "wire": "room_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "plugin.create.channel_id": {
       "wire": "channel_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "plugin.create.channel_type": {
       "wire": "channel_type",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "plugin.create.sync_room": {
       "wire": "sync_room",
@@ -253,22 +256,25 @@
       "wire": "jump_room",
       "stage": "最终JSON表单",
       "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
-      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "plugin.edit.room_id": {
       "wire": "room_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "plugin.edit.channel_id": {
       "wire": "channel_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "plugin.edit.channel_type": {
       "wire": "channel_type",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:plugin_form/PLUGIN_OPEN_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "plugin.edit.sync_room": {
       "wire": "sync_room",
@@ -388,22 +394,25 @@
       "wire": "jump_room",
       "stage": "最终JSON表单",
       "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
-      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "config.create.room_id": {
       "wire": "room_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "config.create.channel_id": {
       "wire": "channel_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "config.create.channel_type": {
       "wire": "channel_type",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "config.create.sync_room": {
       "wire": "sync_room",
@@ -682,22 +691,25 @@
       "wire": "jump_room",
       "stage": "最终JSON表单",
       "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
-      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "config.edit.room_id": {
       "wire": "room_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "config.edit.channel_id": {
       "wire": "channel_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "config.edit.channel_type": {
       "wire": "channel_type",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:config_form",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "config.edit.sync_room": {
       "wire": "sync_room",
@@ -808,22 +820,25 @@
       "wire": "jump_room",
       "stage": "最终JSON表单",
       "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
-      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "wa.create.room_id": {
       "wire": "room_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "wa.create.channel_id": {
       "wire": "channel_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "wa.create.channel_type": {
       "wire": "channel_type",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "wa.create.sync_room": {
       "wire": "sync_room",
@@ -1010,22 +1025,25 @@
       "wire": "jump_room",
       "stage": "最终JSON表单",
       "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
-      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room"
+      "condition": "true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "wa.edit.room_id": {
       "wire": "room_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "wa.edit.channel_id": {
       "wire": "channel_id",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "wa.edit.channel_type": {
       "wire": "channel_type",
       "stage": "最终JSON表单",
-      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS"
+      "evidence": "fupload/scripts/fupload_cli/dd.py:wa_form/WA_FIELDS",
+      "condition": "；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。"
     },
     "wa.edit.sync_room": {
       "wire": "sync_room",

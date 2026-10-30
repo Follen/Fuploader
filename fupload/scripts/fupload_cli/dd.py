@@ -2043,8 +2043,7 @@ class DD(DDBackupMixin):
 
         def channel_selection(value: Mapping[str, Any]) -> Tuple[Any, ...]:
             return (bool(value.get("jump_room")), str(value.get("room_id") or ""),
-                    str(value.get("channel_id") or ""), str(value.get("channel_type") or ""),
-                    bool(value.get("sync_room")))
+                    str(value.get("channel_id") or ""), str(value.get("channel_type") or ""))
         channel_changed = current is None or channel_selection(current) != channel_selection(form)
         if validate_optional_dependencies and form.get("jump_room") and channel_changed:
             channels = safe_channels(session.cc_get("https://api.cc.163.com/v1/mixteammsgproxy/channelList?source=pluginPublish"))

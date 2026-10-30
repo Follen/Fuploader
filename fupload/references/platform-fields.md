@@ -721,7 +721,7 @@ Schema：`fupload.v1.newbee.wa-share-code.set`。
 - GUI 正在运行：借用其已存在的网页会话，`session_source=desktop-cookie`、`native_login_count=0`；失败就停止，不再创建另一条桌面登录，不关闭客户端。旧 `--confirm-close-gui` 参数仅兼容调用。
 - GUI 未运行：读取官方自动登录凭据。邮箱是 `urs + urs_token + normal`；手机号是 `mobile + urs_mobile_token + normal|mobile_password|mobile_uplink`。只有 `mobile_password` 令 `isPassword=true`；未知组合拒绝。
 - 借用会话的原始登录方式无需再次判断；停止仅清理自己的 HTTP/runtime，不请求账号退出。
-- CC 频道列表依赖当前 GUI 的 CC JWT，作者 Cookie 不能直接替代。新增 `dd_channel.py` 仅对该可选操作只读当前 GUI 内存，固定匹配 DD 100130/CPython 3.7.17 的签名、文件哈希及运行时布局，核对同用户、进程创建时间与会话锚点；JWT 不落盘、不输出。高权限 DD 需要同用户管理员终端查询频道；启用频道关联写入时，也需以相同权限启动 Fupload 任务会话。普通作者上传仍只借 Cookie，不要求管理员。缓存 JWT 缺失、失效或读取失败直接停止，不重新登录 DD。11 项产品 mock 测试及 6 项独立 Qt 夹具验证通过；当前 GUI 的管理员实机读取待用户回传结果。
+- CC 频道列表依赖现有 GUI 的 CC JWT，作者 Cookie 不能直接替代。`dd_channel.py` 只在查询频道、新设或更换关联目标时使用运行时读取；现有关联目标未变则保留已核对的详情。读取权限不足时通过一次 UAC 启动同用户短时辅助，普通上传与主进程/broker仍不提权。辅助绑定 DD 100130/CPython 3.7.17 的签名、文件哈希、GUI 创建时间及当前账号 profile，通过受限命名管道只返回候选，不传递或落盘凭据。JWT 到期时使用同一现有会话的 loginToken/UID/EID/校时值按官方 GET /v1/jwt 签名申请，不新建桌面登录；取消、超时或会话变化即停止。
 
 ### 商业与可见性条件
 
@@ -955,10 +955,10 @@ Schema：`fupload.v1.dd.config.create`。
 | `need_buy` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | need_buy；最终JSON表单；true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定；配置wire为整数0/1，detail投影可为boolean |
 | `price_fen` | `integer` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | price_fen；最终JSON表单；单位分；0或10..20000；不是元；免费create归零 |
 | `buy_life_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | buy_life_type；最终JSON表单 |
-| `jump_room` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room |
-| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单 |
-| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单 |
-| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单 |
+| `jump_room` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
 | `sync_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | sync_room；最终JSON表单；true时需要jump_room与有效频道；private强制false |
 | `creation_statement` | `string` | 是 | 拒绝 | 可选 `["original", "chinesize", "renovate", "second"]` | creation_statement；最终JSON表单；提交编辑器要求非空；取用户真实声明，不自动编造 |
 | `with_associate` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | with_associate；最终JSON表单；true时associated_acts至少一项；false清空关联 |
@@ -1026,10 +1026,10 @@ Schema：`fupload.v1.dd.config.edit`。
 | `need_buy` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | need_buy；最终JSON表单；true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定；配置wire为整数0/1，detail投影可为boolean |
 | `price_fen` | `integer` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | price_fen；最终JSON表单；单位分；0或10..20000；不是元；免费create归零 |
 | `buy_life_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | buy_life_type；最终JSON表单 |
-| `jump_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room |
-| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单 |
-| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单 |
-| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单 |
+| `jump_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
 | `sync_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | sync_room；最终JSON表单；true时需要jump_room与有效频道；private强制false |
 | `creation_statement` | `string` | 否/条件必填 | 拒绝 | 可选 `["original", "chinesize", "renovate", "second"]` | creation_statement；最终JSON表单；提交编辑器要求非空；取用户真实声明，不自动编造 |
 | `with_associate` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | with_associate；最终JSON表单；true时associated_acts至少一项；false清空关联 |
@@ -1101,10 +1101,10 @@ Schema：`fupload.v1.dd.plugin.create`。
 | `need_buy` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | need_buy；最终JSON表单；true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定 |
 | `price_fen` | `integer` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | price_fen；最终JSON表单；单位分；0或10..20000；不是元；免费create归零 |
 | `buy_life_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | buy_life_type；最终JSON表单 |
-| `jump_room` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room |
-| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单 |
-| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单 |
-| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单 |
+| `jump_room` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
 | `sync_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | sync_room；最终JSON表单；true时需要jump_room与有效频道；private强制false |
 | `creation_statement` | `string` | 是 | 拒绝 | 可选 `["original", "chinesize", "renovate", "second"]` | creation_statement；最终JSON表单；提交编辑器要求非空；取用户真实声明，不自动编造 |
 | `with_associate` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | with_associate；最终JSON表单；true时associated_acts至少一项；false清空关联 |
@@ -1157,10 +1157,10 @@ Schema：`fupload.v1.dd.plugin.edit`。
 | `need_buy` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | need_buy；最终JSON表单；true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定 |
 | `price_fen` | `integer` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | price_fen；最终JSON表单；单位分；0或10..20000；不是元；免费create归零 |
 | `buy_life_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | buy_life_type；最终JSON表单 |
-| `jump_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room |
-| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单 |
-| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单 |
-| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单 |
+| `jump_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
 | `sync_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | sync_room；最终JSON表单；true时需要jump_room与有效频道；private强制false |
 | `creation_statement` | `string` | 否/条件必填 | 拒绝 | 可选 `["original", "chinesize", "renovate", "second"]` | creation_statement；最终JSON表单；提交编辑器要求非空；取用户真实声明，不自动编造 |
 | `with_associate` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | with_associate；最终JSON表单；true时associated_acts至少一项；false清空关联 |
@@ -1224,10 +1224,10 @@ Schema：`fupload.v1.dd.wa.create`。
 | `need_buy` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | need_buy；最终JSON表单；true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定 |
 | `price_fen` | `integer` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | price_fen；最终JSON表单；单位分；0或10..20000；不是元；免费create归零 |
 | `buy_life_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | buy_life_type；最终JSON表单 |
-| `jump_room` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room |
-| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单 |
-| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单 |
-| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单 |
+| `jump_room` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
 | `sync_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | sync_room；最终JSON表单；true时需要jump_room与有效频道；private强制false |
 | `creation_statement` | `string` | 是 | 拒绝 | 可选 `["original", "chinesize", "renovate", "second"]` | creation_statement；最终JSON表单；提交编辑器要求非空；取用户真实声明，不自动编造 |
 | `with_associate` | `boolean` | 是 | 拒绝 | 见动作条件及嵌套结构 | with_associate；最终JSON表单；true时associated_acts至少一项；false清空关联 |
@@ -1288,10 +1288,10 @@ Schema：`fupload.v1.dd.wa.edit`。
 | `need_buy` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | need_buy；最终JSON表单；true时必须price_fen和buy_life_type；public/private不能代替付费选择；已有对象外层付费模式锁定 |
 | `price_fen` | `integer` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | price_fen；最终JSON表单；单位分；0或10..20000；不是元；免费create归零 |
 | `buy_life_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | buy_life_type；最终JSON表单 |
-| `jump_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room |
-| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单 |
-| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单 |
-| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单 |
+| `jump_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | jump_room；最终JSON表单；true时room_id必填；channel_id与channel_type同时空或同时非空；false清空房间/频道及sync_room；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `room_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | room_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_id` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_id；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
+| `channel_type` | `string` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | channel_type；最终JSON表单；；新建/更换目标时校验实时频道候选；保留已核对自有详情的原关联不重新查询。DD高权限时仅频道读取辅助按需UAC，主上传不提权。 |
 | `sync_room` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | sync_room；最终JSON表单；true时需要jump_room与有效频道；private强制false |
 | `creation_statement` | `string` | 否/条件必填 | 拒绝 | 可选 `["original", "chinesize", "renovate", "second"]` | creation_statement；最终JSON表单；提交编辑器要求非空；取用户真实声明，不自动编造 |
 | `with_associate` | `boolean` | 否/条件必填 | 拒绝 | 见动作条件及嵌套结构 | with_associate；最终JSON表单；true时associated_acts至少一项；false清空关联 |

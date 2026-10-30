@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "1.1.0",
   "skill_version": "1.1.0",
-  "tree_sha256": "305b9a2f14f3d796f6ddcce2f3e7982b98337cf3a52954603b81eddf6031f92a",
+  "tree_sha256": "b64a337ecebb0ce9296104af12a08325501a73ac83236f0f346d2f8f4f9fa4f5",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -87,8 +87,8 @@
     },
     {
       "path": "references/dd.md",
-      "bytes": 3070,
-      "sha256": "ec2e547c37584b9b4aa240d4ad3802b4f90b863ee3a4a22ea4ae53d9623583ab"
+      "bytes": 3588,
+      "sha256": "a4e0cdb33f28caf8be2481f4ba9b6df46e492ef072ef5ce2fcd2c3791354f589"
     },
     {
       "path": "references/modus.md",
@@ -107,8 +107,8 @@
     },
     {
       "path": "references/platform-fields.md",
-      "bytes": 274312,
-      "sha256": "d61c86798d7c375f0c3c6bc95f39e15bc4665e85eb8a2ec86b1e16f2ddf3b8fa"
+      "bytes": 278589,
+      "sha256": "c2bc7374348a2936df6698ff08bd8afc761e4940ec71c105a90a4c78e1cf5f8f"
     },
     {
       "path": "references/workflow.md",
@@ -176,9 +176,14 @@
       "sha256": "523ce06a7b4b98bfa892254d8ca6f1fed475cd2eabccf016a6211e6c3249fa2e"
     },
     {
+      "path": "scripts/fupload_cli/dd_channel_elevated.py",
+      "bytes": 17409,
+      "sha256": "b22331ea3ef0e6fdfc48b8e6df40b9170926639ddca8729ea09b2fdcf236b775"
+    },
+    {
       "path": "scripts/fupload_cli/dd_channel.py",
-      "bytes": 24114,
-      "sha256": "f5bc3d1bb9592a0e61bcd4848492e27b839aa05d331c3bd221c4dab436bb0826"
+      "bytes": 31119,
+      "sha256": "ff0119ca62b4abe9e3a1c6a192aebbe2124a357acc63b55d60c19208a11affe0"
     },
     {
       "path": "scripts/fupload_cli/dd_desktop.py",
@@ -192,8 +197,8 @@
     },
     {
       "path": "scripts/fupload_cli/dd.py",
-      "bytes": 123043,
-      "sha256": "bc34cc342dceb75299d6dbb8f756f0e8519b18a4b7dcecf820ee459ee79c1ca0"
+      "bytes": 122993,
+      "sha256": "6893433b4a2dfaab8d0fffbed553909b94bb9bec632ebdc0e19e5d52175a630f"
     },
     {
       "path": "scripts/fupload_cli/errors.py",
@@ -262,8 +267,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 31127,
-      "sha256": "c7da30208460472473e81755160ce72b84c27d9f67f621f3f405bfacaacf07db"
+      "bytes": 31420,
+      "sha256": "794ee31979b05116ffd57339253bddbaa4c0d2fa337d3f6441ad2b3fa7ccbacb"
     }
   ]
 }

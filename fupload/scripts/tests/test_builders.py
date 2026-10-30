@@ -1302,9 +1302,10 @@ class BuilderTests(unittest.TestCase):
         session.cc_get.side_effect = FuploadError("live channel discovery unavailable")
         # Current is an ownership-checked fresh server detail, not user input.
         DD()._validate_options(session, "config", {**current, "desc": "New HTML"}, current=current)
+        DD()._validate_options(session, "config", {**current, "sync_room": True}, current=current)
         session.cc_get.assert_not_called()
         for changes in ({"room_id": "other"}, {"channel_id": "other"},
-                        {"channel_type": "Voice"}, {"sync_room": True}):
+                        {"channel_type": "Voice"}):
             with self.subTest(changes=changes), self.assertRaisesRegex(FuploadError, "discovery unavailable"):
                 DD()._validate_options(session, "config", {**current, **changes}, current=current)
         with self.assertRaises(FuploadError):

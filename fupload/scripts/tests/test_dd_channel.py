@@ -82,7 +82,7 @@ class DDChannelTests(unittest.TestCase):
         values = {(1, "_messageCenter"): 3, (2, "_msgCenter"): 3, (2, "_jwt"): 4, (1, "_session"): 5}
         snapshot = {"controller": 1, "helper": 2, "center": 3, "token_object": 4, "session_anchor": 5, "token": "synthetic", "session_value": "anchor"}
         texts = {4: "synthetic", 5: "anchor"}
-        with mock.patch.object(memory, "attribute", side_effect=lambda obj, key: values[(obj,key)]), mock.patch.object(memory, "text", side_effect=lambda obj:texts[obj]), mock.patch.object(memory, "is_logged_in", return_value=True):
+        with mock.patch.object(memory, "attribute", side_effect=lambda obj, key: values[(obj,key)]), mock.patch.object(memory, "text", side_effect=lambda obj:texts[obj]), mock.patch.object(memory, 'type_name', return_value='str'), mock.patch.object(memory, "is_logged_in", return_value=True), mock.patch.object(memory, 'refresh_unchanged', return_value=True):
             self.assertTrue(memory.still_online(snapshot))
             values[(2, "_jwt")] = 6
             self.assertFalse(memory.still_online(snapshot))
@@ -124,11 +124,11 @@ class DDChannelTests(unittest.TestCase):
 
     @unittest.skipUnless(os.name == "nt", "Windows process ownership and integrity boundary")
     def test_permissions_and_opened_process_identity_fail_before_runtime_HTTP(self):
+        from fupload_cli import dd_channel_elevated
         gui = {"pid": 1, "started": 10, "signature": {"status":"Valid"}, "dd_dir": str(Path("fixture-install").resolve())}
-        with mock.patch.object(dd_broker,"running_dd_processes",return_value=[gui]), mock.patch.object(dd_channel,"verify_binding"), mock.patch.object(dd_channel,"Memory",side_effect=dd_channel.SessionReadError("process_read_denied_same_windows_integrity_required")), mock.patch.object(dd_channel,"read_channels") as request:
-            with self.assertRaises(FuploadError) as failed: dd_channel.read_desktop_channels(task_broker=True)
-        self.assertIn("Stop only the current Fupload task session", str(failed.exception))
-        self.assertIn("keep DD running", str(failed.exception))
+        with mock.patch.object(dd_broker,"running_dd_processes",return_value=[gui]), mock.patch.object(dd_channel,"verify_binding"), mock.patch.object(dd_channel,"Memory",side_effect=dd_channel.SessionReadError("process_read_denied_same_windows_integrity_required")), mock.patch.object(dd_channel,"read_channels") as request, mock.patch.object(dd_channel_elevated, 'elevated_channels', return_value=CHOICES) as elevate:
+            self.assertEqual(dd_channel.read_desktop_channels(task_broker=True), CHOICES)
+        elevate.assert_called_once_with(gui)
         request.assert_not_called()
         memory = mock.Mock()
         memory.process_identity.return_value = {"started":11,"executable":str(Path("fixture-install/netease_dd.exe").resolve())}

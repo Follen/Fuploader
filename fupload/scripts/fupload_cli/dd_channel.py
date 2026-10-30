@@ -18,6 +18,7 @@ import struct
 import time
 import urllib.error
 import urllib.request
+import urllib.parse
 
 from .errors import FuploadError
 
@@ -35,7 +36,9 @@ class Memory:
         self.kernel.ReadProcessMemory.restype = w.BOOL
         self.handle = self.kernel.OpenProcess(0x1010, False, pid)
         if not self.handle:
-            raise SessionReadError('process_read_denied_same_windows_integrity_required')
+            reason = ('process_read_denied_same_windows_integrity_required' if ctypes.get_last_error() == 5
+                      else 'GUI_process_open_failed')
+            raise SessionReadError(reason)
         self.types = {}
         try:
             self.base = self.module_base(pid, directory)
@@ -227,11 +230,24 @@ class Memory:
             raise SessionReadError('GUI_LoginController_session_anchor_unavailable')
         session_value = self.text(session_anchor)
         token_object = self.attribute(helper, '_jwt')
-        if not token_object or self.type_name(token_object) == 'NoneType':
-            raise SessionReadError('GUI_JwtHelper_has_no_cached_jwt')
-        token = self.text(token_object)
-        if not token or len(token) > 16384 or any(char in token for char in '\r\n'):
+        token = self.text(token_object) if token_object and self.type_name(token_object) != 'NoneType' else ''
+        if len(token) > 16384 or any(char in token for char in '\r\n'):
             raise SessionReadError('GUI_cached_jwt_layout_invalid')
+        # Official DataCenter.getMyUserInfo returns self._myUserInfo.
+        data_center = self.attribute(helper, '_dataCenter')
+        user = self.attribute(data_center, '_myUserInfo') if data_center else None
+        login_object = self.attribute(helper, '_loginToken')
+        delta_object = self.attribute(helper, '_server_time_delta')
+        if not user or not login_object or not delta_object:
+            raise SessionReadError('GUI_refresh_identity_unavailable')
+        login_token = self.text(login_object)
+        identity = {key: self.scalar(self.attribute(user, key)) for key in ('uid', 'eid', 'ccid')}
+        if (not login_token or any(char in login_token for char in '\r\n') or
+                any(not re.fullmatch(r'[0-9]{1,30}', str(value)) for value in identity.values())):
+            raise SessionReadError('GUI_refresh_identity_invalid')
+        delta = self.scalar(delta_object)
+        if type(delta) not in (int, float) or not -86400 <= delta <= 86400:
+            raise SessionReadError('GUI_server_clock_delta_invalid')
         # Check the same anchor and token object again; do not use a value read
         # across logout/reconnect or a refresh that replaced its Python string.
         if (self.attribute(controller, '_messageCenter') != center or
@@ -239,16 +255,54 @@ class Memory:
                 self.attribute(helper, '_jwt') != token_object or
                 self.attribute(controller, '_session') != session_anchor or not self.is_logged_in(center)):
             raise SessionReadError('GUI_session_changed_during_read')
-        return {'token': token, 'token_object': token_object, 'session_anchor': session_anchor, 'session_value': session_value, 'controller': controller, 'helper': helper, 'center': center}
+        result = {'token': token, 'token_object': token_object, 'session_anchor': session_anchor,
+                  'session_value': session_value, 'controller': controller, 'helper': helper, 'center': center,
+                  'data_center': data_center, 'user': user, 'login_object': login_object,
+                  'login_token': login_token, 'delta_object': delta_object, 'delta': delta, **identity}
+        if not self.still_online(result):
+            raise SessionReadError('GUI_session_changed_during_read')
+        return result
+
+    def scalar(self, obj):
+        if not obj:
+            raise SessionReadError('GUI_identity_field_unavailable')
+        kind = self.type_name(obj)
+        if kind == 'str':
+            return self.text(obj)
+        if kind == 'float':
+            return struct.unpack('<d', self.read(obj + 16, 8))[0]
+        if kind == 'int':
+            # Native account endpoint IDs can use all uint64 bits (3 Python
+            # base-2**30 digits). Keep the narrower Enum reader unchanged.
+            size = self.integer(obj + 16)
+            if not -4 <= size <= 4:
+                raise SessionReadError('GUI_identity_integer_exceeds_limit')
+            result = 0
+            for index in range(abs(size)):
+                digit = struct.unpack('<I', self.read(obj + 24 + index * 4, 4))[0]
+                if digit >= 1 << 30:
+                    raise SessionReadError('GUI_identity_integer_layout_invalid')
+                result |= digit << (30 * index)
+            return -result if size < 0 else result
+        raise SessionReadError('GUI_identity_field_type_invalid')
 
     def still_online(self, snapshot):
         return (self.attribute(snapshot['controller'], '_messageCenter') == snapshot['center'] and
                 self.attribute(snapshot['helper'], '_msgCenter') == snapshot['center'] and
                 self.attribute(snapshot['helper'], '_jwt') == snapshot['token_object'] and
                 self.attribute(snapshot['controller'], '_session') == snapshot['session_anchor'] and
-                self.text(snapshot['token_object']) == snapshot['token'] and
+                (self.text(snapshot['token_object']) if snapshot['token_object'] and self.type_name(snapshot['token_object']) != 'NoneType' else '') == snapshot['token'] and
                 self.text(snapshot['session_anchor']) == snapshot['session_value'] and
-                self.is_logged_in(snapshot['center']))
+                self.is_logged_in(snapshot['center']) and self.refresh_unchanged(snapshot))
+
+    def refresh_unchanged(self, snapshot):
+        return (self.attribute(snapshot['helper'], '_dataCenter') == snapshot['data_center'] and
+                self.attribute(snapshot['data_center'], '_myUserInfo') == snapshot['user'] and
+                self.attribute(snapshot['helper'], '_loginToken') == snapshot['login_object'] and
+                self.text(snapshot['login_object']) == snapshot['login_token'] and
+                self.attribute(snapshot['helper'], '_server_time_delta') == snapshot['delta_object'] and
+                self.scalar(snapshot['delta_object']) == snapshot['delta'] and
+                all(self.scalar(self.attribute(snapshot['user'], key)) == snapshot[key] for key in ('uid', 'eid', 'ccid')))
 
 
 EXPECTED = {
@@ -376,6 +430,55 @@ def validate_cached_jwt(token):
         raise
     except Exception:
         raise SessionReadError('GUI_cached_jwt_payload_invalid') from None
+    return claims
+
+
+def validate_identity_jwt(token, snapshot):
+    claims = validate_cached_jwt(token)
+    user = claims.get('user')
+    if isinstance(user, str):
+        try:
+            user = json.loads(user)
+        except Exception:
+            user = None
+    if (claims.get('appid') != 'webcc' or not isinstance(user, dict) or
+            any(str(user.get(key)) != str(snapshot[key]) for key in ('uid', 'eid')) or
+            type(claims.get('exp')) not in (int, float) or claims['exp'] > time.time() + 1200):
+        raise SessionReadError('GUI_JWT_current_identity_mismatch')
+
+
+def current_channel_token(snapshot):
+    if snapshot['token']:
+        try:
+            validate_identity_jwt(snapshot['token'], snapshot)
+            return snapshot['token']
+        except SessionReadError as error:
+            if str(error) != 'GUI_cached_jwt_is_expired_no_refresh_was_triggered':
+                raise
+    # JwtHelper._requestJwt / getServerTime, official DD 100130. This GET
+    # neither changes the native login nor writes the new JWT into the GUI.
+    timestamp = int(time.time() + snapshot['delta'])
+    signature = hashlib.md5(('webcc_%s_%s' % (timestamp, snapshot['login_token'])).encode('utf-8')).hexdigest()
+    query = urllib.parse.urlencode({'appid': 'webcc', 'uid': snapshot['uid'], 'eid': snapshot['eid'], 'timestamp': timestamp})
+    request = urllib.request.Request('https://api.cc.163.com/v1/jwt?' + query, method='GET',
+                                     headers={'Authentication': signature, 'Accept': 'application/json'})
+    try:
+        with urllib.request.build_opener(NoRedirect).open(request, timeout=15) as response:
+            raw = response.read(1048577)
+        if len(raw) > 1048576:
+            raise SessionReadError('JWT_refresh_response_exceeds_limit')
+        payload = json.loads(raw)
+        token = payload.get('data', {}).get('jwt') if isinstance(payload, dict) and payload.get('code') in ('OK', 0, 200) else None
+        if not isinstance(token, str) or len(token) > 16384:
+            raise SessionReadError('GUI_login_token_refresh_rejected')
+        validate_identity_jwt(token, snapshot)
+        return token
+    except urllib.error.HTTPError as error:
+        raise SessionReadError('JWT_refresh_HTTP_' + str(error.code)) from None
+    except SessionReadError:
+        raise
+    except Exception:
+        raise SessionReadError('JWT_refresh_request_or_JSON_failed') from None
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -406,24 +509,33 @@ def read_channels(token):
 
 
 
-def read_desktop_channels(expected_dd_dir=None, *, task_broker=False):
+def read_desktop_channels(expected_dd_dir=None, *, task_broker=False, _allow_elevation=True,
+                          _expected_gui=None, _profile_anchor=None):
     """Return only channel candidates; never forward a credential to a broker."""
     from .dd_broker import running_dd_processes
 
-    stage, memory, snapshot = "verify_GUI", None, None
+    stage, memory, snapshot, token = "verify_GUI", None, None, ''
     try:
         if os.name != "nt" or ctypes.sizeof(ctypes.c_void_p) != 8:
             raise SessionReadError("requires_Windows_64bit_Python")
         before = running_dd_processes()
         if len(before) != 1 or not before[0].get("signature"):
             raise SessionReadError("requires_one_signature_verified_DD_GUI")
+        if _expected_gui is not None and any(before[0].get(key) != _expected_gui.get(key) for key in ('pid', 'started', 'dd_dir')):
+            raise SessionReadError('GUI_changed_during_UAC')
         install = Path(before[0]["dd_dir"]).resolve()
         if expected_dd_dir is not None and install != Path(expected_dd_dir).resolve():
             raise SessionReadError("GUI_installation_does_not_match_task_session")
         stage = "verify_build"
         verify_binding(install)
         stage = "open_readonly_process"
-        memory = Memory(before[0]["pid"], str(install))
+        try:
+            memory = Memory(before[0]["pid"], str(install))
+        except SessionReadError as error:
+            if _allow_elevation and str(error) == 'process_read_denied_same_windows_integrity_required':
+                from .dd_channel_elevated import elevated_channels
+                return elevated_channels(before[0])
+            raise
         verify_same_user(memory)
         identity = memory.process_identity()
         if (identity['started'] != before[0]['started'] or identity['started'] <= 0 or
@@ -431,33 +543,42 @@ def read_desktop_channels(expected_dd_dir=None, *, task_broker=False):
             raise SessionReadError('opened_GUI_identity_changed_before_read')
         stage = "locate_runtime_objects"
         snapshot = memory.snapshot(RUNTIME_RVA)
+        if _profile_anchor is not None:
+            from .dd_desktop import _network_profiles
+            actual_profiles = _network_profiles([before[0]['pid']])
+            if (len(actual_profiles) != 1 or actual_profiles[0][0] != _profile_anchor['network_pid'] or
+                    str(actual_profiles[0][1]) != _profile_anchor['profile'] or
+                    str(snapshot['ccid']) != Path(_profile_anchor['profile']).parent.name):
+                raise SessionReadError('GUI_account_profile_changed_during_UAC')
         stage = "validate_cached_JWT"
-        validate_cached_jwt(snapshot["token"])
+        token = current_channel_token(snapshot)
+        if not memory.still_online(snapshot):
+            raise SessionReadError('GUI_session_changed_before_channel_query')
         stage = "read_channel_candidates"
-        channels = read_channels(snapshot["token"])
-        if snapshot["token"] in json.dumps(channels, ensure_ascii=False):
+        channels = read_channels(token)
+        serialized = json.dumps(channels, ensure_ascii=False)
+        if any(secret and secret in serialized for secret in (token, snapshot['token'], snapshot.get('login_token'))):
             raise SessionReadError("channel_response_echoed_credential")
         stage = "verify_GUI_session"
         after = running_dd_processes()
         if (not memory.still_online(snapshot) or
                 [(p["pid"], p["started"]) for p in before] != [(p["pid"], p["started"]) for p in after]):
             raise SessionReadError("GUI_session_changed_during_channel_query")
+        if _profile_anchor is not None and [(pid, str(path)) for pid, path in _network_profiles([before[0]['pid']])] != [(_profile_anchor['network_pid'], _profile_anchor['profile'])]:
+            raise SessionReadError('GUI_account_profile_changed_during_channel_query')
         return channels
     except Exception as error:
         reason = str(error) if isinstance(error, SessionReadError) else type(error).__name__
-        if reason == "process_read_denied_same_windows_integrity_required":
-            message = ("Only DD channel discovery requires the same Windows integrity level as the running DD GUI. "
-                       "When DD is elevated, run this channels command from an administrator terminal under the same user. "
-                       "Author uploads do not require this access; no additional login was attempted.")
-            if task_broker:
-                message += (" Stop only the current Fupload task session with `dd session stop --session <id>` and "
-                            "start a new Fupload task session from that administrator terminal; keep DD running.")
-        else:
-            message = "Existing DD GUI channel choices could not be read; no additional login was attempted"
+        if snapshot is not None and any(secret and secret in reason for secret in (token, snapshot.get('token'), snapshot.get('login_token'))):
+            reason = 'channel_read_failed'
+        if isinstance(error, FuploadError):
+            raise
+        message = "Existing DD GUI channel choices could not be read; no additional login was attempted"
         raise FuploadError(message, kind="desktop_channel_unavailable", stage="dependency_get",
                            details={"channel_stage": stage, "reason": reason}) from None
     finally:
         if snapshot is not None:
             snapshot["token"] = ""
+            snapshot['login_token'] = ''
         if memory is not None:
             memory.close()
