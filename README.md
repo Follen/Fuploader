@@ -36,7 +36,7 @@ fupload/
 
 ## 环境要求
 
-- Fuploader npm CLI：Node.js >= 18.18、Python >= 3.9
+- Fuploader npm CLI：Node.js >= 18.18、Python >= 3.11
 - 新手盒子官方通道：Windows、macOS 或 Linux，Node.js >= 18、官方 `ncc` CLI 与本机登录态
 - 新手盒子第三方 Python 通道：Windows、Python 3、已安装并登录新手盒子桌面客户端
 - 网易 DD：Windows、Python 3、已安装并登录官方客户端

@@ -32,7 +32,7 @@ function probe(command, args, minimum) {
   return { command, args, version };
 }
 
-export function discoverPython({ platform = process.platform, minimumMinor = 9 } = {}) {
+export function discoverPython({ platform = process.platform, minimumMinor = 11 } = {}) {
   const candidates = platform === "win32"
     ? [["python", []], ["py", ["-3"]], ["python3", []]]
     : [["python3", []], ["python", []]];
@@ -153,7 +153,7 @@ function inspectRuntime({ root, platform, requirementsHash, env, run }) {
   }
   const command = pythonRuntimeExecutable(root, platform);
   const probe = probeRuntime(command, root, env, run);
-  if (!probe || probe.version[0] !== 3 || probe.version[1] < 9) {
+  if (!probe || probe.version[0] !== 3 || probe.version[1] < 11) {
     return null;
   }
   return { command, args: [], ...probe };
@@ -253,7 +253,7 @@ export function ensurePythonRuntime({
 
     const base = discover({ platform });
     if (!base) {
-      throw new Error("Fuploader requires Python >=3.9,<4.0 to create its managed runtime.");
+      throw new Error("Fuploader requires Python >=3.11,<4.0 to create its managed runtime.");
     }
     const nonce = `${process.pid}-${crypto.randomBytes(8).toString("hex")}`;
     const staging = path.join(parent, `.python-stage-${nonce}`);

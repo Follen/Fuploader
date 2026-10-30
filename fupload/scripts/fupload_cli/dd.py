@@ -262,17 +262,29 @@ class Sidecar:
         self.process: Optional[subprocess.Popen[str]] = None
         self.counter = 0
         self.credential_kind: Optional[str] = None
+        self.session_source = "native-login"
         self.lock_handle = None
         self.responses: queue.Queue[Any] = queue.Queue()
         self.reader_thread: Optional[threading.Thread] = None
 
     def __enter__(self) -> "Sidecar":
+        from .dd_broker import running_dd_processes
+        self.session_source = "native-login"
+        processes = running_dd_processes()
+        cookie = None
+        if processes:
+            from .dd_desktop import borrow_desktop_cookie
+            if any(Path(process["dd_dir"]).resolve() != self.dd_dir.resolve() for process in processes):
+                raise FuploadError("running DD does not match the selected installation", kind="trust_boundary", stage="session")
+            cookie = borrow_desktop_cookie(processes)
+            self.session_source = "desktop-cookie"
         self._lock()
         executable = self.dd_dir / "netease_dd.exe"
         script = Path(__file__).with_name("dd_sidecar.py")
         environment = os.environ.copy()
         environment["NETEASE_DD_DIR"] = str(self.dd_dir)
         environment["FUPLOAD_DD_DEVICE_STATE"] = str(state_dir() / "sidecar-device.json")
+        environment["FUPLOAD_DD_SESSION_MODE"] = self.session_source
         self.process = subprocess.Popen(
             [str(executable), str(script)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL, text=True, encoding="utf-8", errors="strict",
@@ -282,6 +294,9 @@ class Sidecar:
         self.reader_thread = threading.Thread(target=self._read_results, daemon=True)
         self.reader_thread.start()
         try:
+            if cookie is not None:
+                self.process.stdin.write(json.dumps({"schema": "fupload.dd.desktop-session.v1", "cookie": cookie}, ensure_ascii=True) + "\n")
+                self.process.stdin.flush()
             ready = self._next_result(timeout=60)
         except Exception:
             self.close()
@@ -291,7 +306,9 @@ class Sidecar:
             error = ready.get("error") if isinstance(ready.get("error"), dict) else {}
             raise _sidecar_startup_error(error)
         credential_kind = ready.get("credential_kind")
-        if credential_kind not in ("email", "mobile"):
+        if credential_kind not in ("email", "mobile") and not (
+            self.session_source == "desktop-cookie" and credential_kind is None
+        ):
             self.close()
             raise FuploadError(
                 "DD sidecar returned an invalid credential kind",

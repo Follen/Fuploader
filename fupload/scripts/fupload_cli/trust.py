@@ -174,7 +174,7 @@ def _powershell_path() -> str:
     return str(Path(buffer.value) / "System32" / "WindowsPowerShell" / "v1.0" / "powershell.exe")
 
 
-def verify_dd_executable(executable: Path) -> Dict[str, str]:
+def _verify_executable(executable: Path, publishers: Tuple[str, ...], product: str) -> Dict[str, str]:
     powershell = _powershell_path()
     script = (
         "Import-Module Microsoft.PowerShell.Security -ErrorAction Stop; "
@@ -194,15 +194,23 @@ def verify_dd_executable(executable: Path) -> Dict[str, str]:
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
         if completed.returncode != 0:
-            raise FuploadError("DD Authenticode verification process failed", kind="trust_boundary")
+            raise FuploadError(product + " Authenticode verification process failed", kind="trust_boundary")
         payload = json.loads((completed.stdout or "").strip() or "{}")
     except (OSError, subprocess.SubprocessError, ValueError) as exc:
-        raise FuploadError("DD Authenticode verification failed", kind="trust_boundary") from exc
+        raise FuploadError(product + " Authenticode verification failed", kind="trust_boundary") from exc
     status = str(payload.get("Status") or "")
     subject = str(payload.get("Subject") or "")
     match = _SUBJECT_ORGANIZATION.search(subject)
     publisher = (match.group(1) or match.group(2)).strip() if match else ""
     normalized_publisher = publisher.casefold()
-    if status.casefold() != "valid" or normalized_publisher not in ALLOWED_DD_PUBLISHERS:
-        raise FuploadError("DD executable has no trusted official signature", kind="trust_boundary")
+    if status.casefold() != "valid" or normalized_publisher not in publishers:
+        raise FuploadError(product + " executable has no trusted official signature", kind="trust_boundary")
     return {"status": status, "publisher": publisher}
+
+
+def verify_dd_executable(executable: Path) -> Dict[str, str]:
+    return _verify_executable(executable, ALLOWED_DD_PUBLISHERS, "DD")
+
+
+def verify_webview_executable(executable: Path) -> Dict[str, str]:
+    return _verify_executable(executable, ("microsoft corporation",), "WebView2")
