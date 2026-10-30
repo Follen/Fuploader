@@ -1295,6 +1295,21 @@ class BuilderTests(unittest.TestCase):
         form["second_category_ids"] = [2]
         DD()._validate_options(ValidDDOptions(), "plugin", form)
 
+    def test_dd_unchanged_saved_channel_does_not_block_unrelated_edits(self) -> None:
+        current = {"jump_room": True, "room_id": "room", "channel_id": "channel",
+                   "channel_type": "Text", "sync_room": False}
+        session = mock.Mock()
+        session.cc_get.side_effect = FuploadError("live channel discovery unavailable")
+        # Current is an ownership-checked fresh server detail, not user input.
+        DD()._validate_options(session, "config", {**current, "desc": "New HTML"}, current=current)
+        session.cc_get.assert_not_called()
+        for changes in ({"room_id": "other"}, {"channel_id": "other"},
+                        {"channel_type": "Voice"}, {"sync_room": True}):
+            with self.subTest(changes=changes), self.assertRaisesRegex(FuploadError, "discovery unavailable"):
+                DD()._validate_options(session, "config", {**current, **changes}, current=current)
+        with self.assertRaises(FuploadError):
+            DD()._validate_options(session, "config", current)
+
     def test_dd_wa_category_parser_accepts_live_c_id_shape(self) -> None:
         class WAOptions(ValidDDOptions):
             def get(self, endpoint, body):

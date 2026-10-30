@@ -2003,6 +2003,7 @@ class DD(DDBackupMixin):
     def _validate_options(
         self, session: Sidecar, resource: str, form: Mapping[str, Any], *,
         validate_optional_dependencies: bool = True,
+        current: Optional[Mapping[str, Any]] = None,
     ) -> None:
         game_type = form.get("game_type")
         if resource == "plugin":
@@ -2040,7 +2041,12 @@ class DD(DDBackupMixin):
             vip_levels = session.get("/anchor_vip/level/list", {"enrich_acts": "false"})
             self._validate_choices(vip_levels, form.get("vip_levels") or [], ("id", "level", "value"), "$.vip_levels")
 
-        if validate_optional_dependencies and form.get("jump_room"):
+        def channel_selection(value: Mapping[str, Any]) -> Tuple[Any, ...]:
+            return (bool(value.get("jump_room")), str(value.get("room_id") or ""),
+                    str(value.get("channel_id") or ""), str(value.get("channel_type") or ""),
+                    bool(value.get("sync_room")))
+        channel_changed = current is None or channel_selection(current) != channel_selection(form)
+        if validate_optional_dependencies and form.get("jump_room") and channel_changed:
             channels = safe_channels(session.cc_get("https://api.cc.163.com/v1/mixteammsgproxy/channelList?source=pluginPublish"))
             if not channels["items"]:
                 raise FuploadError("live channel response contained no selectable values", kind="platform_data_error")
@@ -2198,6 +2204,7 @@ class DD(DDBackupMixin):
         self._validate_options(
             session, "plugin", form,
             validate_optional_dependencies=action != "update",
+            current=current if action != "create" else None,
         )
         validate_no_display_objects(form, "plugin")
         if doc.get("logo_file"):
@@ -2373,7 +2380,7 @@ class DD(DDBackupMixin):
         validation_form = dict(form)
         validation_form["game_type"] = current.get("game_type") or backup.get("game_type")
         validate_config_submission(form, doc)
-        self._validate_options(session, "config", validation_form)
+        self._validate_options(session, "config", validation_form, current=current if action != "create" else None)
         validate_no_display_objects(form, "config")
         if doc.get("display_img_files"):
             existing_images = list(form.get("display_imgs") or [])
@@ -2448,7 +2455,7 @@ class DD(DDBackupMixin):
         validate_locked_usage_mode(current, form, doc)
         form["category_ids"] = [str(category_id) for category_id in (form.get("category_ids") or [])]
         validate_wa_submission(form, doc)
-        self._validate_options(session, "wa", form)
+        self._validate_options(session, "wa", form, current=current if action != "create" else None)
         validate_no_display_objects(form, "wa")
         if doc.get("display_img_files"):
             existing_images = list(form.get("display_imgs") or [])
