@@ -12,13 +12,13 @@ DD provider 仅支持 Windows 官方 DD 客户端。安装发现按显式 CLI �
 
 `dd session doctor` 只读取安装、版本、签名、GUI 运行状态、受信 Known Folder 状态目录和 broker 状态，不启动任何原生重登录流，不创建登录会话。稳定独立 `clientNo` 原子保存在受信 Roaming AppData 下的 `CCVoiceHub/Fupload/sidecar-device.json`；格式错误时停止，不输出、读取 GUI 值或静默轮换。
 
-`dd session start` 在官方 GUI 运行时也可启动，不关闭或终止 GUI。它使用本机保存的凭据启动独立原生会话，并非接入 GUI 进程内的同一个会话；`--confirm-close-gui` 仅作为兼容旧调用的参数保留，不执行关闭。验证覆盖 GUI 保持在线时的会话启动、作者列表读取、插件 ZIP 上传与下载核对，以及任务会话结束后的 GUI 状态。
+`dd session start` 在官方 GUI 运行时只读复用当前 GUI 会话，不关闭客户端，也不新建原生登录。校验官方 DD 与 WebView2 来源后，读取既有 Cookie；读取失败停止，不回退重新登录。`--confirm-close-gui` 仅保留兼容，不执行关闭。当前字段及证据见 [平台字段总表](../../../../fupload/references/platform-fields.md#dd)。
 
-start 启动本地 task broker，由 broker 独占一个官方 `netease_dd.exe` sidecar，并从官方 `AccountCredStorage` 读取 auto account 和 credential。原生重登录必须按官方枚举严格分流：`Account.method=urs + Cred.type=urs_token + Cred.modifier=normal` 使用 `UrsReLoginFlow(controller, sdk, token, username)`；`Account.method=mobile + Cred.type=urs_mobile_token + Cred.modifier=mobile_password|mobile_uplink` 使用 `MobileReLoginFlow(controller, sdk, cgi, netconfig, token, isPassword, username)`，其中 `isPassword` 仅在 modifier 为 `mobile_password` 时为 true。缺失、未知或相互矛盾的组合在调用任何 flow 前失败，不能根据账号字符串猜测类型，也不能在一条 flow 失败后尝试另一条 flow。
+start 启动本地 task broker，由 broker 独占一个官方 `netease_dd.exe` sidecar。仅 GUI 未运行时从官方 `AccountCredStorage` 读取 auto account 和 credential 并执行持久化登录。原生重登录必须按官方枚举严格分流：`Account.method=urs + Cred.type=urs_token + Cred.modifier=normal` 使用 `UrsReLoginFlow(controller, sdk, token, username)`；`Account.method=mobile + Cred.type=urs_mobile_token + Cred.modifier=normal|mobile_password|mobile_uplink` 使用 `MobileReLoginFlow(controller, sdk, cgi, netconfig, token, isPassword, username)`，其中 `isPassword` 仅在 modifier 为 `mobile_password` 时为 true。缺失、未知或相互矛盾的组合在调用任何 flow 前失败，不能根据账号字符串猜测类型，也不能在一条 flow 失败后尝试另一条 flow。
 
-两类 flow 成功后进入完全相同的 JWT 刷新、作者 API client、GET、解析、上传、mutation、读回和清理管线；不得复制 email/mobile 业务实现。broker 返回不含凭据的 opaque `session_id`；所有 DD 资源命令必须显式连接该 session，不能隐式创建 sidecar。broker 严格串行调度所有操作；同一 Windows 用户只能有一个 Fupload DD session，每个 task 只执行一次匹配的原生重登录。十分钟空闲超时仅作崩溃兜底。
+两类 flow 成功后进入完全相同的 JWT 刷新、作者 API client、GET、解析、上传、mutation、读回和清理管线；不得复制 email/mobile 业务实现。broker 返回不含凭据的 opaque `session_id`；所有 DD 资源命令必须显式连接该 session，不能隐式创建 sidecar。broker 严格串行调度所有操作；同一 Windows 用户只能有一个 Fupload DD session，GUI 运行时原生重登录次数为零；GUI 未运行时每个 task 最多执行一次匹配的原生重登录。十分钟空闲超时仅作崩溃兜底。
 
-`dd session status` 只读 broker 状态，不登录。`dd session stop` 按官方退出链显式调用 message-center logout、泵送事件直到 stopped，再执行依赖释放和 Qt 退出；全部发布任务在 `finally` 中 stop。异常退出后，不重放可能已发送的 mutation，先在新 session 中读回。
+`dd session status` 只读 broker 状态，不登录。`dd session stop` 借用 GUI 模式仅释放本地资源，不调用原生 logout；独立原生模式按官方退出链调用 logout 并释放依赖；全部发布任务在 `finally` 中 stop。异常退出后，不重放可能已发送的 mutation，先在新 session 中读回。
 
 ## 两阶段选择与 GET 依赖图
 
@@ -50,9 +50,9 @@ DD GUI 通过父控件变化后再加载子控件；CLI 不得把这些联动改
 
 ## 动态读取和 endpoint 合同
 
-作者 API 固定 origin 为 `https://uiapi.w.163.com`。原生登录先取 `/server/ts`，再经 NEP 签名调用 `/login/dflogin` 并持有 `x-w163-token`；GET/POST 使用官方 `x-timestamp` 签名，signed URL 只作不透明值。频道链为 `/v1/jwt` 后请求 `/v1/mixteammsgproxy/channelList?source=pluginPublish`，header 为 `Authentication: <jwt>`。
+作者 API 固定 origin 为 `https://uiapi.w.163.com`。原生登录先取 `/server/ts`，再经 NEP 签名调用 `/login/dflogin` 并持有 `x-w163-token`；GET/POST 使用官方 `x-timestamp` 签名，signed URL 只作不透明值。频道链为 `/v1/jwt` 后请求 `/v1/mixteammsgproxy/channelList?source=pluginPublish`，header 为 `Authentication: <jwt>`。 借用 GUI 模式使用既有 Cookie 完成作者 HTTP 认证，不执行 LoginController.startLogin 或桌面 IM 登录。新设/变更频道关联时可按需弹 UAC，由同用户短时只读辅助获取现有会话的频道凭据；JWT 过期只按官方签名 GET 申请，不修改 GUI 内存，不请求新桌面登录。普通上传及保留既有频道关联不提权，取消 UAC 在 mutation 前停止。
 
-只读接口覆盖：`/game_type/list`、`/game_versions/list`、`/addon/category`、`/addon/addon_list`、`/addon/detail_v2`、必要时 `/addon/detail`、`/addon/addon_versions`、`/backup/list`、`/backup/detail`、`/share/list`、`/share/detail`、`/wa/categories`、`/wa/list`、`/wa/detail`、`/anchor_vip/level/list`、频道和当前作者关联候选。列表必须遍历真实分页，作者列表顶层 `count` 可作为总数；空的必需动态候选阻止写入。VIP 等级只在 `need_anchor_vip=true` 时读取，频道只在 `jump_room=true` 时读取，关闭的可选功能不得被无关 endpoint 阻断。既有对象由 detail 确认所有权和稳定详情字段；插件 author item 还承担官方修改弹窗的 latest-version 初始投影，其他资源的 author list 只作交叉核对。两个读模型的时间戳不是可比较的写前门禁。插件 update 在上传前遍历 `/addon/addon_versions` 分页：非空结果用于拒绝任一历史重复版本，空或不可用结果不阻止当前版本检查。写后读回以匹配作者列表项的 `latest_version` 为主，`detail_v2` 是补充投影；空历史不能单独判定写入失败或触发重放。
+只读接口覆盖：`/game_type/list`、`/game_versions/list`、`/addon/category`、`/addon/addon_list`、`/addon/detail_v2`、必要时 `/addon/detail`、`/addon/addon_versions`、`/backup/list`、`/backup/detail`、`/share/list`、`/share/detail`、`/wa/categories`、`/wa/list`、`/wa/detail`、`/anchor_vip/level/list`、频道和当前作者关联候选。列表必须遍历真实分页，作者列表顶层 `count` 可作为总数；空的必需动态候选阻止写入。VIP 等级只在 `need_anchor_vip=true` 时读取，频道只在 `jump_room=true` 且新设/变更目标时读取，关闭的可选功能不得被无关 endpoint 阻断。既有对象由 detail 确认所有权和稳定详情字段；插件 author item 还承担官方修改弹窗的 latest-version 初始投影，其他资源的 author list 只作交叉核对。两个读模型的时间戳不是可比较的写前门禁。插件 update 在上传前遍历 `/addon/addon_versions` 分页：非空结果用于拒绝任一历史重复版本，空或不可用结果不阻止当前版本检查。写后读回以匹配作者列表项的 `latest_version` 为主，`detail_v2` 是补充投影；空历史不能单独判定写入失败或触发重放。
 
 写接口为 `/addon/create|modify|delete`、`/share/create|modify|delete`、`/wa/create|modify|delete`。create、update、edit 虽可能共用 modify endpoint，仍使用独立动作白名单；delete 只接收资源 ID、显式确认字段和当前 session，在 delete 前 GET 所有权/状态，在 delete 后 list/get 读回不存在状态。
 

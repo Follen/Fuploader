@@ -119,6 +119,49 @@ class CurseForgeTests(unittest.TestCase):
             provider.project_list(42)
         self.assertIn("authorId=42", request.call_args.args[0])
 
+    def test_project_list_collects_all_pages_with_api_page_size_limit(self) -> None:
+        provider = CurseForge({"CURSEFORGE_API_KEY": "core-secret"})
+        pages = [
+            {"data": [{"id": i, "name": "Project %s" % i} for i in range(1, 51)], "pagination": {"index": 0, "pageSize": 50, "resultCount": 50, "totalCount": 52}},
+            {"data": [{"id": i, "name": "Project %s" % i} for i in (51, 52)], "pagination": {"index": 50, "pageSize": 50, "resultCount": 2, "totalCount": 52}},
+        ]
+        with mock.patch("fupload_cli.curseforge.json_request", side_effect=pages) as request:
+            result = provider.project_list(42)
+        self.assertEqual([item["id"] for item in result["projects"]], list(range(1, 53)))
+        self.assertTrue(result["complete"])
+        self.assertEqual(result["total_count"], 52)
+        self.assertEqual(result["pages"], 2)
+        from urllib.parse import parse_qs, urlsplit
+        queries = [parse_qs(urlsplit(call.args[0]).query) for call in request.call_args_list]
+        self.assertEqual([query["index"] for query in queries], [["0"], ["50"]])
+        self.assertTrue(all(query["pageSize"] == ["50"] and query["authorId"] == ["42"] for query in queries))
+
+    def test_project_list_rejects_repeated_pages_and_incomplete_pagination(self) -> None:
+        provider = CurseForge({"CURSEFORGE_API_KEY": "core-secret"})
+        first = {"data": [{"id": 1}], "pagination": {"totalCount": 2}}
+        cases = (
+            [first, first],
+            [first, {"data": [], "pagination": {"totalCount": 2}}],
+            [first, {"data": [{"id": 2}], "pagination": {"totalCount": 3}}],
+            [{"data": [{"id": 1}], "pagination": {"totalCount": 10001}}],
+            [{"data": [{"id": 1}, {"id": 1}], "pagination": {"totalCount": 2}}],
+        )
+        for pages in cases:
+            with self.subTest(pages=pages), mock.patch("fupload_cli.curseforge.json_request", side_effect=pages):
+                with self.assertRaises(FuploadError):
+                    provider.project_list(42)
+
+    def test_project_list_without_total_continues_after_short_pages_until_empty(self) -> None:
+        provider = CurseForge({"CURSEFORGE_API_KEY": "core-secret"})
+        pages = [{"data": [{"id": 1}]}, {"data": [{"id": 2}]}, {"data": [], "pagination": {"index": 2, "resultCount": 0, "pageSize": 0}}]
+        with mock.patch("fupload_cli.curseforge.json_request", side_effect=pages) as request:
+            result = provider.project_list(42)
+        self.assertEqual([item["id"] for item in result["projects"]], [1, 2])
+        self.assertEqual(result["total_count"], 2)
+        self.assertEqual(result["author_scope"], "member")
+        self.assertTrue(result["complete"])
+        self.assertEqual(request.call_count, 3)
+
     def test_game_versions_uses_upload_token(self) -> None:
         provider = CurseForge({"CURSEFORGE_UPLOAD_TOKEN": "upload-secret"})
         with mock.patch("fupload_cli.curseforge.json_request", return_value=[{"id": 1}]) as request:

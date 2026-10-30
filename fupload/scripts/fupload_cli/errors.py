@@ -11,20 +11,21 @@ _JWT = re.compile(r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]+\
 _WA_VALUE = re.compile(r"!WA:\d+![^\s\"']+")
 _SIGNED = re.compile(r"(?i)(X-Amz-(?:Credential|Signature)=)[^&\s]+")
 _SIGNED_TOKEN = re.compile(r"(?i)(X-Amz-(?:Security-Token|Date|Expires)=)[^&\s]+")
-_URL_TOKEN = re.compile(r"(?i)([?&](?:token|jwt|clientNo|client_no|signature|credential)=)[^&\s]+")
+_URL_TOKEN = re.compile(r"(?i)([?&](?:token|jwt|clientNo|client_no|signature|credential|pkey|user_pkey|code|phone|phone_num)=)[^&\s]+")
 _COOKIE = re.compile(r"(?i)(Cookie|Set-Cookie|Authentication|Authorization)(\s*[:=]\s*)[^\s;]+")
 _SECRET_NAME = (
     r"(?:access[_-]?token|refresh[_-]?token|resource[_-]?token|token|clientNo|client_no|"
     r"clientId|client_id|client[_-]?secret|device[_-]?(?:id|proof)|login[_-]?code|jwt|"
     r"credential|signature|api[_-]?key|auth[_-]?key|password|secret|cookie|set[_-]?cookie|"
-    r"authorization|authentication|signed[_-]?url|upload[_-]?url|presigned[_-]?(?:uri|url))"
+    r"authorization|authentication|signed[_-]?url|upload[_-]?url|presigned[_-]?(?:uri|url)|"
+    r"user[_-]?pkey|pkey|phone[_-]?num(?:ber)?|sms[_-]?code|oauth[_-]?code|wx[_-]?code)"
 )
 _TOKEN_PAIR = re.compile(
     r'''(?i)((?:["']?''' + _SECRET_NAME + r'''["']?)\s*[:=]\s*["']?)[^"',}&\s]+'''
 )
 
 
-def redact(value: str) -> str:
+def redact(value: str, *, limit: Optional[int] = 1000) -> str:
     value = _BEARER.sub("Bearer [REDACTED]", str(value))
     value = _JWT.sub("[REDACTED_JWT]", value)
     value = _WA_VALUE.sub("[REDACTED_WA]", value)
@@ -32,7 +33,8 @@ def redact(value: str) -> str:
     value = _SIGNED_TOKEN.sub(r"\1[REDACTED]", value)
     value = _URL_TOKEN.sub(r"\1[REDACTED]", value)
     value = _COOKIE.sub(r"\1\2[REDACTED]", value)
-    return _TOKEN_PAIR.sub(r"\1[REDACTED]", value)[:1000]
+    value = _TOKEN_PAIR.sub(r"\1[REDACTED]", value)
+    return value if limit is None else value[:limit]
 
 
 class FuploadError(Exception):

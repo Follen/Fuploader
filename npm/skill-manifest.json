@@ -1,9 +1,9 @@
 {
   "schema": "fupload.npm-skill-manifest.v1",
   "package_name": "@follenfang/fupload",
-  "package_version": "1.0.2",
-  "skill_version": "1.0.2",
-  "tree_sha256": "9ebbf3f32c915314e83922dd01a1f988178b14e3af485161d73264bd3240c51d",
+  "package_version": "1.1.0",
+  "skill_version": "1.1.0",
+  "tree_sha256": "b64a337ecebb0ce9296104af12a08325501a73ac83236f0f346d2f8f4f9fa4f5",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -77,88 +77,143 @@
     },
     {
       "path": "references/blackbox.md",
-      "bytes": 2966,
-      "sha256": "ea95e8826af8e54c82343c404f9c97a611ab8ec3fb0282b561907c50169e4307"
+      "bytes": 3381,
+      "sha256": "5a18ac36359b5c12c51ec4942e830dae5729d8e2ce22f654bdc6ac612d5931d5"
     },
     {
       "path": "references/curseforge.md",
-      "bytes": 11991,
-      "sha256": "83ecdc058ed63f97d66977a3a0695c4c7766ddd1accd99a3370ca6104230e62e"
+      "bytes": 1697,
+      "sha256": "f467e75639bd583d9e809d3f7a3dea5692d265ed6a6ae07e51eb93485119c72f"
     },
     {
       "path": "references/dd.md",
-      "bytes": 23096,
-      "sha256": "e41b075cfee96c15eb19ef1ec128e4a937ca85afc8ae8cdd01824196dfc9ae3f"
+      "bytes": 3588,
+      "sha256": "a4e0cdb33f28caf8be2481f4ba9b6df46e492ef072ef5ce2fcd2c3791354f589"
     },
     {
       "path": "references/modus.md",
-      "bytes": 38146,
-      "sha256": "1aa357333988e076b2ab3754a6f530b6e0b8ed30cc6bdd0091bab3cece970f18"
+      "bytes": 2625,
+      "sha256": "595e31db16fb606508fd74f0110beacf3a798da92d3b2af95ce959ebdda2da05"
     },
     {
       "path": "references/newbee-official-cli.md",
-      "bytes": 25535,
-      "sha256": "2499add2a7a571ed85cc0cf1cfc31513dbbc57a6d001a47045087a48a646f080"
+      "bytes": 26889,
+      "sha256": "a5c3e93b6080e981568e437674fd49a23af27c7e108b939f4c1d8389bcd915b0"
     },
     {
       "path": "references/newbee.md",
-      "bytes": 8218,
-      "sha256": "3fa375a6719c5c0080f209245c575fd0f568c8797f0e5d49af1ea3cc4f2278a8"
+      "bytes": 2581,
+      "sha256": "83fba0baea70474159847ab2b52491918d6dea9be41f7aaa4aa8fc2fb80184e5"
+    },
+    {
+      "path": "references/platform-fields.md",
+      "bytes": 278589,
+      "sha256": "c2bc7374348a2936df6698ff08bd8afc761e4940ec71c105a90a4c78e1cf5f8f"
     },
     {
       "path": "references/workflow.md",
-      "bytes": 6034,
-      "sha256": "b3eeca2e9b8926aab79c9dc75362bc6461285ac6072c3495f76b231df0e4f4a6"
+      "bytes": 6873,
+      "sha256": "39af009eb525972afc7e4381a0e8cc516c8ff86f13a057ed4cee325b8c8a8505"
     },
     {
       "path": "scripts/fupload_cli/__init__.py",
       "bytes": 49,
-      "sha256": "802b7319bdb1fc63e17e5090021848fc1215a74ce370e1b0476d485a5c1b2551"
+      "sha256": "ecba2b360c5bb2df1000de57668057ceda9ec13b303915778410ebc212365db9"
+    },
+    {
+      "path": "scripts/fupload_cli/blackbox_auth.py",
+      "bytes": 32088,
+      "sha256": "fdf322da0b3c7e9de7eb6858910bbdd69a5f15a8748885f647ed9b4eb7b4a2dc"
+    },
+    {
+      "path": "scripts/fupload_cli/blackbox_backup.py",
+      "bytes": 28620,
+      "sha256": "208e122b25cce20d99bd3b422ec780eb95ecb676ab5e1442fdaf56adff0f898c"
+    },
+    {
+      "path": "scripts/fupload_cli/blackbox_config.py",
+      "bytes": 27361,
+      "sha256": "d6f18704a978b3e96aa5d77fee0fd5cbaefe604887c258e704932904d554ab59"
+    },
+    {
+      "path": "scripts/fupload_cli/blackbox_http.py",
+      "bytes": 25581,
+      "sha256": "b771f2f631d705ad770546310c0d91b9a8d5407cbda28c7464be260be5f3db65"
     },
     {
       "path": "scripts/fupload_cli/blackbox_web.py",
-      "bytes": 19392,
-      "sha256": "4a849fb297f045b81d261f4456542c165a3c0d9a77f963dbfcbc1c9dad8fec65"
+      "bytes": 19896,
+      "sha256": "941da592332b31cf240964097baecd2904de34068e4cd6ac780c5ea65957b611"
     },
     {
       "path": "scripts/fupload_cli/blackbox.py",
-      "bytes": 17089,
-      "sha256": "4487141898ba6a080d2120c1df9ad83c290528e9b462acb22d6c0f89dbbd117c"
+      "bytes": 19303,
+      "sha256": "e2dd1fa51e55355b62edd8a4cd15527fc8816260725275d3ca41db16002b3072"
+    },
+    {
+      "path": "scripts/fupload_cli/chromium_leveldb.py",
+      "bytes": 13221,
+      "sha256": "7a2fdf7f6cb7ec0b1079dca3ae4da0606cd35156dfafef703cb717f6faf01ca9"
     },
     {
       "path": "scripts/fupload_cli/cli.py",
-      "bytes": 37367,
-      "sha256": "d41692235161079c59776e0d25f5e928b5c45c3a0fbe9ecc7debc66b60a54fd0"
+      "bytes": 43427,
+      "sha256": "691fc4c06a3e833e8019241bd7ce1946b24c8da3749ba12597823b2ec57e3af7"
     },
     {
       "path": "scripts/fupload_cli/curseforge.py",
-      "bytes": 7959,
-      "sha256": "c607c6caba5c551a7e3970bd152de94ab1e96350ee73969048f5aea5bf42c75d"
+      "bytes": 10069,
+      "sha256": "30ad2e1453e54b043e9752c8aee9be3029394e0ba9cd5fc330438327ca81acd9"
+    },
+    {
+      "path": "scripts/fupload_cli/dd_backup.py",
+      "bytes": 40270,
+      "sha256": "eb921a567597ad4c40d6c9e09035cf1e80b498858efd4995d975e11f9201ae27"
     },
     {
       "path": "scripts/fupload_cli/dd_broker.py",
-      "bytes": 28098,
-      "sha256": "20350608544f8654def92f01246f6bd898e320b4f0ebbbfa6480b5abf17ef217"
+      "bytes": 28615,
+      "sha256": "523ce06a7b4b98bfa892254d8ca6f1fed475cd2eabccf016a6211e6c3249fa2e"
+    },
+    {
+      "path": "scripts/fupload_cli/dd_channel_elevated.py",
+      "bytes": 17409,
+      "sha256": "b22331ea3ef0e6fdfc48b8e6df40b9170926639ddca8729ea09b2fdcf236b775"
+    },
+    {
+      "path": "scripts/fupload_cli/dd_channel.py",
+      "bytes": 31119,
+      "sha256": "ff0119ca62b4abe9e3a1c6a192aebbe2124a357acc63b55d60c19208a11affe0"
+    },
+    {
+      "path": "scripts/fupload_cli/dd_desktop.py",
+      "bytes": 21316,
+      "sha256": "51ce65d11351e370d3f6bf174430cd038cf421e5bff09edb8b535a41f28deae2"
     },
     {
       "path": "scripts/fupload_cli/dd_sidecar.py",
-      "bytes": 39309,
-      "sha256": "fa0658f9cd4d5c85f4f1f84dd79bf7b33b5cafb74813107acc09fcf1f17d508c"
+      "bytes": 41585,
+      "sha256": "5701e835da6755b67c482fdb9ce99788d6f24a4cab7a48096a329e65bee4fb7f"
     },
     {
       "path": "scripts/fupload_cli/dd.py",
-      "bytes": 117910,
-      "sha256": "df9739aeade420e8c6b958519df690b5e9a4d1abfc17f1b5db2f70aa2d20698c"
+      "bytes": 122993,
+      "sha256": "6893433b4a2dfaab8d0fffbed553909b94bb9bec632ebdc0e19e5d52175a630f"
     },
     {
       "path": "scripts/fupload_cli/errors.py",
-      "bytes": 3854,
-      "sha256": "6608a78e2fdc5e2ed9e5b329ce7dbed78d6c1dd9fc2144b6c9bc488c5c366a05"
+      "bytes": 4058,
+      "sha256": "60cbac0d5bdbad5ea0d0c2ffd59286072b72de451418ac263658e4637cafc98d"
     },
     {
       "path": "scripts/fupload_cli/io.py",
-      "bytes": 5436,
-      "sha256": "4e5929f80223493057244613caf23575275c5838bf6505da0f3b01c5bae791da"
+      "bytes": 6208,
+      "sha256": "40eb2de3f66df3623ee468309453b38c172ff9a684ecc13e9e048b26ba326e93"
+    },
+    {
+      "path": "scripts/fupload_cli/modus_backup.py",
+      "bytes": 47337,
+      "sha256": "9f507b55ff8450b1349c250f1d9e4e54638be4f8e7026ff246ef32a19a5c0561"
     },
     {
       "path": "scripts/fupload_cli/modus_zip.py",
@@ -167,8 +222,8 @@
     },
     {
       "path": "scripts/fupload_cli/modus.py",
-      "bytes": 74167,
-      "sha256": "f4ac5820476593f3db0a621faac61cbed319b0a046fb35945f9a684f292d0e5f"
+      "bytes": 91837,
+      "sha256": "95d2d7766884708182aac53d5c0b617723acb011553e74ad065a51106b997adf"
     },
     {
       "path": "scripts/fupload_cli/newbee_auth.py",
@@ -176,14 +231,19 @@
       "sha256": "7bc00be625dd139cc4d3abe3c753eaa9bc7339a4e879e0de6fc191d5a43f4e56"
     },
     {
+      "path": "scripts/fupload_cli/newbee_backup.py",
+      "bytes": 53007,
+      "sha256": "ed6fa8c6f60909ebb4fc9eaae0a893141340d34ca00ec163705cab086177675c"
+    },
+    {
       "path": "scripts/fupload_cli/newbee.py",
-      "bytes": 79718,
-      "sha256": "a654668b7465fbfe553b75c6aefccccb1cd3a8704f24c6f0af233865f1cb642a"
+      "bytes": 81597,
+      "sha256": "fb8f224b646cc7eca7dfbeb222d14444f7d0d69f7bf6d07091da9303f6d1be43"
     },
     {
       "path": "scripts/fupload_cli/schema.py",
-      "bytes": 56813,
-      "sha256": "61c3ad7f509c0c547523ee711def1a5dc5282b61e234321f7b25ef211f88dbde"
+      "bytes": 77539,
+      "sha256": "393c1b8d94e4db79d8696b63cd9d02c5513ef0a00c1ed873103396ed7acc5ceb"
     },
     {
       "path": "scripts/fupload_cli/state_machine.py",
@@ -197,8 +257,8 @@
     },
     {
       "path": "scripts/fupload_cli/trust.py",
-      "bytes": 9462,
-      "sha256": "79d31833a16d71ec132612a4a2fd2f015770df469e7db06933b3ea530022c97d"
+      "bytes": 9802,
+      "sha256": "8cbfd1b34500bba7f71f415b5fa36f8a784998a92af86586e8d7bc266221eb26"
     },
     {
       "path": "scripts/fupload.py",
@@ -207,8 +267,8 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 27838,
-      "sha256": "6f75ecaf69889875d4a4d4f8f04a7e3f77dfe3363334cdbd876084fcf8aeb09d"
+      "bytes": 31420,
+      "sha256": "794ee31979b05116ffd57339253bddbaa4c0d2fa337d3f6441ad2b3fa7ccbacb"
     }
   ]
 }

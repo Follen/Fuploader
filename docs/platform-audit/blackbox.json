@@ -1,0 +1,620 @@
+{
+  "plugin.edit.id": {
+    "wire": "POST /wow/open_platform/module/update/ form.id",
+    "stage": "module_update",
+    "condition": "读取module后合并；未提供值保持原值；form不是JSON正文",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:module_edit; captured Open frontend static.max-c.com__index-B2qQ5GFk.js PluginInfoForm.getFormData / ge"
+  },
+  "plugin.edit.name": {
+    "wire": "POST /wow/open_platform/module/update/ form.name",
+    "stage": "module_update",
+    "condition": "读取module后合并；未提供值保持原值；form不是JSON正文",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:module_edit; captured Open frontend static.max-c.com__index-B2qQ5GFk.js PluginInfoForm.getFormData / ge"
+  },
+  "plugin.edit.logo_url": {
+    "wire": "POST /wow/open_platform/module/update/ form.logoUrl",
+    "stage": "module_update",
+    "condition": "读取module后合并；未提供值保持原值；form不是JSON正文",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:module_edit; captured Open frontend static.max-c.com__index-B2qQ5GFk.js PluginInfoForm.getFormData / ge"
+  },
+  "plugin.edit.category_ids": {
+    "wire": "POST /wow/open_platform/module/update/ form.categoryIds",
+    "stage": "module_update",
+    "condition": "读取module后合并；未提供值保持原值；form不是JSON正文",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:module_edit; captured Open frontend static.max-c.com__index-B2qQ5GFk.js PluginInfoForm.getFormData / ge"
+  },
+  "plugin.edit.type": {
+    "wire": "POST /wow/open_platform/module/update/ form.type",
+    "stage": "module_update",
+    "condition": "读取module后合并；未提供值保持原值；form不是JSON正文",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:module_edit; captured Open frontend static.max-c.com__index-B2qQ5GFk.js PluginInfoForm.getFormData / ge"
+  },
+  "plugin.edit.desc": {
+    "wire": "POST /wow/open_platform/module/update/ form.desc",
+    "stage": "module_update",
+    "condition": "读取module后合并；未提供值保持原值；form不是JSON正文",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:module_edit; captured Open frontend static.max-c.com__index-B2qQ5GFk.js PluginInfoForm.getFormData / ge"
+  },
+  "plugin.edit.official": {
+    "wire": "POST /wow/open_platform/module/update/ form.official",
+    "stage": "module_update",
+    "condition": "读取module后合并；未提供值保持原值；form不是JSON正文",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:module_edit; captured Open frontend static.max-c.com__index-B2qQ5GFk.js PluginInfoForm.getFormData / ge"
+  },
+  "plugin.edit.official_url": {
+    "wire": "POST /wow/open_platform/module/update/ form.officialUrl",
+    "stage": "module_update",
+    "condition": "读取module后合并；未提供值保持原值；form不是JSON正文",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:module_edit; captured Open frontend static.max-c.com__index-B2qQ5GFk.js PluginInfoForm.getFormData / ge"
+  },
+  "plugin.edit.core_folders": {
+    "wire": "POST /wow/open_platform/module/update/ form.coreFolders",
+    "stage": "module_update",
+    "condition": "稀疏输入先读完整module；core_folders数组join逗号；type9整合插件UI显示coreFolders。保留未改字段；id不改绑",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:module_edit; captured Open frontend static.max-c.com__index-B2qQ5GFk.js PluginInfoForm.getFormData / ge"
+  },
+  "plugin.update.module_id": {
+    "wire": "POST /wow/open_platform/module_version/upsert/ form.moduleId",
+    "stage": "version_upsert",
+    "condition": "version_id存在时更新；无version_id创建；module_id绑定所属模块",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "plugin.update.name": {
+    "wire": "POST /wow/open_platform/module_version/upsert/ form.name",
+    "stage": "version_upsert",
+    "condition": "version_id存在时更新；无version_id创建；module_id绑定所属模块",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "plugin.update.type": {
+    "wire": "POST /wow/open_platform/module_version/upsert/ form.type",
+    "stage": "version_upsert",
+    "condition": "version_id存在时更新；无version_id创建；module_id绑定所属模块",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "plugin.update.game_versions": {
+    "wire": "POST /wow/open_platform/module_version/upsert/ form.gameVersions",
+    "stage": "version_upsert",
+    "condition": "game_versions join逗号",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "plugin.update.file_url": {
+    "wire": "POST /wow/open_platform/module_version/upsert/ form.fileUrl",
+    "stage": "version_upsert",
+    "condition": "file上传优先；edit未给新file/file_url时保留当前fileUrlHeybox",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "plugin.update.file": {
+    "wire": "POST /wow/cos/upload/token/ form.jsonData=JSON.stringify({upload_infos:[{filename,file_size:bytes/1024/1024,type:module}]}); COS archive URL→upsert form.fileUrl",
+    "stage": "archive_upload",
+    "condition": "本地ZIP存在且有效；file优先覆盖file_url；COS上传与metadata更新为不同步骤；上传失败不写metadata",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:upload_zip/_upload_zip_legacy; fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "version.edit.module_id": {
+    "wire": "POST /wow/open_platform/module_version/upsert/ form.moduleId",
+    "stage": "version_upsert",
+    "condition": "version_id存在时更新；无version_id创建；module_id绑定所属模块",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "version.edit.version_id": {
+    "wire": "POST /wow/open_platform/module_version/upsert/ form.versionId",
+    "stage": "version_upsert",
+    "condition": "version_id存在时更新；无version_id创建；module_id绑定所属模块",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "version.edit.name": {
+    "wire": "POST /wow/open_platform/module_version/upsert/ form.name",
+    "stage": "version_upsert",
+    "condition": "version_id存在时更新；无version_id创建；module_id绑定所属模块",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "version.edit.type": {
+    "wire": "POST /wow/open_platform/module_version/upsert/ form.type",
+    "stage": "version_upsert",
+    "condition": "version_id存在时更新；无version_id创建；module_id绑定所属模块",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "version.edit.game_versions": {
+    "wire": "POST /wow/open_platform/module_version/upsert/ form.gameVersions",
+    "stage": "version_upsert",
+    "condition": "game_versions join逗号",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "version.edit.file_url": {
+    "wire": "POST /wow/open_platform/module_version/upsert/ form.fileUrl",
+    "stage": "version_upsert",
+    "condition": "file上传优先；edit未给新file/file_url时保留当前fileUrlHeybox",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "version.edit.file": {
+    "wire": "POST /wow/cos/upload/token/ form.jsonData=JSON.stringify({upload_infos:[{filename,file_size:bytes/1024/1024,type:module}]}); COS archive URL→upsert form.fileUrl",
+    "stage": "archive_upload",
+    "condition": "本地ZIP存在且有效；file优先覆盖file_url；COS上传与metadata更新为不同步骤；上传失败不写metadata",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:upload_zip/_upload_zip_legacy; fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
+  },
+  "version.delete.version_id": {
+    "wire": "POST /wow/open_platform/module_version/delete/ form.versionId",
+    "stage": "version_delete",
+    "condition": "空业务query；单次写入后只读确认，不重放",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_delete; index-B2qQ5GFk.js PluginVersionList.B / Ae"
+  },
+  "version.delete.module_id": {
+    "wire": "POST /wow/open_platform/module_version/delete/ form.moduleId",
+    "stage": "version_delete",
+    "condition": "空业务query；单次写入后只读确认，不重放",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_delete; index-B2qQ5GFk.js PluginVersionList.B / Ae"
+  },
+  "config.create.configuration": {
+    "wire": "form.configuration=JSON.stringify(完整绑定备份+已有分享内容+稀疏patch)",
+    "stage": "share_write",
+    "condition": "create→POST /wow/create_config_share/；update/edit→POST /wow/update_config_share/。ID/IsClassic/Strappid来自经验证backup，调用者不可覆盖；创建后owned摘要缺BackupID时读取detail确认绑定，不重发create",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.create.backup_id": {
+    "wire": "query.backup_id；同时绑定完整configuration.ID/IsClassic/Strappid",
+    "stage": "share_write",
+    "condition": "create必填；update默认现BackupID；更换备份须显式重选五类内容，不继承旧角色；创建后owned摘要缺BackupID时读取detail确认绑定，不重发create",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.update.configuration": {
+    "wire": "form.configuration=JSON.stringify(完整绑定备份+已有分享内容+稀疏patch)",
+    "stage": "share_write",
+    "condition": "create→POST /wow/create_config_share/；update/edit→POST /wow/update_config_share/。ID/IsClassic/Strappid来自经验证backup，调用者不可覆盖",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.update.backup_id": {
+    "wire": "query.backup_id；同时绑定完整configuration.ID/IsClassic/Strappid",
+    "stage": "share_write",
+    "condition": "create必填；update默认现BackupID；更换备份须显式重选五类内容，不继承旧角色",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.update.share_id": {
+    "wire": "query.share_id",
+    "stage": "share_write",
+    "condition": "先GET语义POST /wow/v2/share/detail/，核验ShareID/BackupID并保留富文本/图片",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.edit.configuration": {
+    "wire": "form.configuration=JSON.stringify(完整绑定备份+已有分享内容+稀疏patch)",
+    "stage": "share_write",
+    "condition": "create→POST /wow/create_config_share/；update/edit→POST /wow/update_config_share/。ID/IsClassic/Strappid来自经验证backup，调用者不可覆盖",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.edit.backup_id": {
+    "wire": "query.backup_id；同时绑定完整configuration.ID/IsClassic/Strappid",
+    "stage": "share_write",
+    "condition": "create必填；update默认现BackupID；更换备份须显式重选五类内容，不继承旧角色",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.edit.share_id": {
+    "wire": "query.share_id",
+    "stage": "share_write",
+    "condition": "先GET语义POST /wow/v2/share/detail/，核验ShareID/BackupID并保留富文本/图片",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.Article": {
+    "wire": "JSON.parse(form.configuration).Article",
+    "stage": "share_write",
+    "condition": "富文本string，原样传递；update未改则保留字节内容，不截HTML",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.ChatInviteCode": {
+    "wire": "JSON.parse(form.configuration).ChatInviteCode",
+    "stage": "share_write",
+    "condition": "string；官方来自get_user_room_list选择房间invite_code；当前CLI未额外核验房间归属",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.ClearFonts": {
+    "wire": "JSON.parse(form.configuration).ClearFonts",
+    "stage": "share_write",
+    "condition": "boolean；是否清空目标对应类别，不是自动全选；create默认false",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.ClearKnownAddons": {
+    "wire": "JSON.parse(form.configuration).ClearKnownAddons",
+    "stage": "share_write",
+    "condition": "boolean；是否清空目标对应类别，不是自动全选；create默认false",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.ClearMaterials": {
+    "wire": "JSON.parse(form.configuration).ClearMaterials",
+    "stage": "share_write",
+    "condition": "boolean；是否清空目标对应类别，不是自动全选；create默认false",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.ClearUnknownAddons": {
+    "wire": "JSON.parse(form.configuration).ClearUnknownAddons",
+    "stage": "share_write",
+    "condition": "boolean；是否清空目标对应类别，不是自动全选；create默认false",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.Fonts": {
+    "wire": "JSON.parse(form.configuration).Fonts",
+    "stage": "share_write",
+    "condition": "{Files:[完整已选文件对象]}；保留绑定备份容器其它元数据；Files空则发布正文省略容器；核验Name属于backup",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.KnownAddons": {
+    "wire": "JSON.parse(form.configuration).KnownAddons",
+    "stage": "share_write",
+    "condition": "array<object>从绑定备份选择；WTF每账号必须显式RealmCharacters[{Realm,Player}]；KnownAddons核验ID",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.Materials": {
+    "wire": "JSON.parse(form.configuration).Materials",
+    "stage": "share_write",
+    "condition": "{Files:[完整已选文件对象]}；保留绑定备份容器其它元数据；Files空则发布正文省略容器；核验Name属于backup",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.NeedsPush": {
+    "wire": "JSON.parse(form.configuration).NeedsPush",
+    "stage": "share_write",
+    "condition": "boolean；官方ke只在更新时赋通知订阅者选择；create中该字段效果unknown",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.Open": {
+    "wire": "JSON.parse(form.configuration).Open",
+    "stage": "share_write",
+    "condition": "boolean；true需ThumbList非空；与公开审核有关",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.SubscribeLevel": {
+    "wire": "JSON.parse(form.configuration).SubscribeLevel",
+    "stage": "share_write",
+    "condition": "integer>=0；当前官方ke仅赋0，非0业务语义unknown，未据UI默认值禁用",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.ThumbList": {
+    "wire": "JSON.parse(form.configuration).ThumbList",
+    "stage": "share_write",
+    "condition": "array<string>图片引用；Open=true至少1张；保留已有引用及query",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.Title": {
+    "wire": "JSON.parse(form.configuration).Title",
+    "stage": "share_write",
+    "condition": "非空；官方JS title.replace(/[^\\x00-\\xff]/g,ab).length<=70，Latin-1权重1、BMP>255权重2、astral权重4；provider已验证",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.UnknownAddons": {
+    "wire": "JSON.parse(form.configuration).UnknownAddons",
+    "stage": "share_write",
+    "condition": "{Files:[完整已选文件对象]}；保留绑定备份容器其它元数据；Files空则发布正文省略容器；核验Name属于backup",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.UpdateLog": {
+    "wire": "JSON.parse(form.configuration).UpdateLog",
+    "stage": "share_write",
+    "condition": "富文本string，原样传递；update未改则保留字节内容，不截HTML",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.WTFList": {
+    "wire": "JSON.parse(form.configuration).WTFList",
+    "stage": "share_write",
+    "condition": "array<object>从绑定备份选择；WTF每账号必须显式RealmCharacters[{Realm,Player}]；KnownAddons核验ID",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.*.configuration.ID/IsClassic/Strappid": {
+    "wire": "unknown as caller input: explicitly prohibited",
+    "stage": "local_validation",
+    "condition": "仅从backup继承，不是schema可写字段",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
+  },
+  "config.delete.share_id": {
+    "wire": "POST /wow/update_config_share/ query.share_id + current.BackupID + delete=1；无configuration正文",
+    "stage": "share_delete",
+    "condition": "先完整枚举当前账号该游戏分享确认归属；删除后读回列表确认",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_delete"
+  },
+  "config.delete.confirm_delete": {
+    "wire": "不发送",
+    "stage": "local_confirmation",
+    "condition": "必须true；CLI schema约束",
+    "evidence": "fupload/scripts/fupload_cli/schema.py:blackbox.config.delete"
+  },
+  "backup.generate.game_dir": {
+    "wire": "不发送路径；仅本地扫描/生成manifest与ZIP",
+    "stage": "local_package",
+    "condition": "output_dir必须在game_dir之外且不存在；拒绝symlink/reparse/traversal",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.generate.output_dir": {
+    "wire": "不发送路径；仅本地扫描/生成manifest与ZIP",
+    "stage": "local_package",
+    "condition": "output_dir必须在game_dir之外且不存在；拒绝symlink/reparse/traversal",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.generate.strappid": {
+    "wire": "configuration.Strappid；IsClassic=(strappid!=wowretail)",
+    "stage": "local_package_then_backup_save",
+    "condition": "当前接受wow[a-z0-9_]+；服务端动态支持分支全集未静态锁死",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.generate.unknown_addons": {
+    "wire": "configuration.UnknownAddons.Files[].{Name,Size}; archive type=unknownModules; ZIP from Interface/AddOns",
+    "stage": "local_package_then_backup_save",
+    "condition": "显式名称数组，空数组表示不选；按清单归档；fonts仅.ttf；容器补Size/MD5/Host/Path",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.generate.materials": {
+    "wire": "configuration.Materials.Files[].{Name,Size}; archive type=materials; ZIP from Interface",
+    "stage": "local_package_then_backup_save",
+    "condition": "显式名称数组，空数组表示不选；按清单归档；fonts仅.ttf；容器补Size/MD5/Host/Path",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.generate.fonts": {
+    "wire": "configuration.Fonts.Files[].{Name,Size}; archive type=fonts; ZIP from Fonts",
+    "stage": "local_package_then_backup_save",
+    "condition": "显式名称数组，空数组表示不选；按清单归档；fonts仅.ttf；容器补Size/MD5/Host/Path",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.generate.wtf_accounts": {
+    "wire": "configuration.WTFList[].Name/Characters/RealmCharacters；每账户archive file_type=wtf",
+    "stage": "local_package_then_backup_save",
+    "condition": "[{name,characters:[{realm,player}]}]→{Name,RealmCharacters:[{Realm,Player}],Characters:[Realm - Player]}；只打选中角色+同账号rootfiles/SavedVariables，不含其它角色",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.generate.known_addons": {
+    "wire": "configuration.KnownAddons",
+    "stage": "local_package_then_backup_save",
+    "condition": "官方brief对象ID,Name,Strategy,VersionID；Strategy本地校验1..5；scan只返回目录候选，不能自动识别known，调用者需提供真实平台brief",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.generate.strategies": {
+    "wire": "configuration.Strategies",
+    "stage": "local_package_then_backup_save",
+    "condition": "array<object>原样；当前只核验对象数组，内部策略字段unknown；不是已验证任意键全集",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.create.game_dir": {
+    "wire": "不发送路径；仅本地扫描/生成manifest与ZIP",
+    "stage": "local_package",
+    "condition": "output_dir必须在game_dir之外且不存在；拒绝symlink/reparse/traversal",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.create.output_dir": {
+    "wire": "不发送路径；仅本地扫描/生成manifest与ZIP",
+    "stage": "local_package",
+    "condition": "output_dir必须在game_dir之外且不存在；拒绝symlink/reparse/traversal",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.create.strappid": {
+    "wire": "configuration.Strappid；IsClassic=(strappid!=wowretail)",
+    "stage": "local_package_then_backup_save",
+    "condition": "当前接受wow[a-z0-9_]+；服务端动态支持分支全集未静态锁死",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.create.unknown_addons": {
+    "wire": "configuration.UnknownAddons.Files[].{Name,Size}; archive type=unknownModules; ZIP from Interface/AddOns",
+    "stage": "local_package_then_backup_save",
+    "condition": "显式名称数组，空数组表示不选；按清单归档；fonts仅.ttf；容器补Size/MD5/Host/Path",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.create.materials": {
+    "wire": "configuration.Materials.Files[].{Name,Size}; archive type=materials; ZIP from Interface",
+    "stage": "local_package_then_backup_save",
+    "condition": "显式名称数组，空数组表示不选；按清单归档；fonts仅.ttf；容器补Size/MD5/Host/Path",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.create.fonts": {
+    "wire": "configuration.Fonts.Files[].{Name,Size}; archive type=fonts; ZIP from Fonts",
+    "stage": "local_package_then_backup_save",
+    "condition": "显式名称数组，空数组表示不选；按清单归档；fonts仅.ttf；容器补Size/MD5/Host/Path",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.create.wtf_accounts": {
+    "wire": "configuration.WTFList[].Name/Characters/RealmCharacters；每账户archive file_type=wtf",
+    "stage": "local_package_then_backup_save",
+    "condition": "[{name,characters:[{realm,player}]}]→{Name,RealmCharacters:[{Realm,Player}],Characters:[Realm - Player]}；只打选中角色+同账号rootfiles/SavedVariables，不含其它角色",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.create.known_addons": {
+    "wire": "configuration.KnownAddons",
+    "stage": "local_package_then_backup_save",
+    "condition": "官方brief对象ID,Name,Strategy,VersionID；Strategy本地校验1..5；scan只返回目录候选，不能自动识别known，调用者需提供真实平台brief",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.create.strategies": {
+    "wire": "configuration.Strategies",
+    "stage": "local_package_then_backup_save",
+    "condition": "array<object>原样；当前只核验对象数组，内部策略字段unknown；不是已验证任意键全集",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.create.file": {
+    "wire": "本地backup.json包→与backup.upload相同链路",
+    "stage": "local_package_then_upload",
+    "condition": "与game_dir/选择等generation字段互斥；给file则直接upload；不给file则先generate",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.upload.file": {
+    "wire": "本地manifest+ZIP验证→POST create_backup分配ID→POST get_user_backup_credential query{backup_id,file_type}→COS PUT→POST save_user_configuration query.backup_id + form.configuration=base64(JSON)",
+    "stage": "backup_upload",
+    "condition": "file不是直接上载到单一API；ID来自服务端；MaxSize核验源字节；COS MD5/ETag及最终list完整对象读回；不重放失败写；COS ContentLength转str匹配Python requests；SDK retry=0且ETag校验；2026-10-30动态接口当前返回的6分支均真实上传/改名/删除/读回及清理",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_backup.py:backup_generate/backup_upload; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs createBackup/finishUpload/doProcessUpload"
+  },
+  "backup.rename.backup_id": {
+    "wire": "POST /wow/rename_user_configuration_backup/ query.backup_id",
+    "stage": "backup_rename",
+    "condition": "先list精确ID匹配，再逐次读回Name",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:backup_rename"
+  },
+  "backup.rename.name": {
+    "wire": "POST /wow/rename_user_configuration_backup/ query.new_name",
+    "stage": "backup_rename",
+    "condition": "非空string",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:backup_rename"
+  },
+  "backup.delete.backup_ids": {
+    "wire": "逐项POST /wow/remove_user_configuration_backup/ query.backup_id",
+    "stage": "backup_delete",
+    "condition": "不是批量HTTP；预先验证所有ID和分享引用；逐项重新检查引用；遇不确定关联/分页中断则停止；逐项读回确认；remove仅一次；若列表暂留记录，仅轮询POST get_user_configuration_backup_list（只读），默认最多10次间隔2秒；耗尽仍verification_required，不重发mutation",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:_backup_delete_plan/backup_delete"
+  },
+  "backup.delete.confirm_delete": {
+    "wire": "不发送",
+    "stage": "local_confirmation",
+    "condition": "必须true",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:backup_delete"
+  },
+  "backup.delete-preview.backup_id": {
+    "wire": "不发送筛选字段；本地filter backupList[].ID/Name/SaveTime后计算引用",
+    "stage": "read_only_preview",
+    "condition": "ID与筛选互斥；before/after严格<或> Unix秒；需枚举每目标游戏自己的全部分享；空页才完结",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:_backup_delete_plan/_config_rows"
+  },
+  "backup.delete-preview.backup_ids": {
+    "wire": "不发送筛选字段；本地filter backupList[].ID/Name/SaveTime后计算引用",
+    "stage": "read_only_preview",
+    "condition": "ID与筛选互斥；before/after严格<或> Unix秒；需枚举每目标游戏自己的全部分享；空页才完结",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:_backup_delete_plan/_config_rows"
+  },
+  "backup.delete-preview.name_contains": {
+    "wire": "不发送筛选字段；本地filter backupList[].ID/Name/SaveTime后计算引用",
+    "stage": "read_only_preview",
+    "condition": "ID与筛选互斥；before/after严格<或> Unix秒；需枚举每目标游戏自己的全部分享；空页才完结",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:_backup_delete_plan/_config_rows"
+  },
+  "backup.delete-preview.name_equals": {
+    "wire": "不发送筛选字段；本地filter backupList[].ID/Name/SaveTime后计算引用",
+    "stage": "read_only_preview",
+    "condition": "ID与筛选互斥；before/after严格<或> Unix秒；需枚举每目标游戏自己的全部分享；空页才完结",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:_backup_delete_plan/_config_rows"
+  },
+  "backup.delete-preview.created_before": {
+    "wire": "不发送筛选字段；本地filter backupList[].ID/Name/SaveTime后计算引用",
+    "stage": "read_only_preview",
+    "condition": "ID与筛选互斥；before/after严格<或> Unix秒；需枚举每目标游戏自己的全部分享；空页才完结",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:_backup_delete_plan/_config_rows"
+  },
+  "backup.delete-preview.created_after": {
+    "wire": "不发送筛选字段；本地filter backupList[].ID/Name/SaveTime后计算引用",
+    "stage": "read_only_preview",
+    "condition": "ID与筛选互斥；before/after严格<或> Unix秒；需枚举每目标游戏自己的全部分享；空页才完结",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:_backup_delete_plan/_config_rows"
+  },
+  "plugin.get.module_id": {
+    "wire": "GET /wow/open_platform/module/detail/ query.moduleId",
+    "stage": "read",
+    "condition": "读取module和分页versionList",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:execute_read; blackbox_config.py; blackbox_backup.py:backup_scan"
+  },
+  "plugin.versions.module_id": {
+    "wire": "GET /wow/open_platform/module_version/list/ query.moduleId + offset/limit",
+    "stage": "read",
+    "condition": "去重推进；达到明确total或短页/空页完结",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:execute_read; blackbox_config.py; blackbox_backup.py:backup_scan"
+  },
+  "config.list.strappid": {
+    "wire": "POST /wow/v2/share/list/ query.strappid + offset/limit + sort_by=weekDownloadNum + my_publish=1",
+    "stage": "read",
+    "condition": "仅当前用户发布，空页才complete",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:execute_read; blackbox_config.py; blackbox_backup.py:backup_scan"
+  },
+  "config.get.share_id": {
+    "wire": "POST /wow/v2/share/detail/ query.share_id",
+    "stage": "read",
+    "condition": "检查返回ShareID/BackupID",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:execute_read; blackbox_config.py; blackbox_backup.py:backup_scan"
+  },
+  "backup.get.backup_id": {
+    "wire": "无单独get；POST /wow/get_user_configuration_backup_list/ 后按backupList[].ID精确匹配",
+    "stage": "read",
+    "condition": "完整对象原样读取",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:execute_read; blackbox_config.py; blackbox_backup.py:backup_scan"
+  },
+  "backup.scan.game_dir": {
+    "wire": "不发送；本地目录扫描",
+    "stage": "read",
+    "condition": "返回候选目录与角色，不自动全选",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:execute_read; blackbox_config.py; blackbox_backup.py:backup_scan"
+  },
+  "backup.scan.strappid": {
+    "wire": "不发送；仅扫描结果上下文",
+    "stage": "read",
+    "condition": "调用者指定游戏分支",
+    "evidence": "fupload/scripts/fupload_cli/blackbox.py:execute_read; blackbox_config.py; blackbox_backup.py:backup_scan"
+  },
+  "plugin.list.*": {
+    "wire": "GET /wow/open_platform/module/list/，无业务query/body",
+    "stage": "read",
+    "condition": "result.moduleList；endpoint是否分页的当前前端证据仅一次请求，未伪造跨页接口",
+    "evidence": "blackbox.py:plugin_list; Open frontend index-B2qQ5GFk.js"
+  },
+  "backup.list.*": {
+    "wire": "POST /wow/get_user_configuration_backup_list/，无业务query/body",
+    "stage": "read",
+    "condition": "result.backupList完整对象；官方无独立get或分页调用",
+    "evidence": "blackbox_config.py:_backup_rows; Desktop2.10.19 extension/view API adapter"
+  },
+  "session.login-start.method": {
+    "wire": "不直接发wire；选择sms或wechat官方状态机",
+    "stage": "local_auth_control",
+    "condition": "不会由业务命令隐式启动；微信与小黑盒App QR不同",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_auth.py; current official login-index.js JH.C/JH.w/JH.S/p$.runCallback; blackbox_http.py:HttpClient/Store/apply_session"
+  },
+  "session.login-start.phone": {
+    "wire": "POST /account/get_login_code/ form.phone_num=base64(RSA1024 PKCS1v15(+86+phone))",
+    "stage": "auth_sms",
+    "condition": "空业务query；本机固定config的device B只在内存借用；非账户cookie；不自动重发",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_auth.py; current official login-index.js JH.C/JH.w/JH.S/p$.runCallback; blackbox_http.py:HttpClient/Store/apply_session"
+  },
+  "session.login-submit.login_id": {
+    "wire": "不发送；匹配本机DPAPI pending.login_id",
+    "stage": "local_auth_control",
+    "condition": "opaque32hex，必须匹配未过期SMS pending",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_auth.py; current official login-index.js JH.C/JH.w/JH.S/p$.runCallback; blackbox_http.py:HttpClient/Store/apply_session"
+  },
+  "session.login-submit.code": {
+    "wire": "POST /account/login_code/ query.code；form.phone_num复用已加密手机号",
+    "stage": "auth_sms",
+    "condition": "4-8digits只从JSON输入；不落凭据明文/不放argv；不重放",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_auth.py; current official login-index.js JH.C/JH.w/JH.S/p$.runCallback; blackbox_http.py:HttpClient/Store/apply_session"
+  },
+  "session.renew.*": {
+    "wire": "GET /account/restore_login，空业务query、无body；同cookiejar与website公共query",
+    "stage": "auth_restore",
+    "condition": "核对已存UID一致，使用服务器expire_at；返回pkey覆盖4cookie；一次恢复成功不代表无限服务端续期",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_auth.py; current official login-index.js JH.C/JH.w/JH.S/p$.runCallback; blackbox_http.py:HttpClient/Store/apply_session"
+  },
+  "session.forget.confirm_forget": {
+    "wire": "不发送；本机删除/tombstone防旧会话复活",
+    "stage": "local_auth_control",
+    "condition": "必须true；不调用远程logout；不影响其它平台",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_auth.py; current official login-index.js JH.C/JH.w/JH.S/p$.runCallback; blackbox_http.py:HttpClient/Store/apply_session"
+  },
+  "session.login-status.login_id": {
+    "wire": "不发送login_id；微信status发送固定长轮询uuid/last/_或读取本机pending状态",
+    "stage": "auth_poll",
+    "condition": "仅复用已有pending，不新建QR；状态完成才激活新会话",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_auth.py; current official login-index.js JH.C/JH.w/JH.S/p$.runCallback; blackbox_http.py:HttpClient/Store/apply_session"
+  },
+  "session.wechat.*": {
+    "wire": "GET api/account/wechat/login/v2/web_sso/?redirect_url=LOGIN&src=1(整体编码)→官方Location open.weixin.qq.com/connect/qrconnect→真实/connect/qrcode/uuid和long.open.weixin.qq.com/connect/l/qrconnect→官方callback→GET /account/wechat/state/ query{_notip:true,heybox_id:empty}",
+    "stage": "auth_wechat",
+    "condition": "appid/state/callback/uuid均从当前官方响应提取并校验固定host/path；不猜appid；无浏览器；image只保存官方PNG/JPEG",
+    "evidence": "fupload/scripts/fupload_cli/blackbox_auth.py; current official login-index.js JH.C/JH.w/JH.S/p$.runCallback; blackbox_http.py:HttpClient/Store/apply_session"
+  },
+  "session.storage.*": {
+    "wire": "不发送本机路径/DPAPI密文；cookie仅发匹配官方HTTPS域",
+    "stage": "local_encrypted_storage",
+    "condition": "CurrentUser DPAPI；active/pending分离；默认SMS旧主会话优先；微信显式选择；risk不写active/pending",
+    "evidence": "blackbox_http.py:Store/_jar/_send"
+  },
+  "*.*.schema": {
+    "wire": "不发送",
+    "stage": "local_validation",
+    "condition": "仅JSON schema版本标记",
+    "evidence": "schema.py:Schema.validate; provider doc filtering"
+  },
+  "*.*.dry_run": {
+    "wire": "不发送dry_run字段",
+    "stage": "local_preview",
+    "condition": "不执行业务mutation；可能读取依赖对象；generate dry_run不写本地包",
+    "evidence": "blackbox.py:execute_write; blackbox_config.py/blackbox_backup.py"
+  },
+  "options.game-types.*": {
+    "wire": "GET /wow/v2/dynamic_conf/ → result.strappidInfos",
+    "stage": "dynamic_options",
+    "condition": "每次读取服务器动态列表；2026-10-30实测6分支wowretail/wowclassicera/wowclassicwlk/wowclassictbc/wowanniversary/wowforever；不是永久固定枚举；6分支均完成最小合成备份真实生命周期并清理，正式服/周年服另完成私密分享CRUD及引用保护",
+    "evidence": "blackbox.py:execute_read options/game-types; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs line101 JA GET call offset689680, target heybox-workshop, result.strappidInfos; isolated live acceptance 2026-10-30"
+  }
+}

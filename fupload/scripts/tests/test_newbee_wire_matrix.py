@@ -12,7 +12,7 @@ from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from fupload_cli.newbee import NewBee, RELATION_TYPES
-from fupload_cli.errors import ValidationError
+from fupload_cli.errors import FuploadError, ValidationError
 from fupload_cli.schema import get_schema
 
 
@@ -397,6 +397,43 @@ class NewBeeFixtures:
 
 
 class NewBeeWireMatrixTests(unittest.TestCase):
+    def test_existing_edit_mode_layouts_are_preserved_on_metadata_and_backup_updates(self) -> None:
+        layouts = [{"account": "A", "name": "Layout", "opaque_future_field": {"value": [1, 2]}}]
+        class WithLayouts(RecordingNewBee):
+            def get_config_raw(self, ident):
+                return {**super().get_config_raw(ident), "t_selected_eml": json.dumps(layouts)}
+            def get_config(self, ident):
+                return NewBee.get_config(self, ident)
+        for metadata_only, change in ((True, {"title": "Changed"}), (False, {"roleid": "role-1"})):
+            provider = WithLayouts(Path(self.temp.name))
+            with mock.patch("fupload_cli.newbee._require_readback") as verify:
+                provider.update_config({"id": 201, **change}, metadata_only)
+            payload = self._post(provider, "/creator/wow/share_config/update")
+            self.assertEqual(payload["selected_eml"], layouts)
+            self.assertEqual(verify.call_args.args[0]["selected_eml"], layouts)
+            self.assertEqual(provider.get_config(201)["selected_eml"], layouts)
+
+    def test_malformed_existing_layouts_stop_before_any_config_mutation(self) -> None:
+        provider = RecordingNewBee(Path(self.temp.name))
+        provider.get_config_raw = mock.Mock(return_value={"t_selected_eml": "not valid json"})
+        with self.assertRaises(FuploadError) as caught:
+            provider.update_config({"id": 201, "title": "Changed"}, True)
+        self.assertEqual(caught.exception.kind, "platform_data_error")
+        self.assertEqual(provider.posts, [])
+
+    def test_layout_loss_in_config_readback_requires_verification(self) -> None:
+        class DroppedLayouts(RecordingNewBee):
+            def get_config_raw(self, ident):
+                return {**super().get_config_raw(ident), "selected_eml": [{"name": "Existing", "opaque": 5}]}
+            def get_config(self, ident):
+                return {"id": ident, "title": "Changed", "selected_eml": []}
+        provider = DroppedLayouts(Path(self.temp.name))
+        with self.assertRaises(FuploadError) as failed:
+            provider.update_config({"id": 201, "title": "Changed"}, True)
+        self.assertTrue(failed.exception.verification_required)
+        self.assertEqual(failed.exception.details["fields"], ["selected_eml"])
+        self.assertEqual(len([p for p in provider.posts if p[0] == "/creator/wow/share_config/update"]), 1)
+
     @classmethod
     def setUpClass(cls) -> None:
         cls.temp = tempfile.TemporaryDirectory()
@@ -448,10 +485,12 @@ class NewBeeWireMatrixTests(unittest.TestCase):
             raise AssertionError("endpoint was not called: %s" % endpoint)
         return matches[0]
 
-    def test_every_schema_field_has_an_explicit_wire_or_local_control_classification(self) -> None:
+    def test_every_creator_schema_field_has_an_explicit_wire_or_local_control_classification(self) -> None:
         classified = 0
         for (platform, resource, action), schema in sorted(get_schema_registry().items()):
-            if platform != "newbee":
+            # Desktop backup endpoints use a different manifest/upload chain;
+            # their wire tests live in test_newbee_backups.py.
+            if platform != "newbee" or resource == "backup":
                 continue
             for field in schema.fields:
                 with self.subTest(resource=resource, action=action, field=field):
@@ -481,10 +520,10 @@ class NewBeeWireMatrixTests(unittest.TestCase):
             return "media"
         return ""
 
-    def test_every_field_reaches_its_exact_wire_target_or_stays_local(self) -> None:
+    def test_every_creator_field_reaches_its_exact_wire_target_or_stays_local(self) -> None:
         count = 0
         for (platform, resource, action), schema in sorted(get_schema_registry().items()):
-            if platform != "newbee":
+            if platform != "newbee" or resource == "backup":
                 continue
             for field in schema.fields:
                 case_id = "%s.%s.%s" % (resource, action, field)

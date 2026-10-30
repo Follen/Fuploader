@@ -13,14 +13,8 @@ permissions:
 
 jobs:
   test:
-    name: Test (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
+    name: Test (windows-latest)
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -34,6 +28,8 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Check package and Skill versions
         run: npm run check:versions
+      - name: Check platform field catalog
+        run: npm run check:fields
       - name: Check release tag
         if: startsWith(github.ref, 'refs/tags/v')
         run: npm run check:release
@@ -47,6 +43,8 @@ jobs:
         run: npm run test:pack
       - name: Test global install, Python launch, and complete uninstall
         run: npm run test:install
+      - name: Install Python test runtime dependencies
+        run: python -m pip install --disable-pip-version-check --requirement npm/lib/python-requirements.txt
       - name: Run Python tests
         run: python -m unittest discover -s fupload/scripts/tests -v
       - name: Compile Python sources

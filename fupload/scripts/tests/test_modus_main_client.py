@@ -16,6 +16,85 @@ from fupload_cli.errors import FuploadError, ValidationError
 
 
 class ModusMainClientTests(unittest.TestCase):
+    def test_live_detail_without_content_text_can_be_edited_without_losing_html(self):
+        provider = ModUs("TOKEN", main_session=True)
+        html = '<p>Long&nbsp;public body</p><img src="cover.webp">[[img:key="cover"]]<script>hidden</script>'
+        current = {"id": "opaque", **provider._share_wire(self._share_document())}
+        current.update(content=html, platform=3, synchronizationType=3)
+        current.pop("contentText", None)
+        with mock.patch.object(provider, "share_detail", return_value=[current]), mock.patch.object(provider, "_request", return_value={"code": 200}) as request:
+            provider.share_update({"share_id": "opaque", "title": "Changed"})
+        wire = request.call_args.args[2]
+        self.assertEqual(wire["content"], html)
+        self.assertEqual(wire["contentText"], "Long public body")
+        self.assertEqual(wire["synchronizationType"], 3)
+        with mock.patch.object(provider, "share_detail", return_value=[current]), mock.patch.object(provider, "_request", return_value={"code": 200}) as request:
+            provider.share_update({"share_id": "opaque", "content": "<p>Replacement body</p>"})
+        self.assertEqual(request.call_args.args[2]["contentText"], "Replacement body")
+
+    def test_sparse_config_edit_preserves_current_wtf_platform_and_rich_text(self):
+        provider = ModUs("TOKEN", main_session=True)
+        current = {"id": "opaque", "addonsId": "9,11", "backupId": 11, "content": '<p>Original<img src="cover.webp"></p>',
+                   "contentText": "Original plain text preserved", "imageUrl": "cover.webp", "isPaid": 0,
+                   "isPublic": 0, "price": 0, "shareType": 0, "tags": "1,2", "title": "Original title",
+                   "excludeWtf": 1, "accountName": "", "roleName": "", "platform": 3, "synchronizationType": 3, "subType": 0}
+        with mock.patch.object(provider, "share_detail", return_value=[current]) as detail, mock.patch.object(provider, "_request", return_value={"code": 200}) as request:
+            provider.share_update({"share_id": "opaque", "title": "Changed title"}, server_type=0)
+        detail.assert_called_once_with("opaque", server_type=0)
+        self.assertEqual(request.call_args.args[2], {**current, "title": "Changed title"})
+
+    def test_sparse_wa_edit_preserves_current_version_platform_and_body(self):
+        provider = ModUs("TOKEN", main_session=True)
+        current = {"id": "opaque", "codeText": "fixture import string", "content": '<p>Original<img src="cover.webp"></p>',
+                   "addonsId": "7", "contentText": "Original plain text preserved", "filePath": "", "imageUrl": "cover.webp",
+                   "isPaid": 0, "isPublic": 1, "price": 0, "shareType": 0, "supportAddon": "Addon", "tags": "1",
+                   "title": "Original title", "version": "2.0", "subType": 0, "platform": 3, "synchronizationType": 3}
+        with mock.patch.object(provider, "import_detail", return_value=[current]) as detail, mock.patch.object(provider, "_request", return_value={"code": 200}) as request:
+            provider.import_update({"import_id": "opaque", "title": "Changed title"}, server_type=0)
+        detail.assert_called_once_with("opaque", server_type=0)
+        self.assertEqual(request.call_args.args[2], {**current, "title": "Changed title"})
+
+    def test_main_tier_clear_uses_official_complete_form_omission(self):
+        provider = ModUs("TOKEN", main_session=True)
+        for resource, identity in (("config", "share_id"), ("wa", "import_id")):
+            current = {"id": "opaque", "requiredTierId": 77, "title": "Original", "platform": 1, "subType": 0}
+            if resource == "config":
+                current.update(provider._share_wire(self._share_document()))
+            else:
+                current.update(provider._import_wire(self._import_document()))
+            method = provider.share_update if resource == "config" else provider.import_update
+            with self.subTest(resource=resource), mock.patch.object(provider, "share_detail" if resource == "config" else "import_detail", return_value=[current]), mock.patch.object(provider, "_request", return_value={"code": 200}) as request:
+                method({identity: "opaque", "required_tier_id": None})
+            self.assertNotIn("requiredTierId", request.call_args.args[2])
+            self.assertEqual(request.call_args.args[2]["content"], current["content"])
+
+    def test_unverified_main_null_clear_and_incomplete_detail_fail_before_mutation(self):
+        provider = ModUs("TOKEN", main_session=True)
+        for key in ("account_name", "role_name"):
+            with self.subTest(key=key), mock.patch.object(provider, "share_detail") as detail, mock.patch.object(provider, "_request") as request:
+                with self.assertRaises(ValidationError):
+                    provider.share_update({"share_id": "opaque", key: None})
+                detail.assert_not_called()
+                request.assert_not_called()
+        with mock.patch.object(provider, "share_detail", return_value=[{"id": "opaque"}]), mock.patch.object(provider, "_request") as request:
+            with self.assertRaises(FuploadError):
+                provider.share_update({"share_id": "opaque", "title": "Changed title"})
+            request.assert_not_called()
+
+    def test_creator_list_and_history_page_flags_are_allowlisted_and_not_cli_envelopes(self):
+        parser, provider = build_parser(), ModUs("TOKEN", main_session=True)
+        commands = (
+            (["modus", "project", "list", "--page", "3", "--page-size", "7", "--keyword", "chosen"], {"pageNum": 3, "pageSize": 7, "keyword": "chosen"}),
+            (["modus", "plugin", "list", "--project-id", "42", "--page", "3", "--page-size", "7"], {"projectId": 42, "pageNum": 3, "pageSize": 7}),
+            (["modus", "plugin", "versions", "--project-id", "42", "--page", "3", "--page-size", "7"], {"projectId": 42, "pageNum": 3, "pageSize": 7}),
+            (["modus", "addon", "history", "--project-id", "42", "--page", "3", "--page-size", "7"], {"projectIds": [42], "pageNum": 3, "pageSize": 7}),
+        )
+        for command, body in commands:
+            args = parser.parse_args(command)
+            with self.subTest(command=command), mock.patch.object(provider, "_request", return_value={"data": []}) as request:
+                provider.execute_read(args.resource, args.action, args)
+            self.assertEqual(request.call_args.args[2], body)
+
     def test_main_doctor_reuses_main_session_without_creator_token_file(self):
         provider = ModUs(main_session=True, authenticate=False)
         with mock.patch("fupload_cli.modus.load_main_session", return_value={
@@ -265,11 +344,11 @@ class ModusMainClientTests(unittest.TestCase):
                 self.assertEqual(wa_schema.validate(document)["addons_id"], addons_id)
 
     def test_main_session_reads_nested_json_without_returning_unrelated_values(self):
+        from test_modus_leveldb_auth import fixture, key, value
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            leveldb = root / "Local Storage" / "leveldb"
-            leveldb.mkdir(parents=True)
-            (leveldb / "000001.log").write_bytes(b"prefix{\"user\":{\"token\":\"TOKEN\",\"deviceId\":\"DEVICE\"}}suffix")
+            fixture(root, [(key("user"), value({"token": "TOKEN", "wallet": {"balance": 0}})),
+                           (key("app"), value({"deviceId": "DEVICE"}))])
             session = load_main_session(root)
             self.assertEqual(session, {"token": "TOKEN", "device_id": "DEVICE"})
 
@@ -281,7 +360,8 @@ class ModusMainClientTests(unittest.TestCase):
             return {"data": {"ok": True}}
         with mock.patch.object(provider, "_request", side_effect=request):
             provider.share_create(self._share_document(), server_type=4)
-            provider.share_update(self._share_document(share_id="share/opaque"), server_type=4)
+            with mock.patch.object(provider, "share_detail", return_value=[{"id": "share/opaque", "platform": 1}]):
+                provider.share_update(self._share_document(share_id="share/opaque"), server_type=4)
             provider.share_detail("share/opaque", server_type=4)
             provider.share_delete("share/opaque", server_type=4)
 
@@ -324,13 +404,14 @@ class ModusMainClientTests(unittest.TestCase):
                 self.assertEqual(body["excludeWtf"], expected)
                 self.assertEqual(body["platform"], 1)
 
-        with mock.patch.object(provider, "_request", side_effect=request):
-            provider.share_update(self._share_document(exclude_wtf=None))
-        self.assertEqual(calls[-1][2]["excludeWtf"], 0)
-        self.assertNotIn("synchronizationType", calls[-1][2])
+        with mock.patch.object(provider, "_request", side_effect=request) as remote:
+            with self.assertRaises(ValidationError):
+                provider.share_update(self._share_document(share_id="opaque", exclude_wtf=None))
+            remote.assert_not_called()
 
     def test_default_lists_match_main_client_payloads(self):
-        provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
+        with mock.patch("fupload_cli.modus.load_current_build", return_value=None):
+            provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
         with mock.patch.object(provider, "_request", return_value={"data": {}}) as request:
             provider.share_list()
         self.assertEqual(request.call_args.args[2], {
@@ -413,9 +494,10 @@ class ModusMainClientTests(unittest.TestCase):
 
         with mock.patch.object(provider, "_request", side_effect=request):
             provider.import_create(self._import_document(required_tier_id=None), server_type=1)
-            provider.import_update(self._import_document(
-                import_id="wa/opaque", required_tier_id=None,
-            ), server_type=1)
+            with mock.patch.object(provider, "import_detail", return_value=[{"id": "wa/opaque", "platform": 1, "synchronizationType": 1}]):
+                provider.import_update(self._import_document(
+                    import_id="wa/opaque", required_tier_id=None,
+                ), server_type=1)
             provider.import_detail("wa/opaque", server_type=1)
             provider.import_delete("wa/opaque", server_type=1)
             provider.import_version_publish({
@@ -513,12 +595,12 @@ class ModusMainClientTests(unittest.TestCase):
     def test_dynamic_config_preflight_binds_backup_addons_account_role_and_tags(self):
         provider = ModUs("TOKEN", main_session=True, device_id="DEVICE")
         backup = {
-            "id": 11,
+            "id": 11, "serverType": 0,
             "knownAddons": json.dumps({"projectids": "9,11"}),
             "wtfAccounts": json.dumps([{"name": "Account", "roles": ["Role"]}]),
         }
         document = self._share_document(
-            exclude_wtf=0, account_name="Account", role_name="Role", required_tier_id=None,
+            exclude_wtf=0, account_name="Account", role_name="Role", required_tier_id=None, server_type=0,
         )
 
         with mock.patch.object(provider, "options", return_value=[{"id": 1}, {"id": 2}]), \

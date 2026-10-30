@@ -1295,6 +1295,22 @@ class BuilderTests(unittest.TestCase):
         form["second_category_ids"] = [2]
         DD()._validate_options(ValidDDOptions(), "plugin", form)
 
+    def test_dd_unchanged_saved_channel_does_not_block_unrelated_edits(self) -> None:
+        current = {"jump_room": True, "room_id": "room", "channel_id": "channel",
+                   "channel_type": "Text", "sync_room": False}
+        session = mock.Mock()
+        session.cc_get.side_effect = FuploadError("live channel discovery unavailable")
+        # Current is an ownership-checked fresh server detail, not user input.
+        DD()._validate_options(session, "config", {**current, "desc": "New HTML"}, current=current)
+        DD()._validate_options(session, "config", {**current, "sync_room": True}, current=current)
+        session.cc_get.assert_not_called()
+        for changes in ({"room_id": "other"}, {"channel_id": "other"},
+                        {"channel_type": "Voice"}):
+            with self.subTest(changes=changes), self.assertRaisesRegex(FuploadError, "discovery unavailable"):
+                DD()._validate_options(session, "config", {**current, **changes}, current=current)
+        with self.assertRaises(FuploadError):
+            DD()._validate_options(session, "config", current)
+
     def test_dd_wa_category_parser_accepts_live_c_id_shape(self) -> None:
         class WAOptions(ValidDDOptions):
             def get(self, endpoint, body):
@@ -1353,6 +1369,18 @@ class BuilderTests(unittest.TestCase):
             {"need_buy": False, "need_anchor_vip": True},
             {"need_buy": False, "need_anchor_vip": True},
         )
+
+    def test_dd_scope_edit_cannot_clear_a_locked_vip_paid_mode(self) -> None:
+        material = {"items": [{"name": "Probe"}], "inner_version": {}}
+        current = {"scope": "public", "need_buy": False, "need_anchor_vip": True,
+                   "vip_levels": [1], "material": material}
+        with self.assertRaisesRegex(ValidationError, "outer free/paid"):
+            config_form(current, {"material": material}, {"scope": "private"})
+        for resource in ("plugin", "wa"):
+            form = dict(current, scope="private")
+            normalize_commercial(form, resource)
+            with self.subTest(resource=resource), self.assertRaisesRegex(ValidationError, "outer free/paid"):
+                validate_locked_usage_mode(current, form, {"scope": "private"})
 
     def test_dd_wa_edit_reparses_unchanged_wa2_and_preserves_material_paths(self) -> None:
         current = {

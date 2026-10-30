@@ -16,7 +16,7 @@ an `NCC_TOKEN` already injected into the Agent environment.
 
 Run `fupload <platform> <resource> <action>` when installed from npm. Only source maintenance or direct-Skill installations without the npm command use `python <skill-root>/scripts/fupload.py <platform> <resource> <action>`. Every command supports `--help`; every write accepts only `--input <path|->`, with optional `--dry-run`.
 
-DD live commands additionally require one opaque `--session <id>`. Run local-only `dd session doctor` first, then `dd session start`; the DD GUI can remain open. Reuse that session for all dependency GETs, serial writes, and readbacks, then always run `dd session stop --session <id>` in `finally`. A task must not start one native login per item.
+DD live commands additionally require one opaque `--session <id>`. Run local-only `dd session doctor` first, then `dd session start`. With DD running, this reuses its current browser cookie with ordinary Windows permissions and performs zero native desktop logins; failure never triggers a second login. Without DD running, the stored-credential native flow is used. Reuse the task session for all dependency GETs, serial writes, and readbacks, then always run `dd session stop --session <id>` in `finally`. Borrowed cleanup does not log out the desktop. A task must not start one native login per item.
 
 Output is one JSON object with `schema=fupload.output.v1`, `platform`, `operation`, `success`, and either `data` or `error`. Exit code `0` means success; `2` means validation, session, platform, or verification failure. A DD native/API error may include `details.log_path` pointing to the matching sanitized JSONL record under `<DD version directory>/Fupload/logs/`; read only that record for response JSON/body, HTTP status, native business code, and field hints.
 
@@ -60,4 +60,6 @@ Python NewBeeBox delete inputs require one `id` and literal `confirm: "DELETE"`;
 
 ## Local artifact checklist
 
-For plugins, inspect TOC interface/build declarations, title/notes/version, addon folders, README, changelog, release archive, logo, and screenshots. For WA, inspect string mode, version, changelog, cover/images, categories, and optional material ZIP/install path. For configurations, select an existing cloud backup, all included/ignored content, roles, and incremental-update items.
+For plugins, inspect TOC interface/build declarations, title/notes/version, addon folders, README, changelog, release archive, logo, and screenshots. For WA, inspect string mode, version, changelog, cover/images, categories, and optional material ZIP/install path. For configurations, select an existing cloud backup or prepare one with the platform's backup scan/generate/upload commands, then select included/ignored content, roles, and incremental-update items.
+
+Cloud-backup deletion uses a separate `backup delete-preview` read and an explicit `backup_ids` write with `confirm_delete:true`. Preview filters do not authorize deleting newly matching records. Every platform checks all owned configuration-share references before deletion and again before each item; referenced backups remain protected and unknown references stop the operation. Record each result and verify absence after deletion. An uncertain result requires readback, never an automatic repeat.

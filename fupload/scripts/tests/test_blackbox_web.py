@@ -192,8 +192,8 @@ class BlackboxWebSessionTests(unittest.TestCase):
         self.assertNotIn("form", kwargs)
 
     def test_protocol_allowlist_includes_upload_token_and_rejects_overrides(self):
-        self.assertEqual(len(API_ROUTES), 7)
-        self.assertEqual(len(API_PATHS), 7)
+        self.assertEqual(len(API_ROUTES), 18)
+        self.assertEqual(len(API_PATHS), 18)
         launcher = FakeLauncher([])
         session = BlackboxWebSession(browser_launcher=launcher)
         invalid = (

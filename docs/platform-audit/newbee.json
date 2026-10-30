@@ -1,0 +1,2960 @@
+{
+  "platform": "newbee",
+  "audit_date": "2026-10-30",
+  "source_version": {
+    "python_schema": "current shared-worktree SCHEMAS",
+    "official_cli": "0.1.29",
+    "installed_desktop": "1.1.29 (app.asar/package.json, registry display name was stale)",
+    "creator_web_snapshot": "legacy-newbee/creator hashed assets; snapshot revision not asserted as latest"
+  },
+  "fields": {
+    "backup.create.game_dir": {
+      "wire": "local source directory (no HTTP field)",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "generate is local only; create accepts generation inputs or an existing bundle; upload verifies bundle layout/hash before any remote request",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.create.game_version_id": {
+      "wire": "versionid",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "Positive live metadata game_version parent ID -> manifest versionid; differs from plugin game_version_list build strings.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.create.output_dir": {
+      "wire": "local bundle directory (no HTTP field)",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "generate is local only; create accepts generation inputs or an existing bundle; upload verifies bundle layout/hash before any remote request",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.create.known_plugins": {
+      "wire": "knowplug_list",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "Known addons are references without ZIP. Require name,id,fileName,fileUrl,mod_file_id,mod_version,display_name,updateType; scan does not synthesize this metadata.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.create.unknown_plugins": {
+      "wire": "unknown_plug + t_unKnown_list",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "Selected AddOns folders only; signed ZIP type unknown_plug; ZIP top-level names must exactly match t_unKnown_list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.create.materials": {
+      "wire": "material + t_material_list",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "Selected Interface material paths only; AddOns is forbidden here; signed ZIP type material; ZIP roots match t_material_list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.create.fonts": {
+      "wire": "font_hash + t_font_list",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "Selected .ttf copies only. Native OssUploader.uploadFolder uploads the staged folder, returns font_hash; official signed client + Node are dependencies. Nonempty font upload not live-tested.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.create.wtf_accounts": {
+      "wire": "wtf[].account/server[].serverName/roleList[].name/commonConfig/roleList[].zip",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "Each account has account/include_common/roles[{server,name}]. common is root files+SavedVariables only; role ZIP must contain only that role root. Unselected accounts/roles and *.bak are excluded. No caller-provided archive URL.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.create.bundle_file": {
+      "wire": "local backup-bundle.json (no HTTP field)",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "generate is local only; create accepts generation inputs or an existing bundle; upload verifies bundle layout/hash before any remote request",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.create.name": {
+      "wire": "t_name",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "Initial create name is server-chosen; requested name is a separate /share/update {t_id,t_name} write followed by readback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.delete.backup_ids": {
+      "wire": "t_id (one POST per selected ID)",
+      "stage": "/v3/share/delete",
+      "condition": "Explicit positive IDs only. Complete author configuration pagination/detail association lookup; any reference/unknown relationship blocks deletion; recheck before each one-shot delete, then negative list readback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": true
+    },
+    "backup.delete.confirm_delete": {
+      "wire": "local deletion confirmation (no HTTP field)",
+      "stage": "/v3/share/delete",
+      "condition": "Literal true is local consent only, never bypasses reference guard.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": true
+    },
+    "backup.generate.game_dir": {
+      "wire": "local source directory (no HTTP field)",
+      "stage": "local generation",
+      "condition": "generate is local only; create accepts generation inputs or an existing bundle; upload verifies bundle layout/hash before any remote request",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": true
+    },
+    "backup.generate.game_version_id": {
+      "wire": "versionid",
+      "stage": "local generation",
+      "condition": "Positive live metadata game_version parent ID -> manifest versionid; differs from plugin game_version_list build strings.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": true
+    },
+    "backup.generate.output_dir": {
+      "wire": "local bundle directory (no HTTP field)",
+      "stage": "local generation",
+      "condition": "generate is local only; create accepts generation inputs or an existing bundle; upload verifies bundle layout/hash before any remote request",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": true
+    },
+    "backup.generate.known_plugins": {
+      "wire": "knowplug_list",
+      "stage": "local generation",
+      "condition": "Known addons are references without ZIP. Require name,id,fileName,fileUrl,mod_file_id,mod_version,display_name,updateType; scan does not synthesize this metadata.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.generate.unknown_plugins": {
+      "wire": "unknown_plug + t_unKnown_list",
+      "stage": "local generation",
+      "condition": "Selected AddOns folders only; signed ZIP type unknown_plug; ZIP top-level names must exactly match t_unKnown_list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": true
+    },
+    "backup.generate.materials": {
+      "wire": "material + t_material_list",
+      "stage": "local generation",
+      "condition": "Selected Interface material paths only; AddOns is forbidden here; signed ZIP type material; ZIP roots match t_material_list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.generate.fonts": {
+      "wire": "font_hash + t_font_list",
+      "stage": "local generation",
+      "condition": "Selected .ttf copies only. Native OssUploader.uploadFolder uploads the staged folder, returns font_hash; official signed client + Node are dependencies. Nonempty font upload not live-tested.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.generate.wtf_accounts": {
+      "wire": "wtf[].account/server[].serverName/roleList[].name/commonConfig/roleList[].zip",
+      "stage": "local generation",
+      "condition": "Each account has account/include_common/roles[{server,name}]. common is root files+SavedVariables only; role ZIP must contain only that role root. Unselected accounts/roles and *.bak are excluded. No caller-provided archive URL.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": false
+    },
+    "backup.rename.id": {
+      "wire": "t_id",
+      "stage": "/share/update",
+      "condition": "generate is local only; create accepts generation inputs or an existing bundle; upload verifies bundle layout/hash before any remote request",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": true
+    },
+    "backup.rename.name": {
+      "wire": "t_name",
+      "stage": "/share/update",
+      "condition": "Initial create name is server-chosen; requested name is a separate /share/update {t_id,t_name} write followed by readback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": true
+    },
+    "backup.upload.bundle_file": {
+      "wire": "local backup-bundle.json (no HTTP field)",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "generate is local only; create accepts generation inputs or an existing bundle; upload verifies bundle layout/hash before any remote request",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": true
+    },
+    "backup.upload.name": {
+      "wire": "t_name",
+      "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
+      "condition": "Initial create name is server-chosen; requested name is a separate /share/update {t_id,t_name} write followed by readback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "schema_supported": true,
+      "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
+      "live_verified": true
+    },
+    "config.create.title": {
+      "wire": "title",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.content": {
+      "wire": "content",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "Public configuration-share description body (HTML/Markdown), NOT raw WTF/backup content. Preserve full text on get; cloud_id/linked_mods/ignored arrays/roleid separately select configuration data.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.content_format": {
+      "wire": "content_format",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "1=HTML/rich text, 2=Markdown; no raw WTF serialization is sent in this field",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.intro": {
+      "wire": "intro",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.picture_urls": {
+      "wire": "pic_url",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.create.picture_files": {
+      "wire": "pic_url",
+      "stage": "local file -> media multipart -> pic_url in main form",
+      "condition": "Local uploads resolve to URLs. File lists append to retained/current URL lists; remote URL-list field explicitly replaces its list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.content_origin": {
+      "wire": "content_origin",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "Read live origin/categories first; categories are IDs, not labels; category list <=5.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.public": {
+      "wire": "sharing",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "public -> sharing=1; private -> sharing=0; private forces link_to_channel=false",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.submit_for_review": {
+      "wire": "local control (not sent)",
+      "stage": "preflight",
+      "condition": "submit_for_review=true is required for requested public publication; no separate review wire flag",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write and schema validators",
+      "schema_supported": true,
+      "official_client_support": "local wrapper control",
+      "live_verified": false
+    },
+    "config.create.link_to_channel": {
+      "wire": "link_to_channel",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "private forces false; plugin create always false; other writes use caller/current value only when public",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.create.subscribe_plan_level": {
+      "wire": "subscribe_plan_level",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.create.price": {
+      "wire": "price",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.create.time_range": {
+      "wire": "time_range",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.create.co_authors": {
+      "wire": "co_authors",
+      "stage": "separate relationship POST /creator/co_author/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. user_id + share_percent (fraction, total <=1); content_type=4",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "config.create.references": {
+      "wire": "references",
+      "stage": "separate relationship POST /creator/content_reference/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=3",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "config.create.cloud_id": {
+      "wire": "cloud_id",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "Choose existing backup ID first. Changing it during update requires complete descendant reselection.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.linked_mods": {
+      "wire": "linked_mods",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "Only selected mod_ids from the live backup are authoritative; other submitted metadata is canonicalized from the selected backup. update_type is wire updateType; it is not an arbitrary version-edit override.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.ignored_unknown_mods": {
+      "wire": "ignored_unknown_mods",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.ignored_materials": {
+      "wire": "ignored_materials",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.ignored_fronts": {
+      "wire": "ignored_fronts",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.create.roleid": {
+      "wire": "roleid",
+      "stage": "POST JSON /creator/wow/share_config/release",
+      "condition": "Empty string means no shared role; otherwise must be an available role_id from the chosen cloud backup; do not send local filesystem role names here. Backup get normalizes the returned numeric role_id to a string matching this schema; use that exact live selector.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": true
+    },
+    "config.delete.id": {
+      "wire": "id",
+      "stage": "POST JSON /creator/wow/share_config/delete",
+      "condition": "Single owned-record ID; get before delete, negative author-list readback afterward. NCC has no equivalent main-record delete.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:delete",
+      "schema_supported": true,
+      "official_client_support": "Creator Center main-record deletion",
+      "live_verified": false
+    },
+    "config.delete.confirm": {
+      "wire": "local control (not sent)",
+      "stage": "preflight",
+      "condition": "literal DELETE; read target before single-record mutation; never a backup reference override",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write and schema validators",
+      "schema_supported": true,
+      "official_client_support": "local wrapper control",
+      "live_verified": false
+    },
+    "config.edit.id": {
+      "wire": "tid",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.title": {
+      "wire": "title",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.content": {
+      "wire": "content",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "Public configuration-share description body (HTML/Markdown), NOT raw WTF/backup content. Preserve full text on get; cloud_id/linked_mods/ignored arrays/roleid separately select configuration data.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.content_format": {
+      "wire": "content_format",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "1=HTML/rich text, 2=Markdown; no raw WTF serialization is sent in this field",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.intro": {
+      "wire": "intro",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.picture_urls": {
+      "wire": "pic_url",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.picture_files": {
+      "wire": "pic_url",
+      "stage": "local file -> media multipart -> pic_url in main form",
+      "condition": "Local uploads resolve to URLs. File lists append to retained/current URL lists; remote URL-list field explicitly replaces its list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.content_origin": {
+      "wire": "content_origin",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "Read live origin/categories first; categories are IDs, not labels; category list <=5.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.public": {
+      "wire": "sharing",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "public -> sharing=1; private -> sharing=0; private forces link_to_channel=false",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.submit_for_review": {
+      "wire": "local control (not sent)",
+      "stage": "preflight",
+      "condition": "submit_for_review=true is required for requested public publication; no separate review wire flag",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write and schema validators",
+      "schema_supported": true,
+      "official_client_support": "local wrapper control",
+      "live_verified": false
+    },
+    "config.edit.link_to_channel": {
+      "wire": "link_to_channel",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "private forces false; plugin create always false; other writes use caller/current value only when public",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.subscribe_plan_level": {
+      "wire": "subscribe_plan_level",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.price": {
+      "wire": "price",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.time_range": {
+      "wire": "time_range",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.edit.co_authors": {
+      "wire": "co_authors",
+      "stage": "separate relationship POST /creator/co_author/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. user_id + share_percent (fraction, total <=1); content_type=4",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "config.edit.references": {
+      "wire": "references",
+      "stage": "separate relationship POST /creator/content_reference/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=3",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "config.update.id": {
+      "wire": "tid",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.update.cloud_id": {
+      "wire": "cloud_id",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "Choose existing backup ID first. Changing it during update requires complete descendant reselection.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.update.linked_mods": {
+      "wire": "linked_mods",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "Only selected mod_ids from the live backup are authoritative; other submitted metadata is canonicalized from the selected backup. update_type is wire updateType; it is not an arbitrary version-edit override.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.update.ignored_unknown_mods": {
+      "wire": "ignored_unknown_mods",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.update.ignored_materials": {
+      "wire": "ignored_materials",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.update.ignored_fronts": {
+      "wire": "ignored_fronts",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config.update.roleid": {
+      "wire": "roleid",
+      "stage": "POST JSON /creator/wow/share_config/update",
+      "condition": "Empty string means no shared role; otherwise must be an available role_id from the chosen cloud backup; do not send local filesystem role names here. Backup get normalizes the returned numeric role_id to a string matching this schema; use that exact live selector.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "config-co-author.set.content_id": {
+      "wire": "content_id",
+      "stage": "POST /creator/co_author/set",
+      "condition": "Positive source/content ID in the resource-specific numeric namespace; separate relationship mutation",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write/_replace_relationships",
+      "schema_supported": true,
+      "official_client_support": "Creator association action",
+      "live_verified": false
+    },
+    "config-co-author.set.co_authors": {
+      "wire": "co_authors",
+      "stage": "separate relationship POST /creator/co_author/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. user_id + share_percent (fraction, total <=1); content_type=4",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "config-reference.set.source_id": {
+      "wire": "source_id",
+      "stage": "POST /creator/content_reference/set",
+      "condition": "Positive source/content ID in the resource-specific numeric namespace; separate relationship mutation",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write/_replace_relationships",
+      "schema_supported": true,
+      "official_client_support": "Creator association action",
+      "live_verified": false
+    },
+    "config-reference.set.references": {
+      "wire": "references",
+      "stage": "separate relationship POST /creator/content_reference/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=3",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "plugin.create.name": {
+      "wire": "name",
+      "stage": "POST JSON /creator/wow/mod/create",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.mod_categories": {
+      "wire": "mod_categories",
+      "stage": "POST JSON /creator/wow/mod/create",
+      "condition": "Read live origin/categories first; categories are IDs, not labels; category list <=5.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.content_origin": {
+      "wire": "content_origin",
+      "stage": "POST JSON /creator/wow/mod/create",
+      "condition": "Read live origin/categories first; categories are IDs, not labels; category list <=5.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.content_format": {
+      "wire": "content_format",
+      "stage": "POST JSON /creator/wow/mod/create",
+      "condition": "1=HTML/rich text, 2=Markdown; no raw WTF serialization is sent in this field",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.intro": {
+      "wire": "intro",
+      "stage": "POST JSON /creator/wow/mod/create",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.description": {
+      "wire": "description",
+      "stage": "POST JSON /creator/wow/mod/create",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.logo": {
+      "wire": "logo",
+      "stage": "POST JSON /creator/wow/mod/create",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.logo_file": {
+      "wire": "logo",
+      "stage": "local file -> media multipart -> logo in main form",
+      "condition": "Local uploads resolve to URLs. File lists append to retained/current URL lists; remote URL-list field explicitly replaces its list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.screenshots": {
+      "wire": "screenshots",
+      "stage": "POST JSON /creator/wow/mod/create",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.screenshot_files": {
+      "wire": "screenshots",
+      "stage": "local file -> media multipart -> screenshots in main form",
+      "condition": "Local uploads resolve to URLs. File lists append to retained/current URL lists; remote URL-list field explicitly replaces its list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.public": {
+      "wire": "share_state",
+      "stage": "POST JSON /creator/wow/mod/create",
+      "condition": "create is always share_state=0/private even when public=true; public request is deferred until a separate first-version upload and edit to share_state=1",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.submit_for_review": {
+      "wire": "local control (not sent)",
+      "stage": "preflight",
+      "condition": "submit_for_review=true is required for requested public publication; no separate review wire flag",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write and schema validators",
+      "schema_supported": true,
+      "official_client_support": "local wrapper control",
+      "live_verified": false
+    },
+    "plugin.create.subscribe_plan_level": {
+      "wire": "subscribe_plan_level",
+      "stage": "POST JSON /creator/wow/mod/create",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.link_to_channel": {
+      "wire": "link_to_channel",
+      "stage": "POST JSON /creator/wow/mod/create",
+      "condition": "private forces false; plugin create always false; other writes use caller/current value only when public",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.create.co_authors": {
+      "wire": "co_authors",
+      "stage": "separate relationship POST /creator/co_author/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. user_id + share_percent (fraction, total <=1); content_type=1",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "plugin.create.references": {
+      "wire": "references",
+      "stage": "separate relationship POST /creator/content_reference/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=1",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "plugin.delete.id": {
+      "wire": "id",
+      "stage": "POST JSON /creator/wow/mod/remove",
+      "condition": "Single owned-record ID; get before delete, negative author-list readback afterward. NCC has no equivalent main-record delete.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:delete",
+      "schema_supported": true,
+      "official_client_support": "Creator Center main-record deletion",
+      "live_verified": false
+    },
+    "plugin.delete.confirm": {
+      "wire": "local control (not sent)",
+      "stage": "preflight",
+      "condition": "literal DELETE; read target before single-record mutation; never a backup reference override",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write and schema validators",
+      "schema_supported": true,
+      "official_client_support": "local wrapper control",
+      "live_verified": false
+    },
+    "plugin.edit.id": {
+      "wire": "id",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.name": {
+      "wire": "name",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.mod_categories": {
+      "wire": "mod_categories",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "Read live origin/categories first; categories are IDs, not labels; category list <=5.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.content_origin": {
+      "wire": "content_origin",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "Read live origin/categories first; categories are IDs, not labels; category list <=5.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.content_format": {
+      "wire": "content_format",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "1=HTML/rich text, 2=Markdown; no raw WTF serialization is sent in this field",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.intro": {
+      "wire": "intro",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.description": {
+      "wire": "description",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.logo": {
+      "wire": "logo",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.logo_file": {
+      "wire": "logo",
+      "stage": "local file -> media multipart -> logo in main form",
+      "condition": "Local uploads resolve to URLs. File lists append to retained/current URL lists; remote URL-list field explicitly replaces its list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.screenshots": {
+      "wire": "screenshots",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.screenshot_files": {
+      "wire": "screenshots",
+      "stage": "local file -> media multipart -> screenshots in main form",
+      "condition": "Local uploads resolve to URLs. File lists append to retained/current URL lists; remote URL-list field explicitly replaces its list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.public": {
+      "wire": "share_state",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "create is always share_state=0/private even when public=true; public request is deferred until a separate first-version upload and edit to share_state=1",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.submit_for_review": {
+      "wire": "local control (not sent)",
+      "stage": "preflight",
+      "condition": "submit_for_review=true is required for requested public publication; no separate review wire flag",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write and schema validators",
+      "schema_supported": true,
+      "official_client_support": "local wrapper control",
+      "live_verified": false
+    },
+    "plugin.edit.subscribe_plan_level": {
+      "wire": "subscribe_plan_level",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.link_to_channel": {
+      "wire": "link_to_channel",
+      "stage": "POST JSON /creator/wow/mod/edit",
+      "condition": "private forces false; plugin create always false; other writes use caller/current value only when public",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "plugin.edit.co_authors": {
+      "wire": "co_authors",
+      "stage": "separate relationship POST /creator/co_author/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. user_id + share_percent (fraction, total <=1); content_type=1",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "plugin.edit.references": {
+      "wire": "references",
+      "stage": "separate relationship POST /creator/content_reference/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=1",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "plugin.update.mod_id": {
+      "wire": "mod_id",
+      "stage": "multipart /creator/wow/mod_file/upload_mod_file",
+      "condition": "New immutable version; read current versions and reject duplicate version before upload",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:update_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step4PluginUpload-ut4XYEw2.js",
+      "schema_supported": true,
+      "official_client_support": "Creator Center version-upload action",
+      "live_verified": false
+    },
+    "plugin.update.version": {
+      "wire": "version",
+      "stage": "multipart /creator/wow/mod_file/upload_mod_file",
+      "condition": "New immutable version; read current versions and reject duplicate version before upload",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:update_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step4PluginUpload-ut4XYEw2.js",
+      "schema_supported": true,
+      "official_client_support": "Creator Center version-upload action",
+      "live_verified": false
+    },
+    "plugin.update.game_version_list": {
+      "wire": "game_version_list",
+      "stage": "multipart /creator/wow/mod_file/upload_mod_file",
+      "condition": "JSON array encoded as multipart text; each value is a live nested client build string, never the parent game-version ID.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:update_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step4PluginUpload-ut4XYEw2.js",
+      "schema_supported": true,
+      "official_client_support": "Creator Center version-upload action",
+      "live_verified": false
+    },
+    "plugin.update.file": {
+      "wire": "multipart file",
+      "stage": "multipart /creator/wow/mod_file/upload_mod_file",
+      "condition": "Python/Creator snapshot accepts .zip/.rar/.7z <=300 MiB. Current official NCC pack/push ZIP limit is 2048 MiB and is a separate execution channel.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:update_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step4PluginUpload-ut4XYEw2.js",
+      "schema_supported": true,
+      "official_client_support": "Creator Center version-upload action",
+      "live_verified": false
+    },
+    "plugin.update.changelog": {
+      "wire": "changelog",
+      "stage": "multipart /creator/wow/mod_file/upload_mod_file",
+      "condition": "New immutable version; read current versions and reject duplicate version before upload",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:update_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step4PluginUpload-ut4XYEw2.js",
+      "schema_supported": true,
+      "official_client_support": "Creator Center version-upload action",
+      "live_verified": false
+    },
+    "plugin.update.link_to_channel": {
+      "wire": "link_to_channel",
+      "stage": "multipart /creator/wow/mod_file/upload_mod_file",
+      "condition": "JSON boolean multipart text; omitted update field preserves current remote link-to-channel state.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:update_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step4PluginUpload-ut4XYEw2.js",
+      "schema_supported": true,
+      "official_client_support": "Creator Center version-upload action",
+      "live_verified": false
+    },
+    "plugin-changelog.edit.file_id": {
+      "wire": "file_id",
+      "stage": "POST /creator/wow/mod_file/edit_changelog",
+      "condition": "file_id selects one historical plugin file; empty/null changelog clears where schema allows",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write",
+      "schema_supported": true,
+      "official_client_support": "Creator version changelog action",
+      "live_verified": false
+    },
+    "plugin-changelog.edit.changelog": {
+      "wire": "changelog",
+      "stage": "POST /creator/wow/mod_file/edit_changelog",
+      "condition": "file_id selects one historical plugin file; empty/null changelog clears where schema allows",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write",
+      "schema_supported": true,
+      "official_client_support": "Creator version changelog action",
+      "live_verified": false
+    },
+    "plugin-co-author.set.content_id": {
+      "wire": "content_id",
+      "stage": "POST /creator/co_author/set",
+      "condition": "Positive source/content ID in the resource-specific numeric namespace; separate relationship mutation",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write/_replace_relationships",
+      "schema_supported": true,
+      "official_client_support": "Creator association action",
+      "live_verified": false
+    },
+    "plugin-co-author.set.co_authors": {
+      "wire": "co_authors",
+      "stage": "separate relationship POST /creator/co_author/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. user_id + share_percent (fraction, total <=1); content_type=1",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "plugin-reference.set.source_id": {
+      "wire": "source_id",
+      "stage": "POST /creator/content_reference/set",
+      "condition": "Positive source/content ID in the resource-specific numeric namespace; separate relationship mutation",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write/_replace_relationships",
+      "schema_supported": true,
+      "official_client_support": "Creator association action",
+      "live_verified": false
+    },
+    "plugin-reference.set.references": {
+      "wire": "references",
+      "stage": "separate relationship POST /creator/content_reference/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=1",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "wa.create.game_version_id": {
+      "wire": "game_version_id",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "Live parent game-version ID; WA edit carries this field but cross-version edit acceptance was not live-tested; categories must be valid for final version.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.name": {
+      "wire": "name",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.intro": {
+      "wire": "intro",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.description": {
+      "wire": "description",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.content_format": {
+      "wire": "content_format",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "1=HTML/rich text, 2=Markdown; no raw WTF serialization is sent in this field",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.thumbnail": {
+      "wire": "thumbnail",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.thumbnail_file": {
+      "wire": "thumbnail",
+      "stage": "local file -> media multipart -> thumbnail in main form",
+      "condition": "Local uploads resolve to URLs. File lists append to retained/current URL lists; remote URL-list field explicitly replaces its list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.images": {
+      "wire": "images",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.image_files": {
+      "wire": "images",
+      "stage": "local file -> media multipart -> images in main form",
+      "condition": "Local uploads resolve to URLs. File lists append to retained/current URL lists; remote URL-list field explicitly replaces its list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.category_id_list": {
+      "wire": "category_id_list",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "Read live origin/categories first; categories are IDs, not labels; category list <=5.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.content_origin": {
+      "wire": "content_origin",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "Read live origin/categories first; categories are IDs, not labels; category list <=5.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.subscribe_plan_level": {
+      "wire": "subscribe_plan_level",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.price": {
+      "wire": "price",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.time_range": {
+      "wire": "time_range",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.public": {
+      "wire": "share_state",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "public -> share_state=1; private -> share_state=2; private forces link_to_channel=false",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.submit_for_review": {
+      "wire": "local control (not sent)",
+      "stage": "preflight",
+      "condition": "submit_for_review=true is required for requested public publication; no separate review wire flag",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write and schema validators",
+      "schema_supported": true,
+      "official_client_support": "local wrapper control",
+      "live_verified": false
+    },
+    "wa.create.link_to_channel": {
+      "wire": "link_to_channel",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "private forces false; plugin create always false; other writes use caller/current value only when public",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.attachments": {
+      "wire": "attachments",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "Objects are name/install_type/install_path/value/is_compressed/timestamp; install type/path from live options; value is uploadserver index code, not local path or arbitrary signed URL.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.co_authors": {
+      "wire": "co_authors",
+      "stage": "separate relationship POST /creator/co_author/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. user_id + share_percent (fraction, total <=1); content_type=3",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "wa.create.references": {
+      "wire": "references",
+      "stage": "separate relationship POST /creator/content_reference/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=2",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "wa.create.wa_str": {
+      "wire": "wa_str",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "Content is sensitive exported WA/string material, loaded via @file. Collection mode uses official JSON-array string representation plus ordered wa_str_titles; do not emit raw content.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.wa_str_titles": {
+      "wire": "wa_str_titles",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "Ordered titles follow collection string order; on update omission preserves the current remote titles.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.wa_log": {
+      "wire": "wa_log",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.create.string_mode": {
+      "wire": "string_mode",
+      "stage": "POST JSON /creator/wow/wa/publish",
+      "condition": "single or collection; collection requires ordered titles; this is Python/Creator support, official NCC publish supports single only.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.delete.id": {
+      "wire": "id",
+      "stage": "POST JSON /creator/wow/wa/delete",
+      "condition": "Single owned-record ID; get before delete, negative author-list readback afterward. NCC has no equivalent main-record delete.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:delete",
+      "schema_supported": true,
+      "official_client_support": "Creator Center main-record deletion",
+      "live_verified": false
+    },
+    "wa.delete.confirm": {
+      "wire": "local control (not sent)",
+      "stage": "preflight",
+      "condition": "literal DELETE; read target before single-record mutation; never a backup reference override",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write and schema validators",
+      "schema_supported": true,
+      "official_client_support": "local wrapper control",
+      "live_verified": false
+    },
+    "wa.edit.id": {
+      "wire": "id",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.game_version_id": {
+      "wire": "game_version_id",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "Live parent game-version ID; WA edit carries this field but cross-version edit acceptance was not live-tested; categories must be valid for final version.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.name": {
+      "wire": "name",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.intro": {
+      "wire": "intro",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.description": {
+      "wire": "description",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.content_format": {
+      "wire": "content_format",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "1=HTML/rich text, 2=Markdown; no raw WTF serialization is sent in this field",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.thumbnail": {
+      "wire": "thumbnail",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.thumbnail_file": {
+      "wire": "thumbnail",
+      "stage": "local file -> media multipart -> thumbnail in main form",
+      "condition": "Local uploads resolve to URLs. File lists append to retained/current URL lists; remote URL-list field explicitly replaces its list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.images": {
+      "wire": "images",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.image_files": {
+      "wire": "images",
+      "stage": "local file -> media multipart -> images in main form",
+      "condition": "Local uploads resolve to URLs. File lists append to retained/current URL lists; remote URL-list field explicitly replaces its list.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.category_id_list": {
+      "wire": "category_id_list",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "Read live origin/categories first; categories are IDs, not labels; category list <=5.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.content_origin": {
+      "wire": "content_origin",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "Read live origin/categories first; categories are IDs, not labels; category list <=5.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.subscribe_plan_level": {
+      "wire": "subscribe_plan_level",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.price": {
+      "wire": "price",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.time_range": {
+      "wire": "time_range",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.public": {
+      "wire": "share_state",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "public -> share_state=1; private -> share_state=2; private forces link_to_channel=false",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.submit_for_review": {
+      "wire": "local control (not sent)",
+      "stage": "preflight",
+      "condition": "submit_for_review=true is required for requested public publication; no separate review wire flag",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write and schema validators",
+      "schema_supported": true,
+      "official_client_support": "local wrapper control",
+      "live_verified": false
+    },
+    "wa.edit.link_to_channel": {
+      "wire": "link_to_channel",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "private forces false; plugin create always false; other writes use caller/current value only when public",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.attachments": {
+      "wire": "attachments",
+      "stage": "POST JSON /creator/wow/wa/update",
+      "condition": "Objects are name/install_type/install_path/value/is_compressed/timestamp; install type/path from live options; value is uploadserver index code, not local path or arbitrary signed URL.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.edit.co_authors": {
+      "wire": "co_authors",
+      "stage": "separate relationship POST /creator/co_author/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. user_id + share_percent (fraction, total <=1); content_type=3",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "wa.edit.references": {
+      "wire": "references",
+      "stage": "separate relationship POST /creator/content_reference/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=2",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "wa.update.id": {
+      "wire": "id",
+      "stage": "POST JSON /creator/wow/wa/update_wa_str",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.update.version": {
+      "wire": "version",
+      "stage": "POST JSON /creator/wow/wa/update_wa_str",
+      "condition": "WA next version is fetched when omitted; explicit/derived version must exceed remote current version; this is not plugin free-text version semantics.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.update.wa_str": {
+      "wire": "wa_str",
+      "stage": "POST JSON /creator/wow/wa/update_wa_str",
+      "condition": "Content is sensitive exported WA/string material, loaded via @file. Collection mode uses official JSON-array string representation plus ordered wa_str_titles; do not emit raw content.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.update.wa_str_titles": {
+      "wire": "wa_str_titles",
+      "stage": "POST JSON /creator/wow/wa/update_wa_str",
+      "condition": "Ordered titles follow collection string order; on update omission preserves the current remote titles.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.update.wa_log": {
+      "wire": "wa_log",
+      "stage": "POST JSON /creator/wow/wa/update_wa_str",
+      "condition": "create sends explicit form; edit/update reads current detail and preserves omitted editable form fields",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa.update.link_to_channel": {
+      "wire": "link_to_channel",
+      "stage": "POST JSON /creator/wow/wa/update_wa_str",
+      "condition": "private forces false; plugin create always false; other writes use caller/current value only when public",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "schema_supported": true,
+      "official_client_support": "Creator Center submitted field",
+      "live_verified": false
+    },
+    "wa-changelog.edit.id": {
+      "wire": "wa_log_id",
+      "stage": "POST /creator/wow/wa_log/edit",
+      "condition": "Edit one changelog; optional wa_id is only for immediate readback, not a mutation field",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write",
+      "schema_supported": true,
+      "official_client_support": "Creator WA changelog action",
+      "live_verified": false
+    },
+    "wa-changelog.edit.wa_id": {
+      "wire": "wa_id (readback only)",
+      "stage": "readback /creator/wow/wa_log/list",
+      "condition": "Edit one changelog; optional wa_id is only for immediate readback, not a mutation field",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write",
+      "schema_supported": true,
+      "official_client_support": "Creator WA changelog action",
+      "live_verified": false
+    },
+    "wa-changelog.edit.wa_log": {
+      "wire": "content",
+      "stage": "POST /creator/wow/wa_log/edit",
+      "condition": "Edit one changelog; optional wa_id is only for immediate readback, not a mutation field",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write",
+      "schema_supported": true,
+      "official_client_support": "Creator WA changelog action",
+      "live_verified": false
+    },
+    "wa-co-author.set.content_id": {
+      "wire": "content_id",
+      "stage": "POST /creator/co_author/set",
+      "condition": "Positive source/content ID in the resource-specific numeric namespace; separate relationship mutation",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write/_replace_relationships",
+      "schema_supported": true,
+      "official_client_support": "Creator association action",
+      "live_verified": false
+    },
+    "wa-co-author.set.co_authors": {
+      "wire": "co_authors",
+      "stage": "separate relationship POST /creator/co_author/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. user_id + share_percent (fraction, total <=1); content_type=3",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "wa-media.upload.file": {
+      "wire": "local file -> upload index/URL",
+      "stage": "kind=image: /creator/wow/wa/upload_media; kind=attachment: uploadserver /upload/v3/prepare -> object PUT -> /upload/v3/index/get",
+      "condition": "Attachment uploader uses indexType=2 and checksumAlgorithm=1; install_type/path are returned descriptor fields, not object PUT credentials",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:upload_attachment/execute_write",
+      "schema_supported": true,
+      "official_client_support": "Creator file upload path",
+      "live_verified": false
+    },
+    "wa-media.upload.kind": {
+      "wire": "local branch selector",
+      "stage": "kind=image: /creator/wow/wa/upload_media; kind=attachment: uploadserver /upload/v3/prepare -> object PUT -> /upload/v3/index/get",
+      "condition": "Attachment uploader uses indexType=2 and checksumAlgorithm=1; install_type/path are returned descriptor fields, not object PUT credentials",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:upload_attachment/execute_write",
+      "schema_supported": true,
+      "official_client_support": "Creator file upload path",
+      "live_verified": false
+    },
+    "wa-media.upload.install_type": {
+      "wire": "attachment.install_type (local returned object)",
+      "stage": "kind=image: /creator/wow/wa/upload_media; kind=attachment: uploadserver /upload/v3/prepare -> object PUT -> /upload/v3/index/get",
+      "condition": "Attachment uploader uses indexType=2 and checksumAlgorithm=1; install_type/path are returned descriptor fields, not object PUT credentials",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:upload_attachment/execute_write",
+      "schema_supported": true,
+      "official_client_support": "Creator file upload path",
+      "live_verified": false
+    },
+    "wa-media.upload.install_path": {
+      "wire": "attachment.install_path (local returned object)",
+      "stage": "kind=image: /creator/wow/wa/upload_media; kind=attachment: uploadserver /upload/v3/prepare -> object PUT -> /upload/v3/index/get",
+      "condition": "Attachment uploader uses indexType=2 and checksumAlgorithm=1; install_type/path are returned descriptor fields, not object PUT credentials",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:upload_attachment/execute_write",
+      "schema_supported": true,
+      "official_client_support": "Creator file upload path",
+      "live_verified": false
+    },
+    "wa-reference.set.source_id": {
+      "wire": "source_id",
+      "stage": "POST /creator/content_reference/set",
+      "condition": "Positive source/content ID in the resource-specific numeric namespace; separate relationship mutation",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write/_replace_relationships",
+      "schema_supported": true,
+      "official_client_support": "Creator association action",
+      "live_verified": false
+    },
+    "wa-reference.set.references": {
+      "wire": "references",
+      "stage": "separate relationship POST /creator/content_reference/set",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=2",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "schema_supported": true,
+      "official_client_support": "Creator Center separate association actions",
+      "live_verified": false
+    },
+    "wa-share-code.set.module_id": {
+      "wire": "moduleId",
+      "stage": "POST next-origin /bannerserver/ShareCode/Set",
+      "condition": "gameId=1,moduleType=3 fixed; module_id is a WA record ID; no caller credential/base URL",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:execute_write",
+      "schema_supported": true,
+      "official_client_support": "static implementation; latest official UI exact button behavior unknown",
+      "live_verified": false
+    }
+  },
+  "official_cli": {
+    "version": "0.1.29",
+    "auth_checked": false,
+    "policy": "Default to installed NCC unless user explicitly selects third-party Python. Do not silently switch channels on unsupported fields/actions. No whoami/token-store inspection performed.",
+    "sections": {
+      "addons": [
+        "list",
+        "info",
+        "init",
+        "push",
+        "create",
+        "edit",
+        "pack",
+        "sync",
+        "versions",
+        "changelog",
+        "game-versions",
+        "categories",
+        "comments"
+      ],
+      "wa": [
+        "list",
+        "info",
+        "init",
+        "pull",
+        "push",
+        "publish",
+        "edit",
+        "categories",
+        "comments"
+      ],
+      "uipack": [
+        "list",
+        "info",
+        "init",
+        "pull",
+        "push",
+        "publish",
+        "comments"
+      ],
+      "cloudbackup": [
+        "list",
+        "info"
+      ]
+    },
+    "commands": {
+      "ncc wow addons list": {
+        "options": [
+          {
+            "flags": "--keyword <kw>",
+            "description": "搜索关键词（匹配插件名称/描述）"
+          },
+          {
+            "flags": "--pagenum <n>",
+            "description": "页码（等同位置参数写法）"
+          },
+          {
+            "flags": "--pagesize <n>",
+            "description": "每页数量（10-2000）"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons info": {
+        "options": [
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons init": {
+        "options": [
+          {
+            "flags": "--id <mod_id>",
+            "description": "插件 ID（ncc wow addons list 查询）"
+          },
+          {
+            "flags": "--refresh-config",
+            "description": "强制刷新客户端版本分组缓存"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons push": {
+        "options": [
+          {
+            "flags": "--id <mod_id>",
+            "description": "插件 ID（缺省读 ncc.json）"
+          },
+          {
+            "flags": "--version <v>",
+            "description": "版本名（自由文本，同插件内不可重复；缺省读 ncc.json）"
+          },
+          {
+            "flags": "--changelog <text|@file>",
+            "description": "更新日志（@file 从文件读；缺省读 ncc.json 的 changelog_file）"
+          },
+          {
+            "flags": "--game-versions <spec>",
+            "description": "适配客户端版本：显式版本串(11.2.7,12.1.0)/auto=.toc 检测（缺省读 ncc.json）"
+          },
+          {
+            "flags": "--dry-run",
+            "description": "只校验参数+打包预检，不上传"
+          },
+          {
+            "flags": "--refresh-config",
+            "description": "强制刷新客户端版本分组缓存"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons create": {
+        "options": [
+          {
+            "flags": "--name <name>",
+            "description": "插件名称"
+          },
+          {
+            "flags": "--description <text|@file>",
+            "description": "插件详情正文（Markdown，@file 从文件读）"
+          },
+          {
+            "flags": "--categories <ids>",
+            "description": "分类 ID，逗号分隔（查询：ncc wow addons categories）"
+          },
+          {
+            "flags": "--logo <file|url>",
+            "description": "插件图标（本地图片路径或已上传链接）"
+          },
+          {
+            "flags": "--screenshots <items>",
+            "description": "插件截图，逗号分隔（本地图片路径或已上传链接）"
+          },
+          {
+            "flags": "--intro <text>",
+            "description": "一句话简介（缺省从正文自动提取）"
+          },
+          {
+            "flags": "--home-page <name>",
+            "description": "官网名称"
+          },
+          {
+            "flags": "--home-page-link <url>",
+            "description": "官网链接（http 开头）"
+          },
+          {
+            "flags": "--private",
+            "description": "私密发布（默认公开；公开内容进入平台审核）"
+          },
+          {
+            "flags": "--origin <type>",
+            "description": "内容来源：original 原创 / repost 转载 / localized 汉化 (default: \"original\")"
+          },
+          {
+            "flags": "--subscribe-level <n>",
+            "description": "订阅计划等级（需已开通对应订阅计划）"
+          },
+          {
+            "flags": "--link-channel",
+            "description": "发布后自动推送动态到社区频道"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons edit": {
+        "options": [
+          {
+            "flags": "--name <name>",
+            "description": "插件名称"
+          },
+          {
+            "flags": "--description <text|@file>",
+            "description": "插件详情正文（Markdown，@file 从文件读）"
+          },
+          {
+            "flags": "--intro <text>",
+            "description": "一句话简介（传空串 \"\" 则从正文重新提取）"
+          },
+          {
+            "flags": "--categories <ids>",
+            "description": "分类 ID，逗号分隔（查询：ncc wow addons categories）"
+          },
+          {
+            "flags": "--logo <file|url>",
+            "description": "插件图标（本地图片路径或已上传链接）"
+          },
+          {
+            "flags": "--screenshots <items>",
+            "description": "插件截图，逗号分隔（本地图片路径或已上传链接，整组替换）"
+          },
+          {
+            "flags": "--private",
+            "description": "设为私密"
+          },
+          {
+            "flags": "--public",
+            "description": "设为公开（公开内容进入平台审核）"
+          },
+          {
+            "flags": "--subscribe-level <n>",
+            "description": "订阅计划等级（0=取消订阅门槛，需已开通对应订阅计划）"
+          },
+          {
+            "flags": "--link-channel",
+            "description": "本次编辑推送动态到社区频道"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons pack": {
+        "options": [
+          {
+            "flags": "--version <v>",
+            "description": "版本号（用于输出文件名；缺省读 ncc.json）"
+          },
+          {
+            "flags": "--out <path>",
+            "description": "输出 zip 文件或目录（默认当前目录，文件名 <目录名>-<版本号>.zip）"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons sync": {
+        "options": [
+          {
+            "flags": "--yes",
+            "description": "确认覆盖本地内容文件"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons versions": {
+        "options": [
+          {
+            "flags": "--id <mod_id>",
+            "description": "插件 ID"
+          },
+          {
+            "flags": "--pagenum <n>",
+            "description": "页码（等同位置参数写法）"
+          },
+          {
+            "flags": "--pagesize <n>",
+            "description": "每页数量（10-2000）"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons changelog": {
+        "options": [
+          {
+            "flags": "--set <text|@file>",
+            "description": "新的日志内容（@file 从文件读；不传则查看）"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons game-versions": {
+        "options": [
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [
+          {
+            "command": "list [options] [page]",
+            "description": "我的插件列表"
+          },
+          {
+            "command": "info <mod_id>",
+            "description": "插件详情：审核/发布状态、编辑回填信息（简介/分类/图片/官网）、最新版本与下载链接"
+          },
+          {
+            "command": "init [options] [dir]",
+            "description": "生成 ncc.json"
+          },
+          {
+            "command": "create [options]",
+            "description": "创建插件（图标/截图传本地图片自动上传；创建后 init 关联目录再 push"
+          },
+          {
+            "command": "edit [options] <mod_id>",
+            "description": "编辑已发布插件的信息（read-modify-write：只改传入项，其余保持当前值；图标/截图传本地图片自动上传）"
+          },
+          {
+            "command": "categories [options]",
+            "description": "插件分类表（创建插件时用 ID 选择分类）"
+          },
+          {
+            "command": "push [options] [dir]",
+            "description": "打包插件目录并上传新版本（核心命令，先 --dry-run 预检）"
+          },
+          {
+            "command": "pack [options] [dir]",
+            "description": "打包插件目录为本地 zip（纯离线：不上传、无需登录）"
+          },
+          {
+            "command": "sync [options] [dir]",
+            "description": "用线上最新版本覆盖本地工程内容（读 ncc.json 关联的插件；须附 --yes 确认）"
+          },
+          {
+            "command": "versions [options] [page]",
+            "description": "版本文件列表（含 file_id，供 changelog 编辑）"
+          },
+          {
+            "command": "changelog [options] <file_id>",
+            "description": "查看/编辑指定版本的更新日志（--set 编辑）"
+          },
+          {
+            "command": "comments",
+            "description": "评论管理：列出收到的评价并回复"
+          },
+          {
+            "command": "help [command]",
+            "description": "display help for command"
+          }
+        ],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons categories": {
+        "options": [
+          {
+            "flags": "--refresh-config",
+            "description": "强制刷新分类缓存"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow addons comments": {
+        "options": [
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [
+          {
+            "command": "list [options] <content_id> [page]",
+            "description": "评价列表（可翻页）"
+          },
+          {
+            "command": "reply [options] <review_id>",
+            "description": "回复一条评价（回复先进审核，通过后公开展示）"
+          },
+          {
+            "command": "help [command]",
+            "description": "display help for command"
+          }
+        ],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow wa list": {
+        "options": [
+          {
+            "flags": "--keyword <kw>",
+            "description": "搜索关键词（匹配名称/简介）"
+          },
+          {
+            "flags": "--paid",
+            "description": "只看付费内容"
+          },
+          {
+            "flags": "--free",
+            "description": "只看免费内容"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow wa info": {
+        "options": [
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow wa init": {
+        "options": [
+          {
+            "flags": "--id <wa_id>",
+            "description": "字符串 ID（ncc wow wa list 查询）"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow wa pull": {
+        "options": [
+          {
+            "flags": "--out <path>",
+            "description": "输出文件（默认 wa_<ID>_v<版本>.txt）"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow wa push": {
+        "options": [
+          {
+            "flags": "--file <path>",
+            "description": "字符串内容文件（如 pull 拉取后编辑的文件）"
+          },
+          {
+            "flags": "--log <text|@file>",
+            "description": "更新日志（@file 从文件读）"
+          },
+          {
+            "flags": "--version <v>",
+            "description": "新版本号（1.2.3 形式，须大于当前版本；缺省自动递增）"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow wa publish": {
+        "options": [
+          {
+            "flags": "--name <name>",
+            "description": "字符串名称"
+          },
+          {
+            "flags": "--description <text|@file>",
+            "description": "字符串描述正文（Markdown，@file 从文件读）"
+          },
+          {
+            "flags": "--wa-str <text|@file>",
+            "description": "导出的字符串内容（建议 @file 从文件读）"
+          },
+          {
+            "flags": "--game-version <id|名称>",
+            "description": "游戏版本（如 2 或 正式服）"
+          },
+          {
+            "flags": "--categories <ids>",
+            "description": "分类 ID，逗号分隔，至多 5 个（查询：ncc wow wa categories --game-version X）"
+          },
+          {
+            "flags": "--thumbnail <file|url>",
+            "description": "展示图（本地图片路径或已上传链接）"
+          },
+          {
+            "flags": "--images <items>",
+            "description": "预览图，逗号分隔（本地图片路径或已上传链接）"
+          },
+          {
+            "flags": "--changelog <text|@file>",
+            "description": "更新日志"
+          },
+          {
+            "flags": "--intro <text>",
+            "description": "一句话简介"
+          },
+          {
+            "flags": "--private",
+            "description": "私密发布（默认公开；公开内容进入平台审核）"
+          },
+          {
+            "flags": "--price <元>",
+            "description": "单项付费价格，单位元（付费内容需人工审核）"
+          },
+          {
+            "flags": "--subscribe-level <n>",
+            "description": "订阅计划等级（需已开通对应订阅计划）"
+          },
+          {
+            "flags": "--time-range <r>",
+            "description": "订阅有效时间范围"
+          },
+          {
+            "flags": "--origin <type>",
+            "description": "内容来源：original 原创 / repost 转载 / localized 汉化 (default: \"original\")"
+          },
+          {
+            "flags": "--link-channel",
+            "description": "发布后自动推送动态到社区频道"
+          },
+          {
+            "flags": "--refresh-config",
+            "description": "强制刷新游戏版本缓存"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow wa edit": {
+        "options": [
+          {
+            "flags": "--name <name>",
+            "description": "字符串名称"
+          },
+          {
+            "flags": "--description <text|@file>",
+            "description": "字符串描述正文（Markdown，@file 从文件读）"
+          },
+          {
+            "flags": "--intro <text>",
+            "description": "一句话简介"
+          },
+          {
+            "flags": "--categories <ids>",
+            "description": "分类 ID，逗号分隔，至多 5 个（查询：ncc wow wa categories --game-version X）"
+          },
+          {
+            "flags": "--thumbnail <file|url>",
+            "description": "展示图（本地图片路径或已上传链接）"
+          },
+          {
+            "flags": "--images <items>",
+            "description": "预览图，逗号分隔（本地图片路径或已上传链接，整组替换）"
+          },
+          {
+            "flags": "--private",
+            "description": "设为私密"
+          },
+          {
+            "flags": "--public",
+            "description": "设为公开（公开内容进入平台审核）"
+          },
+          {
+            "flags": "--price <元>",
+            "description": "单项付费价格，单位元（0=取消单项付费；付费内容需人工审核）"
+          },
+          {
+            "flags": "--subscribe-level <n>",
+            "description": "订阅计划等级（0=取消订阅门槛，需已开通对应订阅计划）"
+          },
+          {
+            "flags": "--link-channel",
+            "description": "本次编辑推送动态到社区频道"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow wa categories": {
+        "options": [
+          {
+            "flags": "--game-version <id|名称>",
+            "description": "游戏版本（如 2 或 正式服）"
+          },
+          {
+            "flags": "--refresh-config",
+            "description": "强制刷新游戏版本缓存"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow wa comments": {
+        "options": [
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [
+          {
+            "command": "list [options] <content_id> [page]",
+            "description": "评价列表（可翻页）"
+          },
+          {
+            "command": "reply [options] <review_id>",
+            "description": "回复一条评价（回复先进审核，通过后公开展示）"
+          },
+          {
+            "command": "help [command]",
+            "description": "display help for command"
+          }
+        ],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow uipack list": {
+        "options": [
+          {
+            "flags": "--keyword <kw>",
+            "description": "搜索关键词（匹配分享码/标题）"
+          },
+          {
+            "flags": "--paid",
+            "description": "只看付费内容"
+          },
+          {
+            "flags": "--free",
+            "description": "只看免费内容"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow uipack info": {
+        "options": [
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow uipack init": {
+        "options": [
+          {
+            "flags": "--id <config_id>",
+            "description": "配置 ID（ncc wow uipack list 查询）"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow uipack pull": {
+        "options": [
+          {
+            "flags": "--out <path>",
+            "description": "输出文件（默认 uipack_<ID>.md，HTML 格式为 .html）"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow uipack push": {
+        "options": [
+          {
+            "flags": "--file <path>",
+            "description": "正文内容文件（Markdown；HTML 存量请走网页端）"
+          },
+          {
+            "flags": "--title <text>",
+            "description": "新标题"
+          },
+          {
+            "flags": "--intro <text|@file>",
+            "description": "新摘要（@file 从文件读；不传且更新了正文时自动从正文提取）"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow uipack publish": {
+        "options": [
+          {
+            "flags": "--backup <backup_id>",
+            "description": "云端备份 ID"
+          },
+          {
+            "flags": "--title <title>",
+            "description": "标题"
+          },
+          {
+            "flags": "--content <text|@file>",
+            "description": "正文（Markdown，@file 从文件读）"
+          },
+          {
+            "flags": "--images <items>",
+            "description": "展示图，逗号分隔，至少一张（本地图片路径或已上传链接）"
+          },
+          {
+            "flags": "--role <roleid>",
+            "description": "分享的角色数据 ID（缺省不指定）"
+          },
+          {
+            "flags": "--intro <text>",
+            "description": "自定义摘要（缺省从正文自动提取）"
+          },
+          {
+            "flags": "--private",
+            "description": "私密发布（默认公开；公开发布需认证作者，内容进入平台审核）"
+          },
+          {
+            "flags": "--price <元>",
+            "description": "价格，单位元（默认免费）"
+          },
+          {
+            "flags": "--subscribe-level <n>",
+            "description": "订阅计划等级（需已开通对应订阅计划）"
+          },
+          {
+            "flags": "--time-range <r>",
+            "description": "订阅有效时间范围"
+          },
+          {
+            "flags": "--origin <type>",
+            "description": "内容来源：original 原创 / repost 转载 / localized 汉化 (default: \"original\")"
+          },
+          {
+            "flags": "--link-channel",
+            "description": "发布后自动推送动态到社区频道"
+          },
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow uipack comments": {
+        "options": [
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [
+          {
+            "command": "list [options] <content_id> [page]",
+            "description": "评价列表（可翻页）"
+          },
+          {
+            "command": "reply [options] <review_id>",
+            "description": "回复一条评价（回复先进审核，通过后公开展示）"
+          },
+          {
+            "command": "help [command]",
+            "description": "display help for command"
+          }
+        ],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow cloudbackup list": {
+        "options": [
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      },
+      "ncc wow cloudbackup info": {
+        "options": [
+          {
+            "flags": "-h, --help",
+            "description": "display help for command"
+          }
+        ],
+        "subcommands": [],
+        "help_verified": true,
+        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
+      }
+    },
+    "capability_differences": [
+      {
+        "feature": "plugin homepage",
+        "ncc": "addons create --home-page / --home-page-link; body home_page/home_page_link",
+        "python": "not in schema; Creator Center snapshot submit also omits it",
+        "evidence": "installed dist/ncc.cjs /mod/create builder; addons create --help"
+      },
+      {
+        "feature": "plugin visibility namespace",
+        "ncc": "CLI wrapper create sends private=2/public=1",
+        "python": "legacy Creator create is always private share_state=0; public after first content is a separate edit",
+        "evidence": "installed dist/ncc.cjs /mod/create; newbee.py:create_plugin"
+      },
+      {
+        "feature": "plugin packages",
+        "ncc": "ZIP automatic pack/push up to2048MiB, build auto from TOC; excludes hidden/ignore files",
+        "python": "prebuilt ZIP/RAR/7z up to300MiB; explicit game_version_list build strings",
+        "evidence": "ncc docs/push --help; Creator Step4PluginUpload Ot; newbee.py:update_plugin"
+      },
+      {
+        "feature": "configuration selection",
+        "ncc": "uipack publish exposes backup/role, not the complete linked/ignored selection arrays; push only title/content/intro",
+        "python": "explicit linked_mods,ignored_*,roleid; backup-content update separate from metadata edit",
+        "evidence": "uipack publish/push --help and release builder"
+      },
+      {
+        "feature": "WA collections and attachments",
+        "ncc": "publish/push/edit documentation restricts to single string; multi-string/attachments web-only",
+        "python": "collection mode, ordered titles, attachment upload and descriptors supported",
+        "evidence": "wa publish/edit/push --help; newbee.py:create_wa/upload_attachment"
+      },
+      {
+        "feature": "backup mutation",
+        "ncc": "cloudbackup list/info only; upload/restore via desktop client",
+        "python": "selective generate/upload/create/rename/delete-preview/delete",
+        "evidence": "cloudbackup --help; desktop 1.1.29 app.js29474/8761.js"
+      },
+      {
+        "feature": "main-record deletion",
+        "ncc": "plugin/WA/config deletion documented as online-only",
+        "python": "single-record deletes plus separately guarded backup batches",
+        "evidence": "addons create/wa publish/uipack publish --help; newbee.py:delete"
+      }
+    ]
+  },
+  "source_evidence": [
+    {
+      "path": "D:/Software/NewBeeBox/resources/app.asar!js/8761.js",
+      "sha256": "8c0a50f7e38a1f94809905665ab142b893903599db9d2835b7b83f23a5609cf7",
+      "verified": "current desktop backup manifest/components/rename/list/delete/WTF roots/Fonts uploadFolder"
+    },
+    {
+      "path": "D:/Software/NewBeeBox/resources/app.asar!js/app.js",
+      "sha256": "57b0f97abc0cb558e558bbf2550bf15ca91c75fd7c7f88c26481d8ca43e6d5f9",
+      "verified": "module29474 backup endpoints; desktop Bearer request path"
+    },
+    {
+      "path": "D:/Software/NewBeeBox/resources/app.asar!js/chunk-common.js",
+      "sha256": "5e8b66fcfe870ec0dff4e8b71348240a44340517ca5755023fa4166988f64713",
+      "verified": "current desktop config public content=t_content; config submit selected_eml=[] and desktop-specific price=0/time_range empty"
+    },
+    {
+      "path": "C:\\Users\\follen\\AppData\\Roaming\\npm\\node_modules\\@newbeebox\\newbeebox-creator-center-cli\\dist\\ncc.cjs",
+      "sha256": "6f5fe244fd14823a37559a864b8fd37bdb5475adb5de15944df389580798d3ca",
+      "verified": "installed CLI0.1.29 flags and separate wire wrappers"
+    }
+  ],
+  "official_effective_fields_snapshot": {
+    "plugin.create": [
+      "content_format",
+      "content_origin",
+      "description",
+      "intro",
+      "link_to_channel",
+      "logo",
+      "mod_categories",
+      "name",
+      "screenshots",
+      "share_state",
+      "subscribe_plan_level"
+    ],
+    "plugin.edit": [
+      "content_format",
+      "content_origin",
+      "description",
+      "id",
+      "intro",
+      "link_to_channel",
+      "logo",
+      "mod_categories",
+      "name",
+      "screenshots",
+      "share_state",
+      "subscribe_plan_level"
+    ],
+    "plugin.update": [
+      "changelog",
+      "file",
+      "game_version_list",
+      "link_to_channel",
+      "mod_id",
+      "version"
+    ],
+    "config.create": [
+      "cloud_id",
+      "content",
+      "content_format",
+      "content_origin",
+      "ignored_fronts",
+      "ignored_materials",
+      "ignored_unknown_mods",
+      "intro",
+      "link_to_channel",
+      "linked_mods",
+      "pic_url",
+      "price",
+      "roleid",
+      "sharing",
+      "subscribe_plan_level",
+      "time_range",
+      "title"
+    ],
+    "config.update": [
+      "cloud_id",
+      "content",
+      "content_format",
+      "content_origin",
+      "ignored_fronts",
+      "ignored_materials",
+      "ignored_unknown_mods",
+      "intro",
+      "link_to_channel",
+      "linked_mods",
+      "pic_url",
+      "price",
+      "roleid",
+      "sharing",
+      "subscribe_plan_level",
+      "tid",
+      "time_range",
+      "title"
+    ],
+    "config.edit": [
+      "cloud_id",
+      "content",
+      "content_format",
+      "content_origin",
+      "ignored_fronts",
+      "ignored_materials",
+      "ignored_unknown_mods",
+      "intro",
+      "link_to_channel",
+      "linked_mods",
+      "pic_url",
+      "price",
+      "roleid",
+      "sharing",
+      "subscribe_plan_level",
+      "tid",
+      "time_range",
+      "title"
+    ],
+    "wa.create": [
+      "attachments",
+      "category_id_list",
+      "content_format",
+      "content_origin",
+      "description",
+      "game_version_id",
+      "images",
+      "intro",
+      "link_to_channel",
+      "name",
+      "price",
+      "share_state",
+      "string_mode",
+      "subscribe_plan_level",
+      "thumbnail",
+      "time_range",
+      "wa_log",
+      "wa_str",
+      "wa_str_titles"
+    ],
+    "wa.edit": [
+      "attachments",
+      "category_id_list",
+      "content_format",
+      "content_origin",
+      "description",
+      "game_version_id",
+      "id",
+      "images",
+      "intro",
+      "link_to_channel",
+      "name",
+      "price",
+      "share_state",
+      "subscribe_plan_level",
+      "thumbnail",
+      "time_range",
+      "wa_log"
+    ],
+    "wa.update": [
+      "id",
+      "link_to_channel",
+      "version",
+      "wa_log",
+      "wa_str",
+      "wa_str_titles"
+    ]
+  },
+  "omissions_and_unknowns": [
+    {
+      "field": "home_page/home_page_link",
+      "classification": "NCC-only exposed capability; Python schema missing by channel",
+      "condition": "Do not invent these keys in Python JSON or claim full NCC parity."
+    },
+    {
+      "field": "selected_eml",
+      "classification": "existing opaque arrays preserved and verified; new nonempty selection schema remains unknown",
+      "wire": "selected_eml",
+      "condition": "config get returns existing selected_eml. edit/update deep-copy the existing array to the native selected_eml wire field, including unknown nested keys, and require matching readback. Malformed non-array values stop before mutation. Caller cannot create/change layouts through schema.",
+      "evidence": "newbee.py:_selected_layouts/_config_form/update_config; test_newbee_wire_matrix.py layout preservation/loss/malformed regression"
+    },
+    {
+      "field": "backup known-plugin discovery",
+      "classification": "local scan only lists folder candidates",
+      "condition": "Python does not currently reproduce the native remote-recognition + local-lock lookup. Caller must provide returned/verified full known-plugin briefs; never synthesize IDs from folder names."
+    },
+    {
+      "field": "WA cross-version editing",
+      "classification": "schema carries game_version_id; real cross-parent acceptance not live-tested",
+      "condition": "Only assert current wire and live-category preflight; do not claim every server-side transition is supported."
+    },
+    {
+      "field": "new nonempty edit-mode layout selection and server-atomic reference protection",
+      "classification": "not verified",
+      "condition": "No schema for creating/replacing selected_eml entries. Client-side positive reference protection is verified live using own temporary private config and backup; server atomic reference enforcement remains unverified."
+    }
+  ],
+  "live_verification": {
+    "date": "2026-10-30",
+    "channel": "third-party Python",
+    "fixture": "synthetic FuploadBackupProbe, TOC Interface120105 only, unknown-plugin ZIP, game_version_id2",
+    "passed": [
+      "local generate",
+      "one signed object PUT",
+      "backup create/list/readback",
+      "rename/readback",
+      "complete reference delete-preview",
+      "one delete/negative list readback",
+      "original two backups retained"
+    ],
+    "deleted_test_backup_id": 4141994,
+    "critical_observation": "Historical official wclboxdata.cn-hangzhou.oss.aliyuncs.com HTTP upload URLs are upgraded to TLS; signed PUT requires Content-Type application/x-www-form-urlencoded. Missing/wrong Content-Type returned403; matching header returned200.",
+    "not_exercised": [
+      "public plugin/WA publication",
+      "new nonempty edit-mode layout mutation",
+      "server-side atomic reference protection"
+    ],
+    "evidence": "root conversation tool record; docs/cloud-backup-support.md; no credential-bearing HAR persisted",
+    "additional_acceptance": {
+      "date": "2026-10-30",
+      "synthetic_only": true,
+      "all_component_backup": {
+        "deleted_test_id": 4142385,
+        "unknown_plugins": 1,
+        "materials": 1,
+        "fonts": 1,
+        "wtf_accounts": 2,
+        "wtf_roles": 2,
+        "zip_count": 5,
+        "native_font_upload": true,
+        "passed": [
+          "generate",
+          "upload/create/readback",
+          "rename/readback",
+          "complete delete preview",
+          "two-item batch deletion/negative readback"
+        ]
+      },
+      "second_bulk_item_deleted_id": 4142386,
+      "dynamic_branches": [
+        {
+          "branch_id": 9,
+          "branch_name": "无限",
+          "id": 4142398,
+          "generate_upload_readback_rename": true
+        },
+        {
+          "branch_id": 4,
+          "branch_name": "泰坦重铸",
+          "id": 4142399,
+          "generate_upload_readback_rename": true
+        },
+        {
+          "branch_id": 7,
+          "branch_name": "熊猫人之谜",
+          "id": 4142400,
+          "generate_upload_readback_rename": true
+        },
+        {
+          "branch_id": 8,
+          "branch_name": "燃烧的远征",
+          "id": 4142401,
+          "generate_upload_readback_rename": true
+        },
+        {
+          "branch_id": 6,
+          "branch_name": "经典旧世",
+          "id": 4142402,
+          "generate_upload_readback_rename": true
+        },
+        {
+          "branch_id": 3,
+          "branch_name": "探索赛季",
+          "id": 4142403,
+          "generate_upload_readback_rename": true
+        }
+      ],
+      "all_current_branch_ids": [
+        9,
+        2,
+        4,
+        7,
+        8,
+        6,
+        3
+      ],
+      "cross_branch_cleanup": {
+        "deleted_count": 6,
+        "deleted_ids": [
+          4142398,
+          4142399,
+          4142400,
+          4142401,
+          4142402,
+          4142403
+        ],
+        "created_records_remaining": [],
+        "original_records_retained": true,
+        "final_backup_count": 2
+      },
+      "read_only_categories": {
+        "9": 28,
+        "2": 83,
+        "4": 50,
+        "7": 42,
+        "8": 28,
+        "6": 28,
+        "3": 27
+      },
+      "private_reference_attempt": {
+        "result": "passed with a new role-backed synthetic private configuration; original failed request was not replayed",
+        "backup_id": 4142419,
+        "private_config_id": 62433,
+        "private_readback": true,
+        "reference_preview_blocked": true,
+        "confirm_delete_hard_rejected": true,
+        "remote_delete_requests_while_linked": 0,
+        "private_config_deleted_first": true,
+        "backup_deleted_after_unlink": true,
+        "configurations_remaining": 0,
+        "created_records_remaining": [],
+        "original_two_backups_retained": true,
+        "evidence": "ignored analyze/newbee-release-check/reference.py and reference-result.json; instrumented /v3/share/delete call count"
+      },
+      "evidence": "ignored analyze/newbee-release-check/{probe.py,result.json,branches.py,branches-result.json}; tool results, no credentials recorded",
+      "local_selector_correction": {
+        "field": "role_id",
+        "observed_wire_type": "number in backup detail",
+        "public_output_type": "string matching config.roleid schema",
+        "regression": "test_remote_numeric_role_ids_are_exposed_as_config_selector_strings",
+        "extra_local_validation_test_backup_deleted_id": 4142416
+      }
+    }
+  },
+  "validation": {
+    "creator_wire_tests": "test_newbee_wire_matrix.py covers162 legacy Creator schema fields; excludes desktop backup schemas deliberately",
+    "backup_tests": "All test_newbee*.py:40 tests passed, including all 162 legacy Creator schema field cases; layout preservation/readback/malformed data; numeric role selector normalization; archive selection; complete references; batch recheck; permission messages; and one-shot writes.",
+    "no_new_remote_mutations_during_audit": false,
+    "authorized_synthetic_only_remote_mutations": true
+  },
+  "preservation_behaviors": {
+    "config.selected_eml": {
+      "wire": "selected_eml",
+      "stage": "existing detail -> edit/update -> readback",
+      "condition": "opaque preservation only, no schema mutation key; missing field omitted; malformed non-array rejected before mutation",
+      "evidence": "newbee.py:_selected_layouts/_config_form/update_config; newbee wire matrix regressions",
+      "schema_supported": false,
+      "official_client_support": "desktop config selected_eml field",
+      "live_verified": false
+    }
+  },
+  "issue_25_acceptance": {
+    "generate_and_readback": "passed live for all 7 dynamically returned game branches; nonempty materials/fonts/multi-account WTF passed on branch2",
+    "delete_and_readback": "passed live two-item and six-item bulk deletion; every test backup absent afterwards",
+    "preview_and_confirmation": "passed live complete reference preview; deletion requires explicit backup_ids and confirm_delete through CLI schema",
+    "missing_and_permissions": "local tests: not_found blocks whole batch; official permission message/code retained, explicit failures never retried",
+    "associated_backup_refusal": "passed live: synthetic private config62433 linked to own backup4142419; preview refused, confirm_delete:true refused with zero /v3/share/delete calls; config deleted then backup deleted; pagination/race/batch edge cases also covered by mocks",
+    "existing_records": "all original two backups retained; no configuration records remain"
+  }
+}

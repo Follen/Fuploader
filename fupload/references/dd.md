@@ -1,130 +1,38 @@
-# NetEase DD field and workflow reference
+# 网易 DD 操作
 
-## Task session
+完整字段、选择器、条件和接口映射见[平台字段总表](platform-fields.md#dd)。本文件保留会话与执行顺序。
 
-Run `dd session doctor` first. Doctor only discovers the installation, verifies the Authenticode publisher, reports official DD processes and reads local broker state; it does not login or run either native relogin flow. Run `dd session start` whether or not the DD GUI is running. The task starts a separate native session using stored credentials; it does not close or attach to the GUI. The legacy `--confirm-close-gui` option is accepted but never closes the GUI.
+## 一个任务复用一个会话
 
-`start` leaves the official GUI running, starts one task broker, and reads the official `AccountCredStorage` auto account and credential. It selects the native relogin flow only from this strict enum matrix:
+1. `dd session doctor`：检查官方安装和 GUI 状态，不执行登录。
+2. `dd session start`：返回 session_id。
+3. 任务内全部查询、写入及读回使用同一个 `--session <id>`，串行执行。
+4. 在 `finally` 中执行 `dd session stop --session <id>`，要求 cleanup_complete=true。
 
-- `Account.method=urs`, `Cred.type=urs_token`, `Cred.modifier=normal`: run `UrsReLoginFlow(controller, sdk, token, username)` for the email login state.
-- `Account.method=mobile`, `Cred.type=urs_mobile_token`, `Cred.modifier=normal|mobile_password|mobile_uplink`: run `MobileReLoginFlow(controller, sdk, cgi, netconfig, token, isPassword, username)` for the mobile login state. `normal` is emitted by the official DD 100130 client for SMS/non-password mobile login. `isPassword` is true only for `mobile_password`.
+GUI 正在运行时，只借用现有网页会话，native_login_count=0；不关闭客户端，不另开桌面登录。复用失败直接停止。`--confirm-close-gui` 仅兼容旧调用，不执行关闭。GUI 未运行时才使用官方保存凭据的邮箱/手机号原生登录流程。
 
-Missing, unknown, or contradictory enum combinations fail before either flow is called. Do not infer account kind from the account string, coerce a value, or fall back to the other flow after a login failure. Do not request or accept manual account names, passwords, tokens, credential values, or account-type overrides.
+用户不需提供 DD 邮箱、手机号、密码或 Cookie；禁止凭账号文本猜登录方式。借用会话清理不请求账号退出。频道关联按下节的最小提权流程查询；不改变原有频道时复用已核对的自有详情。
 
-After the selected flow succeeds, both credential kinds use the same JWT refresh, author API client, GET, parser, upload, mutation, readback, logout, and cleanup path. `start` returns an opaque `session_id`; pass it through `--session` to every DD read and write. All operations are serialized through this one task session and one native login. Run `dd session status --session <id>` for a local status check and always run `dd session stop --session <id>` in `finally`; successful stop reports `cleanup_complete=true`. The ten-minute idle timeout is only a crash fallback.
+## 选择、提交和读回
 
-Do not request or expose account names, credential values, tokens, Cookies, JWTs, the credential database, signed URLs, `clientNo`, raw WA content, or raw backup objects. The safe credential kind may be reported without its account identity or value. The device state remains under Windows Known Folder Roaming AppData at `CCVoiceHub/Fupload/sidecar-device.json`.
+先读 game-types、对应 build 与分类树。插件 primary/secondary 分类有父子关系，变更父项后重新选择子项。关联内容使用平台返回的 (act_type,sn)，VIP 与频道只在功能启用时查询。
 
-## Authentication compatibility verification
+配置依赖：`backup_sn -> backup detail -> WTF account/server/role -> 该账号的 WA`。输入稳定 selector/UID/名称，最终表单由程序重建；不要提交原始 WTF 或正式服 EditMode/CooldownManager 导入串。不同 *_ids 字段未必都是数字 ID，按总表的逐项说明填写。
 
-Any change to DD authentication or session dispatch requires automated tests for every supported email and mobile enum combination. Each case must select exactly one matching flow, verify its constructor arguments, and reject missing, unknown, or contradictory combinations before login without fallback. Unified tests cover the common JWT refresh, author API client, resource operations, single broker/sidecar/login lifecycle, and explicit logout path after dispatch; this common path does not need to be repeated per credential kind.
+已有对象先读详情及作者列表，再保留未指定的值。免费/付费外层模式在创建后锁定，scope 变化也不能绕过。旧对象缺少当下必填项时先补明确值，不用 null 或 create 默认值填补。
 
-When a full isolated live regression is requested, run it only under the account currently persisted by the official DD client and record its safe credential kind. Do not switch that account merely to repeat the matrix for another credential kind. In one task session, read the live dependency graph for every current non-exploration seasonal build, then cover plugin and WA create, update, edit, readback, binary upload, delete, and final cleanup. For configuration, run the same CRUD, image-upload, readback, and cleanup matrix on every build where `/backup/list` returns a cloud backup whose `/backup/detail` supports valid selections. When a build has no usable cloud backup, record an explicit safe `N/A` reason; never silently skip it or fabricate a backup selector. For other authentication changes, choose tests appropriate to the change and report any unverified behavior.
+Logo、展示图、附件通过官方授权上传；上传成功不等于最终发布成功。每次写后核对目标字段。最终请求失败或读回不明时，先查询状态，不自动重复提交。原生/API 错误包含 stage、HTTP/业务码及脱敏日志位置时，只读取对应错误记录。
 
-Verification evidence may contain only the safe credential kind, executed command, exit status, readback result, `N/A` items, implementation commit, DD version, resource hashes, and cleanup result. Redact account names, credential values, passwords, tokens, Cookies, JWTs, signed URLs, `clientNo`, signatures, device proofs, raw WA strings, and raw configuration backup content. Cleanup may remove only the isolated objects recorded as created by that run; do not modify pre-existing remote resources. A completed, failed, or timed-out run must verify that no DD sidecar, task broker, or live broker state remains.
+## 云备份
 
-## GET before one final JSON
+scan/generate 只操作明确选择的本地内容。upload/create 校验 bundle 与分组 ZIP 后走官方 pre_create、对象 PUT、finish_create，并读回。include_common、WTF 根文件和角色选择分开处理；包中不能混入未选择的账号/角色或公共配置。
 
-DD GUI fields are not a flat form. Resolve these dependencies before generating the write JSON:
+删除先预览并完整核对自有配置分享引用，执行每项前重查；已关联、分页不完整或关联未知时禁止删除。只删除备份，不连带删除配置分享。
 
-- `game_type` -> `game_versions`, `associated_acts`, WA `category_ids`;
-- `primary_category_id` -> `second_category_ids`;
-- `scope` -> `share_code_life_type`, anchor-VIP availability, `sync_room`;
-- outer free/paid state -> `need_buy`, `need_anchor_vip` -> `price_fen`, `buy_life_type`, `vip_levels`;
-- `jump_room` -> `room_id` -> `channel_id` and `channel_type`;
-- `backup_sn` -> backup detail -> WTF account/server/role -> account-scoped `known_wa_ids` and `unknown_wa_ids`;
-- retail backup -> `retail_ui_config` selectors;
-- `with_file` -> WA `file` and `file_install_path`.
+## 关联空间／频道与 UAC
 
-Choose a parent, GET and display only that parent's child choices, then continue. Changing a parent invalidates all descendants. Generate one final JSON only after the graph closes. Store parent fields and stable IDs/opaque selectors, never copied backend objects or display names.
+普通上传、备份，以及更新时保留原有关联，继续使用普通权限。仅查询频道候选、新设或更换关联目标时尝试读取频道；如果 DD 本身以高权限运行，Windows 会弹 UAC，由短时辅助进程只读其现有会话。DD 本身普通权限运行时直接读取，不弹 UAC。
 
-The Python provider repeats every live GET in the same session before any upload or mutation. A missing, duplicate, or cross-parent selection fails at its exact JSON path with `verification_required=false`. DD detail is authoritative for an existing object's form and ownership; author-list timestamps are not comparable freshness gates.
+辅助进程只返回频道候选，随即退出；Fupload 主进程和任务 broker 不提权，也不要求重建管理员任务会话。取消 UAC 或读取失败，在发布请求前停止，不重新登录、关闭或退出 DD。
 
-Author-owned plugin/config/WA lists and association candidates traverse the real DD pagination contract instead of assuming the first 100 rows contain every selected SN. Repeated pages or the bounded page limit are platform-data failures and stop the write before upload.
-
-The installed author-list response may expose its total as top-level `count`; treat that as the pagination bound. Fetch anchor-VIP levels only when `need_anchor_vip=true`, and fetch CC room/channel data only when `jump_room=true`. Disabled optional features must not fail because an unrelated dependency endpoint is empty or unavailable.
-
-## Shared fields
-
-All three create/edit form models use `scope`, `share_code_life_type`, `need_buy`, `price_fen`, `buy_life_type`, `jump_room`, `room_id`, `channel_id`, `channel_type`, `sync_room`, `creation_statement`, `with_associate`, `associated_acts`, `need_anchor_vip`, and `vip_levels`.
-
-- `scope` is `public` or `private`. Private requires `share_code_life_type`, clears anchor VIP and room sync. Plugin/WA public force `share_code_life_type=forever`; config public omits it.
-- `need_buy=true` requires `buy_life_type`; `price_fen` may be `0` or `10..20000` fen because the official submit validation explicitly accepts zero. A free create resolves to zero, while an existing paid form may retain a hidden historical price when `need_buy` is turned off but the outer paid mode remains active through anchor VIP.
-- The outer free/paid selector is locked after an SN exists. It is derived from `need_buy || need_anchor_vip` and is not a wire field. Existing paid content may still adjust payment methods and their price/lifetime/VIP children while remaining paid.
-- `jump_room=true` requires `room_id`. `channel_id` and `channel_type` are both empty for a room-only link or both present for one live child channel.
-- `with_associate=true` requires nonempty `associated_acts`; each item is exactly `{sn,act_type}` with `act_type` `addon`, `share`, or `wa`.
-- Remote detail/list projections may enrich associated items with display-only fields such as names, covers, or timestamps. Python validates the live reference, then strips every item back to exactly `{sn,act_type}` before any create/modify mutation.
-- `need_anchor_vip=true` requires public scope. `vip_levels` must contain only live values when supplied, but the official submit validation accepts an empty array. Turning only `need_anchor_vip` off preserves the existing level array; switching to private scope or switching the outer mode to free clears it.
-- `creation_statement` is `original`, `chinesize`, `renovate`, or `second`.
-
-Omission on edit preserves the remote value. Explicit false follows the field-specific official behavior: room and association children are cleared, while anchor VIP levels remain unless private scope or the outer free mode clears them.
-
-## Update description (`update_desc`)
-
-`update_desc` is rendered as HTML on the DD web and client surface, for plugins, configuration shares, and WA alike. The renderer collapses plain-text line feeds, so a multi-line changelog must use markup: `<p>first line</p><p>second line</p>`, or `<br>` between lines. A JSON string that contains only `\n` is stored intact but renders as a single line.
-
-The Python CLI copies the supplied string into the wire form unchanged and performs no HTML escaping, so callers may pass tags directly. The platform normalizes `\r\n` and `\n` to LF; the line-ending style itself has no effect on rendering. The 1000-character limit applies to the whole string, tags included.
-
-A published version's `update_desc` cannot be corrected through the CLI: `plugin edit`, `config edit`, and `wa edit` do not accept the field, and plugin version fields are not edit fields. Correct the format by writing the next version's `update_desc` properly.
-
-## Plugin
-
-`plugin create` fields: `game_type`, `scope`, `addon_type`, `name`, `description`, `logo`/`logo_file`, `detail_imgs`/`detail_img_files`, `primary_category_id`, `second_category_ids`, `html_desc`, `game_versions`, `detail_url`/`file`, `release_type`, `version`, `update_desc`, and all shared fields. Name, description, and version are at most 80 characters; update description is at most 1000; detail images are at most 8.
-
-Every path in `detail_img_files` must exist as a regular local file. Validation reports the exact indexed path, such as `$.detail_img_files[0]`, before any upload or mutation.
-
-`game_type` and the outer free/paid state are create-only. `plugin update` requires `sn`, `game_versions`, `version`, and `update_desc`; optional `file`, `detail_url`, and `release_type` publish a new version. `plugin edit` requires `sn` and accepts `description`, `html_desc`, `update_desc`, `logo`/`logo_file`, plus the official existing-record commercial and association controls (`scope`, payment/lifetime/VIP fields, room/channel linkage, `creation_statement`, and associated content). Other first-publication metadata (`addon_type`, `name`, detail images, and categories) and package/version fields are not edit fields. To repair the current announcement, supply only `sn` and HTML `update_desc` (at most 1000 characters including tags) to `plugin edit`; the existing published version and package URL are preserved. This does not edit arbitrary rows in version history. The CLI verifies metadata edits through both detail and author-list readback; if DD accepts the request but leaves the remote value unchanged, it reports a verification-required error rather than false success.
-
-To replace an existing plugin Logo without publishing a new version, use `plugin edit` with `{"schema":"fupload.v1.dd.plugin.edit","sn":"<plugin-sn>","logo_file":"C:/path/logo.png"}` (or `logo` with an already-uploaded image URL). The official editor uploads one image with `a19-ui-media/img`, business `addon`, and an empty wire file name; `logo_file` reuses this upload path with a 10 MiB limit. A supplied local file takes precedence over `logo`, as on create. Omitted metadata, commercial settings and the current published package/version are rebuilt from the existing record, not reset. Logo edits return `logo_readback: {logo, source}` with the actual matching image URL and `detail_v2` or `author_list` as the source; the raw `readback` detail can still be stale. A successful POST alone is not proof of a Logo change. `plugin update` remains version-only; use `plugin edit` for Logo changes. Existing complete-form preflight still applies: legacy records with blank required fields can be blocked before upload. Do not invent a creation statement or alter unrelated metadata to pass it. A live legacy TAP test also received generic HTTP 422 when bypassing preflight and when sending only `sn`/`logo`; neither workaround is implemented. A separate live test on 荔枝笔记 verified replacement via author-list readback, byte-for-byte downloaded image equality, restoration of the original Logo, and unchanged metadata/version.
-
-When `assign_user_sn` is present, the official UI exposes only the public scope option. Python validates the final rebuilt form and rejects a private scope before upload or mutation.
-
-When rebuilding a plugin update/edit form, preserve field presence from the current DD record. A field absent from both official projections must remain absent; do not synthesize JSON `null`, because the official web `pick -> JSON.stringify` path omits absent properties and DD can reject synthetic nulls with HTTP 422. The official detail dialog is opened from the matching author-list item and takes `detail_url`, `release_type`, and `version` from that item's `latest_version`; `detail_v2` supplies the stable detail fields and top-level `game_versions`. Python therefore uses the same-SN author item only to fill null/missing latest-version placeholders, never to overwrite stable metadata or top-level builds.
-
-Before `plugin update`, traverse `/addon/addon_versions` pages as an optional duplicate guard. If it returns version rows, reject any candidate version already present anywhere in that history before upload; if it is empty or unavailable, retain the current-version check and continue. After update, confirm the submitted version fields from the matching item in the author plugin list, whose `latest_version` is the official update projection. `detail_v2` is supplementary. An empty history never marks a successful private-plugin update as failed and never triggers replay.
-
-Read `plugin categories`, choose `primary_category_id`, then choose only returned `second_category_ids`. Read `plugin game-versions --game-type <id>` and use its stable values. The package accepts `.zip` only. Before login/upload, local plugin ZIP files are checked for backslash paths in both the central directory and local file headers; DD cannot recognize these paths reliably. Rebuild such ZIPs with forward-slash (`/`) entry names (Windows PowerShell 5 `Compress-Archive` may produce incompatible backslash names). Fupload rejects the package rather than rewriting it. External `detail_url` packages are not downloaded for this check. Authorization always uses `file_type=a19-ui-res`, `business_id=addon`, fixed `file_name=addon.zip`, and `mime_type=application/x-zip-compressed`. Plugin image authorization uses `a19-ui-media/img` with an explicit empty wire file name.
-
-## Configuration share
-
-`config create` fields: `backup_sn`, `scope`, `title`, `brief_desc`, `desc`, `update_desc`, `display_imgs`/`display_img_files`, `known_addon_ids`, `unknown_addon_ids`, `wtf_role_ids`, `material_names`, `font_names`, `known_wa_ids`, `unknown_wa_ids`, optional `retail_ui_config`, all incremental arrays, and shared fields. The incremental arrays are `known_addon_update_ids`, `unknown_addon_update_ids`, `material_update_names`, `font_update_names`, `known_wa_update_ids`, and `unknown_wa_update_ids`.
-
-Title is at most 40 characters, brief description 50, update description 1000, and display images 8. `wtf_role_ids` contains at most one opaque selector returned by `config backup-get`.
-
-Run `config backups`, select `backup_sn`, then run `config backup-get --sn <backup>`. Choose content references only from that response. After choosing one WTF role, filter known/unknown WA by the selected role's account. Switching backup requires complete reselection. Switching the WTF account clears both WA groups. Unknown WA internal IDs are restored by Python from `extra.wa_account_info[account]`; they never appear in input JSON.
-
-Every wire content group is rebuilt from the latest backup. Each `inner_version` map covers every source item; a new entry is 1, an existing value is preserved, and only explicitly listed existing update entries increment.
-
-An incremental array may be submitted without repeating its unchanged selection array; Python applies it to the current selected items from the fresh detail. Every incremental marker must reference an item that remains selected. A stale or unselected marker is rejected at its exact `*_update_ids` or `*_update_names` path before upload or mutation.
-
-Every path in `display_img_files` must exist as a regular local file and is rejected at its indexed JSON path before upload when absent.
-
-For retail, `retail_ui_config` accepts `edit_mode_selectors`, `default_edit_mode_selector`, `cool_down_selectors`, and `enable_dd_setup_wizard`. Up to five edit modes are allowed and one selected mode is default. Only one cooldown per `spec_tag` is allowed. Selectors are bound to one backup; raw `import_string` and raw edit/cooldown objects are read-only and never emitted.
-
-`config update` requires `share_sn`, `backup_sn`, and `update_desc`; it changes backup content and increments. `config edit` requires `share_sn` and changes metadata, images, and allowed shared fields only. Config images omit `file_name` from upload authorization.
-
-## WA/string
-
-`wa create` fields: `game_type`, `scope`, `name`, `game_version`, `brief_desc`, `display_imgs`/`display_img_files`, `category_ids`, `content`, `desc`, `update_desc`, `version`, `with_file`, optional local `file`, `file_install_path`, and all shared fields. Name is at most 40 characters, brief description 50, update description 1000, numeric version length 80, categories 5, and images 8.
-
-Read `wa categories --game-type <id>` and use only that game type's category IDs. `game_type` and outer free/paid mode are locked after creation. `wa update` requires `sn`, `content`, `update_desc`, `version`, and `with_file`; new version input contains digits only and must be numerically greater than the current value. Historical current values are compared with the official JavaScript `Number(current)` behavior, so a legacy value such as `1.2` may advance to `2`. `wa edit` requires `sn` and accepts metadata, categories, images, and allowed shared fields. Assigned WA records also validate the final rebuilt scope as public.
-
-The official create builder supplies defaults that are required even when the user did not make a business choice: `share_code_life_type="seven_day"`, `need_buy=false`, `buy_life_type="seven_day"`, `category_ids=["ui_original"]`, `file_install_path="Interface/Addons"`, `vip_levels=[]`, and `version="0"`. The CLI applies these only to create, then applies the user's explicit values and normalizes every submitted category ID to its string wire form. Update and edit preserve remote values for omitted fields rather than reapplying create defaults.
-
-Every submit whose content begins `!WA:2!` is reparsed by the installed official chain `WowUIInterface.parseWa({"waStr": content}) -> WaParser.parseWa(content)`, including unchanged content on edit. Native `JsResult.toJson()` output may use success code `0` or `200`; IDs come from nested `result.uid` and `result.id`. Internal `parse_wa_uid` and `parse_wa_id` are read-only wire fields and are not accepted in JSON. Non-WA2 clears them.
-
-When `with_file=true`, create requires a local `.zip` `file` and nonempty `file_install_path`; update may preserve an existing material when `file` is omitted. Authorization uses `a19-ui-res/wa`, fixed `file_name=wa_materials.zip`, fixed ZIP MIME, and a 50 MiB local limit plus server `maxSize`. `with_file=false` follows the official builder and preserves existing internal `file_path` and install path rather than clearing them. WA images omit upload `file_name`.
-
-## Delete
-
-`plugin delete`, `config delete`, and `wa delete` each accept one nonempty `sn` and `confirm_delete`=true. Python GETs the target and ownership state before `/addon/delete`, `/share/delete`, or `/wa/delete`, then verifies absence through list/get readback. An uncertain delete is never automatically retried.
-
-## Errors and readback
-
-Stages are `session`, `dependency_get`, `upload_authorize`, `object_put`, `mutation`, `readback`, and `native_parser`. Explicit HTTP/business failures and all pre-mutation validation failures have `verification_required=false`. In particular, HTTP 4xx responses such as 422 are confirmed server rejections, not uncertain writes; the CLI reports `http_status` and a bounded, secret-free validation summary when the native response exposes one. PUT/mutation connection uncertainty and accepted-write readback uncertainty have `verification_required=true`; GET first and do not replay the write. Native failures retain a bounded exception message and the native `code`/`error_code` when present, with signed-URL query credentials, signatures, and tokens redacted before they leave the sidecar.
-
-Each DD native/API failure appends one ASCII JSON line to `<DD version directory>/Fupload/logs/dd-errors-YYYYMMDD.jsonl`. The record includes HTTP status, native business code including falsy code `0`, stage, endpoint, request field names, the sanitized request JSON/body, validation hints, and the sanitized response JSON/body. Upload authorization records `/file/upload`; object PUT records `object-store-put` instead of the signed URL. Token, JWT, Cookie, authorization, credential, client identifier, device proof, signature, and signed upload URL fields are redacted recursively, including truncated non-JSON text. Request and response bodies are independently bounded to 1 MiB by UTF-8 bytes and record their original size and truncation state. A log write failure is reported as `log_write_error` without replacing the original DD error.
-
-After an accepted mutation, detail readback uses a short bounded GET-only poll and never resends the mutation. Plugin edit/version confirmation also checks the matching author-list projection because the official UI opens the modify dialog from that item while `detail_v2` can remain stale or contain null latest-version placeholders. Configuration readback compares its official integer `need_buy` wire value with the boolean detail projection through a resource-specific conversion.
-
-The parent process and native sidecar exchange ASCII-only JSONL, and Fuploader's final JSON output follows the same rule. Non-ASCII request, response, and output text is represented with JSON Unicode escapes so Chinese titles, descriptions, announcements, and URLs do not depend on either Windows process code page. JSON consumers recover original UTF-8 strings through normal parsing.
+凭据仅留在读取进程内存。短期 JWT 已到期时，可使用同一现有会话的 loginToken 按官方固定接口申请新 JWT；不发起桌面登录或向 GUI 写内存。底层会话失效时明确报错，不自动重登。当前运行时辅助固定匹配 DD 100130 / CPython 3.7.17，版本或身份不符即停止。

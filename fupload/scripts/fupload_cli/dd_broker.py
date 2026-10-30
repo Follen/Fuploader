@@ -432,6 +432,7 @@ def start(confirm_close_gui: bool) -> Dict[str, Any]:
             "sidecar_count": active.get("sidecar_count", 1),
             "native_login_count": active.get("native_login_count", 1),
             "credential_kind": active.get("credential_kind"),
+            "session_source": active.get("session_source", "native-login"),
         }
     processes = running_dd_processes()
     root = _state_dir()
@@ -460,11 +461,12 @@ def start(confirm_close_gui: bool) -> Dict[str, Any]:
                 "session_id": state["session_id"],
                 "running": True,
                 "reused": False,
-                "login_count": 1,
+                "login_count": state.get("native_login_count", 1),
                 "broker_count": state.get("broker_count", 1),
                 "sidecar_count": state.get("sidecar_count", 1),
                 "native_login_count": state.get("native_login_count", 1),
                 "credential_kind": state.get("credential_kind"),
+                "session_source": state.get("session_source", "native-login"),
                 "closed_gui_processes": 0,
                 "gui_running_at_start": bool(processes),
             }
@@ -591,9 +593,10 @@ def _serve(startup_id: str) -> int:
         state["dd_dir"] = str(sidecar.dd_dir)
         state["signature"] = sidecar.signature
         state["credential_kind"] = sidecar.credential_kind
+        state["session_source"] = getattr(sidecar, "session_source", "native-login")
         state["broker_count"] = 1
         state["sidecar_count"] = 1
-        state["native_login_count"] = 1
+        state["native_login_count"] = 0 if state["session_source"] == "desktop-cookie" else 1
         _atomic_json(state_path, state)
         try:
             startup_path.unlink()
@@ -621,16 +624,18 @@ def _serve(startup_id: str) -> int:
                             "session_id": session_id,
                             "started_at": started_at,
                             "last_activity": last_activity,
-                            "login_count": 1,
+                            "login_count": state.get("native_login_count", 1),
                             "broker_count": state.get("broker_count", 1),
                             "sidecar_count": state.get("sidecar_count", 1),
                             "native_login_count": state.get("native_login_count", 1),
                             "credential_kind": state.get("credential_kind"),
+                            "session_source": state.get("session_source", "native-login"),
                             "dd_dir": state.get("dd_dir"),
                             "signature": state.get("signature"),
                         }
                     elif command == "stop":
-                        data = {"running": False, "session_id": session_id, "logout_requested": True}
+                        data = {"running": False, "session_id": session_id,
+                                "logout_requested": state.get("native_login_count", 1) > 0}
                         should_stop = True
                     elif command == "write":
                         data = _dd_module().DD().execute_write_on(

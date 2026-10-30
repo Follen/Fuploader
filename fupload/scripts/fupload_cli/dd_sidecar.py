@@ -704,6 +704,36 @@ def open_session(timeout=45):
     return author_session_or_cleanup(qt, container, flow, jwt_helper, client)
 
 
+def open_desktop_session(cookie):
+    """Authenticate only the author HTTP client; never create a desktop login."""
+    from cli_anything.ccvoicehub.core.qt_runtime import QtRuntime
+    from cli_anything.ccvoicehub.core.ui_api_client import UiApiClient
+    from components.wow_ui.nep_wrapper import NepWrapper
+    from types import SimpleNamespace
+
+    if not isinstance(cookie, (tuple, list)) or len(cookie) != 2 or not all(
+        isinstance(value, str) and value and not any(char in value for char in "\r\n;")
+        for value in cookie
+    ) or cookie[0] != "NTES_YD_SESS":
+        raise RuntimeError("invalid internal DD desktop-session handshake")
+    qt = QtRuntime.get_instance()
+    client = None
+    try:
+        nep = NepWrapper(None)
+        if not nep.isDllInited():
+            raise RuntimeError("DD NEP module is not initialized")
+        client = UiApiClient(nep, login_cookie=tuple(cookie))
+        client._session.headers["User-Agent"] = USER_AGENT
+        install_response_probe(client, capture_success=True)
+        flow = SimpleNamespace(_fupload_credential_kind=None, _fupload_session_source="desktop-cookie")
+    except Exception:
+        if client is not None:
+            client.close()
+        qt.shutdown()
+        raise
+    return author_session_or_cleanup(qt, None, flow, None, client)
+
+
 def api_result(payload):
     return payload.get("result") if isinstance(payload, dict) else None
 
@@ -853,6 +883,11 @@ def run_command(session, command):
                 raise failure_from_exception(exc, "object_put")
             return {"d_url": info["d_url"], "size": size}
         if action == "cc_get":
+            if session[3] is None:
+                raise SidecarFailure(
+                    "DD channel discovery requires a CC JWT and is not available through the borrowed desktop cookie; no additional login was attempted",
+                    "dependency_get",
+                )
             jwt_value = session[3].getJwt()
             url = command["url"]
             request = urllib.request.Request(
@@ -926,7 +961,8 @@ def close_session(session):
     except Exception:
         pass
     try:
-        container.shutdown()
+        if container is not None:
+            container.shutdown()
     finally:
         qt.shutdown()
 
@@ -936,15 +972,26 @@ def main():
     bootstrap()
     import datacenter.local_data.machine_data as machine_data
     original = machine_data.clientNo
-    value, created = load_client_no(machine_data)
-    machine_data.clientNo = value
     session = None
     try:
-        session = open_session()
+        mode = os.environ.get("FUPLOAD_DD_SESSION_MODE", "native-login")
+        if mode == "desktop-cookie":
+            handshake = json.loads(sys.stdin.readline())
+            if not isinstance(handshake, dict) or handshake.get("schema") != "fupload.dd.desktop-session.v1":
+                raise RuntimeError("invalid internal DD desktop-session handshake")
+            created = False
+            session = open_desktop_session(handshake.get("cookie"))
+        elif mode == "native-login":
+            value, created = load_client_no(machine_data)
+            machine_data.clientNo = value
+            session = open_session()
+        else:
+            raise RuntimeError("unsupported internal DD session mode")
         output({
             "ready": True,
             "device_state_created": created,
             "credential_kind": getattr(session[2], "_fupload_credential_kind", None),
+            "session_source": mode,
         })
         for line in sys.stdin:
             if not line.strip():

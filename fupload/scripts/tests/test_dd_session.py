@@ -750,7 +750,7 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual([operation[0] for operation in operations], ["read"] + ["write"] * 7)
 
     def test_broker_lifecycle_is_single_for_each_credential_kind(self) -> None:
-        for credential_kind in ("email", "mobile"):
+        for credential_kind in ("email", "mobile", None):
             with self.subTest(credential_kind=credential_kind):
                 counters = {"enter": 0, "exit": 0}
 
@@ -761,6 +761,7 @@ class DDSessionTests(unittest.TestCase):
                     def __enter__(self):
                         counters["enter"] += 1
                         self.credential_kind = credential_kind
+                        self.session_source = "desktop-cookie" if credential_kind is None else "native-login"
                         return self
 
                     def __exit__(self, *_args):
@@ -793,10 +794,12 @@ class DDSessionTests(unittest.TestCase):
                         self.assertEqual(status["credential_kind"], credential_kind)
                         self.assertEqual(status["broker_count"], 1)
                         self.assertEqual(status["sidecar_count"], 1)
-                        self.assertEqual(status["native_login_count"], 1)
+                        self.assertEqual(status["native_login_count"], 0 if credential_kind is None else 1)
+                        self.assertEqual(status["login_count"], status["native_login_count"])
 
                         stopped = dd_broker.stop(session_id)
                         self.assertTrue(stopped["cleanup_complete"])
+                        self.assertEqual(stopped["logout_requested"], credential_kind is not None)
                         thread.join(timeout=5)
 
                 self.assertFalse(thread.is_alive())

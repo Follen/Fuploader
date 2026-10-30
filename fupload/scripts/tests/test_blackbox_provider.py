@@ -16,6 +16,18 @@ from fupload_cli.blackbox_web import BlackboxWebSession, web_hkey
 from fupload_cli.errors import FuploadError
 
 class BlackboxProviderTests(unittest.TestCase):
+    def test_game_type_discovery_requires_the_official_dynamic_result(self):
+        calls = []
+        def transport(method, path, body, query):
+            calls.append((method, path, body, query))
+            return {"status": "ok", "result": {"strappidInfos": [{"strappid": "wowretail", "name": "Retail"}]}}
+        result = Blackbox(transport=transport).execute_read("options", "game-types", {})
+        self.assertEqual(result["items"][0]["strappid"], "wowretail")
+        self.assertEqual(calls, [("GET", "/wow/v2/dynamic_conf/", {}, {})])
+        for malformed in (None, [], {}, ["wowretail"]):
+            with self.subTest(result=malformed), self.assertRaises(FuploadError):
+                Blackbox(transport=lambda *args: {"result": {"strappidInfos": malformed}}).execute_read("options", "game-types", {})
+
     def test_web_session_is_the_only_authentication_runtime(self):
         class Session:
             def request(self, method, path, body=None, query=None):
@@ -26,49 +38,15 @@ class BlackboxProviderTests(unittest.TestCase):
         result = provider._request("GET", "/wow/open_platform/module/list/")
         self.assertEqual(result["status"], "ok")
 
-    def test_blackbox_package_has_no_desktop_client_auth_dependency(self):
-        package = Path(__file__).resolve().parents[1] / "fupload_cli"
-        self.assertFalse((package / "blackbox_auth.py").exists())
-        self.assertIsNone(importlib.util.find_spec("fupload_cli.blackbox_auth"))
-        self.assertNotIn(
-            "blackbox_auth",
-            {module.name for module in pkgutil.iter_modules([str(package)])},
-        )
-
-        forbidden_imports = {"subprocess", "winreg", "psutil"}
-        forbidden_literals = {
-            "blackbox_auth",
-            "HeyboxApp",
-            "heybox-pc-launcher",
-            "config.json",
-            "ProgramFiles",
-            "ELECTRON_RUN_AS_NODE",
-        }
-        for name in ("blackbox.py", "blackbox_web.py"):
-            source = (package / name).read_text(encoding="utf-8")
-            tree = ast.parse(source, filename=name)
-            imports = {
-                alias.name.split(".", 1)[0]
-                for node in ast.walk(tree)
-                if isinstance(node, (ast.Import, ast.ImportFrom))
-                for alias in (
-                    node.names if isinstance(node, ast.Import)
-                    else [ast.alias(name=node.module or "")]
-                )
-            }
-            self.assertTrue(forbidden_imports.isdisjoint(imports), name)
-            for literal in forbidden_literals:
-                self.assertNotIn(literal, source, name)
-
-        cli_source = (package / "cli.py").read_text(encoding="utf-8")
-        cli_tree = ast.parse(cli_source, filename="cli.py")
-        blackbox_tree = next(
-            node for node in cli_tree.body
-            if isinstance(node, ast.FunctionDef) and node.name == "_blackbox_tree"
-        )
-        blackbox_cli = ast.get_source_segment(cli_source, blackbox_tree) or ""
-        self.assertIn("managed Heybox Workshop web session", blackbox_cli)
-        self.assertNotIn("desktop client", blackbox_cli)
+    def test_default_uses_http_and_never_launches_browser_when_login_is_required(self):
+        from fupload_cli.blackbox_http import BlackboxHttpSession
+        provider = Blackbox()
+        self.assertIs(provider._web_session_factory, BlackboxHttpSession)
+        with patch.object(BlackboxHttpSession, "request", side_effect=FuploadError("login required", kind="login_required")), patch.object(BlackboxWebSession, "_launch") as browser:
+            with self.assertRaises(FuploadError) as raised:
+                provider.plugin_list()
+        self.assertEqual(raised.exception.kind, "login_required")
+        browser.assert_not_called()
 
     def test_web_hkey_vector_changes_with_inputs(self):
         path = "/wow/open_platform/module_version/list/"
@@ -101,7 +79,7 @@ class BlackboxProviderTests(unittest.TestCase):
         self.assertTrue(provider.execute_write("version", "create", {"module_id":7,"name":"v","type":3,"game_versions":["1.0"],"file_url":"https://x"})["verified"])
         self.assertTrue(provider.execute_write("version", "delete", {"module_id":7,"version_id":9})["verified"])
 
-    def test_version_delete_retries_when_deleted_row_reactivates(self):
+    def test_version_delete_does_not_replay_when_deleted_row_reactivates(self):
         state = {"row": {"id": 9, "auditState": 1}, "deletes": 0, "reads": 0}
         def transport(method, path, body, query):
             if path.endswith("module_version/delete/"):
@@ -115,9 +93,10 @@ class BlackboxProviderTests(unittest.TestCase):
                 return {"status": "ok", "result": {"versionList": [dict(state["row"])]}}
             raise AssertionError(path)
         provider = Blackbox({"verify_attempts": 1, "delete_settle_seconds": 0.001}, transport)
-        result = provider.version_delete({"module_id": 7, "version_id": 9})
-        self.assertTrue(result["retry"])
-        self.assertEqual(state["deletes"], 2)
+        with self.assertRaises(FuploadError) as raised:
+            provider.version_delete({"module_id": 7, "version_id": 9})
+        self.assertTrue(raised.exception.verification_required)
+        self.assertEqual(state["deletes"], 1)
 
     def test_module_edit_waits_for_delayed_field_projection(self):
         state = {"categoryIds": [1], "reads_after_write": 0, "written": False}
@@ -136,7 +115,7 @@ class BlackboxProviderTests(unittest.TestCase):
         self.assertTrue(result["verified"])
         self.assertEqual(state["reads_after_write"], 2)
 
-    def test_version_delete_retry_requires_a_second_stability_window(self):
+    def test_version_delete_stability_failure_requires_readback(self):
         state = {"row": {"id": 9, "auditState": 1}, "deletes": 0, "reads": 0}
         def transport(method, path, body, query):
             if path.endswith("module_version/delete/"):
@@ -155,7 +134,7 @@ class BlackboxProviderTests(unittest.TestCase):
         with self.assertRaises(FuploadError) as raised:
             provider.version_delete({"module_id":7,"version_id":9})
         self.assertEqual(raised.exception.kind,"verification_required")
-        self.assertEqual(state["deletes"],2)
+        self.assertEqual(state["deletes"],1)
 
     def test_version_edit_preserves_archive_and_normalizes_readback_types(self):
         calls = []

@@ -1,0 +1,3534 @@
+{
+  "schema": "fupload.platform-audit.v1",
+  "audited_on": "2026-10-30",
+  "sources": {
+    "creator_api": {
+      "kind": "official-binary-il",
+      "path": "D:/Code/Fuploader/analyze/modus-creator/all-api-il.txt",
+      "artifact": "ModUs.Creator.dll 0.1.6.0",
+      "artifact_sha256": "EF6FC5C872EF04A867650D63EE50C7414276522D82ECD7A1A7482AFD2E9B314D"
+    },
+    "creator_vm": {
+      "kind": "official-binary-il",
+      "path": "D:/Code/Fuploader/analyze/modus-creator/creator-vm-il.txt"
+    },
+    "main_api": {
+      "kind": "official-extracted-js",
+      "path": "D:/Code/Fuploader/analyze/modus/beautified-renderer-main.js",
+      "scope": "配套app-extracted/package.json标记1.2.9；不得把旧报告1.2.16版本标签自动赋给此源码"
+    },
+    "main_backup": {
+      "kind": "official-extracted-js",
+      "path": "D:/Code/Fuploader/analyze/modus/beautified-main.js"
+    },
+    "config_form": {
+      "kind": "official-extracted-js",
+      "path": "D:/Code/Fuploader/analyze/modus/beautified-author/edit-sharing-article-ah3kJVpB.js"
+    },
+    "wa_form": {
+      "kind": "official-extracted-js",
+      "path": "D:/Code/Fuploader/analyze/modus/beautified-author/edit-string-article-DnBwBI99.js"
+    },
+    "subscription_form": {
+      "kind": "official-extracted-js",
+      "path": "D:/Code/Fuploader/analyze/modus/app-extracted/dist/electron/renderer/assets/useRequiredSubscriptionTier-BKA8ZVbW.js"
+    },
+    "editor_content": {
+      "kind": "official-extracted-js",
+      "path": "D:/Code/Fuploader/analyze/modus/app-extracted/dist/electron/renderer/assets/editor-content-B-rQY96c.js"
+    },
+    "provider_modus": {
+      "kind": "implementation",
+      "path": "fupload/scripts/fupload_cli/modus.py"
+    },
+    "provider_backup": {
+      "kind": "implementation",
+      "path": "fupload/scripts/fupload_cli/modus_backup.py"
+    },
+    "provider_cf": {
+      "kind": "implementation",
+      "path": "fupload/scripts/fupload_cli/curseforge.py"
+    },
+    "schema": {
+      "kind": "implementation-contract",
+      "path": "fupload/scripts/fupload_cli/schema.py",
+      "scope": "仅作Fupload输入枚举，不作为官网能力来源"
+    },
+    "cf_upload": {
+      "kind": "official-current-doc",
+      "url": "https://support.curseforge.com/support/solutions/articles/9000197321",
+      "modified": "2026-09-27",
+      "accessed": "2026-10-30"
+    },
+    "cf_core": {
+      "kind": "official-current-doc",
+      "url": "https://docs.curseforge.com/rest-api/",
+      "accessed": "2026-10-30"
+    }
+  },
+  "platforms": {
+    "modus": {
+      "fields": {
+        "project.create.name": {
+          "wire": "name",
+          "stage": "project-create",
+          "condition": "项目名；编辑由显式值覆盖state basic_info同名值",
+          "evidence": [
+            "creator_api:L8561-L8685",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "project.create.alt_name": {
+          "wire": "altName",
+          "stage": "project-create",
+          "condition": "创建可空；编辑空字符串转换官方<null>标记",
+          "evidence": [
+            "creator_api:L8561-L8685",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "project.create.summary": {
+          "wire": "summary",
+          "stage": "project-create",
+          "condition": "编辑空值官方使用<null>；当前schema要求非空字符串",
+          "evidence": [
+            "creator_api:L8561-L8685",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "project.create.categories": {
+          "wire": "categories",
+          "stage": "project-create",
+          "condition": "官方CSV分类ID；998仅BigFoot；分类来源options categories",
+          "evidence": [
+            "creator_api:L8561-L8685",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "project.create.license": {
+          "wire": "license(JSON string)",
+          "stage": "project-create",
+          "condition": "有效来源是project_state.license；当前顶层license被snapshot覆盖，冲突输入会静默无效",
+          "evidence": [
+            "provider_modus:_project_document",
+            "creator_api:BuildLicenseJson"
+          ],
+          "status": "accepted-but-shadowed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.create.repo_url": {
+          "wire": "repoUrl",
+          "stage": "project-create",
+          "condition": "创建空白时省略；编辑空字符串转换<null>",
+          "evidence": [
+            "creator_api:L8561-L8685",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "project.create.required_tier_id": {
+          "wire": "requiredTierId",
+          "stage": "project-create",
+          "condition": "创建正整数；编辑数字字符串或<null>清空",
+          "evidence": [
+            "creator_api:L8561-L8685",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.create.publish_platforms": {
+          "wire": "synchronizationType（由state.basic_info派生）",
+          "stage": "project-create",
+          "condition": "modus=1,bigfoot=2,两者=3；当前顶层publish_platforms不重新派生sync，冲突时被snapshot派生值盖过",
+          "evidence": [
+            "creator_vm:L654-L676",
+            "provider_modus:_project_document"
+          ],
+          "status": "accepted-but-shadowed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.create.project_state": {
+          "wire": "仅本机处理，不发接口：complete状态快照；game/basic_info/license先本地恢复校验，状态/游戏UI对象不直接送API；业务字段投影到官方payload",
+          "stage": "local-control",
+          "condition": "complete状态快照；game/basic_info/license先本地恢复校验，状态/游戏UI对象不直接送API；业务字段投影到官方payload",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.create.logo_base64": {
+          "wire": "screenshotBase64sReqs.screenshotBase64s",
+          "stage": "project-create",
+          "condition": "创建logo.webp的WebP Base64字符串",
+          "evidence": [
+            "creator_api:L8561-L8685",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "project.create.screenshot_base64s": {
+          "wire": "screenshotBase64sReqs.screenshotBase64s",
+          "stage": "project-create",
+          "condition": "创建兼容输入：仅在缺logo_base64时取数组第一个元素；不是多图截图上传",
+          "evidence": [
+            "creator_api:L8561-L8685",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "project.edit.project_id": {
+          "wire": "projectId",
+          "stage": "project-edit",
+          "condition": "正整数；delete实际为POST",
+          "evidence": [
+            "creator_api:L9210-L9240",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": " 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.name": {
+          "wire": "name",
+          "stage": "project-edit",
+          "condition": "项目名；编辑由显式值覆盖state basic_info同名值",
+          "evidence": [
+            "creator_vm:BuildProjectChanges",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": " 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.alt_name": {
+          "wire": "altName",
+          "stage": "project-edit",
+          "condition": "创建可空；编辑空字符串转换官方<null>标记",
+          "evidence": [
+            "creator_vm:BuildProjectChanges",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": " 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.summary": {
+          "wire": "summary",
+          "stage": "project-edit",
+          "condition": "编辑空值官方使用<null>；当前schema要求非空字符串",
+          "evidence": [
+            "creator_vm:BuildProjectChanges",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": " 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.categories": {
+          "wire": "categories",
+          "stage": "project-edit",
+          "condition": "官方CSV分类ID；998仅BigFoot；分类来源options categories",
+          "evidence": [
+            "creator_vm:BuildProjectChanges",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": " 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.license": {
+          "wire": "license(JSON string)",
+          "stage": "project-edit",
+          "condition": "有效来源是project_state.license；当前顶层license被snapshot覆盖，冲突输入会静默无效",
+          "evidence": [
+            "provider_modus:_project_document",
+            "creator_api:BuildLicenseJson"
+          ],
+          "status": "accepted-but-shadowed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.repo_url": {
+          "wire": "repoUrl",
+          "stage": "project-edit",
+          "condition": "创建空白时省略；编辑空字符串转换<null>",
+          "evidence": [
+            "creator_vm:BuildProjectChanges",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": " 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.required_tier_id": {
+          "wire": "requiredTierId",
+          "stage": "project-edit",
+          "condition": "创建正整数；编辑数字字符串或<null>清空",
+          "evidence": [
+            "creator_vm:BuildProjectChanges",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.publish_platforms": {
+          "wire": "synchronizationType（由state.basic_info派生）",
+          "stage": "project-edit",
+          "condition": "modus=1,bigfoot=2,两者=3；当前顶层publish_platforms不重新派生sync，冲突时被snapshot派生值盖过",
+          "evidence": [
+            "creator_vm:L654-L676",
+            "provider_modus:_project_document"
+          ],
+          "status": "accepted-but-shadowed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.project_state": {
+          "wire": "仅本机处理，不发接口：complete状态快照；game/basic_info/license先本地恢复校验，状态/游戏UI对象不直接送API；业务字段投影到官方payload",
+          "stage": "local-control",
+          "condition": "complete状态快照；game/basic_info/license先本地恢复校验，状态/游戏UI对象不直接送API；业务字段投影到官方payload",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.description": {
+          "wire": "description",
+          "stage": "project-edit",
+          "condition": "仅编辑；保持存储HTML，清空为<null>",
+          "evidence": [
+            "creator_vm:BuildProjectChanges",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": " 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.required_dependencies": {
+          "wire": "requiredDependencies",
+          "stage": "project-edit",
+          "condition": "仅编辑；依赖项目ID CSV，空值为<null>",
+          "evidence": [
+            "creator_vm:BuildProjectChanges",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": " 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.images": {
+          "wire": "images",
+          "stage": "project-edit",
+          "condition": "编辑imagesOps时必须同时给出最终图片数量",
+          "evidence": [
+            "creator_vm:BuildProjectChanges",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": " 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.edit.image_ops": {
+          "wire": "imagesOps",
+          "stage": "project-edit",
+          "condition": "编辑upload/delete/rename操作，保持官方name/from/to/base64字段",
+          "evidence": [
+            "creator_vm:BuildProjectChanges",
+            "provider_modus:_project_wire"
+          ],
+          "status": "source-confirmed",
+          "notes": " 0<project_id<200000000为官方受限项目；执行时读取当前detail核对不可编辑字段未变，仅提交summary/description/altName。name/repo/tier/sync/categories/dependencies/license/images变更拒绝。"
+        },
+        "project.delete.project_id": {
+          "wire": "URL projectId",
+          "stage": "project-delete",
+          "condition": "正整数；delete实际为POST；官方受限项目0<id<200000000禁止该写入，schema/dry-run/执行均拒绝",
+          "evidence": [
+            "creator_api:L9210-L9240",
+            "provider_modus:project_delete"
+          ],
+          "status": "source-confirmed"
+        },
+        "project.delete.confirm": {
+          "wire": "仅本机处理，不发接口：本地DELETE确认，不进入HTTP body",
+          "stage": "local-control",
+          "condition": "本地DELETE确认，不进入HTTP body",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only"
+        },
+        "plugin.create.project_id": {
+          "wire": "projectId",
+          "stage": "release-create",
+          "condition": "按字段存在发送；省略保留；官方受限项目0<id<200000000禁止该写入，schema/dry-run/执行均拒绝",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.file_id": {
+          "wire": "fileId",
+          "stage": "release-create",
+          "condition": "create/upload只用于签名与对象路径；metadata create不发fileId；update/edit发fileId",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.version": {
+          "wire": "version",
+          "stage": "release-create",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.type": {
+          "wire": "type",
+          "stage": "release-create",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.supported_game_versions": {
+          "wire": "supportedGameVersionsReqs",
+          "stage": "release-create",
+          "condition": "数组元素严格为gameVersion/server；ZIP时必须与Interface及wow_builds实时选项一致",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.md5": {
+          "wire": "md5",
+          "stage": "release-create",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.zip_size": {
+          "wire": "zipSize",
+          "stage": "release-create",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.unzip_size": {
+          "wire": "unzipSize",
+          "stage": "release-create",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.path": {
+          "wire": "path",
+          "stage": "release-create",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.toc_version": {
+          "wire": "tocVersion",
+          "stage": "release-create",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.changelog": {
+          "wire": "changelog",
+          "stage": "release-create",
+          "condition": "编辑显式null发送JSON null清空（官方OptionalStringUpdate）；创建空值不表示清旧记录",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.file": {
+          "wire": "PUT ZIP bytes",
+          "stage": "binary-upload",
+          "condition": "本地ZIP；metadata与对象上传分开；缺file的edit/update没有PUT",
+          "evidence": [
+            "creator_api:UploadReleasePackageAsync",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.create.transaction_log": {
+          "wire": "仅本机处理，不发接口：仅本地事务记录路径；不进入API body",
+          "stage": "local-control",
+          "condition": "仅本地事务记录路径；不进入API body",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only"
+        },
+        "plugin.upload.project_id": {
+          "wire": "projectId",
+          "stage": "release-upload",
+          "condition": "按字段存在发送；省略保留；官方受限项目0<id<200000000禁止该写入，schema/dry-run/执行均拒绝",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.file_id": {
+          "wire": "fileId",
+          "stage": "release-upload",
+          "condition": "create/upload只用于签名与对象路径；metadata create不发fileId；update/edit发fileId",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.version": {
+          "wire": "version",
+          "stage": "release-upload",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.type": {
+          "wire": "type",
+          "stage": "release-upload",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.supported_game_versions": {
+          "wire": "supportedGameVersionsReqs",
+          "stage": "release-upload",
+          "condition": "数组元素严格为gameVersion/server；ZIP时必须与Interface及wow_builds实时选项一致",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.md5": {
+          "wire": "md5",
+          "stage": "release-upload",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.zip_size": {
+          "wire": "zipSize",
+          "stage": "release-upload",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.unzip_size": {
+          "wire": "unzipSize",
+          "stage": "release-upload",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.path": {
+          "wire": "path",
+          "stage": "release-upload",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.toc_version": {
+          "wire": "tocVersion",
+          "stage": "release-upload",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.changelog": {
+          "wire": "changelog",
+          "stage": "release-upload",
+          "condition": "编辑显式null发送JSON null清空（官方OptionalStringUpdate）；创建空值不表示清旧记录",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.file": {
+          "wire": "PUT ZIP bytes",
+          "stage": "binary-upload",
+          "condition": "本地ZIP；metadata与对象上传分开；缺file的edit/update没有PUT",
+          "evidence": [
+            "creator_api:UploadReleasePackageAsync",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.transaction_log": {
+          "wire": "仅本机处理，不发接口：仅本地事务记录路径；不进入API body",
+          "stage": "local-control",
+          "condition": "仅本地事务记录路径；不进入API body",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only"
+        },
+        "plugin.update.project_id": {
+          "wire": "projectId",
+          "stage": "release-update",
+          "condition": "按字段存在发送；省略保留；官方受限项目0<id<200000000禁止该写入，schema/dry-run/执行均拒绝",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.file_id": {
+          "wire": "fileId",
+          "stage": "release-update",
+          "condition": "create/upload只用于签名与对象路径；metadata create不发fileId；update/edit发fileId",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.version": {
+          "wire": "version",
+          "stage": "release-update",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.type": {
+          "wire": "type",
+          "stage": "release-update",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.supported_game_versions": {
+          "wire": "supportedGameVersionsReqs",
+          "stage": "release-update",
+          "condition": "数组元素严格为gameVersion/server；ZIP时必须与Interface及wow_builds实时选项一致",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.md5": {
+          "wire": "md5",
+          "stage": "release-update",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.zip_size": {
+          "wire": "zipSize",
+          "stage": "release-update",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.unzip_size": {
+          "wire": "unzipSize",
+          "stage": "release-update",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.path": {
+          "wire": "path",
+          "stage": "release-update",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.toc_version": {
+          "wire": "tocVersion",
+          "stage": "release-update",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.changelog": {
+          "wire": "changelog",
+          "stage": "release-update",
+          "condition": "编辑显式null发送JSON null清空（官方OptionalStringUpdate）；创建空值不表示清旧记录",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.file": {
+          "wire": "PUT ZIP bytes",
+          "stage": "binary-upload",
+          "condition": "本地ZIP；metadata与对象上传分开；缺file的edit/update没有PUT",
+          "evidence": [
+            "creator_api:UploadReleasePackageAsync",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.update.transaction_log": {
+          "wire": "仅本机处理，不发接口：仅本地事务记录路径；不进入API body",
+          "stage": "local-control",
+          "condition": "仅本地事务记录路径；不进入API body",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only"
+        },
+        "plugin.edit.project_id": {
+          "wire": "projectId",
+          "stage": "release-edit",
+          "condition": "按字段存在发送；省略保留；官方受限项目0<id<200000000禁止该写入，schema/dry-run/执行均拒绝",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.file_id": {
+          "wire": "fileId",
+          "stage": "release-edit",
+          "condition": "create/upload只用于签名与对象路径；metadata create不发fileId；update/edit发fileId",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.version": {
+          "wire": "version",
+          "stage": "release-edit",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.type": {
+          "wire": "type",
+          "stage": "release-edit",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.supported_game_versions": {
+          "wire": "supportedGameVersionsReqs",
+          "stage": "release-edit",
+          "condition": "数组元素严格为gameVersion/server；ZIP时必须与Interface及wow_builds实时选项一致",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.md5": {
+          "wire": "md5",
+          "stage": "release-edit",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.zip_size": {
+          "wire": "zipSize",
+          "stage": "release-edit",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.unzip_size": {
+          "wire": "unzipSize",
+          "stage": "release-edit",
+          "condition": "有ZIP则派生并校验显式值；无ZIP的update/edit透传显式metadata（本轮修复原忽略输入）",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.path": {
+          "wire": "path",
+          "stage": "release-edit",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.toc_version": {
+          "wire": "tocVersion",
+          "stage": "release-edit",
+          "condition": "按字段存在发送；省略保留",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.changelog": {
+          "wire": "changelog",
+          "stage": "release-edit",
+          "condition": "编辑显式null发送JSON null清空（官方OptionalStringUpdate）；创建空值不表示清旧记录",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.file": {
+          "wire": "PUT ZIP bytes",
+          "stage": "binary-upload",
+          "condition": "本地ZIP；metadata与对象上传分开；缺file的edit/update没有PUT",
+          "evidence": [
+            "creator_api:UploadReleasePackageAsync",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.edit.transaction_log": {
+          "wire": "仅本机处理，不发接口：仅本地事务记录路径；不进入API body",
+          "stage": "local-control",
+          "condition": "仅本地事务记录路径；不进入API body",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only"
+        },
+        "plugin.delete.project_id": {
+          "wire": "projectId",
+          "stage": "release-delete",
+          "condition": "POST delete body仅projectId/fileId；官方受限项目0<id<200000000禁止该写入，schema/dry-run/执行均拒绝",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.delete.file_id": {
+          "wire": "fileId",
+          "stage": "release-delete",
+          "condition": "POST delete body仅projectId/fileId",
+          "evidence": [
+            "creator_api:L16568-L16690",
+            "creator_api:L17632-L17725",
+            "provider_modus:_release_wire",
+            "provider_modus:publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.delete.confirm": {
+          "wire": "仅本机处理，不发接口：删除本地确认，不进入HTTP body",
+          "stage": "local-control",
+          "condition": "删除本地确认，不进入HTTP body",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only"
+        },
+        "media.upload.file": {
+          "wire": "multipart.file",
+          "stage": "image-upload",
+          "condition": "main图片原文件，返回对象key；无X-Server-Type",
+          "evidence": [
+            "config_form:image upload helper",
+            "provider_modus:image_upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.addons_id": {
+          "wire": "addonsId",
+          "stage": "config-create",
+          "condition": "config来自backup knownAddons.projectids；WA来自适用插件选项；按字符串发送",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.account_name": {
+          "wire": "accountName",
+          "stage": "config-create",
+          "condition": "字符串；null无明确官方清空语义现已在schema/provider拒绝；exclude_wtf=1时规范为空字符串",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.backup_id": {
+          "wire": "backupId",
+          "stage": "config-create",
+          "condition": "云正整数ID；改ID须显式给addon/WTF账号/角色选择",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.content": {
+          "wire": "content",
+          "stage": "config-create",
+          "condition": "公开富文本存储HTML；图片可为资源键标记，可能包含编辑器WA块；不能当原始配置串整体摘要",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.content_text": {
+          "wire": "contentText",
+          "stage": "config-create",
+          "condition": "公开正文纯文本，不是HTML也不是配置码；用于长度校验/检索；真实detail省略contentText时按官方Q2从正文恢复；正文改动且未指定纯文本时同步重算。",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.image_url": {
+          "wire": "imageUrl",
+          "stage": "config-create",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.is_paid": {
+          "wire": "isPaid",
+          "stage": "config-create",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.is_public": {
+          "wire": "isPublic",
+          "stage": "config-create",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.price": {
+          "wire": "price",
+          "stage": "config-create",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.share_type": {
+          "wire": "shareType",
+          "stage": "config-create",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.tags": {
+          "wire": "tags",
+          "stage": "config-create",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.title": {
+          "wire": "title",
+          "stage": "config-create",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.exclude_wtf": {
+          "wire": "excludeWtf",
+          "stage": "config-create",
+          "condition": "0/1；1排除WTF并清空accountName/roleName；更新未提供时保留原值",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.role_name": {
+          "wire": "roleName",
+          "stage": "config-create",
+          "condition": "字符串；null无明确官方清空语义现已在schema/provider拒绝；exclude_wtf=1时规范为空字符串",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.required_tier_id": {
+          "wire": "requiredTierId",
+          "stage": "config-create",
+          "condition": "null=官方无档位；创建省略，完整更新表单删除旧requiredTierId键。sub_type=0校验普通tiers；sub_type=1读取本人当前gameCode的season detail，只接受相同id、isEnabled=1且platformSeasonStatus!=2。稀疏编辑取当前subType/requiredTierId补齐后校验。",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire",
+            "main_api:L10823-L10828",
+            "main_api:L11014-L11019",
+            "provider_modus:author_season_subscription/_validate_main_write"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.sub_type": {
+          "wire": "subType",
+          "stage": "config-create",
+          "condition": "normal=0/season=1；官方season档位由独立season detail API读取，Fupload尚无该发现命令",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.platform": {
+          "wire": "platform",
+          "stage": "config-create",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.synchronization_type": {
+          "wire": "synchronizationType",
+          "stage": "config-create",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.create.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.share_id": {
+          "wire": "id",
+          "stage": "config-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.addons_id": {
+          "wire": "addonsId",
+          "stage": "config-update",
+          "condition": "config来自backup knownAddons.projectids；WA来自适用插件选项；按字符串发送",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.account_name": {
+          "wire": "accountName",
+          "stage": "config-update",
+          "condition": "字符串；null无明确官方清空语义现已在schema/provider拒绝；exclude_wtf=1时规范为空字符串",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.backup_id": {
+          "wire": "backupId",
+          "stage": "config-update",
+          "condition": "云正整数ID；改ID须显式给addon/WTF账号/角色选择",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.content": {
+          "wire": "content",
+          "stage": "config-update",
+          "condition": "公开富文本存储HTML；图片可为资源键标记，可能包含编辑器WA块；不能当原始配置串整体摘要",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.content_text": {
+          "wire": "contentText",
+          "stage": "config-update",
+          "condition": "公开正文纯文本，不是HTML也不是配置码；用于长度校验/检索；真实detail省略contentText时按官方Q2从正文恢复；正文改动且未指定纯文本时同步重算。",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.image_url": {
+          "wire": "imageUrl",
+          "stage": "config-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.is_paid": {
+          "wire": "isPaid",
+          "stage": "config-update",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.is_public": {
+          "wire": "isPublic",
+          "stage": "config-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.price": {
+          "wire": "price",
+          "stage": "config-update",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.share_type": {
+          "wire": "shareType",
+          "stage": "config-update",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.tags": {
+          "wire": "tags",
+          "stage": "config-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.title": {
+          "wire": "title",
+          "stage": "config-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.exclude_wtf": {
+          "wire": "excludeWtf",
+          "stage": "config-update",
+          "condition": "0/1；1排除WTF并清空accountName/roleName；更新未提供时保留原值",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.role_name": {
+          "wire": "roleName",
+          "stage": "config-update",
+          "condition": "字符串；null无明确官方清空语义现已在schema/provider拒绝；exclude_wtf=1时规范为空字符串",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.required_tier_id": {
+          "wire": "requiredTierId",
+          "stage": "config-update",
+          "condition": "null=官方无档位；创建省略，完整更新表单删除旧requiredTierId键。sub_type=0校验普通tiers；sub_type=1读取本人当前gameCode的season detail，只接受相同id、isEnabled=1且platformSeasonStatus!=2。稀疏编辑取当前subType/requiredTierId补齐后校验。",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire",
+            "main_api:L10823-L10828",
+            "main_api:L11014-L11019",
+            "provider_modus:author_season_subscription/_validate_main_write"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.sub_type": {
+          "wire": "subType",
+          "stage": "config-update",
+          "condition": "normal=0/season=1；官方season档位由独立season detail API读取，Fupload尚无该发现命令",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.platform": {
+          "wire": "platform",
+          "stage": "config-update",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.synchronization_type": {
+          "wire": "synchronizationType",
+          "stage": "config-update",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.update.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.share_id": {
+          "wire": "id",
+          "stage": "config-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.addons_id": {
+          "wire": "addonsId",
+          "stage": "config-edit",
+          "condition": "config来自backup knownAddons.projectids；WA来自适用插件选项；按字符串发送",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.account_name": {
+          "wire": "accountName",
+          "stage": "config-edit",
+          "condition": "字符串；null无明确官方清空语义现已在schema/provider拒绝；exclude_wtf=1时规范为空字符串",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.backup_id": {
+          "wire": "backupId",
+          "stage": "config-edit",
+          "condition": "云正整数ID；改ID须显式给addon/WTF账号/角色选择",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.content": {
+          "wire": "content",
+          "stage": "config-edit",
+          "condition": "公开富文本存储HTML；图片可为资源键标记，可能包含编辑器WA块；不能当原始配置串整体摘要",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.content_text": {
+          "wire": "contentText",
+          "stage": "config-edit",
+          "condition": "公开正文纯文本，不是HTML也不是配置码；用于长度校验/检索；真实detail省略contentText时按官方Q2从正文恢复；正文改动且未指定纯文本时同步重算。",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.image_url": {
+          "wire": "imageUrl",
+          "stage": "config-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.is_paid": {
+          "wire": "isPaid",
+          "stage": "config-edit",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.is_public": {
+          "wire": "isPublic",
+          "stage": "config-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.price": {
+          "wire": "price",
+          "stage": "config-edit",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.share_type": {
+          "wire": "shareType",
+          "stage": "config-edit",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.tags": {
+          "wire": "tags",
+          "stage": "config-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.title": {
+          "wire": "title",
+          "stage": "config-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.exclude_wtf": {
+          "wire": "excludeWtf",
+          "stage": "config-edit",
+          "condition": "0/1；1排除WTF并清空accountName/roleName；更新未提供时保留原值",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.role_name": {
+          "wire": "roleName",
+          "stage": "config-edit",
+          "condition": "字符串；null无明确官方清空语义现已在schema/provider拒绝；exclude_wtf=1时规范为空字符串",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.required_tier_id": {
+          "wire": "requiredTierId",
+          "stage": "config-edit",
+          "condition": "null=官方无档位；创建省略，完整更新表单删除旧requiredTierId键。sub_type=0校验普通tiers；sub_type=1读取本人当前gameCode的season detail，只接受相同id、isEnabled=1且platformSeasonStatus!=2。稀疏编辑取当前subType/requiredTierId补齐后校验。",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire",
+            "main_api:L10823-L10828",
+            "main_api:L11014-L11019",
+            "provider_modus:author_season_subscription/_validate_main_write"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.sub_type": {
+          "wire": "subType",
+          "stage": "config-edit",
+          "condition": "normal=0/season=1；官方season档位由独立season detail API读取，Fupload尚无该发现命令",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.platform": {
+          "wire": "platform",
+          "stage": "config-edit",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.synchronization_type": {
+          "wire": "synchronizationType",
+          "stage": "config-edit",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.edit.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.delete.share_id": {
+          "wire": "URL opaque id",
+          "stage": "config-delete",
+          "condition": "ID按不透明字符串URL编码；不转float/Number",
+          "evidence": [
+            "config_form:L314-L363",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.delete.confirm": {
+          "wire": "仅本机处理，不发接口：只用于本地删除确认，不进入API body",
+          "stage": "local-control",
+          "condition": "只用于本地删除确认，不进入API body",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only"
+        },
+        "config.delete.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.backup-edit.backup_id": {
+          "wire": "id",
+          "stage": "cloud-backup-backup-edit",
+          "condition": "云端正整数ID，不能混用本地backupId",
+          "evidence": [
+            "main_backup:backup endpoints",
+            "provider_modus:cloud_backup_update"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.backup-edit.backup_name": {
+          "wire": "backupName",
+          "stage": "cloud-backup-rename",
+          "condition": "改名后detail读回",
+          "evidence": [
+            "provider_modus:cloud_backup_update"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.backup-edit.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.backup-delete.backup_id": {
+          "wire": "URL id",
+          "stage": "cloud-backup-backup-delete",
+          "condition": "云端正整数ID，不能混用本地backupId",
+          "evidence": [
+            "main_backup:backup endpoints",
+            "provider_modus:cloud_backup_update"
+          ],
+          "status": "source-confirmed"
+        },
+        "config.backup-delete.confirm": {
+          "wire": "仅本机处理，不发接口：只用于本地删除确认，不进入API body",
+          "stage": "local-control",
+          "condition": "只用于本地删除确认，不进入API body",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only"
+        },
+        "config.backup-delete.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.code_text": {
+          "wire": "codeText",
+          "stage": "wa-create",
+          "condition": "WA/import原始导入字符串，输出仍需保护；与公开Article正文区分",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.content": {
+          "wire": "content",
+          "stage": "wa-create",
+          "condition": "公开富文本存储HTML；图片可为资源键标记，可能包含编辑器WA块；不能当原始配置串整体摘要",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.addons_id": {
+          "wire": "addonsId",
+          "stage": "wa-create",
+          "condition": "config来自backup knownAddons.projectids；WA来自适用插件选项；按字符串发送",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.content_text": {
+          "wire": "contentText",
+          "stage": "wa-create",
+          "condition": "公开正文纯文本，不是HTML也不是配置码；用于长度校验/检索；真实detail省略contentText时按官方Q2从正文恢复；正文改动且未指定纯文本时同步重算。",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.file_path": {
+          "wire": "filePath",
+          "stage": "wa-create",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.image_url": {
+          "wire": "imageUrl",
+          "stage": "wa-create",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.is_paid": {
+          "wire": "isPaid",
+          "stage": "wa-create",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.is_public": {
+          "wire": "isPublic",
+          "stage": "wa-create",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.price": {
+          "wire": "price",
+          "stage": "wa-create",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.share_type": {
+          "wire": "shareType",
+          "stage": "wa-create",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.support_addon": {
+          "wire": "supportAddon",
+          "stage": "wa-create",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.tags": {
+          "wire": "tags",
+          "stage": "wa-create",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.title": {
+          "wire": "title",
+          "stage": "wa-create",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.version": {
+          "wire": "version",
+          "stage": "wa-create",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.required_tier_id": {
+          "wire": "requiredTierId",
+          "stage": "wa-create",
+          "condition": "null=官方无档位；创建省略，完整更新表单删除旧requiredTierId键。sub_type=0校验普通tiers；sub_type=1读取本人当前gameCode的season detail，只接受相同id、isEnabled=1且platformSeasonStatus!=2。稀疏编辑取当前subType/requiredTierId补齐后校验。",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire",
+            "main_api:L10823-L10828",
+            "main_api:L11014-L11019",
+            "provider_modus:author_season_subscription/_validate_main_write"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.sub_type": {
+          "wire": "subType",
+          "stage": "wa-create",
+          "condition": "normal=0/season=1；官方season档位由独立season detail API读取，Fupload尚无该发现命令",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.platform": {
+          "wire": "platform",
+          "stage": "wa-create",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.synchronization_type": {
+          "wire": "synchronizationType",
+          "stage": "wa-create",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.create.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.import_id": {
+          "wire": "id",
+          "stage": "wa-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.code_text": {
+          "wire": "codeText",
+          "stage": "wa-update",
+          "condition": "WA/import原始导入字符串，输出仍需保护；与公开Article正文区分",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.content": {
+          "wire": "content",
+          "stage": "wa-update",
+          "condition": "公开富文本存储HTML；图片可为资源键标记，可能包含编辑器WA块；不能当原始配置串整体摘要",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.addons_id": {
+          "wire": "addonsId",
+          "stage": "wa-update",
+          "condition": "config来自backup knownAddons.projectids；WA来自适用插件选项；按字符串发送",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.content_text": {
+          "wire": "contentText",
+          "stage": "wa-update",
+          "condition": "公开正文纯文本，不是HTML也不是配置码；用于长度校验/检索；真实detail省略contentText时按官方Q2从正文恢复；正文改动且未指定纯文本时同步重算。",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.file_path": {
+          "wire": "filePath",
+          "stage": "wa-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.image_url": {
+          "wire": "imageUrl",
+          "stage": "wa-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.is_paid": {
+          "wire": "isPaid",
+          "stage": "wa-update",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.is_public": {
+          "wire": "isPublic",
+          "stage": "wa-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.price": {
+          "wire": "price",
+          "stage": "wa-update",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.share_type": {
+          "wire": "shareType",
+          "stage": "wa-update",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.support_addon": {
+          "wire": "supportAddon",
+          "stage": "wa-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.tags": {
+          "wire": "tags",
+          "stage": "wa-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.title": {
+          "wire": "title",
+          "stage": "wa-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.version": {
+          "wire": "version",
+          "stage": "wa-update",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.required_tier_id": {
+          "wire": "requiredTierId",
+          "stage": "wa-update",
+          "condition": "null=官方无档位；创建省略，完整更新表单删除旧requiredTierId键。sub_type=0校验普通tiers；sub_type=1读取本人当前gameCode的season detail，只接受相同id、isEnabled=1且platformSeasonStatus!=2。稀疏编辑取当前subType/requiredTierId补齐后校验。",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire",
+            "main_api:L10823-L10828",
+            "main_api:L11014-L11019",
+            "provider_modus:author_season_subscription/_validate_main_write"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.sub_type": {
+          "wire": "subType",
+          "stage": "wa-update",
+          "condition": "normal=0/season=1；官方season档位由独立season detail API读取，Fupload尚无该发现命令",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.platform": {
+          "wire": "platform",
+          "stage": "wa-update",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.synchronization_type": {
+          "wire": "synchronizationType",
+          "stage": "wa-update",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.update.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.import_id": {
+          "wire": "id",
+          "stage": "wa-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.code_text": {
+          "wire": "codeText",
+          "stage": "wa-edit",
+          "condition": "WA/import原始导入字符串，输出仍需保护；与公开Article正文区分",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.content": {
+          "wire": "content",
+          "stage": "wa-edit",
+          "condition": "公开富文本存储HTML；图片可为资源键标记，可能包含编辑器WA块；不能当原始配置串整体摘要",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.addons_id": {
+          "wire": "addonsId",
+          "stage": "wa-edit",
+          "condition": "config来自backup knownAddons.projectids；WA来自适用插件选项；按字符串发送",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.content_text": {
+          "wire": "contentText",
+          "stage": "wa-edit",
+          "condition": "公开正文纯文本，不是HTML也不是配置码；用于长度校验/检索；真实detail省略contentText时按官方Q2从正文恢复；正文改动且未指定纯文本时同步重算。",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.file_path": {
+          "wire": "filePath",
+          "stage": "wa-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.image_url": {
+          "wire": "imageUrl",
+          "stage": "wa-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.is_paid": {
+          "wire": "isPaid",
+          "stage": "wa-edit",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.is_public": {
+          "wire": "isPublic",
+          "stage": "wa-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.price": {
+          "wire": "price",
+          "stage": "wa-edit",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.share_type": {
+          "wire": "shareType",
+          "stage": "wa-edit",
+          "condition": "所审官方表单固定免费0；schema不应把其它服务端值描述成已支持业务分支",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.support_addon": {
+          "wire": "supportAddon",
+          "stage": "wa-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.tags": {
+          "wire": "tags",
+          "stage": "wa-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.title": {
+          "wire": "title",
+          "stage": "wa-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.version": {
+          "wire": "version",
+          "stage": "wa-edit",
+          "condition": "创建按显式字段；edit/update先完整detail再allowlist保留省略字段",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.required_tier_id": {
+          "wire": "requiredTierId",
+          "stage": "wa-edit",
+          "condition": "null=官方无档位；创建省略，完整更新表单删除旧requiredTierId键。sub_type=0校验普通tiers；sub_type=1读取本人当前gameCode的season detail，只接受相同id、isEnabled=1且platformSeasonStatus!=2。稀疏编辑取当前subType/requiredTierId补齐后校验。",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire",
+            "main_api:L10823-L10828",
+            "main_api:L11014-L11019",
+            "provider_modus:author_season_subscription/_validate_main_write"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.sub_type": {
+          "wire": "subType",
+          "stage": "wa-edit",
+          "condition": "normal=0/season=1；官方season档位由独立season detail API读取，Fupload尚无该发现命令",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.platform": {
+          "wire": "platform",
+          "stage": "wa-edit",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.synchronization_type": {
+          "wire": "synchronizationType",
+          "stage": "wa-edit",
+          "condition": "已实现wire转发及本地1/3约束；本次所审1.2.9编辑器payload未包含此选择，不能据schema声称当前UI完整展示",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.edit.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.delete.import_id": {
+          "wire": "URL opaque id",
+          "stage": "wa-delete",
+          "condition": "ID按不透明字符串URL编码；不转float/Number",
+          "evidence": [
+            "wa_form:L432-L465",
+            "subscription_form:buildSubscriptionPayload",
+            "provider_modus:_main_update_wire"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.delete.confirm": {
+          "wire": "仅本机处理，不发接口：只用于本地删除确认，不进入API body",
+          "stage": "local-control",
+          "condition": "只用于本地删除确认，不进入API body",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only"
+        },
+        "wa.delete.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.version-publish.import_id": {
+          "wire": "importId",
+          "stage": "import-version-publish",
+          "condition": "changelog为空白时省略；单次发布新不可变版本",
+          "evidence": [
+            "main_api:L37490-L37499",
+            "provider_modus:import_version_publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.version-publish.version": {
+          "wire": "version",
+          "stage": "import-version-publish",
+          "condition": "changelog为空白时省略；单次发布新不可变版本",
+          "evidence": [
+            "main_api:L37490-L37499",
+            "provider_modus:import_version_publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.version-publish.code_text": {
+          "wire": "codeText",
+          "stage": "import-version-publish",
+          "condition": "changelog为空白时省略；单次发布新不可变版本",
+          "evidence": [
+            "main_api:L37490-L37499",
+            "provider_modus:import_version_publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.version-publish.changelog": {
+          "wire": "changelog",
+          "stage": "import-version-publish",
+          "condition": "changelog为空白时省略；单次发布新不可变版本",
+          "evidence": [
+            "main_api:L37490-L37499",
+            "provider_modus:import_version_publish"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.version-publish.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.version-delete.version_id": {
+          "wire": "query.versionId",
+          "stage": "import-version-delete",
+          "condition": "不放body；DELETE",
+          "evidence": [
+            "main_api:L37500-L37512",
+            "provider_modus:import_version_delete"
+          ],
+          "status": "source-confirmed"
+        },
+        "wa.version-delete.confirm": {
+          "wire": "仅本机处理，不发接口：只用于本地删除确认，不进入API body",
+          "stage": "local-control",
+          "condition": "只用于本地删除确认，不进入API body",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only"
+        },
+        "wa.version-delete.server_type": {
+          "wire": "HTTP header.X-Server-Type",
+          "stage": "request-context",
+          "condition": "0-4，0有效；不进入写body",
+          "evidence": [
+            "main_api:L37390-L37515",
+            "provider_modus:_build"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.generate.game_root": {
+          "wire": "仅本机处理，不发接口：仅本地选择/输出/读取manifest，不直接进入API；源路径从上传manifest递归移除",
+          "stage": "local-control",
+          "condition": "仅本地选择/输出/读取manifest，不直接进入API；源路径从上传manifest递归移除",
+          "evidence": [
+            "provider_backup"
+          ],
+          "status": "local-only"
+        },
+        "backup.generate.output_dir": {
+          "wire": "仅本机处理，不发接口：仅本地选择/输出/读取manifest，不直接进入API；源路径从上传manifest递归移除",
+          "stage": "local-control",
+          "condition": "仅本地选择/输出/读取manifest，不直接进入API；源路径从上传manifest递归移除",
+          "evidence": [
+            "provider_backup"
+          ],
+          "status": "local-only"
+        },
+        "backup.generate.backup_name": {
+          "wire": "backupName",
+          "stage": "backup-name",
+          "condition": "generate写manifest；create/upload/register/rename使用相同名称",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:generate"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.generate.server_type": {
+          "wire": "source.gameId / serverType / HTTP header.X-Server-Type",
+          "stage": "backup-context",
+          "condition": "generate写manifest；cloud注册写serverType；Build必须匹配manifest",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.generate.addon_names": {
+          "wire": "unknownAddons(JSON string).list + ZIP",
+          "stage": "backup-selection",
+          "condition": "目录作为unknown addon保存实际文件；不猜project/file ID",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:generate"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.generate.font_names": {
+          "wire": "fonts(JSON string)[name,md5,size] + font object",
+          "stage": "backup-selection",
+          "condition": "先fontMd5存在性检查，按所选文件上传缺失字体",
+          "evidence": [
+            "main_backup:rY",
+            "provider_backup:upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.generate.material_names": {
+          "wire": "materialCosInfo(JSON string).list + ZIP",
+          "stage": "backup-selection",
+          "condition": "仅Interface下非AddOns所选材料",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:generate"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.generate.roles": {
+          "wire": "wtfAccounts(JSON string).roles + WTF ZIP",
+          "stage": "backup-selection",
+          "condition": "账号/服务器/角色三元组；上传前校验层级并固定文件集，未选角色文件拒绝",
+          "evidence": [
+            "main_backup:oY/aY",
+            "provider_backup:_wtf_upload_plan"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.create.game_root": {
+          "wire": "仅本机处理，不发接口：仅本地选择/输出/读取manifest，不直接进入API；源路径从上传manifest递归移除",
+          "stage": "local-control",
+          "condition": "仅本地选择/输出/读取manifest，不直接进入API；源路径从上传manifest递归移除",
+          "evidence": [
+            "provider_backup"
+          ],
+          "status": "local-only"
+        },
+        "backup.create.output_dir": {
+          "wire": "仅本机处理，不发接口：仅本地选择/输出/读取manifest，不直接进入API；源路径从上传manifest递归移除",
+          "stage": "local-control",
+          "condition": "仅本地选择/输出/读取manifest，不直接进入API；源路径从上传manifest递归移除",
+          "evidence": [
+            "provider_backup"
+          ],
+          "status": "local-only"
+        },
+        "backup.create.backup_name": {
+          "wire": "backupName",
+          "stage": "backup-name",
+          "condition": "generate写manifest；create/upload/register/rename使用相同名称",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:generate"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.create.server_type": {
+          "wire": "source.gameId / serverType / HTTP header.X-Server-Type",
+          "stage": "backup-context",
+          "condition": "generate写manifest；cloud注册写serverType；Build必须匹配manifest",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.create.addon_names": {
+          "wire": "unknownAddons(JSON string).list + ZIP",
+          "stage": "backup-selection",
+          "condition": "目录作为unknown addon保存实际文件；不猜project/file ID",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:generate"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.create.font_names": {
+          "wire": "fonts(JSON string)[name,md5,size] + font object",
+          "stage": "backup-selection",
+          "condition": "先fontMd5存在性检查，按所选文件上传缺失字体",
+          "evidence": [
+            "main_backup:rY",
+            "provider_backup:upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.create.material_names": {
+          "wire": "materialCosInfo(JSON string).list + ZIP",
+          "stage": "backup-selection",
+          "condition": "仅Interface下非AddOns所选材料",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:generate"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.create.roles": {
+          "wire": "wtfAccounts(JSON string).roles + WTF ZIP",
+          "stage": "backup-selection",
+          "condition": "账号/服务器/角色三元组；上传前校验层级并固定文件集，未选角色文件拒绝",
+          "evidence": [
+            "main_backup:oY/aY",
+            "provider_backup:_wtf_upload_plan"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.upload.manifest_file": {
+          "wire": "仅本机处理，不发接口：仅本地选择/输出/读取manifest，不直接进入API；源路径从上传manifest递归移除",
+          "stage": "local-control",
+          "condition": "仅本地选择/输出/读取manifest，不直接进入API；源路径从上传manifest递归移除",
+          "evidence": [
+            "provider_backup"
+          ],
+          "status": "local-only"
+        },
+        "backup.upload.server_type": {
+          "wire": "source.gameId / serverType / HTTP header.X-Server-Type",
+          "stage": "backup-context",
+          "condition": "generate写manifest；cloud注册写serverType；Build必须匹配manifest",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.rename.backup_id": {
+          "wire": "id",
+          "stage": "backup-rename",
+          "condition": "云数字ID；本地字符串backupId不能代用",
+          "evidence": [
+            "provider_modus:cloud_backup_update"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.rename.backup_name": {
+          "wire": "backupName",
+          "stage": "backup-name",
+          "condition": "generate写manifest；create/upload/register/rename使用相同名称",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:generate"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.rename.server_type": {
+          "wire": "source.gameId / serverType / HTTP header.X-Server-Type",
+          "stage": "backup-context",
+          "condition": "generate写manifest；cloud注册写serverType；Build必须匹配manifest",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.delete.backup_ids": {
+          "wire": "DELETE URL /system/user/backup/delete/{id}",
+          "stage": "protected-batch-delete",
+          "condition": "显式ID逐条全分页关联检查后删除；预览筛选不能直接写；有效serverType身份必需；检查全部五个Build的完整配置引用，不确定写入不重放。",
+          "evidence": [
+            "provider_backup:delete_many",
+            "provider_backup:references"
+          ],
+          "status": "source-confirmed"
+        },
+        "backup.delete.confirm_delete": {
+          "wire": "仅本机处理，不发接口：本地确认，引用保护无确认绕过",
+          "stage": "local-control",
+          "condition": "本地确认，引用保护无确认绕过；有效serverType身份必需；检查全部五个Build的完整配置引用，不确定写入不重放。",
+          "evidence": [
+            "provider_backup"
+          ],
+          "status": "local-only"
+        },
+        "backup.delete.server_type": {
+          "wire": "source.gameId / serverType / HTTP header.X-Server-Type",
+          "stage": "backup-context",
+          "condition": "generate写manifest；cloud注册写serverType；Build必须匹配manifest；有效serverType身份必需；检查全部五个Build的完整配置引用，不确定写入不重放。",
+          "evidence": [
+            "main_backup:SO",
+            "provider_backup:upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "project.*.project_state.license.type": {
+          "wire": "license(JSON string).type",
+          "stage": "project-license",
+          "condition": "snapshot license为有效来源，官方JSON字符串只加入非空属性",
+          "evidence": [
+            "creator_api:BuildLicenseJson",
+            "provider_modus:_license_json"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.license.holder": {
+          "wire": "license(JSON string).holder",
+          "stage": "project-license",
+          "condition": "snapshot license为有效来源，官方JSON字符串只加入非空属性",
+          "evidence": [
+            "creator_api:BuildLicenseJson",
+            "provider_modus:_license_json"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.license.year": {
+          "wire": "license(JSON string).year",
+          "stage": "project-license",
+          "condition": "snapshot license为有效来源，官方JSON字符串只加入非空属性",
+          "evidence": [
+            "creator_api:BuildLicenseJson",
+            "provider_modus:_license_json"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.license.content": {
+          "wire": "license(JSON string).content",
+          "stage": "project-license",
+          "condition": "snapshot license为有效来源，官方JSON字符串只加入非空属性",
+          "evidence": [
+            "creator_api:BuildLicenseJson",
+            "provider_modus:_license_json"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.name": {
+          "wire": "name",
+          "stage": "project-state-projection",
+          "condition": "项目名；编辑由显式值覆盖state basic_info同名值",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.alt_name": {
+          "wire": "altName",
+          "stage": "project-state-projection",
+          "condition": "创建可空；编辑空字符串转换官方<null>标记",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.summary": {
+          "wire": "summary",
+          "stage": "project-state-projection",
+          "condition": "编辑空值官方使用<null>；当前schema要求非空字符串",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.repo_url": {
+          "wire": "repoUrl",
+          "stage": "project-state-projection",
+          "condition": "创建空白时省略；编辑空字符串转换<null>",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.required_tier_id": {
+          "wire": "requiredTierId",
+          "stage": "project-state-projection",
+          "condition": "创建正整数；编辑数字字符串或<null>清空",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.categories": {
+          "wire": "categories",
+          "stage": "project-state-projection",
+          "condition": "官方CSV分类ID；998仅BigFoot；分类来源options categories",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.description": {
+          "wire": "description",
+          "stage": "project-state-projection",
+          "condition": "仅编辑；保持存储HTML，清空为<null>",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.required_dependencies": {
+          "wire": "requiredDependencies",
+          "stage": "project-state-projection",
+          "condition": "仅编辑；依赖项目ID CSV，空值为<null>",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.images": {
+          "wire": "images",
+          "stage": "project-state-projection",
+          "condition": "编辑imagesOps时必须同时给出最终图片数量",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.image_ops": {
+          "wire": "imagesOps",
+          "stage": "project-state-projection",
+          "condition": "编辑upload/delete/rename操作，保持官方name/from/to/base64字段",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.logo_base64": {
+          "wire": "screenshotBase64sReqs.screenshotBase64s",
+          "stage": "project-state-projection",
+          "condition": "创建logo.webp的WebP Base64字符串",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.screenshot_base64s": {
+          "wire": "screenshotBase64sReqs.screenshotBase64s",
+          "stage": "project-state-projection",
+          "condition": "创建兼容输入：仅在缺logo_base64时取数组第一个元素；不是多图截图上传",
+          "evidence": [
+            "creator_vm:ProjectCreate/Create and BuildProjectChanges",
+            "provider_modus:_project_document"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.game": {
+          "wire": "仅本机处理，不发接口：游戏选择只在本地步骤与读回模型中保存；官方CreateProject payload没有game字段",
+          "stage": "local-control",
+          "condition": "游戏选择只在本地步骤与读回模型中保存；官方CreateProject payload没有game字段",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.publish_platforms": {
+          "wire": "synchronizationType",
+          "stage": "project-state-projection",
+          "condition": "位掩码1/2/3；998为BigFoot独占；有BigFoot不能选普通tier",
+          "evidence": [
+            "creator_vm:L654-L676",
+            "provider_modus:ProjectStateMachine"
+          ],
+          "status": "source-confirmed",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.cf_url": {
+          "wire": "仅本机处理，不发接口：可保存原detail投影；当前_project_wire不发送该服务端字段",
+          "stage": "local-control",
+          "condition": "可保存原detail投影；当前_project_wire不发送该服务端字段",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.logo": {
+          "wire": "仅本机处理，不发接口：可保存原detail投影；当前_project_wire不发送该服务端字段",
+          "stage": "local-control",
+          "condition": "可保存原detail投影；当前_project_wire不发送该服务端字段",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "project.*.project_state.basic_info.status": {
+          "wire": "仅本机处理，不发接口：可保存原detail投影；当前_project_wire不发送该服务端字段",
+          "stage": "local-control",
+          "condition": "可保存原detail投影；当前_project_wire不发送该服务端字段",
+          "evidence": [
+            "provider_modus"
+          ],
+          "status": "local-only",
+          "notes": "project_state 是完成表单的规范来源；顶层 license 经状态机规范化后必须与快照相同，publish_platforms 必须选择相同平台（顺序可不同）；其他顶层元数据覆盖后用 from_snapshot 重新执行分类、平台、订阅等级和同步类型约束。冲突在接口请求前拒绝。参见 M-STATE。"
+        },
+        "options.season-subscription.author_id": {
+          "wire": "GET query authorId",
+          "stage": "read",
+          "condition": "可选正整数；省略从当前登录userInfo取userId/id，不接受token输入",
+          "evidence": [
+            "subscription_form:GET_AUTHOR_SEASON_SUB_DETAIL",
+            "provider_modus:author_season_subscription"
+          ],
+          "status": "source-confirmed"
+        },
+        "options.season-subscription.game_type": {
+          "wire": "GET query gameType",
+          "stage": "read",
+          "condition": "CLI必填官方gameCode，由subscription-game-types读取；写入校验用当前server_type关联官方gameCode",
+          "evidence": [
+            "main_api:L10828",
+            "main_api:L11006-L11019",
+            "subscription_form",
+            "provider_modus:author_season_subscription"
+          ],
+          "status": "source-confirmed"
+        }
+      },
+      "read_actions": {
+        "session.doctor": {
+          "route": "GET system/user/getInfo + local session presence",
+          "params": "--client creator|main",
+          "evidence": [
+            "provider_modus:doctor"
+          ]
+        },
+        "builds.list": {
+          "route": "local fixed Build catalogue",
+          "params": "none",
+          "evidence": [
+            "provider_modus:builds"
+          ]
+        },
+        "account.info": {
+          "route": "GET system/user/getInfo",
+          "params": "none",
+          "evidence": [
+            "creator_api:GetUserInfoAsync"
+          ]
+        },
+        "account.subscription-count": {
+          "route": "GET user/author/subscription/active/count",
+          "params": "none",
+          "evidence": [
+            "creator_api:GetActiveAuthorSubscriptionCountAsync"
+          ]
+        },
+        "account.statistics": {
+          "route": "GET game/data/author/project/statistics",
+          "params": "none",
+          "evidence": [
+            "creator_api:GetAuthorProjectStatisticsAsync"
+          ]
+        },
+        "addon.info": {
+          "route": "POST plugin/list/info",
+          "params": "directories -> pluginList[]; server_type -> X-Server-Type",
+          "evidence": [
+            "creator_api:GetAddonInfoByDirectoriesAsync"
+          ]
+        },
+        "addon.project-info": {
+          "route": "POST plugin/list/detail",
+          "params": "project_ids -> projectIds[]; X-Server-Type",
+          "evidence": [
+            "creator_api:GetAddonProjectInfoAsync"
+          ]
+        },
+        "addon.history": {
+          "route": "POST plugin/project/history",
+          "params": "project_id -> projectIds:[id]; --page -> pageNum; --page-size -> pageSize; X-Server-Type",
+          "evidence": [
+            "creator_api:GetAddonProjectHistoryAsync",
+            "provider_modus:execute_read"
+          ]
+        },
+        "project.list": {
+          "route": "POST game/data/author/project/list",
+          "params": "--page -> pageNum; --page-size -> pageSize; keyword -> keyword; CLI envelope不发",
+          "evidence": [
+            "creator_api:GetAuthorProjectsAsync",
+            "provider_modus:project_list"
+          ]
+        },
+        "project.get": {
+          "route": "GET game/data/author/project/detail/{projectId}",
+          "params": "project_id -> URL",
+          "evidence": [
+            "creator_api:GetProjectDetailAsync"
+          ]
+        },
+        "project.dependencies": {
+          "route": "POST game/data/author/project/dependency/query",
+          "params": "name or projectIds[]二选一；IDs为Int32范围",
+          "evidence": [
+            "creator_api:QueryProjectDependenciesAsync",
+            "provider_modus:_dependency_query_wire"
+          ]
+        },
+        "plugin.list|versions": {
+          "route": "POST game/data/author/project/file/list",
+          "params": "projectId/pageNum/pageSize；Creator family不按Build过滤",
+          "evidence": [
+            "creator_api:L11650-L11682",
+            "provider_modus:release_list"
+          ]
+        },
+        "plugin.get": {
+          "route": "GET game/data/author/project/file/detail/{fileId}",
+          "params": "只有file_id进URL；project_id为本地身份上下文，不拼第二段",
+          "evidence": [
+            "creator_api:L13732-L13760"
+          ]
+        },
+        "options.categories": {
+          "route": "GET plugin/list/Categories",
+          "params": "none",
+          "evidence": [
+            "creator_api:GetCategoriesAsync"
+          ]
+        },
+        "options.subscription-tiers": {
+          "route": "GET user/author/subscription/tiers",
+          "params": "当前普通档位；不是season detail",
+          "evidence": [
+            "creator_api:GetAuthorSubscriptionTiersAsync",
+            "subscription_form"
+          ]
+        },
+        "options.game-versions": {
+          "route": "POST game/data/config/detail",
+          "params": "keys:[显式key]；wow_builds是已用键",
+          "evidence": [
+            "creator_api:GetGameConfigsAsync"
+          ]
+        },
+        "options.config-tags|wa-tags|wa-support-addons": {
+          "route": "fixed cdn client_static_api share_tags.json/imports_tags.json/imports_support_addons.json",
+          "params": "no auth",
+          "evidence": [
+            "provider_modus:options"
+          ]
+        },
+        "config.list|wa.list": {
+          "route": "POST system/user/share/list | system/user/import/list",
+          "params": "pageNum/pageSize/server/mine及明确筛选，header同server；tags为数组",
+          "evidence": [
+            "main_api:L37418-L37487",
+            "provider_modus:share_list/import_list"
+          ]
+        },
+        "config.get|wa.get": {
+          "route": "POST system/user/share/detail | system/user/import/detail",
+          "params": "shareIds[] | importIds[]不透明字符串数组；X-Server-Type",
+          "evidence": [
+            "main_api:L37425-L37485"
+          ]
+        },
+        "config.backups|backup.list": {
+          "route": "GET system/user/backup/list",
+          "params": "X-Server-Type",
+          "evidence": [
+            "main_backup:backup list"
+          ]
+        },
+        "config.backup-get|backup.get": {
+          "route": "GET system/user/backup/detail/{id}",
+          "params": "cloud numeric id; X-Server-Type",
+          "evidence": [
+            "main_backup:backup detail"
+          ]
+        },
+        "backup.scan": {
+          "route": "local",
+          "params": "game_root; no login required",
+          "evidence": [
+            "provider_backup:scan"
+          ]
+        },
+        "backup.delete-preview": {
+          "route": "backup list + complete owned share list/details",
+          "params": "explicit IDs or name/ISO date filters",
+          "evidence": [
+            "provider_backup:preview/references"
+          ]
+        },
+        "options.subscription-game-types": {
+          "route": "GET user/game-type/list",
+          "params": "none；返回gameCode候选；main session",
+          "evidence": [
+            "main_api:L10828",
+            "main_api:L11006-L11009",
+            "provider_modus:options"
+          ]
+        },
+        "options.season-subscription": {
+          "route": "GET user/author/season-sub/detail",
+          "params": "--author-id -> authorId（可省略取本人），--game-type -> gameType；明确不发X-Server-Type；无data返回null",
+          "evidence": [
+            "main_api:L10824",
+            "main_api:L11014-L11019",
+            "subscription_form",
+            "provider_modus:author_season_subscription"
+          ]
+        }
+      },
+      "findings": [
+        {
+          "id": "M-AUTH",
+          "state": "fixed-and-live-read-verified",
+          "finding": "Creator官方IL添加/保留Bearer；main发送存储token原样。现实现区分，已有Bearer不叠加。两登录来源各读两个API家族均接受；不能据此推广所有写权限或账号等价。"
+        },
+        {
+          "id": "M-METADATA",
+          "state": "fixed-local-tests",
+          "finding": "原metadata-only md5/zip_size/unzip_size被publish丢弃、changelog:null被过滤；现透传并对携ZIP显式摘要/尺寸校验，null edit清空。"
+        },
+        {
+          "id": "M-SPARSE",
+          "state": "fixed-local-tests",
+          "finding": "原稀疏config/WA edit重置platform/exclude/sync；现读detail重建allowlist完整表单，省略保留；只在create加默认。"
+        },
+        {
+          "id": "M-PAGING",
+          "state": "fixed-local-tests",
+          "finding": "--page曾未映射page_num，project list曾把CLI envelope发API；现修复并限定body键。"
+        },
+        {
+          "id": "M-STATE",
+          "state": "fixed-local-tests",
+          "finding": "完成 project_state 作为 license/platform 规范来源；相同顶层值兼容，冲突明确拒绝；其他元数据保留覆盖语义，effective basic_info 重新用 from_snapshot 校验，禁止tier/category/sync覆盖绕过。"
+        },
+        {
+          "id": "M-RESTRICTED",
+          "state": "fixed-local-tests",
+          "finding": "官方0<projectId<200000000范围已实施：edit读当前detail核对不可编辑字段未变，只发summary/description/altName；其余项目字段变更拒绝。project delete和release create/edit/delete在schema/dry-run/provider均阻止。"
+        },
+        {
+          "id": "M-SEASON",
+          "state": "implemented-live-read-and-local-tests",
+          "finding": "已解码真实GET user/game-type/list与GET user/author/season-sub/detail?authorId&gameType；新增两个只读options动作。sub_type=1独立校验本人、当前gameCode、id、启用状态和未结束状态；不再拿普通tiers校验。"
+        },
+        {
+          "id": "M-CREATE-ID",
+          "state": "fixed-local-tests",
+          "finding": "config create移除share_id，WA create移除import_id，schema拒绝；provider create/execute入口也拒绝既有编辑ID，编辑动作继续支持不透明ID。"
+        },
+        {
+          "id": "M-CONTENT",
+          "state": "semantics-confirmed",
+          "finding": "content是富文本存储HTML/图资源键标记；contentText是公开纯正文。codeText才是WA导入串。当前提交不做Base64；读入有旧格式Base64兼容。"
+        },
+        {
+          "id": "M-SOURCE-VERSIONS",
+          "state": "evidence-scope",
+          "finding": "所审Creator DLL为0.1.6.0；主客户端提取package.json为1.2.9。旧api-surface.csv将project delete写GET、release detail拼两个ID，均与已读IL矛盾，应以IL为准。"
+        }
+      ],
+      "auth_read_checks": [
+        {
+          "source": "creator",
+          "endpoint_family": "creator-project-list",
+          "accepted": true,
+          "after_official_header_fix": true
+        },
+        {
+          "source": "creator",
+          "endpoint_family": "main-backup-list",
+          "accepted": true,
+          "after_official_header_fix": true
+        },
+        {
+          "source": "main",
+          "endpoint_family": "creator-project-list",
+          "accepted": true,
+          "after_official_header_fix": true
+        },
+        {
+          "source": "main",
+          "endpoint_family": "main-backup-list",
+          "accepted": true,
+          "after_official_header_fix": true
+        }
+      ],
+      "platform_capabilities_not_implemented": [
+        {
+          "capability": "author subscription tier save",
+          "route": "POST user/author/subscription/save",
+          "evidence": [
+            "creator_api:SaveAuthorSubscriptionTiersAsync"
+          ],
+          "cli_schema": null
+        },
+        {
+          "capability": "Creator QR login",
+          "route": "system/user/wechat/qrcode/generate and status/{scene}",
+          "evidence": [
+            "creator_api:GenerateQrCodeAsync/PollLoginStatusAsync"
+          ],
+          "cli_schema": null
+        }
+      ],
+      "coverage": {
+        "registered_fields": 245,
+        "mapped_registered_fields": 245,
+        "missing": [],
+        "unknown": []
+      },
+      "capability_read_checks": [
+        {
+          "operation": "options.subscription-game-types",
+          "accepted": true,
+          "choices": [
+            "wow_retail",
+            "wow_classic_titan"
+          ],
+          "source": "existing main-client session",
+          "remote_writes": false
+        },
+        {
+          "operation": "options.season-subscription",
+          "game_type": "wow_retail",
+          "accepted": true,
+          "configured": false,
+          "source": "existing main-client session",
+          "remote_writes": false
+        }
+      ]
+    },
+    "curseforge": {
+      "fields": {
+        "plugin.upload.project_id": {
+          "wire": "URL /api/projects/{projectId}/upload-file",
+          "stage": "file-upload",
+          "condition": "父文件模式不发送两个版本字段；上传返回ID不等于已审核/公开",
+          "evidence": [
+            "cf_upload:L74-L102",
+            "provider_cf:CurseForge.upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.file": {
+          "wire": "multipart.file",
+          "stage": "file-upload",
+          "condition": "父文件模式不发送两个版本字段；上传返回ID不等于已审核/公开",
+          "evidence": [
+            "cf_upload:L74-L102",
+            "provider_cf:CurseForge.upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.changelog": {
+          "wire": "multipart.metadata(JSON).changelog",
+          "stage": "file-upload",
+          "condition": "父文件模式不发送两个版本字段；上传返回ID不等于已审核/公开",
+          "evidence": [
+            "cf_upload:L74-L102",
+            "provider_cf:CurseForge.upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.changelog_type": {
+          "wire": "multipart.metadata(JSON).changelogType",
+          "stage": "file-upload",
+          "condition": "父文件模式不发送两个版本字段；上传返回ID不等于已审核/公开",
+          "evidence": [
+            "cf_upload:L74-L102",
+            "provider_cf:CurseForge.upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.display_name": {
+          "wire": "multipart.metadata(JSON).displayName",
+          "stage": "file-upload",
+          "condition": "父文件模式不发送两个版本字段；上传返回ID不等于已审核/公开",
+          "evidence": [
+            "cf_upload:L74-L102",
+            "provider_cf:CurseForge.upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.game_versions": {
+          "wire": "multipart.metadata(JSON).gameVersions",
+          "stage": "file-upload",
+          "condition": "父文件模式不发送两个版本字段；上传返回ID不等于已审核/公开",
+          "evidence": [
+            "cf_upload:L74-L102",
+            "provider_cf:CurseForge.upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.game_version_names": {
+          "wire": "multipart.metadata(JSON).gameVersionNames",
+          "stage": "file-upload",
+          "condition": "父文件模式不发送两个版本字段；上传返回ID不等于已审核/公开",
+          "evidence": [
+            "cf_upload:L74-L102",
+            "provider_cf:CurseForge.upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.release_type": {
+          "wire": "multipart.metadata(JSON).releaseType",
+          "stage": "file-upload",
+          "condition": "父文件模式不发送两个版本字段；上传返回ID不等于已审核/公开",
+          "evidence": [
+            "cf_upload:L74-L102",
+            "provider_cf:CurseForge.upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.parent_file_id": {
+          "wire": "multipart.metadata(JSON).parentFileID",
+          "stage": "file-upload",
+          "condition": "父文件模式不发送两个版本字段；上传返回ID不等于已审核/公开",
+          "evidence": [
+            "cf_upload:L74-L102",
+            "provider_cf:CurseForge.upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.relations": {
+          "wire": "multipart.metadata(JSON).relations.projects",
+          "stage": "file-upload",
+          "condition": "父文件模式不发送两个版本字段；上传返回ID不等于已审核/公开",
+          "evidence": [
+            "cf_upload:L74-L102",
+            "provider_cf:CurseForge.upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.is_marked_for_manual_release": {
+          "wire": "multipart.metadata(JSON).isMarkedForManualRelease",
+          "stage": "file-upload",
+          "condition": "父文件模式不发送两个版本字段；上传返回ID不等于已审核/公开",
+          "evidence": [
+            "cf_upload:L74-L102",
+            "provider_cf:CurseForge.upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.relations.projects[].slug": {
+          "wire": "metadata.relations.projects[].slug",
+          "stage": "file-upload",
+          "condition": "关联项目slug",
+          "evidence": [
+            "cf_upload:L88-L96",
+            "provider_cf:upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.relations.projects[].type": {
+          "wire": "metadata.relations.projects[].type",
+          "stage": "file-upload",
+          "condition": "官方关联枚举；不推测其它取值",
+          "evidence": [
+            "cf_upload:L88-L96",
+            "provider_cf:upload"
+          ],
+          "status": "source-confirmed"
+        },
+        "plugin.upload.relations.projects[].project_id": {
+          "wire": "metadata.relations.projects[].projectID",
+          "stage": "file-upload",
+          "condition": "可选精确关联ID",
+          "evidence": [
+            "cf_upload:L88-L96",
+            "provider_cf:upload"
+          ],
+          "status": "source-confirmed"
+        }
+      },
+      "read_actions": {
+        "session.doctor": {
+          "route": "local config presence only",
+          "params": "fixed AUTHOR_ID/API_KEY/UPLOAD_TOKEN presence booleans",
+          "evidence": [
+            "provider_cf:doctor"
+          ]
+        },
+        "project.list": {
+          "route": "GET https://api.curseforge.com/v1/mods/search",
+          "params": "gameId=1,authorId(member),index/pageSize<=50; x-api-key; all pages up to official 10000 cap",
+          "evidence": [
+            "cf_core:Search Mods/Pagination Limits",
+            "provider_cf:project_list"
+          ]
+        },
+        "plugin.game-versions": {
+          "route": "GET https://wow.curseforge.com/api/game/versions",
+          "params": "X-Api-Token; IDs/names for upload",
+          "evidence": [
+            "cf_upload:L62-L71",
+            "provider_cf:game_versions"
+          ]
+        }
+      },
+      "findings": [
+        {
+          "id": "CF-PAGING",
+          "state": "fixed-local-tests",
+          "finding": "原作者项目仅首50条；现全分页、总数/重复/提前结束检查，并标author_scope=member。authorId含成员项目，不仅主作者。"
+        },
+        {
+          "id": "CF-EDIT",
+          "state": "platform-supported-cli-not-implemented",
+          "finding": "官方2026-09-27文章提供update-file metadata更新。Fupload无此动作；不得描述为平台不能编辑文件。"
+        },
+        {
+          "id": "CF-ACCEPTANCE",
+          "state": "known-boundary",
+          "finding": "upload返回file_id只表示接受；没有自动moderation/public readback。doctor仅查本地presence，不宣称凭据有效。"
+        }
+      ],
+      "platform_capabilities_not_implemented": [
+        {
+          "capability": "existing file metadata edit",
+          "route": "POST /api/projects/{projectId}/update-file",
+          "fields": [
+            "fileID",
+            "changelog",
+            "changelogType",
+            "displayName",
+            "gameVersions",
+            "gameVersionNames",
+            "releaseType",
+            "relations"
+          ],
+          "evidence": [
+            "cf_upload:L105-L135"
+          ],
+          "cli_schema": null
+        },
+        {
+          "capability": "game dependency lookup",
+          "route": "GET /api/game/dependencies",
+          "evidence": [
+            "cf_upload:L51-L59"
+          ],
+          "cli_schema": null
+        },
+        {
+          "capability": "public project detail/file list/file detail/changelog readback",
+          "route": "Core GET /v1/mods/{id}, /v1/mods/{id}/files, /v1/mods/{id}/files/{fileId}, /changelog",
+          "evidence": [
+            "cf_core:Get Mod/Get Mod Files/Get Mod File/Get Mod File Changelog"
+          ],
+          "cli_schema": null
+        }
+      ],
+      "coverage": {
+        "registered_fields": 11,
+        "mapped_registered_fields": 11,
+        "missing": [],
+        "unknown": []
+      }
+    }
+  }
+}

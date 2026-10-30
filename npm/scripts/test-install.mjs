@@ -4,6 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { removeInstallTestDirectory, withInstallTestCleanup } from "./install-test-cleanup.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const expectedVersion = JSON.parse(fs.readFileSync(path.join(packageRoot, "package.json"), "utf8")).version;
@@ -151,17 +152,10 @@ async function exercise({ name, ignoreScripts }) {
 const packDirectory = path.join(temporary, "pack");
 fs.mkdirSync(packDirectory);
 let tarball;
-try {
+await withInstallTestCleanup(async () => {
   const pack = runNpm(["pack", "--json", "--ignore-scripts", "--pack-destination", packDirectory]);
   tarball = path.join(packDirectory, JSON.parse(pack.stdout)[0].filename);
   await exercise({ name: "normal", ignoreScripts: false });
   await exercise({ name: "ignore-scripts", ignoreScripts: true });
   process.stdout.write("Global install, managed Python runtime, Python launch, Skill, and self-uninstall checks passed.\n");
-} finally {
-  fs.rmSync(temporary, {
-    recursive: true,
-    force: true,
-    maxRetries: process.platform === "win32" ? 20 : 0,
-    retryDelay: 200,
-  });
-}
+}, () => removeInstallTestDirectory(temporary));

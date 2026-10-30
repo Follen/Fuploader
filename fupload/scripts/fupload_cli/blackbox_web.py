@@ -20,6 +20,7 @@ WORKSHOP_URL = "https://open.xiaoheihe.cn/zh_cn/workshop"
 LOGIN_ORIGIN = "https://login.xiaoheihe.cn"
 API_ORIGIN = "https://workshopapi.xiaoheihe.cn"
 API_ROUTES = frozenset({
+    ("GET", "/wow/v2/dynamic_conf/"),
     ("GET", "/wow/open_platform/module/list/"),
     ("GET", "/wow/open_platform/module/detail/"),
     ("POST", "/wow/open_platform/module/update/"),
@@ -27,6 +28,16 @@ API_ROUTES = frozenset({
     ("POST", "/wow/open_platform/module_version/upsert/"),
     ("POST", "/wow/open_platform/module_version/delete/"),
     ("POST", "/wow/cos/upload/token/"),
+    ("POST", "/wow/get_user_configuration_backup_list/"),
+    ("POST", "/wow/remove_user_configuration_backup/"),
+    ("POST", "/wow/rename_user_configuration_backup/"),
+    ("POST", "/wow/v2/share/list/"),
+    ("POST", "/wow/v2/share/detail/"),
+    ("POST", "/wow/create_config_share/"),
+    ("POST", "/wow/update_config_share/"),
+    ("POST", "/wow/create_backup/"),
+    ("POST", "/wow/get_user_backup_credential/"),
+    ("POST", "/wow/save_user_configuration/"),
 })
 API_PATHS = frozenset(path for _method, path in API_ROUTES)
 WEB_QUERY_KEYS = frozenset({
