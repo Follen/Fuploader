@@ -107,7 +107,7 @@ class CookieSnapshotTests(unittest.TestCase):
         gui = [{'pid': 10, 'dd_dir': str(directory), 'signature': {'status': 'Valid'}}]
         process = mock.Mock()
         process.stdin = io.StringIO()
-        with mock.patch('fupload_cli.dd.discover_dd_info', return_value=(directory, {})), mock.patch('fupload_cli.dd_broker.running_dd_processes', return_value=gui), mock.patch.object(desktop, 'borrow_desktop_cookie', return_value=('NTES_YD_SESS', 'non-secret-fixture')), mock.patch.object(Sidecar, '_lock'), mock.patch.object(Sidecar, '_next_result', return_value={'ready': True, 'credential_kind': None}), mock.patch('fupload_cli.dd.threading.Thread'), mock.patch('fupload_cli.dd.subprocess.Popen', return_value=process) as spawn:
+        with mock.patch('fupload_cli.dd.discover_dd_info', return_value=(directory, {})), mock.patch('fupload_cli.dd.state_dir', return_value=Path('fixture-state')), mock.patch('fupload_cli.dd_broker.running_dd_processes', return_value=gui), mock.patch.object(desktop, 'borrow_desktop_cookie', return_value=('NTES_YD_SESS', 'non-secret-fixture')), mock.patch.object(Sidecar, '_lock'), mock.patch.object(Sidecar, '_next_result', return_value={'ready': True, 'credential_kind': None}), mock.patch('fupload_cli.dd.threading.Thread'), mock.patch('fupload_cli.dd.subprocess.Popen', return_value=process) as spawn:
             session = Sidecar().__enter__()
             self.assertEqual(session.session_source, 'desktop-cookie')
             self.assertEqual(json.loads(process.stdin.getvalue())['cookie'], ['NTES_YD_SESS', 'non-secret-fixture'])
