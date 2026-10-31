@@ -1,6 +1,6 @@
 """Heybox Workshop plugin provider."""
 from __future__ import annotations
-import hashlib, json, time, zipfile
+import hashlib, json, re, time, zipfile
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit, urlunsplit
 from typing import Any, Mapping
@@ -10,11 +10,12 @@ from .blackbox_http import BlackboxHttpSession
 from .blackbox_auth import BlackboxAuth
 from .blackbox_config import BlackboxConfigMixin
 from .blackbox_backup import BlackboxBackupMixin
+from .blackbox_wa import BlackboxWAMixin
 
 API_MISC_BASE = "https://api.xiaoheihe.cn"
 API_BASE = API_ORIGIN
 
-class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin):
+class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin, BlackboxWAMixin):
     def __init__(self, config: Mapping[str, Any] | None = None, transport=None, *, web_session=None, web_session_factory=None):
         self.config = dict(config or {})
         self._transport = transport
@@ -55,6 +56,10 @@ class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin):
             if not isinstance(rows, list) or not rows or not all(isinstance(row, dict) for row in rows):
                 raise FuploadError("Heybox dynamic game branches are incomplete", kind="protocol_error")
             return {"items": self._redact(rows)}
+        if resource == "wa":
+            if action == "list": return self.wa_list(argument("strappid"))
+            if action == "get": return self.wa_get(argument("slug"), argument("strappid"))
+            if action == "categories": return self.wa_categories()
         if resource == "config":
             if action == "list": return self.config_list(argument("strappid"))
             if action == "get": return self.config_get(argument("share_id"))
@@ -74,6 +79,9 @@ class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin):
     def execute_write(self, resource: str, action: str, doc: Mapping[str,Any]):
         if resource == "session":
             return BlackboxAuth().execute_write(action, doc)
+        if resource == "wa":
+            if action in ("create", "update", "edit"): return self.wa_upsert(doc, create=action == "create")
+            if action == "delete": return self.wa_delete(doc)
         if resource == "config":
             if action in ("create", "update", "edit"): return self.config_upsert(doc, create=action == "create")
             if action == "delete": return self.config_delete(doc)
@@ -121,13 +129,34 @@ class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin):
         aliases={"module_id":"moduleId","version_id":"versionId","game_versions":"gameVersions","file_url":"fileUrl"}
         normalized={aliases.get(k,k):v for k,v in doc.items() if k not in {"schema","dry_run"}}
         upload_result = None
+        edit_archive_source = None
+        if "file" in normalized and "versionId" in normalized:
+            module_id, version_id = int(normalized["moduleId"]), int(normalized["versionId"])
+            existing = self._find_version(module_id, version_id)
+            if (not existing or self._id_value(existing.get("id")) != version_id or
+                    "moduleId" in existing and self._id_value(existing["moduleId"]) != module_id):
+                raise FuploadError("replacement version was not found uniquely in the requested module", kind="verification_required", verification_required=True)
+            branch = self._canonical_archive_branch(module_id, self._comparable("gameVersions", existing.get("gameVersions")))
+            current_url = self._archive_url(existing)
+            if branch is None or self._strict_canonical_branch(current_url) != branch:
+                raise FuploadError("replacement archive source is not a confirmed official branch", kind="verification_required", verification_required=True)
+            edit_archive_source = {"module_id": module_id, "version_id": version_id, "url": current_url,
+                                   "branch": branch, "replacement": True}
         if "file" in normalized:
             upload_result=self.upload_zip(int(normalized["moduleId"]),str(normalized["file"]))
             normalized["fileUrl"]=upload_result["url"]
         if "fileUrl" not in normalized and "versionId" in normalized:
             existing = self._find_version(int(normalized["moduleId"]), int(normalized["versionId"]))
+            identifier = (existing or {}).get("id")
+            if existing and (isinstance(identifier, bool) or not isinstance(identifier, (int, str)) or not str(identifier).isdigit() or
+                             int(identifier) <= 0 or self._id_value(identifier) != self._id_value(normalized["versionId"]) or
+                             "moduleId" in existing and self._id_value(existing["moduleId"]) != self._id_value(normalized["moduleId"])):
+                raise FuploadError("current version archive source identifies another record",kind="verification_required",verification_required=True)
             current_url=self._archive_url(existing or {})
-            if current_url: normalized["fileUrl"]=current_url
+            if current_url:
+                normalized["fileUrl"]=current_url
+                edit_archive_source={"module_id":int(normalized["moduleId"]),"version_id":int(normalized["versionId"]),"url":current_url,
+                    "branch":self._canonical_archive_branch(int(normalized["moduleId"]), self._comparable("gameVersions", existing.get("gameVersions")))}
         required=("moduleId","name","type","gameVersions","fileUrl")
         missing=[k for k in required if k not in normalized]
         if missing: raise ValidationError("missing field(s): %s"%", ".join(missing))
@@ -140,15 +169,29 @@ class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin):
         response_id=(response_result.get("versionId") or response_result.get("id")) if isinstance(response_result,dict) else None
         target_id=body.get("versionId") or (self._id_value(response_id) if response_id is not None else None)
         expected = {"name":body["name"],"type":body["type"],"gameVersions":list(map(str,games))}
+        allow_canonical = upload_result is not None and "versionId" not in body
         found=self._wait_version(body["moduleId"],target_id,body["name"],excluded_ids=existing_ids,
-                                 expected=expected,expected_archive=body["fileUrl"])
+                                 expected=expected,expected_archive=body["fileUrl"],allow_canonical=allow_canonical,edit_archive_source=edit_archive_source)
         mismatches=[key for key,wanted in {"name":body["name"],"type":body["type"],"gameVersions":list(map(str,games))}.items() if self._comparable(key,found.get(key))!=self._comparable(key,wanted)]
-        if self._comparable("fileUrl", self._archive_url(found)) != self._comparable("fileUrl", body["fileUrl"]):
+        archive_mode = self._archive_readback_mode(body["moduleId"], found, body["fileUrl"],
+                                                  games, allow_canonical=allow_canonical, excluded_ids=existing_ids,edit_archive_source=edit_archive_source)
+        if archive_mode is None:
             mismatches.append("fileUrl")
         if mismatches: raise FuploadError("version upsert readback mismatch",kind="verification_required",verification_required=True,details={"fields":mismatches})
-        result={"accepted":True,"verified":True,"module_id":body["moduleId"],"version_id":found.get("id"),"readback":self._redact(found),"response":self._redact(response)}
+        result={"accepted":True,"verified":True,"metadata_verified":True,"verification_scope":"remote_metadata",
+                "verified_fields":["version_id", "name", "type", "gameVersions"] + (["archive_url"] if archive_mode == "url_exact" else ["canonical_archive_url", "canonical_branch"]),
+                "unverified_fields":["archive_bytes"],
+                "archive_verification":{"mode":archive_mode,"content_verified":False,"public_download_verified":False},
+                "module_id":body["moduleId"],"version_id":found.get("id"),"readback":self._redact(found),"response":self._redact(response)}
         if upload_result:
             result["upload"]={key:upload_result[key] for key in ("protocol","bytes","sha256") if key in upload_result}
+        result["archive_verification"]["source"] = "local_upload" if upload_result else "existing_version_record" if edit_archive_source else "caller_supplied_url"
+        if edit_archive_source:
+            result["archive_verification"].update(source_module_id=edit_archive_source["module_id"],source_version_id=edit_archive_source["version_id"])
+            if self._strict_canonical_branch(edit_archive_source["url"]):
+                result["archive_verification"]["source_archive_url"] = edit_archive_source["url"]
+            else:
+                result["archive_verification"]["source_archive_url_sha256"] = hashlib.sha256(str(edit_archive_source["url"]).encode()).hexdigest()
         return result
     def version_delete(self,doc):
         version_id=doc.get("versionId",doc.get("version_id")); module_id=doc.get("moduleId",doc.get("module_id"))
@@ -166,30 +209,54 @@ class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin):
     def _version_rows(self,module_id):
         limit = int(self.config.get("version_page_size", 100))
         max_pages = int(self.config.get("version_max_pages", 100))
-        rows = []
-        page_fingerprints = set()
-        for page_index in range(max_pages):
-            offset = page_index * limit
+        if limit < 1 or max_pages < 1:
+            raise ValidationError("version pagination limits must be positive")
+        rows, seen, offset, expected_total = [], set(), 0, None
+        for _ in range(max_pages):
             result = self._result(self._request(
                 "GET", "/wow/open_platform/module_version/list/",
                 query={"moduleId":module_id,"offset":offset,"limit":limit},
             ))
-            page = result.get("versionList") or []
-            if not isinstance(page, list):
+            if not isinstance(result, Mapping):
                 raise FuploadError("version list response is invalid", kind="verification_required", verification_required=True)
-            fingerprint = tuple(self._id_value(item.get("id")) for item in page if isinstance(item, Mapping))
-            if page and fingerprint in page_fingerprints:
-                raise FuploadError("version list pagination did not advance", kind="verification_required", verification_required=True)
-            page_fingerprints.add(fingerprint)
-            rows.extend(item for item in page if isinstance(item, dict))
-            total = next((result.get(key) for key in ("totalCount", "total_count", "total", "count") if isinstance(result.get(key), int)), None)
-            if not page or len(page) < limit or (total is not None and len(rows) >= total):
+            if "strappidInfos" in result:
+                self._version_branch_options = (module_id, result["strappidInfos"])
+            page = result.get("versionList")
+            totals = [result[key] for key in ("totalCount", "total_count", "total", "count") if key in result]
+            if (not isinstance(page, list) or any(type(value) is not int or value < 0 for value in totals) or
+                    len(set(totals)) > 1):
+                raise FuploadError("version list response is invalid", kind="verification_required", verification_required=True)
+            if totals:
+                if expected_total is not None and expected_total != totals[0]:
+                    raise FuploadError("version list changed during pagination", kind="verification_required", verification_required=True)
+                expected_total = totals[0]
+            if not page:
+                if expected_total is not None and len(rows) != expected_total:
+                    raise FuploadError("version list ended before its reported total", kind="verification_required", verification_required=True)
                 return rows
+            for item in page:
+                identity = item.get("id") if isinstance(item, Mapping) else None
+                if (isinstance(identity, bool) or not isinstance(identity, (str, int)) or
+                        not str(identity).isascii() or not str(identity).isdigit() or int(identity) <= 0 or int(identity) in seen):
+                    raise FuploadError("version list contains invalid or repeated records", kind="verification_required", verification_required=True)
+                seen.add(int(identity))
+                rows.append(dict(item))
+            offset += len(page)
+            if expected_total is not None:
+                if len(rows) > expected_total:
+                    raise FuploadError("version list exceeds its reported total", kind="verification_required", verification_required=True)
+                if len(rows) == expected_total:
+                    return rows
+            # A server cap can produce a short page even when more rows exist.
+            # Without a total only an empty page establishes completion.
         raise FuploadError("version list pagination exceeded the supported limit", kind="verification_required", verification_required=True)
 
     def _find_version(self, module_id, version_id):
         wanted=self._id_value(version_id)
-        return next((x for x in self._version_rows(module_id) if self._id_value(x.get("id"))==wanted),None)
+        matches=[x for x in self._version_rows(module_id) if self._id_value(x.get("id"))==wanted]
+        if len(matches)>1:
+            raise FuploadError("current version archive source is ambiguous",kind="verification_required",verification_required=True)
+        return matches[0] if matches else None
     def _wait_module(self,module_id,expected):
         attempts=int(self.config.get("verify_attempts",30))
         mismatches=list(expected)
@@ -199,12 +266,88 @@ class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin):
             if not mismatches: return actual
             if attempt+1<attempts: time.sleep(float(self.config.get("verify_interval",2)))
         raise FuploadError("module update readback mismatch",kind="verification_required",verification_required=True,details={"fields":mismatches})
-    def _wait_version(self,module_id,version_id,name,deleted=False,expected=None,excluded_ids=None,expected_archive=None):
+    def _canonical_archive_branch(self, module_id, games):
+        snapshot = getattr(self, "_version_branch_options", None)
+        if not snapshot or snapshot[0] != module_id or not isinstance(snapshot[1], list) or not games:
+            return None
+        matches, seen = [], set()
+        for row in snapshot[1]:
+            if not isinstance(row, Mapping): return None
+            branch, versions = row.get("strappid"), row.get("gameVersions")
+            if (not isinstance(branch, str) or not re.fullmatch(r"wow[a-z0-9_]+", branch) or branch in seen or
+                    not isinstance(versions, list) or any(not isinstance(item, str) or not item for item in versions)):
+                return None
+            seen.add(branch)
+            if set(map(str, games)).issubset(versions): matches.append(branch)
+        return matches[0] if len(matches) == 1 else None
+
+    @staticmethod
+    def _strict_canonical_branch(url):
+        if not isinstance(url, str): return None
+        try:
+            parsed = urlsplit(url)
+        except ValueError:
+            return None
+        if parsed.scheme != "https" or parsed.netloc != "wow.max-c.com" or parsed.query or parsed.fragment: return None
+        match = re.fullmatch(r"/wow/wow_module_file/(wow[a-z0-9_]+)/[a-f0-9]{32}\.zip", parsed.path)
+        return match[1] if match else None
+
+    def _archive_readback_mode(self, module_id, found, source, games, *, allow_canonical=False, excluded_ids=None,edit_archive_source=None):
+        actual = self._archive_url(found)
+        if "moduleId" in found and self._id_value(found["moduleId"]) != module_id: return None
+        if allow_canonical or edit_archive_source is not None:
+            identifier = found.get("id")
+            if (isinstance(identifier, bool) or not isinstance(identifier, (int, str)) or
+                    not str(identifier).isdigit() or int(identifier) <= 0 or self._id_value(identifier) in (excluded_ids or set())):
+                return None
+        if edit_archive_source is not None and edit_archive_source.get("replacement"):
+            if (edit_archive_source["module_id"] != module_id or
+                    self._id_value(found.get("id")) != edit_archive_source["version_id"] or
+                    actual == edit_archive_source["url"]):
+                return None
+            branch = self._canonical_archive_branch(module_id, games)
+            try:
+                intake = urlsplit(source)
+            except (ValueError, TypeError):
+                return None
+            if (branch is None or branch != edit_archive_source["branch"] or
+                    intake.scheme != "https" or intake.netloc != "wow.max-c.com" or intake.query or intake.fragment or
+                    not re.fullmatch(r"/wow/module/[A-Za-z0-9_%-][A-Za-z0-9_.%~-]*\.(?i:zip)", intake.path)):
+                return None
+            if actual == source:
+                return "url_exact"
+            return "server_replacement_canonicalization" if self._strict_canonical_branch(actual) == branch else None
+        if actual == source: return "url_exact"
+        if not allow_canonical and edit_archive_source is None: return None
+        if not isinstance(source, str) or not isinstance(actual, str): return None
+        try:
+            intake, canonical = urlsplit(source), urlsplit(actual)
+        except ValueError:
+            return None
+        if any(url.scheme != "https" or url.netloc != "wow.max-c.com" or url.query or url.fragment for url in (intake, canonical)):
+            return None
+        branch = self._canonical_archive_branch(module_id, games)
+        if branch is None or self._strict_canonical_branch(actual) != branch: return None
+        if allow_canonical:
+            if not re.fullmatch(r"/wow/module/[A-Za-z0-9_%-][A-Za-z0-9_.%~-]*\.(?i:zip)", intake.path): return None
+            return "server_canonicalization"
+        if (edit_archive_source["module_id"] != module_id or edit_archive_source["url"] != source or
+                self._id_value(found.get("id")) != edit_archive_source["version_id"] or
+                edit_archive_source["branch"] != branch or self._strict_canonical_branch(source) != branch):
+            return None
+        return "server_recanonicalization"
+
+    def _wait_version(self,module_id,version_id,name,deleted=False,expected=None,excluded_ids=None,expected_archive=None,allow_canonical=False,edit_archive_source=None):
         excluded_ids=excluded_ids or set()
         for attempt in range(int(self.config.get("verify_attempts",30))):
             rows=self._version_rows(module_id)
+            if allow_canonical:
+                fresh_matches = [row for row in rows if self._id_value(row.get("id")) not in excluded_ids and row.get("name") == name and
+                                 all(self._comparable(key, row.get(key)) == self._comparable(key, wanted) for key, wanted in (expected or {}).items())]
+                if len(fresh_matches) > 1:
+                    raise FuploadError("version write readback is ambiguous",kind="verification_required",verification_required=True)
             if version_id is not None:
-                candidates=[x for x in rows if self._id_value(x.get("id"))==self._id_value(version_id)]
+                candidates=[x for x in rows if self._id_value(x.get("id"))==self._id_value(version_id) and self._id_value(x.get("id")) not in excluded_ids]
             else:
                 candidates=[x for x in rows if x.get("name")==name and self._id_value(x.get("id")) not in excluded_ids]
             if len(candidates)>1: raise FuploadError("version write readback is ambiguous",kind="verification_required",verification_required=True)
@@ -214,7 +357,8 @@ class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin):
                 for key, wanted in (expected or {}).items()
             )
             if matches_expected and expected_archive is not None:
-                matches_expected = self._comparable("fileUrl", self._archive_url(found)) == self._comparable("fileUrl", expected_archive)
+                matches_expected = self._archive_readback_mode(module_id, found, expected_archive,
+                    (expected or {}).get("gameVersions", []), allow_canonical=allow_canonical, excluded_ids=excluded_ids,edit_archive_source=edit_archive_source) is not None
             if (deleted and (found is None or found.get("auditState")==4)) or (not deleted and found and matches_expected): return found or {}
             if attempt+1<int(self.config.get("verify_attempts",30)): time.sleep(float(self.config.get("verify_interval",2)))
         raise FuploadError("version write was not confirmed by readback",kind="verification_required",verification_required=True)

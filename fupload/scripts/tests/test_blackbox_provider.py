@@ -67,7 +67,7 @@ class BlackboxProviderTests(unittest.TestCase):
             if path.endswith("module/list/"): return {"status":"ok","result":{"moduleList":[state["module"]]}}
             if path.endswith("module/detail/"): return {"status":"ok","result":{"module":state["module"]}}
             if path.endswith("module/update/"): writes.append(dict(body)); state["module"].update(body); return {"status":"ok","result":{}}
-            if path.endswith("module_version/list/"): return {"status":"ok","result":{"versionList":state["versions"]}}
+            if path.endswith("module_version/list/"): return {"status":"ok","result":{"versionList":state["versions"],"total":len(state["versions"])}}
             if path.endswith("module_version/upsert/"):
                 row={**body,"id":body.get("versionId",9),"gameVersions":body["gameVersions"].split(","),"fileUrlHeybox":body["fileUrl"]}; state["versions"]=[row]; return {"status":"ok","result":{}}
             if path.endswith("module_version/delete/"): state["versions"]=[]; return {"status":"ok","result":{}}
@@ -90,7 +90,7 @@ class BlackboxProviderTests(unittest.TestCase):
                 state["reads"] += 1
                 if state["deletes"] == 1 and state["reads"] == 2:
                     state["row"]["auditState"] = 1
-                return {"status": "ok", "result": {"versionList": [dict(state["row"])]}}
+                return {"status": "ok", "result": {"versionList": [dict(state["row"])], "total":1}}
             raise AssertionError(path)
         provider = Blackbox({"verify_attempts": 1, "delete_settle_seconds": 0.001}, transport)
         with self.assertRaises(FuploadError) as raised:
@@ -128,7 +128,7 @@ class BlackboxProviderTests(unittest.TestCase):
                     state["row"]["auditState"] = 1
                 if state["deletes"] == 2 and state["reads"] == 4:
                     state["row"]["auditState"] = 1
-                return {"status":"ok","result":{"versionList":[dict(state["row"])]}}
+                return {"status":"ok","result":{"versionList":[dict(state["row"])],"total":1}}
             raise AssertionError(path)
         provider = Blackbox({"verify_attempts":1,"delete_settle_seconds":0.001}, transport)
         with self.assertRaises(FuploadError) as raised:
@@ -140,7 +140,7 @@ class BlackboxProviderTests(unittest.TestCase):
         calls = []
         row = {"id":"9","name":"old","type":"1","gameVersions":"1.0,2.0","fileUrlHeybox":"https://cdn.example/archive.zip"}
         def transport(method,path,body,query):
-            if path.endswith("module_version/list/"): return {"status":"ok","result":{"versionList":[dict(row)]}}
+            if path.endswith("module_version/list/"): return {"status":"ok","result":{"versionList":[dict(row)],"total":1}}
             if path.endswith("module_version/upsert/"):
                 calls.append(dict(body)); row.update(body); row["gameVersions"]=body["gameVersions"].split(","); return {"status":"ok","result":{"versionId":9}}
             raise AssertionError(path)
@@ -151,7 +151,7 @@ class BlackboxProviderTests(unittest.TestCase):
     def test_create_readback_excludes_preexisting_same_name(self):
         rows=[{"id":1,"name":"same","type":1,"gameVersions":["1.0"],"fileUrlHeybox":"https://old"}]
         def transport(method,path,body,query):
-            if path.endswith("module_version/list/"): return {"status":"ok","result":{"versionList":[dict(x) for x in rows]}}
+            if path.endswith("module_version/list/"): return {"status":"ok","result":{"versionList":[dict(x) for x in rows],"total":len(rows)}}
             if path.endswith("module_version/upsert/"):
                 rows.append({"id":2,**body,"gameVersions":body["gameVersions"].split(","),"fileUrlHeybox":body["fileUrl"]}); return {"status":"ok","result":{}}
             raise AssertionError(path)
@@ -187,7 +187,7 @@ class BlackboxProviderTests(unittest.TestCase):
         row = {"id": 9, "name": "new", "type": 2, "gameVersions": ["1.0"], "fileUrlHeybox": "https://cdn.example/old.zip"}
         def transport(method, path, body, query):
             if path.endswith("module_version/list/"):
-                return {"status": "ok", "result": {"versionList": [dict(row)]}}
+                return {"status": "ok", "result": {"versionList": [dict(row)], "total":1}}
             if path.endswith("module_version/upsert/"):
                 return {"status": "ok", "result": {"versionId": 9}}
             raise AssertionError(path)
@@ -208,5 +208,233 @@ class BlackboxProviderTests(unittest.TestCase):
         provider = Blackbox({"verify_attempts": 1, "delete_settle_seconds": 0}, transport)
         with self.assertRaises(FuploadError):
             provider.version_delete({"module_id": 7, "version_id": 101})
+
+class VersionPaginationTests(unittest.TestCase):
+    def provider(self, result_for_offset):
+        offsets = []
+        def transport(method, path, body, query):
+            if path.endswith("/delete/"):
+                return {"status": "ok", "result": {}}
+            offsets.append(query["offset"])
+            return {"status": "ok", "result": result_for_offset(query["offset"])}
+        return Blackbox({"verify_attempts": 1, "delete_settle_seconds": 0}, transport), offsets
+
+    def test_short_pages_advance_by_actual_rows_with_and_without_total(self):
+        rows = [{"id": i} for i in range(1, 7)]
+        for with_total in (True, False):
+            provider, offsets = self.provider(lambda offset: {
+                "versionList": rows[offset:offset + 2], **({"total": 6} if with_total else {})})
+            self.assertEqual(provider._version_rows(7), rows)
+            self.assertEqual(offsets, [0, 2, 4] if with_total else [0, 2, 4, 6])
+
+    def test_short_page_cannot_hide_undeleted_target(self):
+        rows = [{"id": i, "auditState": 2} for i in range(1, 102)]
+        provider, offsets = self.provider(lambda offset: {"versionList": rows[offset:offset + 15], "total": 101})
+        with self.assertRaises(FuploadError) as caught:
+            provider.version_delete({"module_id": 7, "version_id": 101})
+        self.assertTrue(caught.exception.verification_required)
+        self.assertEqual(offsets, [0, 15, 30, 45, 60, 75, 90])
+
+    def test_incomplete_or_malformed_lists_never_confirm_delete(self):
+        for make_result in (
+            lambda offset: {"versionList": [{"id": 1}] if not offset else [], "total": 2},
+            lambda offset: {"versionList": [{"id": 1}], "total": 2},
+            lambda offset: {"versionList": [{"id": 1}], "total": True},
+            lambda offset: {"versionList": [{"id": 1}], "total": "2"},
+            lambda offset: {"versionList": [{"id": 1}], "total": 2, "totalCount": 3},
+            lambda offset: {"versionList": [{"id": 1}, {"id": 2}], "total": 1},
+            lambda offset: {"versionList": None},
+            lambda offset: {"versionList": [{"id": True}]},
+            lambda offset: {"versionList": [None]},
+            lambda offset: {"versionList": [{"id": offset + 1}], "total": 3 if not offset else 4},
+        ):
+            provider, _ = self.provider(make_result)
+            with self.subTest(make_result=make_result), self.assertRaises(FuploadError) as caught:
+                provider.version_delete({"module_id": 7, "version_id": 99})
+            self.assertTrue(caught.exception.verification_required)
+
+    def test_no_total_is_bounded_when_server_never_finishes(self):
+        provider, offsets = self.provider(lambda offset: {"versionList": [{"id": offset + 1}]})
+        provider.config["version_max_pages"] = 2
+        with self.assertRaises(FuploadError):
+            provider._version_rows(7)
+        self.assertEqual(offsets, [0, 1])
+
+class CanonicalArchiveTests(unittest.TestCase):
+    INTAKE = "https://wow.max-c.com/wow/module/Temporary-123.zip"
+    CANONICAL = "https://wow.max-c.com/wow/wow_module_file/wowretail/" + "a" * 32 + ".zip"
+
+    def run_upsert(self, *, actual=None, intake=None, infos=None, existing=False, local=True, duplicate=False, returned_old_id=False, bad_id=None,
+                   caller_url=False, source_url=None, source_id=None, source_module=None, duplicate_same_id=False, replace_file=False):
+        old = {"id": 9, "name": "old", "type": 3, "gameVersions": ["12.1.7"], "fileUrlHeybox": self.CANONICAL}
+        if source_url is not None: old["fileUrlHeybox"] = source_url
+        if source_id is not None: old["id"] = source_id
+        if source_module is not None: old["moduleId"] = source_module
+        rows = [dict(old)] if existing or returned_old_id else []
+        posts = []
+        if infos is None:
+            infos = [{"strappid": "wowretail", "gameVersions": ["12.1.7"]},
+                     {"strappid": "wowclassicera", "gameVersions": ["1.15.9"]}]
+        def transport(method, path, body, query):
+            if path.endswith("module_version/list/"):
+                return {"status": "ok", "result": {"versionList": [dict(row) for row in rows], "total":len(rows), "strappidInfos": infos}}
+            if path.endswith("module_version/upsert/"):
+                posts.append(dict(body))
+                row = {"id": 9 if existing or returned_old_id else 10, "name": body["name"], "type": body["type"],
+                       "gameVersions": body["gameVersions"].split(","), "fileUrlHeybox": actual or self.CANONICAL}
+                if bad_id is not None:
+                    row["id"] = bad_id
+                rows[:] = [row]
+                if duplicate:
+                    rows.append({**row, "id": 11})
+                if duplicate_same_id:
+                    rows.append(dict(row))
+                return {"status": "ok", "result": {"versionId": row["id"]}}
+            raise AssertionError(path)
+        provider = Blackbox({"verify_attempts": 1}, transport)
+        doc = {"module_id": 7, "name": "new", "type": 3, "game_versions": ["12.1.7"]}
+        if existing:
+            doc["version_id"] = 9
+            if caller_url:
+                doc["file_url"] = self.CANONICAL
+        elif not local:
+            doc["file_url"] = self.INTAKE
+        if local and (not existing or replace_file):
+            doc["file"] = "/local/synthetic.zip"
+        with patch.object(provider, "upload_zip", return_value={"url": intake or self.INTAKE, "protocol": "legacy", "bytes": 10, "sha256": "b" * 64}) as upload:
+            try:
+                result = provider.version_upsert(doc)
+                return result, posts, upload.call_count
+            except FuploadError as error:
+                self.assertLessEqual(len(posts), 1)
+                self.last_posts = posts
+                raise error
+
+    def test_local_upload_canonicalization_verifies_only_remote_metadata(self):
+        result, posts, uploads = self.run_upsert()
+        self.assertTrue(result["verified"])
+        self.assertTrue(result["metadata_verified"])
+        self.assertEqual(result["verification_scope"], "remote_metadata")
+        self.assertEqual(result["archive_verification"]["mode"], "server_canonicalization")
+        self.assertFalse(result["archive_verification"]["content_verified"])
+        self.assertFalse(result["archive_verification"]["public_download_verified"])
+        self.assertEqual(result["unverified_fields"], ["archive_bytes"])
+        self.assertEqual(result["version_id"], 10)
+        self.assertIn("canonical_branch", result["verified_fields"])
+        self.assertEqual((len(posts), uploads), (1, 1))
+
+    def test_existing_version_local_replacement_confirms_changed_official_archive(self):
+        changed = self.CANONICAL.replace("a" * 32, "c" * 32)
+        result, posts, uploads = self.run_upsert(existing=True, replace_file=True, actual=changed)
+        self.assertEqual(result["version_id"], 9)
+        self.assertEqual(posts[0]["versionId"], 9)
+        self.assertEqual((uploads, len(posts)), (1, 1))
+        self.assertEqual(result["archive_verification"]["mode"], "server_replacement_canonicalization")
+        self.assertEqual(result["archive_verification"]["source"], "local_upload")
+        self.assertEqual(result["archive_verification"]["source_archive_url"], self.CANONICAL)
+        self.assertEqual(result["verification_scope"], "remote_metadata")
+        self.assertFalse(result["archive_verification"]["content_verified"])
+        self.assertEqual(result["unverified_fields"], ["archive_bytes"])
+
+    def test_existing_replacement_rejects_stale_archive_wrong_identity_and_branch(self):
+        changed = self.CANONICAL.replace("a" * 32, "c" * 32)
+        for overrides in ({"actual": self.CANONICAL}, {"bad_id": 11}, {"duplicate_same_id": True},
+                          {"source_id": 8}, {"source_module": 999}, {"infos": []},
+                          {"actual": changed.replace("wowretail/", "wowclassicera/")},
+                          {"actual": changed + "?sign=opaque"},
+                          {"intake": "https://example.invalid/new.zip"},
+                          {"source_url": "https://example.invalid/old.zip"}):
+            with self.subTest(overrides=overrides), self.assertRaises(FuploadError) as caught:
+                self.run_upsert(**{"existing": True, "replace_file": True, "actual": changed, **overrides})
+            self.assertTrue(caught.exception.verification_required)
+
+    def test_canonical_exception_never_applies_to_caller_supplied_file_url(self):
+        with self.assertRaises(FuploadError) as caught:
+            self.run_upsert(local=False)
+        self.assertTrue(caught.exception.verification_required)
+
+    def test_canonical_exception_requires_official_upload_intake_source(self):
+        for intake in (self.INTAKE.replace("https:", "http:"), self.INTAKE.replace("wow.max-c.com", "example.invalid"),
+                       self.INTAKE + "?signature=opaque", self.CANONICAL):
+            with self.subTest(intake=intake), self.assertRaises(FuploadError):
+                self.run_upsert(intake=intake, actual=self.CANONICAL.replace("a" * 32, "d" * 32))
+
+    def test_new_local_upload_requires_a_positive_concrete_version_id(self):
+        for identity in (True, 0, "not-an-id", ""):
+            with self.subTest(identity=identity), self.assertRaises(FuploadError):
+                self.run_upsert(bad_id=identity)
+
+    def test_existing_caller_file_url_requires_exact_url_even_if_canonical(self):
+        changed = self.CANONICAL.replace("a" * 32, "c" * 32)
+        with self.assertRaises(FuploadError) as caught:
+            self.run_upsert(existing=True, caller_url=True, actual=changed)
+        self.assertTrue(caught.exception.verification_required)
+        result, _, uploads = self.run_upsert(existing=True)
+        self.assertEqual(result["archive_verification"]["mode"], "url_exact")
+        self.assertFalse(result["archive_verification"]["content_verified"])
+        self.assertEqual(uploads, 0)
+
+    def test_existing_metadata_edit_recanonicalization_has_original_record_provenance(self):
+        changed = self.CANONICAL.replace("a" * 32, "c" * 32)
+        result, posts, uploads = self.run_upsert(existing=True, actual=changed)
+        self.assertEqual(result["archive_verification"]["mode"], "server_recanonicalization")
+        self.assertEqual(result["archive_verification"]["source"], "existing_version_record")
+        self.assertEqual(result["archive_verification"]["source_module_id"], 7)
+        self.assertEqual(result["archive_verification"]["source_version_id"], 9)
+        self.assertEqual(result["archive_verification"]["source_archive_url"], self.CANONICAL)
+        self.assertEqual(posts[0]["fileUrl"], self.CANONICAL)
+        self.assertEqual(result["readback"]["fileUrlHeybox"], changed)
+        self.assertTrue(result["metadata_verified"])
+        self.assertEqual(result["verification_scope"], "remote_metadata")
+        self.assertFalse(result["archive_verification"]["content_verified"])
+        self.assertEqual(result["unverified_fields"], ["archive_bytes"])
+        self.assertEqual(uploads, 0)
+
+    def test_metadata_recanonicalization_rejects_wrong_identity_source_branch_and_duplicates(self):
+        changed = self.CANONICAL.replace("a" * 32, "c" * 32)
+        bad = [{"source_id": 8}, {"source_module": 999}, {"bad_id": 11},
+               {"source_url": "https://example.invalid/unknown.zip"},
+               {"source_url": self.CANONICAL.replace("wowretail/", "wowclassicera/")},
+               {"actual": changed.replace("wowretail/", "wowclassicera/")},
+               {"actual": changed.replace("wow.max-c.com", "example.invalid")},
+               {"duplicate_same_id": True}, {"infos": []}]
+        for kwargs in bad:
+            params = {"existing": True, "actual": changed, **kwargs}
+            with self.subTest(params=params), self.assertRaises(FuploadError):
+                self.run_upsert(**params)
+
+    def test_duplicate_original_source_records_prevent_metadata_write(self):
+        row = {"id": 9, "name": "old", "gameVersions": ["12.1.7"], "fileUrlHeybox": self.CANONICAL}
+        writes = []
+        def transport(method, route, body, query):
+            if method == "POST": writes.append(body)
+            return {"status": "ok", "result": {"versionList": [dict(row), dict(row)]}}
+        with self.assertRaises(FuploadError) as caught:
+            Blackbox({"verify_attempts": 1}, transport).version_upsert({"module_id": 7, "version_id": 9, "name": "new", "type": 3, "game_versions": ["12.1.7"]})
+        self.assertTrue(caught.exception.verification_required)
+        self.assertEqual(writes, [])
+
+    def test_canonical_origin_path_and_game_branch_are_strict(self):
+        bad = [self.CANONICAL.replace("https:", "http:"), self.CANONICAL.replace("wow.max-c.com", "example.invalid"),
+               self.CANONICAL + "?token=opaque", self.CANONICAL.replace("wowretail/", "wowclassicera/"),
+               self.CANONICAL.replace("wow.max-c.com", "wow.max-c.com:443"),
+               self.CANONICAL.replace("a" * 32, "not-a-digest")]
+        for url in bad:
+            with self.subTest(url=url), self.assertRaises(FuploadError) as caught:
+                self.run_upsert(actual=url)
+            self.assertTrue(caught.exception.verification_required)
+
+    def test_canonicalization_requires_unambiguous_current_branch_options(self):
+        for infos in ([], [{"strappid": "wowretail", "gameVersions": ["other"]}],
+                      [{"strappid": "wowretail", "gameVersions": ["12.1.7"]}, {"strappid": "wowclassicera", "gameVersions": ["12.1.7"]}]):
+            with self.subTest(infos=infos), self.assertRaises(FuploadError):
+                self.run_upsert(infos=infos)
+
+    def test_canonicalization_rejects_duplicate_matches_and_reused_version_id(self):
+        for kwargs in ({"duplicate": True}, {"returned_old_id": True}):
+            with self.subTest(kwargs=kwargs), self.assertRaises(FuploadError) as caught:
+                self.run_upsert(**kwargs)
+            self.assertTrue(caught.exception.verification_required)
+
 
 if __name__ == "__main__": unittest.main()

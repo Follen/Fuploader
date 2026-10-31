@@ -80,13 +80,13 @@
   "plugin.update.file_url": {
     "wire": "POST /wow/open_platform/module_version/upsert/ form.fileUrl",
     "stage": "version_upsert",
-    "condition": "file上传优先；edit未给新file/file_url时保留当前fileUrlHeybox",
+    "condition": "file上传优先；edit未给新file/file_url时保留当前fileUrlHeybox；caller file_url不适用新本地上传的canonical化例外；不匹配继续verification_required，不声称字节或审核已确认",
     "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
   },
   "plugin.update.file": {
     "wire": "POST /wow/cos/upload/token/ form.jsonData=JSON.stringify({upload_infos:[{filename,file_size:bytes/1024/1024,type:module}]}); COS archive URL→upsert form.fileUrl",
     "stage": "archive_upload",
-    "condition": "本地ZIP存在且有效；file优先覆盖file_url；COS上传与metadata更新为不同步骤；上传失败不写metadata",
+    "condition": "本地ZIP存在且有效；file优先覆盖file_url；COS上传与metadata更新为不同步骤；上传失败不写metadata；仅新版本本地上传可按严格官方intake→canonical、唯一新ID/元数据与动态同branch条件验证remote metadata；content_verified/public_download_verified始终false，archive_bytes未核验；既有编辑不走新上传例外",
     "evidence": "fupload/scripts/fupload_cli/blackbox.py:upload_zip/_upload_zip_legacy; fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
   },
   "version.edit.module_id": {
@@ -98,7 +98,7 @@
   "version.edit.version_id": {
     "wire": "POST /wow/open_platform/module_version/upsert/ form.versionId",
     "stage": "version_upsert",
-    "condition": "version_id存在时更新；无version_id创建；module_id绑定所属模块",
+    "condition": "version_id存在时更新；无version_id创建；module_id绑定所属模块；无file/file_url时从本次同moduleId/versionId唯一record取原URL；仅同branch严格官方canonical→canonical及同ID/name/type/games精确读回可接受server_recanonicalization，输出原record来源；错误ID/来源/branch/重复匹配仍v.required",
     "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
   },
   "version.edit.name": {
@@ -122,13 +122,13 @@
   "version.edit.file_url": {
     "wire": "POST /wow/open_platform/module_version/upsert/ form.fileUrl",
     "stage": "version_upsert",
-    "condition": "file上传优先；edit未给新file/file_url时保留当前fileUrlHeybox",
+    "condition": "file上传优先；edit未给新file/file_url时保留当前fileUrlHeybox；caller file_url不适用新本地上传的canonical化例外；不匹配继续verification_required，不声称字节或审核已确认",
     "evidence": "fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
   },
   "version.edit.file": {
     "wire": "POST /wow/cos/upload/token/ form.jsonData=JSON.stringify({upload_infos:[{filename,file_size:bytes/1024/1024,type:module}]}); COS archive URL→upsert form.fileUrl",
     "stage": "archive_upload",
-    "condition": "本地ZIP存在且有效；file优先覆盖file_url；COS上传与metadata更新为不同步骤；上传失败不写metadata",
+    "condition": "本地ZIP存在且有效；file优先覆盖file_url；COS上传与metadata更新为不同步骤；上传失败不写metadata；仅新版本本地上传可按严格官方intake→canonical、唯一新ID/元数据与动态同branch条件验证remote metadata；content_verified/public_download_verified始终false，archive_bytes未核验；既有编辑不走新上传例外；既有ID的新file不适用仅metadata编辑的recanonicalization例外，地址无法精确读回时仍待核验",
     "evidence": "fupload/scripts/fupload_cli/blackbox.py:upload_zip/_upload_zip_legacy; fupload/scripts/fupload_cli/blackbox.py:version_upsert; captured Open frontend index-B2qQ5GFk.js PluginVersionList.M / be"
   },
   "version.delete.version_id": {
@@ -146,7 +146,7 @@
   "config.create.configuration": {
     "wire": "form.configuration=JSON.stringify(完整绑定备份+已有分享内容+稀疏patch)",
     "stage": "share_write",
-    "condition": "create→POST /wow/create_config_share/；update/edit→POST /wow/update_config_share/。ID/IsClassic/Strappid来自经验证backup，调用者不可覆盖；创建后owned摘要缺BackupID时读取detail确认绑定，不重发create",
+    "condition": "create→POST /wow/create_config_share/；update/edit→POST /wow/update_config_share/。ID/IsClassic/Strappid来自经验证backup，调用者不可覆盖；创建后owned摘要缺BackupID时读取detail确认绑定，不重发create；Open:false仅不在公开列表展示，匿名仅share_id可取正文和Code，不是访问隔离；仅本人可读需求不能创建分享",
     "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
   },
   "config.create.backup_id": {
@@ -158,7 +158,7 @@
   "config.update.configuration": {
     "wire": "form.configuration=JSON.stringify(完整绑定备份+已有分享内容+稀疏patch)",
     "stage": "share_write",
-    "condition": "create→POST /wow/create_config_share/；update/edit→POST /wow/update_config_share/。ID/IsClassic/Strappid来自经验证backup，调用者不可覆盖",
+    "condition": "create→POST /wow/create_config_share/；update/edit→POST /wow/update_config_share/。ID/IsClassic/Strappid来自经验证backup，调用者不可覆盖；Open:false仅不在公开列表展示，匿名仅share_id可取正文和Code，不是访问隔离；仅本人可读需求不能创建分享",
     "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
   },
   "config.update.backup_id": {
@@ -176,7 +176,7 @@
   "config.edit.configuration": {
     "wire": "form.configuration=JSON.stringify(完整绑定备份+已有分享内容+稀疏patch)",
     "stage": "share_write",
-    "condition": "create→POST /wow/create_config_share/；update/edit→POST /wow/update_config_share/。ID/IsClassic/Strappid来自经验证backup，调用者不可覆盖",
+    "condition": "create→POST /wow/create_config_share/；update/edit→POST /wow/update_config_share/。ID/IsClassic/Strappid来自经验证backup，调用者不可覆盖；Open:false仅不在公开列表展示，匿名仅share_id可取正文和Code，不是访问隔离；仅本人可读需求不能创建分享",
     "evidence": "fupload/scripts/fupload_cli/blackbox_config.py:config_upsert/_validate_selection; Desktop2.10.19 heybox.wow-workshop1.1.3 view/assets/index-C7aTznJw.js ke/Yl/Hl"
   },
   "config.edit.backup_id": {
@@ -536,7 +536,7 @@
   "plugin.list.*": {
     "wire": "GET /wow/open_platform/module/list/，无业务query/body",
     "stage": "read",
-    "condition": "result.moduleList；endpoint是否分页的当前前端证据仅一次请求，未伪造跨页接口",
+    "condition": "result.moduleList全量列表；当前官方PluginList pagination:false且无分页请求参数；真机3项，offset/limit及page/pageSize变化不改变ID集合；版本列表另有分页",
     "evidence": "blackbox.py:plugin_list; Open frontend index-B2qQ5GFk.js"
   },
   "backup.list.*": {
@@ -616,5 +616,161 @@
     "stage": "dynamic_options",
     "condition": "每次读取服务器动态列表；2026-10-30实测6分支wowretail/wowclassicera/wowclassicwlk/wowclassictbc/wowanniversary/wowforever；不是永久固定枚举；6分支均完成最小合成备份真实生命周期并清理，正式服/周年服另完成私密分享CRUD及引用保护",
     "evidence": "blackbox.py:execute_read options/game-types; Desktop2.10.19 heybox.wow-workshop1.1.3 extension.mjs line101 JA GET call offset689680, target heybox-workshop, result.strappidInfos; isolated live acceptance 2026-10-30"
+  },
+  "wa.create.configuration": {
+    "wire": "POST /wow/create_wa/ form.configuration=JSON.stringify(完整WA对象)",
+    "stage": "wa_upsert",
+    "condition": "外层scope=public；显式strappid/open/subscribeLevel；create另需categories/name/screens/encoded；更新省略字段按已核作者/slug详情保留；不输出encoded，不重放写；verified_fields/unverified_fields明确可核验范围",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.update.configuration": {
+    "wire": "POST /wow/update_wa/?slug=... form.configuration=JSON.stringify(完整WA对象)",
+    "stage": "wa_upsert",
+    "condition": "外层scope=public；显式strappid/open/subscribeLevel；create另需categories/name/screens/encoded；更新省略字段按已核作者/slug详情保留；不输出encoded，不重放写；verified_fields/unverified_fields明确可核验范围",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.edit.configuration": {
+    "wire": "POST /wow/update_wa/?slug=... form.configuration=JSON.stringify(完整WA对象)",
+    "stage": "wa_upsert",
+    "condition": "外层scope=public；显式strappid/open/subscribeLevel；create另需categories/name/screens/encoded；更新省略字段按已核作者/slug详情保留；不输出encoded，不重放写；verified_fields/unverified_fields明确可核验范围",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.update.slug": {
+    "wire": "query.slug on /wow/update_wa/；详情 /wow/get_wa_detail/ query.slug+version_id",
+    "stage": "wa_identity",
+    "condition": "opaque string；完整my_publish分页及详情作者ID核验后才写；最新version_id来自LatestVersion.Version",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.edit.slug": {
+    "wire": "query.slug on /wow/update_wa/；详情 /wow/get_wa_detail/ query.slug+version_id",
+    "stage": "wa_identity",
+    "condition": "opaque string；完整my_publish分页及详情作者ID核验后才写；最新version_id来自LatestVersion.Version",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.delete.slug": {
+    "wire": "query.slug on /wow/update_wa/；详情 /wow/get_wa_detail/ query.slug+version_id",
+    "stage": "wa_identity",
+    "condition": "opaque string；完整my_publish分页及详情作者ID核验后才写；最新version_id来自LatestVersion.Version",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.delete.strappid": {
+    "wire": "POST /wow/get_wa_list/ query.strappid，用于owned归属核对；delete请求自身不发strappid",
+    "stage": "wa_identity",
+    "condition": "显式分支；列表分页至空页、重复/不完整拒绝；AuditState=1时拒绝删除",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.delete.confirm_delete": {
+    "wire": "不发送；最终wire为POST /wow/update_wa/ query{slug,delete:1}，空form正文",
+    "stage": "local_confirmation",
+    "condition": "必须true；删除后只读列表确认不存在，不重放",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.*.configuration.categories": {
+    "wire": "configuration.categories=官方TagList[].Key数组",
+    "stage": "wa_configuration",
+    "condition": "类型与条件见blackbox.md/references；省略更新字段保留原值",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.*.configuration.strappid": {
+    "wire": "configuration.strappid",
+    "stage": "wa_configuration",
+    "condition": "每次显式提供，详情不含此字段",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.*.configuration.open": {
+    "wire": "configuration.open",
+    "stage": "wa_configuration",
+    "condition": "原始bool不是隐私控制；true/false均要求外层scope=public；2026-10-31六分支false均匿名可取精确合成串；true测试对象AuditState1，单次delete业务failed；false更新转2后deleteok；不宣称已证首次拒因；open本身没有详情回显，列入unverified_fields",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.*.configuration.name": {
+    "wire": "configuration.name",
+    "stage": "wa_configuration",
+    "condition": "非空string；JS加权长度<=70；Latin-1(<=U+00FF)权重1，其它BMP权重2，astral以UTF16双单元计总权重4",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.*.configuration.descriptionHeybox": {
+    "wire": "configuration.descriptionHeybox ← detail.Description",
+    "stage": "wa_configuration",
+    "condition": "类型与条件见blackbox.md/references；省略更新字段保留原值",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.*.configuration.updateLog": {
+    "wire": "configuration.updateLog ← detail.UpdateLog",
+    "stage": "wa_configuration",
+    "condition": "类型与条件见blackbox.md/references；省略更新字段保留原值",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.*.configuration.screens": {
+    "wire": "configuration.screens [{src,thumb}] ← detail.ThumbList",
+    "stage": "wa_configuration",
+    "condition": "非空[{src,thumb}]；官方编辑初始化从ThumbList取urls并构建src=thumb；省略时沿用该行为；详情仅核验src数组，screens.thumb列入unverified_fields",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.*.configuration.encoded": {
+    "wire": "configuration.encoded ← detail.Encoded；输出替换为字节数/SHA256",
+    "stage": "wa_configuration",
+    "condition": "opaque非空字符串；不打印；稀疏编辑保留原串",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.*.configuration.subscribeLevel": {
+    "wire": "configuration.subscribeLevel",
+    "stage": "wa_configuration",
+    "condition": "每次显式非负integer，详情不含此字段；官方赋0；非0语义未验证；结果unverified_fields明确含此字段，不宣称已读回确认",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.list.strappid": {
+    "wire": "POST /wow/get_wa_list/ query{offset,limit,my_publish:1,strappid,sortBy:finalScore}",
+    "stage": "wa_read",
+    "condition": "只读；作者通过POST /wow/v2/get_user_info/ result.heybox_id与restored session核对；Encoded只摘要；offset按实际返回行数推进，直到空页；重复/封顶均failclosed",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.get.slug": {
+    "wire": "POST /wow/get_wa_detail/ query{slug,version_id}，version来自owned列表LatestVersion.Version",
+    "stage": "wa_read",
+    "condition": "只读；作者通过POST /wow/v2/get_user_info/ result.heybox_id与restored session核对；Encoded只摘要",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.get.strappid": {
+    "wire": "owned分页归属检查；detail本身不发送分支",
+    "stage": "wa_read",
+    "condition": "只读；作者通过POST /wow/v2/get_user_info/ result.heybox_id与restored session核对；Encoded只摘要",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.categories.*": {
+    "wire": "POST /wow/get_wa_tag_list/ result.list[].TagList[]",
+    "stage": "wa_read",
+    "condition": "只读官方分类；不代表作者拥有任何WA，不要求人为选择非空分支候选",
+    "evidence": "Desktop2.10.19 heybox.wow-workshop1.1.3 WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js ve; index-D2mjhRUP.js ba/ka/Fa/k; blackbox_wa.py"
+  },
+  "wa.create.scope": {
+    "wire": "不发送；本地公开发布意图",
+    "stage": "local_visibility_control",
+    "condition": "必填且只能public；private/缺省在请求前拒绝；与原始configuration.open分离，false不代表私密",
+    "evidence": "blackbox_wa.py:wa_upsert; schema.py:BLACKBOX_WA_SCOPE; 2026-10-31 synthetic acceptance"
+  },
+  "wa.update.scope": {
+    "wire": "不发送；本地公开发布意图",
+    "stage": "local_visibility_control",
+    "condition": "必填且只能public；private/缺省在请求前拒绝；与原始configuration.open分离，false不代表私密",
+    "evidence": "blackbox_wa.py:wa_upsert; schema.py:BLACKBOX_WA_SCOPE; 2026-10-31 synthetic acceptance"
+  },
+  "wa.edit.scope": {
+    "wire": "不发送；本地公开发布意图",
+    "stage": "local_visibility_control",
+    "condition": "必填且只能public；private/缺省在请求前拒绝；与原始configuration.open分离，false不代表私密",
+    "evidence": "blackbox_wa.py:wa_upsert; schema.py:BLACKBOX_WA_SCOPE; 2026-10-31 synthetic acceptance"
+  },
+  "wa.*.lifecycle": {
+    "wire": "create/update配置form；delete query{slug,delete:1}；GET/readback不适用，官方只读列表和详情本身使用POST",
+    "stage": "live_acceptance",
+    "condition": "2026-10-31动态6分支均完成scopepublic/openfalse/subscribeLevel0合成CRUD；所有对象清理，六列表0，逐slug not_found；匿名get_wa_string内容SHA与本轮合成串匹配；原串不输出",
+    "evidence": "blackbox_wa.py:wa_upsert/wa_get/wa_delete/_wa_rows; schema.py:BLACKBOX_WA_SCOPE; isolated live run FuploadWA-20261031-021304-38cac0"
+  },
+  "version.*.verification": {
+    "wire": "不发送输出标志；GET module_version/list result.versionList+strappidInfos核验",
+    "stage": "remote_metadata_readback",
+    "condition": "verified=true仅remote_metadata；metadata_verified/verified_fields明确范围；archive_verification.content_verified=false/public_download_verified=false；unverified_fields=[archive_bytes]；新本地上传例外仅严格官方路径/唯一fresh ID/精确name,type,games/动态唯一同分支；其它差异v.required；无file且无caller file_url的metadata编辑另要求本次同module/version唯一原record与source provenance、前后同branch官方canonical、同ID+目标name/type/games精确匹配；返回server_recanonicalization，已有版本附本地file换包另需唯一原ID/module/官方分支及原canonical来源，写后新URL不能等于旧URL，只接受同branch官方intake→canonical，mode=server_replacement_canonicalization；分页按实际长度推进，total完整一致，无total至空页，畸形/重复/提前空页拒绝；仍不证明包字节、下载或审核",
+    "evidence": "blackbox.py:version_upsert/_find_version/_wait_version/_archive_readback_mode/_strict_canonical_branch/_canonical_archive_branch; official current PluginVersionList.v; 2026-10-31 isolated module211855824/version211857744 full update/edit/delete"
   }
 }

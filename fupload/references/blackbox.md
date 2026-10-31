@@ -33,3 +33,23 @@ Cookie 和 pending 任务使用 Windows CurrentUser DPAPI 加密；待登录任�
 - 写入一次后读回；网络中断、验证码已提交、版本删除状态回退等情况均不自动重放写操作。
 
 数据 API 固定为官方 HTTPS 域名和允许路由；不接受调用者提供 Cookie、token、pkey、签名、API 地址或浏览器 profile。COS 仍使用 npm 专用 Python 环境中的官方 SDK。
+
+配置的 `Open:false` 仅表示不出现在公开列表，不提供访问隔离。实测匿名调用方仅凭分享编号就能读取正文及分享码，再凭码取得下载凭据；云备份本身的匿名直取仍被拒绝。若用户要求仅本人可访问，不能用配置分享代替云备份保存，也不能将此状态描述为私密发布。
+
+
+## WA / 字符串
+
+黑盒 WA 仅支持明确公开发布。create/update/edit 必须提供外层 `scope: "public"`；`open` 是平台原始字段，不能作为隐私开关。实测 `open:false` 和审核中状态均可能被匿名接口取回导入串，禁止把私密内容上传到此通道。
+
+先用 `blackbox wa categories` 读取分类，再用 `wa list --strappid <分支>` 和 `wa get --strappid <分支> --slug <编号>` 选择当前作者的记录。create/update/edit/delete 使用对应版本化 schema 和 `--input PATH|-`，完整字段见[平台字段总表](platform-fields.md#blackbox)。导入串只通过输入文件或 stdin 提供，输出及错误仅保留摘要。
+
+更新时省略的可读字段保留现有值；详情不返回的 `strappid`、`open`、`subscribeLevel` 必须显式提供。写后区分 `verified_fields` 与 `unverified_fields`，不把接口接受等同于全部字段已核对。审核状态为 1 时删除会被拒绝；确认目标状态后再操作，未知写入结果先读回，不自动重发。
+
+
+## 插件版本的读回范围
+
+版本写入返回的 `verified:true` 限定为 `verification_scope:remote_metadata`。`metadata_verified` 与 `verified_fields` 说明已核对的远端字段；`archive_verification.content_verified:false`、`public_download_verified:false` 和 `unverified_fields:["archive_bytes"]` 明确表示未确认包字节或公开下载，也不代表审核完成。
+
+新本地ZIP创建版本时，平台会将官方上传地址转换为正式版本地址。仅当唯一新版本、名称/类型/游戏版本匹配、当前官方版本选项能唯一确定同一分支、转换前后都是严格允许的官方路径时，才接受这种元数据读回。调用者提供的任意file_url不适用。既有编辑仅在无file和无caller file_url、原URL取自本次同模块/版本的唯一记录、同ID和目标元数据匹配、前后均为同一官方分支canonical路径时，才接受server_recanonicalization；输出保留原record来源，仍不确认包字节。其它地址变化返回待核验。出现verification_required时先读回本轮确切版本，不自动重复创建或编辑。
+
+版本列表按实际页长推进，有总数时核对完整总数，无总数时读到空页；列表不完整不能作为删除成功的证据。`version edit` 带本地ZIP会先核对原版本和官方分支，再验证同ID的新包地址确实变化；仍只声明远程元数据验证，包字节未自动验证。写入不确定时只读核对，不重复上传或提交。

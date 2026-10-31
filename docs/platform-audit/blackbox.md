@@ -23,7 +23,7 @@
 
 `plugin update` 是版本 upsert 的CLI别名，不是插件元数据编辑。版本字段为 `moduleId, versionId(更新时), name, type, gameVersions(逗号连接), fileUrl`，空业务query。`file` 是本地ZIP输入，经上传取得fileUrl后写版本；不是远程JSON字段。编辑不给新file/file_url时使用现版本fileUrlHeybox。删除只有一次POST，后续只读检查auditState/消失；请求失败或结果不稳定不自动重放。
 
-插件列表官方前端仅一次读取moduleList，尚无其分页参数证据；版本列表已有offset/limit。CLI的version create/update入口和provider实现不能等同schema已注册动作：当前明确注册version.edit/delete，创建可由plugin.update无versionId完成。中央表应以schema实际注册为准。
+插件列表当前官方协议一次读取完整moduleList，表格明确pagination:false；版本列表另有offset/limit分页。2026-10-31实测默认请求和三组分页参数均返回同一组3个插件，无分页元数据，顺序可变。CLI的version create/update入口和provider实现不能等同schema已注册动作：当前明确注册version.edit/delete，创建可由plugin.update无versionId完成。中央表应以schema实际注册为准。
 
 ## 配置分享
 
@@ -73,7 +73,7 @@ active与pending分开加密，使用Windows用户绑定DPAPI。pending不覆盖
 
 ## 已明确的未知项
 
-当前未验证：SubscribeLevel非0语义、NeedsPush创建语义、Strategies对象内部完整契约、插件moduleList是否存在未公开分页。2026-10-30动态接口当前返回6个分支；该列表应每次从服务器读取，不能视为永久固定全集。非0等级和NeedsPush创建语义未用远程写入验证。机器表相应condition标明未知，不能从原生UI默认值猜服务端限制。
+当前未验证：SubscribeLevel非0语义、NeedsPush创建语义、Strategies对象内部完整契约。2026-10-30动态接口当前返回6个分支；该列表应每次从服务器读取，不能视为永久固定全集。非0等级和NeedsPush创建语义未用远程写入验证。机器表相应condition标明未知，不能从原生UI默认值猜服务端限制。
 
 ## 2026-10-30 隔离实测验收
 
@@ -86,3 +86,85 @@ active与pending分开加密，使用Windows用户绑定DPAPI。pending不覆盖
 上述两份分享和备份已清理。随后对wowclassicera、wowclassicwlk、wowclassictbc、wowforever各用新marker完成最小unknown addon单ZIP生成→上传/完整读回→改名读回→删除预览→删除与负向读回；逐个完成清理后再进入下一分支，始终不积攒云备份。每次均确认返回Strappid匹配、IsClassic=true、WTFList为空。至此当前动态接口返回的全部6分支均完成真实备份生命周期。
 
 经典旧世分支首次删除后列表短暂返回旧记录，首次确认给出verification_required；随后独立只读查询证实已删除，未重发删除请求。已为此补充有限只读轮询及回归测试。最终独立查询确认云备份数0、6分支我的分享均0，本轮共6份备份和2份私密分享全部清理，未修改已有对象。此验收覆盖配置/备份，不代表插件版本发布或非0订阅等级已经实测。
+
+
+## WA原生接口与CLI补齐
+
+Desktop2.10.19的`WaEditor.vue_vue_type_style_index_1_lang-BCttcQdD.js`已给出create/update配置字段，`index-D2mjhRUP.js`给出owned分页、详情版本和delete:1。CLI新增wa create/update/edit/delete/list/get/categories，精确字段映射在机器表wa项中。
+
+只读实测确认：分类result.list为145组、TagList.Key为string；详情直接返回Slug、HeyboxId、Encoded、Name、Description、UpdateLog、ThumbList、Categories、AuditState、CanView，缺少open/strappid/subscribeLevel。故每次更新都要求这三个不可读业务值显式输入，其余字段保留原详情。作者身份由当前session恢复与get_user_info双重核对。Encoded全部只输出长度/摘要；错误回显不保留原响应或异常链。
+
+官方编辑器固定open=true。2026-10-31首次合成写入open:false后，独立无cookie会话仍满足可访问判定，写入返回visibility_mismatch；该对象1920159771已清理并负读回。正式schema/provider要求外层scope=public；scope=private或缺省在任何请求前拒绝。原始open可为false，但不能宣传私密WA。后续实测证明详情与字符串是独立入口：匿名detail可能failed或Encoded为空，匿名get_wa_string仍返回完整合成串；已删除生产中的旧私密判定helper，不能只凭详情拒绝声明私密。成功结果以verified_fields/unverified_fields区分可读回字段：subscribeLevel、screens.thumb、open本身不宣称已持久化核验。六动态分支真机结果见下节。
+
+当前官网新chunk `index-DiSpld6I.js`提供ORIGINAL/MODIFIED插件submit及CurseForge认领，新提交包含首个ZIP版本并进入审核，页面说明结果通过站内信通知。仍未找到模块容器delete或审核撤回入口；现有delete仅针对module_version。此结论是已读官方入口的范围，不等同服务端绝无内部管理接口。
+
+
+## 2026-10-31 WA六分支真实验收
+
+本轮先验证当前恢复会话和作者身份，六分支owned WA基线均0；只创建带唯一FuploadWA标记、禁用加载的合成WA。最终完整轮次为 `FuploadWA-20261031-021304-38cac0`，使用scope=public、原始open=false、subscribeLevel=0；每支完成清理后才进入下一支。
+
+| strappid | 本轮临时slug | 结果 |
+| --- | --- | --- |
+| wowretail | 1920185871 | create/get/update/edit/delete与负读回通过 |
+| wowclassicera | 1920192011 | create/get/update/edit/delete与负读回通过 |
+| wowclassicwlk | 1920208164 | create/get/update/edit/delete与负读回通过 |
+| wowclassictbc | 1920216315 | create/get/update/edit/delete与负读回通过 |
+| wowanniversary | 1920223066 | create/get/update/edit/delete与负读回通过 |
+| wowforever | 1920232426 | create/get/update/edit/delete与负读回通过 |
+
+更新使用新的合成原串和更新日志；稀疏编辑仅改标题，其余HTML正文、img、主图、分类与原串保持精确一致。创建和编辑后都用独立无cookie HTTP客户端查询：detail返回CanView=true但Encoded为空，get_wa_string返回非空Encoded，摘要精确匹配本轮合成串。这直接证明open=false不能作为私密权限。原串仅在内存对比，日志只记录长度/摘要与布尔判据，不保存或输出内容。
+
+公开路径open=true另用临时1920165358验证：写入成功后AuditState=1，官方UI禁用删除；在已验证owner后对同一对象直发一次已证delete:1，业务status=failed且对象仍在，未重放该请求。随后本轮清理授权下，完整保留内容、仅将open改false，状态立即1→2，之后新的一次delete返回ok且负读回成功。未记录首次失败的完整业务msg，因此不把该响应具体拒因写成已证审核规则。审核中该对象的匿名detail返回failed，但匿名get_wa_string仍能取回完整合成串。
+
+首个open=false范围探测1920159771和一次匿名只读网络异常中止的1920178708也均已清理；未重复任何不明写请求。全轮6项及此前3项测试对象共9项均清理。最终owned列表六分支均0，逐slug的provider与独立CLI get均not_found，基线保持。受控证据在本机ignored analyze/blackbox-live-acceptance对应FuploadWA目录的journal.json/events.jsonl、pending-cleanup.json和cli-smoke.json；正式协议证据为上述2.10.19官方模块与生产blackbox_wa.py/schema.py方法。
+
+插件模块后续已获用户明确授权单次提交并创建本轮测试模块，最新验收与保留范围见下节；仍无已证模块容器删除或撤审入口。
+
+## 配置 unlisted 的真实访问语义
+
+本轮单 retail 临时配置 owner 详情为 Open=false；匿名仅 share_id 仍可取相同正文和 Code，安装接口无 Code 拒绝、有该 Code 返回一条下载签名；匿名 backup_id 直接下载拒绝。未下载原始 WTF，探针只存长度、SHA、布尔和状态，分享码及签名 URL 不落盘。该开关是隐藏列表，不能承诺访问隔离；临时分享与备份均已单次删除并负读回，证据 `analyze/blackbox-live-acceptance/FuploadPrivateConfig-20261031-023936-e6729304/privacy.json`。
+
+
+## 2026-10-31 插件提交与版本地址转换
+
+用户明确授权后，仅用合成惰性插件提交一次官方plugin.submit：ORIGINAL、Alpha=3、开发工具1031、gameVersionIds="12.1.7"、初版0.0.1。当前选项接口和官网N/J调用表明gameVersionIds实际是版本文本CSV，不是数值ID。正式生产未新增plugin.create；一次临时研究提交的实际result键为createdAt/moduleId/status，当前官网代码仍取module_id，不能以该前端取值拼写代替实际响应。
+
+当前账号owned列表及detail核对出模块211855824，初版211855825（0.0.1、type3、auditState2）。plugin.edit已通过并将说明恢复。初次额外0.0.2（211855929）upsert业务ok，但服务端把官方上传intake URL转换成正式fileUrlHeybox，原来的严格字符串比较给出verification_required；该额外版本已单次删除并稳定读回auditState4，初版未改。
+
+现已落实的最小兼容仅用于新本地file上传创建：上传源须为严格官方HTTPS /wow/module/...zip；必须找到唯一新正整数version ID，name/type/gameVersions精确读回，且版本列表当前result.strappidInfos把所选版本唯一映射到同一分支。只有严格官方HTTPS /wow/wow_module_file/<同分支>/<32位小写hex>.zip能作为server_canonicalization元数据读回。缺映射、分支不符/歧义、外域、端口/query、坏路径、重复匹配或旧ID均继续verification_required。调用者file_url不走该例外；既有无新file的编辑有下述单独的原record来源校验。
+
+版本upsert的verified=true含义明确限定为verification_scope=remote_metadata，metadata_verified=true与verified_fields说明哪些元数据已核对；archive_verification.content_verified=false、public_download_verified=false，unverified_fields包含archive_bytes。它不证明包字节相同、匿名可下载或审核完成。匿名读取本轮上传和canonical ZIP均遇HTTP403，未将目录中的32位名称推断为本机ZIP的MD5。
+
+修复后用新惰性0.0.3（211856992）通过正式schema+execute_write完成plugin.update：预期intake地址、实际canonical地址和name/type/games在清理前保存，返回上述metadata-only成功。随后无新file的version.edit请求也业务ok且name读回变更，但平台再次改写canonical hash；当时严格已有URL规则返回verification_required，没有重发编辑。该额外版本已单次删除并经10秒稳定读回auditState4，初版与模块保留，无额外活动版本。因此补充单独的metadata-edit例外：必须无file且无caller file_url，输入URL仅从本次同moduleId/versionId的唯一原record获取；原记录ID、模块绑定及其URL来源可追溯，前后均严格同一动态分支的官方canonical路径，同一已知version ID与目标name/type/games精确读回，才接受server_recanonicalization。caller file_url、未知/重复来源、错ID/module、外域或分支变化仍拒绝；不泛化为任意地址变化成功。
+
+受控本机证据为ignored analyze/blackbox-plugin-submit-plan-20261031/FuploadTemp10313C7F/{submission.json,managed-lifecycle.json,canonical-readback.json,canonical-lifecycle.json}；协议来源为当前官网index-DiSpld6I.js的J/N与index-CfH3ZfOW.js的PluginVersionList.v（编辑时将fileUrlHeybox作为fileUrl输入）。模块及初版属于本次授权保留资源，尚无可保证移除容器的官方入口。
+
+
+最终用新的0.0.4（211857744）经正式schema+execute_write完整通过plugin.update、version.edit、version.delete：初次上传intake→canonical使用server_canonicalization；编辑只改版本名称、无file/file_url，从同一已知原record的canonical→同branch新canonical使用server_recanonicalization，输出同时包含source=existing_version_record、source_module_id/source_version_id/source_archive_url。所有元数据、原URL来源及实际地址都在删除前记录。两次upsert的metadata_verified=true、verification_scope=remote_metadata，archive content/public download标志均false。删除仅一次，随后10秒稳定读回auditState4。之前0.0.2和0.0.3也均为4；无额外活动版本，模块211855824与原版211855825保留。连此前plugin.edit，四个现有插件写入口均已真实通过；完整新证据为同目录canonical-lifecycle-0.0.4.json。
+
+此兼容不扩展到既有version.edit显式提交新file或caller file_url后的任意地址变化：若不能按原有URL精确读回，仍需verification_required并先只读核验。它也不把初版或额外版本的auditState数字等同于已确认可公开下载。
+
+### 2026-10-31 正式 CLI 微信登录补测
+
+通过正式 `session login-start` 生成微信二维码，用户扫码确认后，`session login-status` 返回 `authenticated:true`、`api_ready:true`、`method:wechat`。随后按顺序执行 `session doctor`、`backup list`、`plugin list` 均成功，验证了二维码到业务接口的完整链路。全程仅 HTTP 与 CLI，没有操作浏览器或客户端界面。原二维码过期路径与短信登录此前已测；本次成功回调后才替换 active 会话。证据保存在 ignored `analyze/full-live-20261031/blackbox-wechat-status-new.json` 与 `blackbox-wechat-business-new.json`。
+
+
+## 2026-10-31 补验官方签名下载与不公开分享的实际内容
+
+保留的授权临时模块211855824、初版211855825已补验实际下载。安装版2.10.19官方 `heybox.wow-workshop/extension.mjs` 的 `getInstallModuleInfo`（offset2282643）先GET `/wow/get_download_sign/`，参数为 `strappid`、`versionId`、`encrypt=1`，按同文件 `Rq` 的AES-128-CBC格式解密结果，再由 `downloadOneModule` 使用 `LatestVersion.FileUrlHeybox?sign=...`。本轮严格使用该正常下载链路，未在日志保存签名或登录凭据。
+
+下载HTTP200、1083字节，MD5与官方 `FileMd5Heybox` 一致。原始本地ZIP为967字节，服务端重新打包后的容器字节不同；排除目录项后文件名全集相同，TOC、惰性Lua和README三个文件逐字节相同。初版记录读前读后未改变，审核状态仍为2。此前不带签名的直链403只说明该URL需要签名，不能据此认定正常下载链路失败。证据：`analyze/blackbox-plugin-submit-plan-20261031/FuploadTemp10313C7F/signed-download-readback.json`。这是保留版本的独立实测；当前provider每次upsert仍只自动核对远程元数据，不能把本轮结论泛化为每次上传均已自动验包或已通过审核。
+
+另建全新纯合成 `Open:false` 分享1920315317及备份6296235补验WTF实际ZIP。匿名只凭share_id的detail返回同一Code；不带Code的install请求失败，带该Code可取得签名。官方 `downloadBackup`（offset623945）使用 `https://WtfAccount.Host/WtfAccount.Path?sign=...`，当前Host为 `wowbackup.max-c.com`，不是先前测试脚本误设的COS域名。本轮按官方地址匿名GET成功，HTTP200、539字节，MD5与该备份对象一致；两个文件均为本轮合成账号的测试内容，按Windows CRLF规范比较一致。未访问任何用户真实WTF。分享与备份随后均删除，远程列表恢复原有0/0基线。证据：`analyze/blackbox-live-acceptance/FuploadPrivateConfigVerify-20261031-105148-0b5241da/privacy.json`。因此 `Open:false` 的“不出现在公开列表”语义已验证到实际内容下载，不应作为私有隔离边界。
+
+本轮未对付费或通知契约发送试探写入。官方模块列表页面仍只调用一次无分页参数的列表方法，版本列表明确带offset/limit；单模块账号不能证明服务端不存在未公开分页。官方备份源码能定位Strategies使用的 `ID`、`Strategy`、可选 `LockVersion`，策略枚举0/1/2/5以及锁版本取Id/Name；它不能证明完整服务端扩展契约。SubscribeLevel非0的付费含义、NeedsPush创建后的通知含义、Strategies未观察扩展字段、以及WA详情未回显的open/subscribeLevel/thumb，继续保留为未证实项，不写成通过。
+
+### 插件列表分页补核
+
+2026-10-31 对照官方 `index-CfH3ZfOW.js`：页面调用 `pe()` 不传分页参数，取 `result.moduleList`，PluginList 表格使用 `pagination:!1`。同一包的 PluginVersionList 则明确传 `offset/limit` 并读取 `total`，两者不是同一种列表协议。实际已登录账号默认查询返回3项；`offset=0/limit=1`、`offset=1/limit=1`、`page=2/pageSize=1` 均返回相同3个ID，响应仅含moduleList，顺序可变。Fupload 保持一次获取插件列表，不循环请求无效分页参数；版本列表保留现有分页处理。此项从待验证清单移除；未制造额外公开模块来测试假定的隐藏上限。只读证据：ignored `analyze/blackbox-pagination-20261031/probe.json`。
+
+### 审计修复：版本短页与已有版本换包
+
+版本列表现在按实际页长度推进offset，有总数时必须恰好读全；总数变化、提前空页、无效或重复ID均返回待核验。无总数时只以空页结束，不能将短页当成完整列表。删除后的负读回使用同一完整性检查，避免漏掉后页中的目标。
+
+正式version.edit附带本地ZIP时，上传前核对唯一原版本、module和官方分支，保留原canonical URL。写后要求同一版本身份、精确目标元数据、同一官方分支，且地址已从原包变化；只允许本次本地上传的官方intake到canonical路径。旧地址未变、外部地址或身份不一致均待核验，不重放上传或写入。返回server_replacement_canonicalization，验证范围仍为remote_metadata，archive_bytes仍未自动验证。本轮修复为离线回归，没有新增远程写入。

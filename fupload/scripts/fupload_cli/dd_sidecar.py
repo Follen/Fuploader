@@ -541,9 +541,52 @@ def login_author_client(client):
         client._fupload_capture_success = False
 
 
+def stabilize_author_request_clock(client):
+    """Keep NEP signing and headers on one server timestamp per request.
+
+    DD 100130 reads the clock independently in its extra-argument and header
+    builders. They can cross a second boundary. Wrap only this serial sidecar's
+    client, including login (which bypasses get/post), without replaying writes.
+    Sampling is lazy because login first synchronizes the server clock.
+    """
+    if not callable(getattr(type(client), "_get_current_server_ts", None)):
+        return
+    if vars(client).get("_fupload_request_clock_installed") is True:
+        return
+
+    def wrap(operation):
+        def request(*args, **kwargs):
+            getter = client._get_current_server_ts
+            had_instance_getter = "_get_current_server_ts" in vars(client)
+            previous = vars(client).get("_get_current_server_ts")
+            sampled = []
+
+            def request_timestamp():
+                if not sampled:
+                    sampled.append(getter())
+                return sampled[0]
+
+            client._get_current_server_ts = request_timestamp
+            try:
+                return operation(*args, **kwargs)
+            finally:
+                if had_instance_getter:
+                    client._get_current_server_ts = previous
+                else:
+                    del client._get_current_server_ts
+        return request
+
+    for name in ("get", "post", "login"):
+        operation = getattr(client, name, None)
+        if callable(operation):
+            setattr(client, name, wrap(operation))
+    client._fupload_request_clock_installed = True
+
+
 def author_session_or_cleanup(qt, container, flow, jwt_helper, client):
     session = (qt, container, flow, jwt_helper, client)
     try:
+        stabilize_author_request_clock(client)
         login_author_client(client)
     except Exception:
         try:
@@ -777,16 +820,13 @@ def _native_wa_ids(value):
 
 
 def parse_native_wa(session, content):
-    """Follow the installed DD bridge and parser chain; never synthesize IDs."""
-    container = session[1]
-    try:
-        interface = container.get_instance("WowUIInterface")
-    except Exception:
-        interface = None
-    bridge = getattr(interface, "parseWa", None)
-    if callable(bridge):
-        return _native_wa_ids(bridge({"waStr": content}))
+    """Use the official synchronous decoder, never the asynchronous UI bridge.
 
+    WowUIInterface.parseWa schedules a task and returns a pending FakePromise.
+    The sidecar already runs in DD's installation directory, which the Lua
+    decoder needs for its relative library paths. Both session modes share this
+    same parser and neither needs to create an additional UI/container object.
+    """
     try:
         from components.wow_ui.wa.wa_parser import WaParser
         parser = WaParser(None)

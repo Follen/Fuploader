@@ -133,11 +133,14 @@ class RecordingNewBee(NewBee):
         if endpoint == "/creator/content_reference/set":
             self._relations["references"] = copy.deepcopy(payload["references"])
         if endpoint == "/creator/content_reference/list":
-            return {"list": copy.deepcopy(self._relations["references"])}
+            return {"list": [{**item, "type": item["type"] + 1} for item in copy.deepcopy(self._relations["references"])]}
         if endpoint == "/creator/wow/wa_log/latest_str_info":
             return {"version": "2"}
         if endpoint == "/creator/wow/wa_log/list":
             return {"list": [{"id": payload.get("wa_id"), "content": "changed"}]}
+        if endpoint == "/creator/wow/mod_file/get_changelog":
+            edit = next(body for route, body in reversed(self.posts) if route == "/creator/wow/mod_file/edit_changelog" and body["file_id"] == payload["file_id"])
+            return {"file_id": payload["file_id"], "changelog": edit["changelog"]}
         return {}
 
     def post_next(self, endpoint: str, body: Mapping[str, Any]) -> Any:
@@ -359,7 +362,7 @@ class NewBeeFixtures:
         if action == "set" and resource.endswith("-co-author"):
             docs[(resource, action)] = {"content_id": 101, "co_authors": [{"user_id": 9, "share_percent": 0.25}]}
         if action == "set" and resource.endswith("-reference"):
-            docs[(resource, action)] = {"source_id": 101, "references": [{"type": 7, "id": 8}]}
+            docs[(resource, action)] = {"source_id": 101, "references": [{"type": 1, "id": 8}]}
         return {"schema": schema.name, **copy.deepcopy(docs[(resource, action)])}
 
     def normal_value(self, resource: str, action: str, field: str) -> Any:
@@ -373,7 +376,7 @@ class NewBeeFixtures:
             "screenshots": ["https://cdn.invalid/new-shot.png"], "screenshot_files": [str(self.image)],
             "public": True, "submit_for_review": True, "subscribe_plan_level": 1,
             "link_to_channel": True, "co_authors": [{"user_id": 9, "share_percent": 0.25}],
-            "references": [{"type": 7, "id": 8}], "version": "2.0",
+            "references": [{"type": 1, "id": 8}], "version": "2.0",
             "game_version_list": ["3.80.2"], "file": str(self.package), "changelog": "Changed",
             "picture_urls": ["https://cdn.invalid/new-config.png"], "picture_files": [str(self.image)],
             "price": 100, "time_range": "seven_day", "cloud_id": 5,

@@ -146,6 +146,9 @@ class Schema:
             _validate_backup_document(self.name, value)
         if self.name.startswith("fupload.v1.blackbox.config."):
             _validate_blackbox_configuration(self.name, value)
+        if self.name.startswith("fupload.v1.blackbox.wa.") and "configuration" in value:
+            from .blackbox_wa import validate_wa_configuration
+            validate_wa_configuration(value["configuration"], create=self.name.endswith(".create"))
         if self.name.startswith("fupload.v1.modus.config"):
             exclude = value.get("exclude_wtf")
             if exclude == 1 and (value.get("account_name") or value.get("role_name")):
@@ -1067,6 +1070,13 @@ register("blackbox", "session", "login-submit", required({
 register("blackbox", "session", "renew", {})
 register("blackbox", "session", "forget", required({"confirm_forget": f("boolean", choices=(True,))}, ("confirm_forget",)))
 
+BLACKBOX_WA_CONFIGURATION = f("object", nonempty=True, description="Official WA fields: categories:string[], strappid:string, open:boolean, name:string, descriptionHeybox/updateLog:HTML strings, screens:[{src,thumb}], encoded:opaque string, subscribeLevel:integer. Every write explicitly supplies strappid/open/subscribeLevel. Native open is not a privacy control; outer scope public is required.")
+BLACKBOX_WA_SCOPE = f("string", choices=("public",), description="Explicit public publishing intent; local only. Native configuration.open does not guarantee privacy.")
+register("blackbox", "wa", "create", required({"scope": BLACKBOX_WA_SCOPE, "configuration": BLACKBOX_WA_CONFIGURATION}, ("scope", "configuration")))
+for _action in ("update", "edit"):
+    register("blackbox", "wa", _action, required({"slug": f("string", nonempty=True, max_length=256), "scope": BLACKBOX_WA_SCOPE, "configuration": BLACKBOX_WA_CONFIGURATION}, ("slug", "scope", "configuration")))
+register("blackbox", "wa", "delete", required({"slug": f("string", nonempty=True, max_length=256), "strappid": f("string", nonempty=True), "confirm_delete": f("boolean", choices=(True,))}, ("slug", "strappid", "confirm_delete")))
+
 # Cloud backup packages keep their platform wire identities and selection
 # objects distinct. Only explicit IDs can reach a delete write schema.
 BACKUP_CONFIRM = f("boolean", choices=(True,))
@@ -1117,7 +1127,7 @@ for _platform, _generation, _required in (
     register(_platform, "backup", "delete", required({"backup_ids": f("array", nonempty=True, max_items=1000), "confirm_delete": BACKUP_CONFIRM,
                                                     **({"server_type": MODUS_BUILD_ID} if _platform == "modus" else {})}, ("backup_ids", "confirm_delete")))
 
-BLACKBOX_CONFIG_FIELDS = {"backup_id": f("string", nonempty=True), "configuration": f("object", nonempty=True)}
+BLACKBOX_CONFIG_FIELDS = {"backup_id": f("string", nonempty=True), "configuration": f("object", nonempty=True, description="Official configuration object. Open:false hides it from public lists; it does not restrict access to someone who knows the share ID.")}
 register("blackbox", "config", "create", required(BLACKBOX_CONFIG_FIELDS, ("backup_id", "configuration")))
 for _action in ("update", "edit"):
     register("blackbox", "config", _action, required({**BLACKBOX_CONFIG_FIELDS, "share_id": f("string", nonempty=True)}, ("share_id", "configuration")))

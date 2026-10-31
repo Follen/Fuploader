@@ -135,6 +135,18 @@ class FullSchemaStateMatrixTests(unittest.TestCase):
                 else:
                     base.update({"share_id": "share", "configuration": {"Article": "<p>Changed</p>", "KnownAddons": [],
                                  "UnknownAddons": {"Files": []}, "WTFList": [], "Materials": {"Files": []}, "Fonts": {"Files": []}}})
+            elif resource == "wa":
+                if action == "delete":
+                    base.update({"slug": "fixture-slug", "strappid": "wowretail", "confirm_delete": True})
+                else:
+                    base["scope"] = "public"
+                    base["configuration"] = {"strappid": "wowretail", "open": True, "subscribeLevel": 0}
+                    if action == "create":
+                        base["configuration"].update({"name": "Fixture", "categories": ["gen0"],
+                            "screens": [{"src": "https://cdn.invalid/fixture.png", "thumb": "https://cdn.invalid/fixture.png"}],
+                            "encoded": "!WA:2!synthetic-schema-fixture"})
+                    else:
+                        base["slug"] = "fixture-slug"
             return base
         if platform == "modus":
             base = {"schema": "fupload.v1.modus.%s.%s" % (resource, action)}

@@ -2,7 +2,7 @@
 name: fupload
 description: Explicit author-publishing workflow for World of Warcraft plugins, configuration shares, and WA/strings on NewBeeBox, NetEase DD, CurseForge, Heybox Workshop, and ModUs.Creator, including local Creator login reuse and plugin ZIP publishing. Use only when the user explicitly invokes `$fupload`, explicitly asks to use the Fupload Skill, or loads this Skill by path. Do not trigger from ordinary mentions of publishing, NewBeeBox, DD, CurseForge, Heybox, ModUs, plugins, configurations, or WA.
 metadata:
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Fupload
@@ -78,7 +78,7 @@ For npm package maintenance, use `fupload update` to update the CLI, managed Pyt
 - Read [references/dd.md](references/dd.md) only for DD.
 - Read [references/curseforge.md](references/curseforge.md) for every CurseForge lookup or upload.
 - Use [references/platform-fields.md](references/platform-fields.md) as the single field/type/wire reference. Search only the selected platform/action section rather than loading the whole catalog.
-- Read [references/blackbox.md](references/blackbox.md) for Heybox HTTP login steps, plugin/version operations, configuration shares and cloud backups.
+- Read [references/blackbox.md](references/blackbox.md) for Heybox HTTP login steps, plugin/version operations, public WA/strings, configuration shares and cloud backups.
 - Read [references/modus.md](references/modus.md) for every ModUs project, addon discovery, release, upload, update, or delete workflow.
 - For Python, run the exact leaf command with `--help` before creating its input. Treat help as the executable schema contract.
 
@@ -100,9 +100,15 @@ For every existing DD update or edit, GET the detail first and rebuild the offic
 
 For Heybox Workshop, use the encrypted pure HTTP session and explicit SMS/WeChat login steps. No browser profile or desktop account Cookie is imported as the active identity. Login may reuse the official client's device-risk field only; it is not an account credential. Never accept caller-supplied cookies, pkey, tokens, signatures, API URLs, or profile paths. Plugin/version reads and configuration/backup reads resolve current candidates. Metadata edits preserve omitted values; version updates upload or reuse a ZIP URL and verify the final version. Version deletion waits for asynchronous soft deletion, but never automatically sends a second delete when state returns active. Do not print authentication/COS material or delete a whole module.
 
+Heybox may replace a new ZIP's intake URL with its canonical archive URL. A version response with `verification_scope: "remote_metadata"` confirms the remote record, not package bytes or approval. Report `archive_verification` and `unverified_fields` accurately; do not say the downloadable package was verified when `content_verified` is false.
+
+Heybox WA writes require explicit `scope: "public"`. Resolve the game branch and WA tags, then select an owned slug for updates or deletion. The native `open` field and pending-review status do not guarantee privacy: anonymous string retrieval was observed in both states. Never use this route to store private imports. Preserve omitted readable fields, explicitly supply the fields missing from detail, and distinguish `verified_fields` from `unverified_fields` in the result. See the platform reference for the input contract.
+
+Heybox configuration `Open:false` means unlisted, not access-restricted: anonymous callers knowing the share ID can obtain its body and share code. If the user requests access limited to themselves, keep the cloud backup instead of creating a configuration share.
+
 For ModUs, run `modus session doctor`, then read account info, project list/detail, categories, `game-versions --key wow_builds`, subscription tiers, and the target's release list/detail before writing. Project create/edit requires a completed persisted state in the order `choose_game -> basic_info -> license -> complete`. Publish targets are a nonempty multi-select: ModUs and BigFoot may coexist; ModUs-only, BigFoot-only, and both derive synchronization values 1, 2, and 3. Category `998` is BigFoot-only. Use the returned category IDs. For non-season projects, an empty subscription-tiers result leaves only “none”, with `required_tier_id` null. For season subscriptions, query `modus options subscription-game-types` and `modus options season-subscription --game-type <returned-code>` for the relevant author. Ordinary tiers cannot substitute for an enabled, unfinished season subscription.
 
-For DD WA create, resolve the required choices before generating JSON, then let the Python CLI supply only the official create defaults for omitted form values: seven-day share and purchase lifetimes, `need_buy=false`, category `ui_original`, `Interface/Addons`, empty VIP levels, and version `0`. Submit category IDs as strings even when a discovery response represents them numerically. WA create/update versions contain digits only; update must be numerically greater than the current remote value. Every `!WA:2!` create/update/edit is reparsed by the installed official `WowUIInterface.parseWa` chain, including unchanged edit content. Do not carry create defaults into WA update/edit; omitted existing fields preserve their remote value.
+For DD WA create, resolve the required choices before generating JSON, then let the Python CLI supply only the official create defaults for omitted form values: seven-day share and purchase lifetimes, `need_buy=false`, category `ui_original`, `Interface/Addons`, empty VIP levels, and version `0`. The default category remains usable when the dynamic category tree is empty. Submit category IDs as strings even when a discovery response represents them numerically. WA create/update versions contain digits only; update must be numerically greater than the current remote value. Every `!WA:2!` create/update/edit is reparsed by the installed official synchronous `WaParser`, including unchanged edit content; the UI bridge returns an asynchronous task and is not a parser result. Do not carry create defaults into WA update/edit; omitted existing fields preserve their remote value.
 
 For official NewBeeBox, use only `ncc whoami -o json` to verify authentication; do not inspect its credential files. For third-party Python NewBeeBox, run `newbee session doctor`; credentials must come from the Windows Known Folder auth-store and all authenticated requests must use fixed official HTTPS origins. For DD, run `dd session doctor`; discovery must accept only an Authenticode-valid executable from an allowed official NetEase publisher. Doctor is local-only and must not start a native login. Do not set endpoint, credential-directory, or DD executable-path environment overrides.
 
