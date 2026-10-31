@@ -8,6 +8,7 @@ import http.client
 import json
 import mimetypes
 import os
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -608,7 +609,10 @@ class NewBee(NewBeeBackupMixin):
         return None
 
     @staticmethod
-    def _require_relation_readback(name: str, expected: Sequence[Mapping[str, Any]], actual: Any, endpoint: str) -> None:
+    def _require_relation_readback(
+        name: str, expected: Sequence[Mapping[str, Any]], actual: Any, endpoint: str,
+        *, source_type: Optional[int] = None, source_id: Optional[int] = None,
+    ) -> None:
         rows = NewBee._relation_rows(actual, name)
         if rows is None:
             raise FuploadError(
@@ -623,12 +627,45 @@ class NewBee(NewBeeBackupMixin):
                 for item in rows
             }
         else:
+            # The official RelatedContentPicker uses its fixed sourceType prop
+            # for selected rows, rather than the list API's display `type`.
+            # Keep the request context explicit: target IDs remain exact, and
+            # any echoed source identity must still agree with that request.
+            if source_type is not None and source_id is not None:
+                identities = [(actual, {"source_type": source_type, "content_type": source_type,
+                                        "source_id": source_id, "content_id": source_id})]
+                identities.extend((row, {"source_type": source_type, "source_id": source_id}) for row in rows)
+                for value, fields in identities:
+                    if not isinstance(value, dict):
+                        continue
+                    for key, wanted_value in fields.items():
+                        if key not in value:
+                            continue
+                        raw = value[key]
+                        if isinstance(raw, bool) or not (type(raw) is int or isinstance(raw, str) and raw.isascii() and raw.isdecimal()) or int(raw) != wanted_value:
+                            raise FuploadError(
+                                "relationship readback belongs to a different source",
+                                kind="verification_required", endpoint=endpoint, verification_required=True,
+                            )
             wanted = {(int(item["type"]), int(item["id"])) for item in expected}
-            observed = {
-                (int(_pick(item, "type", "content_type", "t_type", default=0) or 0),
-                 int(_pick(item, "id", "content_id", "t_id", default=0) or 0))
-                for item in rows
-            }
+            # Display IDs live in separate resource namespaces. Matching only
+            # the numeric target ID cannot establish which resource was linked.
+            display_to_picker = {2: 1, 3: 2, 4: 3}
+            observed = set()
+            for item in rows:
+                returned_types = [item[key] for key in ("type", "content_type", "t_type") if key in item]
+                if not returned_types or any(
+                    isinstance(raw, bool) or
+                    not (type(raw) is int or isinstance(raw, str) and raw.isascii() and raw.isdecimal()) or
+                    int(raw) not in display_to_picker
+                    for raw in returned_types
+                ) or len({int(raw) for raw in returned_types}) != 1:
+                    raise FuploadError(
+                        "relationship readback has a missing or conflicting target type",
+                        kind="verification_required", endpoint=endpoint, verification_required=True,
+                    )
+                observed.add((display_to_picker[int(returned_types[0])],
+                              int(_pick(item, "id", "content_id", "t_id", default=0) or 0)))
         if wanted != observed:
             raise FuploadError(
                 "relationship write readback did not match the complete replacement",
@@ -648,7 +685,10 @@ class NewBee(NewBeeBackupMixin):
             body = {"source_type": types["references"], "source_id": ident, "references": doc["references"]}
             mutation = self.post("/creator/content_reference/set", body)
             readback = self.post("/creator/content_reference/list", {"content_type": types["references"], "content_id": ident})
-            self._require_relation_readback("references", doc["references"], readback, "/creator/content_reference/list")
+            self._require_relation_readback(
+                "references", doc["references"], readback, "/creator/content_reference/list",
+                source_type=types["references"], source_id=ident,
+            )
             result["references"] = {"result": mutation, "readback": readback}
         return result
 
@@ -1270,6 +1310,34 @@ class NewBee(NewBeeBackupMixin):
     def latest_wa(self, ident: int) -> Any:
         return _redact_wa(self.post("/creator/wow/wa_log/latest_str_info", {"wa_id": ident}))
 
+    def edit_plugin_changelog(self, doc: Mapping[str, Any]) -> Dict[str, Any]:
+        ident, expected = int(doc["file_id"]), doc["changelog"] or ""
+        result = self.post("/creator/wow/mod_file/edit_changelog", {"file_id": ident, "changelog": expected})
+        endpoint = "/creator/wow/mod_file/get_changelog"
+        # The successful write can remain invisible for several reads. Repeat
+        # only this read endpoint, never the edit request.
+        for attempt in range(4):
+            try:
+                readback = self.post(endpoint, {"file_id": ident})
+                actual = _first_object(readback)
+                file_id = actual.get("file_id")
+                if isinstance(file_id, str) and file_id.isdigit():
+                    file_id = int(file_id)
+            except Exception as exc:
+                raise FuploadError("plugin changelog was written but its readback could not be verified",
+                                   kind="verification_required", stage="readback", endpoint=endpoint,
+                                   verification_required=True,
+                                   details={"file_id": ident, "read_attempts": attempt + 1, "automatic_retry": False}) from exc
+            if (type(file_id) is int and file_id == ident and "changelog" in actual and
+                    (actual["changelog"] == expected or expected == "" and actual["changelog"] is None)):
+                return {"result": result, "readback": readback}
+            if attempt < 3:
+                time.sleep(0.25 * 2 ** attempt)
+        raise FuploadError("plugin changelog write was not confirmed by matching file ID and complete text",
+                           kind="verification_required", stage="readback", endpoint=endpoint,
+                           verification_required=True,
+                           details={"file_id": ident, "read_attempts": 4, "automatic_retry": False})
+
     def _validate_attachments(self, attachments: Any) -> None:
         allowed = {"name", "install_type", "install_path", "value", "is_compressed", "timestamp"}
         paths = self.attachment_paths()
@@ -1336,8 +1404,7 @@ class NewBee(NewBeeBackupMixin):
         if (resource, action) == ("wa", "update"): return self.update_wa(doc)
         if (resource, action) == ("wa", "edit"): return self.edit_wa(doc)
         if (resource, action) == ("plugin-changelog", "edit"):
-            result = self.post("/creator/wow/mod_file/edit_changelog", {"file_id": doc["file_id"], "changelog": doc["changelog"] or ""})
-            return {"result": result, "readback": self.post("/creator/wow/mod_file/get_changelog", {"file_id": doc["file_id"]})}
+            return self.edit_plugin_changelog(doc)
         if (resource, action) == ("wa-changelog", "edit"):
             result = self.post("/creator/wow/wa_log/edit", {"wa_log_id": doc["id"], "content": doc["wa_log"] or ""})
             readback = None

@@ -18,6 +18,10 @@ project create/edit 使用官方 choose_game、basic_info、license 状态机的
 
 版本 ZIP 会解析 MD5、压缩/解压尺寸、TOC 与兼容版本。明确提供的摘要和尺寸必须与文件一致；仅编辑 metadata 时不能静默丢弃 schema 接受的字段。发布后按项目及版本读回；上传对象成功不代表版本登记成功。
 
+带 ZIP 时，默认 path 使用官方的 modus/wow/addons/{projectId}/files/{fileId}.zip。显式 path 原样提交，随后核对保存的文件身份、路径、MD5、尺寸，并从官方 CDN 下载完整包验证；非官方地址需人工核验。路径修改或上传后的下载验证失败会返回 verification_required，不自动重发写入。仅 metadata 编辑且省略 path 时保留原路径。changelog 的显式 null 或空白在 update/edit 中发送官方 `<null>` 清空标记，非空正文原样保留。
+
+真机对照中，首次访问 CDN 前完成的同一 fileId 二进制替换，完整包字节、MD5 和尺寸均验证通过；已访问过的下载地址则可能仍返回旧缓存，八小时后复查仍见旧包。此时作者记录已更新也会保留 verification_required，不能重复上传来处理缓存。plugin upload 创建新 fileId 的独立版本，不会自动替换或删除旧版本。
+
 ## 配置、WA 与备份
 
 主客户端使用 server_type（--build 为别名）选择游戏分支。读取分页与写入正文不包含 CLI 的 handler/platform/resource 等内部字段。稀疏编辑先读取详情，保留未指定字段；create 的默认平台不能重置已有配置。

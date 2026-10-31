@@ -1382,7 +1382,7 @@ class DDSessionTests(unittest.TestCase):
         self.assertEqual(record["http_status"], 422)
         self.assertEqual(record["business_code"], 42201)
 
-    def test_native_wa_parser_uses_official_bridge_and_nested_result(self) -> None:
+    def test_native_wa_parser_uses_official_sync_parser_and_nested_result(self) -> None:
         with mock.patch.dict(os.environ, {
             "NETEASE_DD_DIR": "D:/Software/NetEaseDD/100128",
             "FUPLOAD_DD_DEVICE_STATE": "D:/state/sidecar-device.json",
@@ -1393,12 +1393,16 @@ class DDSessionTests(unittest.TestCase):
             def toJson(self):
                 return json.dumps({"code": 200, "result": {"uid": "wa-uid", "id": "wa-id"}})
 
-        interface = mock.MagicMock()
-        interface.parseWa.return_value = NativeResult()
+        parser = mock.MagicMock()
+        parser.parseWa.return_value = NativeResult()
         container = mock.MagicMock()
-        container.get_instance.return_value = interface
-        result = module.parse_native_wa((None, container, None, None, None), "!WA:2!content")
-        interface.parseWa.assert_called_once_with({"waStr": "!WA:2!content"})
+        factory = mock.Mock(return_value=parser)
+        parser_module = ModuleType('components.wow_ui.wa.wa_parser')
+        parser_module.WaParser = factory
+        with mock.patch.dict(sys.modules, {parser_module.__name__: parser_module}):
+            result = module.parse_native_wa((None, container, None, None, None), "!WA:2!content")
+        parser.parseWa.assert_called_once_with("!WA:2!content")
+        container.get_instance.assert_not_called()
         self.assertEqual(result, {"parse_wa_uid": "wa-uid", "parse_wa_id": "wa-id"})
 
     def test_native_business_error_is_logged_and_returns_log_path(self) -> None:

@@ -858,6 +858,11 @@ class ModUs:
             # UploadReleaseAsync's create payload has no fileId. The ID is
             # reserved by GetReleaseFileIdAsync and is consumed by signing.
             wire.pop("fileId", None)
+        elif "changelog" in doc:
+            # Blank/null clearing follows Creator 0.1.9 NullMarkerIfWhiteSpace;
+            # nonempty caller HTML is preserved verbatim.
+            value = doc["changelog"]
+            wire["changelog"] = "<null>" if value is None or isinstance(value, str) and not value.strip() else value
         return _safe(_unwrap(self._request("POST", route, wire)))
 
     def user_info(self) -> Any:
@@ -1427,6 +1432,97 @@ class ModUs:
     def release_delete(self, project_id: int, file_id: int) -> Any:
         return _safe(_unwrap(self._request("POST", "game/data/author/project/delete", {"projectId": _full_project_id(project_id), "fileId": _positive_id(file_id, field="file_id")})))
 
+    def _verify_release_download(self, project_id: int, file_id: int, metadata: Mapping[str, Any]) -> Dict[str, Any]:
+        """Confirm the saved record and the package URL used by Creator.
+
+        Retry only reads: a failed verification must never replay metadata or
+        binary writes. Foreign/custom origins remain stored but require manual
+        verification rather than receiving a successful publish result.
+        """
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, request, fp, code, msg, headers, newurl):
+                return None
+
+        def resource_url(path: Any) -> str:
+            if not isinstance(path, str) or not path.strip():
+                raise ValueError("missing package path")
+            # Creator Resolve preserves absolute HTTP(S) values, otherwise it
+            # concatenates the base and TrimStart('/'). Do not normalize a
+            # different URL into one which happens to pass verification.
+            if path != path.strip() or any(ord(char) < 32 for char in path):
+                raise ValueError("package origin needs manual verification")
+            if path.lower().startswith(("http://", "https://")):
+                url = path
+            else:
+                if re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", path):
+                    raise ValueError("package origin needs manual verification")
+                url = RESOURCE_BASE + path.lstrip("/")
+            parsed = urllib.parse.urlsplit(url)
+            if (parsed.scheme != "https" or parsed.hostname != "cdn.modus.cool" or
+                    parsed.username is not None or parsed.password is not None or parsed.port not in (None, 443) or
+                    parsed.query or parsed.fragment):
+                raise ValueError("package origin needs manual verification")
+            encoded_path = urllib.parse.quote(parsed.path, safe="/%:@-._~!$&'()*+,;=")
+            return urllib.parse.urlunsplit((parsed.scheme, parsed.netloc, encoded_path, "", ""))
+
+        last_error, last_reason, last_http_status, observed = None, None, None, {}
+        reasons = {"missing package path": "missing_path", "package origin needs manual verification": "manual_origin_verification",
+                   "release identity mismatch": "identity_mismatch", "saved package path mismatch": "saved_path_mismatch",
+                   "saved package digest or size mismatch": "saved_digest_or_size_mismatch",
+                   "download exceeds recorded size": "download_size_mismatch", "download does not match package metadata": "download_content_mismatch"}
+        for attempt in range(4):
+            last_http_status, observed = None, {}
+            try:
+                detail = self.release_detail(project_id, file_id)
+                if (not isinstance(detail, Mapping) or
+                        str(detail.get("fileId", detail.get("id"))) != str(file_id) or
+                        "projectId" in detail and str(detail["projectId"]) != str(project_id)):
+                    raise ValueError("release identity mismatch")
+                url = resource_url(detail.get("path"))
+                if "path" in metadata and resource_url(metadata["path"]) != url:
+                    raise ValueError("saved package path mismatch")
+                expected_md5 = str(detail.get("md5", "")).lower()
+                expected_size = detail.get("zipSize")
+                if (not re.fullmatch(r"[a-f0-9]{32}", expected_md5) or type(expected_size) is not int or
+                        not 0 <= expected_size <= MAX_PACKAGE_BYTES or
+                        "md5" in metadata and str(metadata["md5"]).lower() != expected_md5 or
+                        "zip_size" in metadata and metadata["zip_size"] != expected_size):
+                    raise ValueError("saved package digest or size mismatch")
+                digest, count = hashlib.md5(), 0
+                request = urllib.request.Request(url, headers={"Accept": "application/zip"}, method="GET")
+                # No author token, device header, cookie or signed upload query
+                # is forwarded to the public package download endpoint.
+                with urllib.request.build_opener(NoRedirect).open(request, timeout=15) as response:
+                    cache_age = getattr(response, "headers", {}).get("Age")
+                    if isinstance(cache_age, str) and cache_age.isascii() and cache_age.isdigit():
+                        observed["cache_age_seconds"] = int(cache_age)
+                    while True:
+                        block = response.read(min(1048576, expected_size - count + 1))
+                        if not block:
+                            break
+                        count += len(block)
+                        if count > expected_size:
+                            raise ValueError("download exceeds recorded size")
+                        digest.update(block)
+                observed.update({"expected_bytes": expected_size, "downloaded_bytes": count,
+                                 "expected_md5": expected_md5, "downloaded_md5": digest.hexdigest()})
+                if count != expected_size or digest.hexdigest() != expected_md5:
+                    raise ValueError("download does not match package metadata")
+                return {"verified": True, "bytes": count, "md5": expected_md5, "read_attempts": attempt + 1}
+            except Exception as exc:
+                last_error = type(exc).__name__
+                last_reason = reasons.get(str(exc), "read_exception")
+                if isinstance(exc, urllib.error.HTTPError):
+                    last_http_status = exc.code
+            if attempt < 3:
+                time.sleep(0.25 * 2 ** attempt)
+        raise FuploadError(
+            "Release was written but its saved package URL could not be verified; inspect it before another write",
+            kind="verification_required", stage="release_readback", verification_required=True, http_status=last_http_status,
+            details={"project_id": project_id, "file_id": file_id, "read_attempts": 4,
+                     "automatic_retry": False, "read_error_type": last_error, "readback_reason": last_reason, **observed},
+        ) from None
+
     def publish(self, doc: Mapping[str, Any], *, update: bool = False) -> Dict[str, Any]:
         project_id = _full_project_id(doc["project_id"])
         file_path = doc.get("file")
@@ -1458,6 +1554,8 @@ class ModUs:
             ) from exc
 
         current_stage = "prepare"
+        remote_write_attempted = False
+        remote_write_accepted = False
         try:
             allocated_file_id = not bool(supplied_file_id)
             current_stage = "file_id"
@@ -1507,18 +1605,29 @@ class ModUs:
                     "unzip_size": unzip_size,
                     "toc_version": derived["toc_version"],
                     "supported_game_versions": selected_games,
-                    "path": doc.get("path") or archive.name,
+                    "path": doc.get("path") or "modus/wow/addons/%s/files/%s.zip" % (project_id, file_id),
                 })
             current_stage = "release_metadata_update" if update else "release_metadata"
             transaction["stages"].append(current_stage)
             transaction["active_stage"] = current_stage
             save_transaction()
+            remote_write_attempted = True
             result = self.release_metadata(metadata, update=update)
+            remote_write_accepted = True
             if archive is None:
+                readback = None
+                if "path" in metadata:
+                    current_stage = "release_readback"
+                    transaction["stages"].append(current_stage)
+                    transaction["active_stage"] = current_stage
+                    save_transaction()
+                    readback = self._verify_release_download(project_id, file_id, metadata)
+                    transaction["readback"] = readback
                 transaction.pop("active_stage", None)
                 transaction.update({"completed": True, "upload": None})
                 save_transaction()
-                return {"project_id": project_id, "file_id": file_id, "metadata": result, "upload": None, "transaction": _safe(transaction)}
+                return {"project_id": project_id, "file_id": file_id, "metadata": result, "upload": None,
+                        **({"readback": readback} if readback is not None else {}), "transaction": _safe(transaction)}
             current_stage = "signature"
             transaction["stages"].append(current_stage)
             transaction["active_stage"] = current_stage
@@ -1529,13 +1638,20 @@ class ModUs:
             transaction["active_stage"] = current_stage
             save_transaction()
             uploaded = self.upload_zip(signed, str(archive))
-            transaction.pop("active_stage", None)
-            transaction.update({"completed": True, "upload": uploaded})
+            current_stage = "release_readback"
+            transaction["stages"].append(current_stage)
+            transaction["active_stage"] = current_stage
             save_transaction()
-            return {"project_id": project_id, "file_id": file_id, "metadata": result, "upload": uploaded, "transaction": _safe(transaction)}
+            readback = self._verify_release_download(project_id, file_id, metadata)
+            transaction.pop("active_stage", None)
+            transaction.update({"completed": True, "upload": uploaded, "readback": readback})
+            save_transaction()
+            return {"project_id": project_id, "file_id": file_id, "metadata": result, "upload": uploaded,
+                    "readback": readback, "transaction": _safe(transaction)}
         except FuploadError as exc:
             if exc.stage in (None, "dependency_get"):
                 exc.stage = current_stage
+            transaction.pop("completed", None)
             transaction["failed_stage"] = exc.stage or current_stage
             transaction["error"] = exc.as_dict()
             transaction["retained_archive"] = bool(archive and archive.is_file())
@@ -1546,10 +1662,16 @@ class ModUs:
             raise
         except OSError as exc:
             wrapped = FuploadError(
-                "ModUs upload preparation failed",
+                ("ModUs release write was attempted but its completion could not be recorded; inspect it before another write"
+                 if remote_write_attempted else "ModUs upload preparation failed"),
                 stage=current_stage,
-                details={"response_summary": redact(str(exc)) or exc.__class__.__name__},
+                verification_required=remote_write_attempted,
+                details={"response_summary": redact(str(exc)) or exc.__class__.__name__,
+                         "project_id": project_id, "file_id": transaction.get("file_id"),
+                         "remote_write_attempted": remote_write_attempted,
+                         "remote_write_accepted": remote_write_accepted, "automatic_retry": False},
             )
+            transaction.pop("completed", None)
             transaction["failed_stage"] = current_stage
             transaction["error"] = wrapped.as_dict()
             transaction["retained_archive"] = bool(archive and archive.is_file())

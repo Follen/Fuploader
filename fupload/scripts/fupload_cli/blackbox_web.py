@@ -38,6 +38,13 @@ API_ROUTES = frozenset({
     ("POST", "/wow/create_backup/"),
     ("POST", "/wow/get_user_backup_credential/"),
     ("POST", "/wow/save_user_configuration/"),
+    ("POST", "/wow/v2/get_user_info/"),
+    ("POST", "/wow/get_wa_list/"),
+    ("POST", "/wow/get_wa_detail/"),
+    ("POST", "/wow/get_wa_string/"),
+    ("POST", "/wow/get_wa_tag_list/"),
+    ("POST", "/wow/create_wa/"),
+    ("POST", "/wow/update_wa/"),
 })
 API_PATHS = frozenset(path for _method, path in API_ROUTES)
 WEB_QUERY_KEYS = frozenset({

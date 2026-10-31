@@ -243,7 +243,7 @@ class BuilderTests(unittest.TestCase):
                 if endpoint == "/creator/co_author/list":
                     return {"list": [{"user_id": 9, "share_percent": 0.25}]}
                 if endpoint == "/creator/content_reference/list":
-                    return {"list": [{"type": 7, "id": 8}]}
+                    return {"list": [{"type": 2, "id": 8}]}
                 return {}
 
         for resource, types in RELATION_TYPES.items():
@@ -251,7 +251,7 @@ class BuilderTests(unittest.TestCase):
                 provider = RelationNewBee()
                 relationships = provider._replace_relationships(resource, 42, {
                     "co_authors": [{"user_id": 9, "share_percent": 0.25}],
-                    "references": [{"type": 7, "id": 8}],
+                    "references": [{"type": 1, "id": 8}],
                 })
                 self.assertEqual(list(relationships), ["co_authors", "references"])
                 self.assertEqual(provider.calls[0], ("/creator/co_author/set", {
@@ -260,7 +260,7 @@ class BuilderTests(unittest.TestCase):
                 }))
                 self.assertEqual(provider.calls[2], ("/creator/content_reference/set", {
                     "source_type": types["references"], "source_id": 42,
-                    "references": [{"type": 7, "id": 8}],
+                    "references": [{"type": 1, "id": 8}],
                 }))
 
     def test_newbee_config_create_falls_back_to_unfiltered_author_list(self) -> None:

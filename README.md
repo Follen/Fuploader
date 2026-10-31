@@ -76,7 +76,7 @@ CURSEFORGE_UPLOAD_TOKEN=
 $fupload
 ```
 
-该 Skill 不会因普通提及“发布”“新手盒子”“DD”“CurseForge”或“Heybox”而自动触发。Agent 会先询问平台、资源和动作。新手盒子会自动检测 `ncc`：已安装即默认使用官方通道；未安装时先询问是否安装；只有用户显式选择第三方 Python 管理工具才进入项目内 CLI。CurseForge 上传缺少作者 ID 时，Agent 会主动询问；缺少 API Key 或 Upload Token 时，只会引导用户在本机填写 `~/.fupload/curseforge.env`，不会要求在对话中提供秘密。Heybox 命令复用桌面客户端登录态，支持模块元数据和版本增删改，不支持整体删除模块。Agent 在被发布项目中创建 `publish/<时间>-<平台>-<资源>-<动作>/`，同一次发布的脱敏 JSON 按原子步骤保存为 `01-<动作>.json`、`02-<动作>.json`。展示完整写入计划并得到确认后才会真实写入。
+该 Skill 不会因普通提及“发布”“新手盒子”“DD”“CurseForge”或“Heybox”而自动触发。Agent 会先询问平台、资源和动作。新手盒子会自动检测 `ncc`：已安装即默认使用官方通道；未安装时先询问是否安装；只有用户显式选择第三方 Python 管理工具才进入项目内 CLI。CurseForge 上传缺少作者 ID 时，Agent 会主动询问；缺少 API Key 或 Upload Token 时，只会引导用户在本机填写 `~/.fupload/curseforge.env`，不会要求在对话中提供秘密。Heybox 命令使用短信／微信登录和加密 HTTP 会话复用，支持模块元数据、版本操作及公开 WA 发布，不支持整体删除模块；WA 的 open 字段和审核状态都不保证私密。Agent 在被发布项目中创建 `publish/<时间>-<平台>-<资源>-<动作>/`，同一次发布的脱敏 JSON 按原子步骤保存为 `01-<动作>.json`、`02-<动作>.json`。展示完整写入计划并得到确认后才会真实写入。
 
 ## CLI 使用
 

@@ -1,6 +1,6 @@
 {
   "platform": "newbee",
-  "audit_date": "2026-10-30",
+  "audit_date": "2026-10-31",
   "source_version": {
     "python_schema": "current shared-worktree SCHEMAS",
     "official_cli": "0.1.29",
@@ -38,11 +38,12 @@
     "backup.create.known_plugins": {
       "wire": "knowplug_list",
       "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
-      "condition": "Known addons are references without ZIP. Require name,id,fileName,fileUrl,mod_file_id,mod_version,display_name,updateType; scan does not synthesize this metadata.",
-      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "condition": "Known addons are references without ZIP. Require name,id,fileName,fileUrl,mod_file_id,mod_version,display_name,updateType; scan does not synthesize this metadata. Live synthetic plugin/file IDs were read from this run; fileUrl and lock mod_version were null because Creator owner detail does not expose those values. This verifies metadata reference storage, not installation or a fabricated classifier result.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Nonempty metadata through schema generate/upload and independent get; selected actual synthetic plugin/file IDs; no known-addon ZIP uploaded"
     },
     "backup.create.unknown_plugins": {
       "wire": "unknown_plug + t_unKnown_list",
@@ -65,7 +66,7 @@
     "backup.create.fonts": {
       "wire": "font_hash + t_font_list",
       "stage": "selective ZIP/font upload -> /v3/share/create -> optional /share/update",
-      "condition": "Selected .ttf copies only. Native OssUploader.uploadFolder uploads the staged folder, returns font_hash; official signed client + Node are dependencies. Nonempty font upload not live-tested.",
+      "condition": "Selected .ttf copies only. Native OssUploader.uploadFolder uploads the staged folder, returns font_hash; official signed client + Node are dependencies. Nonempty synthetic .ttf staging and official native upload were verified live; no user font files used.",
       "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
       "schema_supported": true,
       "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
@@ -146,11 +147,12 @@
     "backup.generate.known_plugins": {
       "wire": "knowplug_list",
       "stage": "local generation",
-      "condition": "Known addons are references without ZIP. Require name,id,fileName,fileUrl,mod_file_id,mod_version,display_name,updateType; scan does not synthesize this metadata.",
-      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
+      "condition": "Known addons are references without ZIP. Require name,id,fileName,fileUrl,mod_file_id,mod_version,display_name,updateType; scan does not synthesize this metadata. Live synthetic plugin/file IDs were read from this run; fileUrl and lock mod_version were null because Creator owner detail does not expose those values. This verifies metadata reference storage, not installation or a fabricated classifier result.",
+      "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Nonempty metadata through schema generate/upload and independent get; selected actual synthetic plugin/file IDs; no known-addon ZIP uploaded"
     },
     "backup.generate.unknown_plugins": {
       "wire": "unknown_plug + t_unKnown_list",
@@ -173,7 +175,7 @@
     "backup.generate.fonts": {
       "wire": "font_hash + t_font_list",
       "stage": "local generation",
-      "condition": "Selected .ttf copies only. Native OssUploader.uploadFolder uploads the staged folder, returns font_hash; official signed client + Node are dependencies. Nonempty font upload not live-tested.",
+      "condition": "Selected .ttf copies only. Native OssUploader.uploadFolder uploads the staged folder, returns font_hash; official signed client + Node are dependencies. Nonempty synthetic .ttf staging and official native upload were verified live; no user font files used.",
       "evidence": "fupload/scripts/fupload_cli/newbee_backup.py:generate_backup/upload_backup/rename_backup/delete_backups; D:/Software/NewBeeBox/resources/app.asar!js/8761.js; !js/app.js module29474",
       "schema_supported": true,
       "official_client_support": "desktop 1.1.29 verified static protocol; wrapper selectors are local",
@@ -317,29 +319,32 @@
     "config.create.subscribe_plan_level": {
       "wire": "subscribe_plan_level",
       "stage": "POST JSON /creator/wow/share_config/release",
-      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "config.create.price": {
       "wire": "price",
       "stage": "POST JSON /creator/wow/share_config/release",
-      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "config.create.time_range": {
       "wire": "time_range",
       "stage": "POST JSON /creator/wow/share_config/release",
-      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "config.create.co_authors": {
       "wire": "co_authors",
@@ -353,8 +358,8 @@
     "config.create.references": {
       "wire": "references",
       "stage": "separate relationship POST /creator/content_reference/set",
-      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=3",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=3 Official picker normalizes each selected item type to its fixed sourceType (plugin1/WA2/config3), retaining the exact target id. Search/list display type is a different namespace and must not be copied directly into set. Python write verification always maps observed display types 2/3/4 to wire types 1/2/3 per target, requires exact target IDs and rejects missing/unknown/conflicting target types or source identities; no raw-type fallback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100; current Creator RelatedContentPicker.vue_vue_type_script_setup_true_lang-CAMsWYM6.js F(a), props h=e; Step3PluginForm-CS7_MERc.js source-type1, Step3StringForm-Bv2FLfXb.js source-type2, Step3ShareConfigForm-Cj2x9K4p.js source-type3; live20261031 own target31228 temporary source32720 (deleted)",
       "schema_supported": true,
       "official_client_support": "Creator Center separate association actions",
       "live_verified": false
@@ -372,37 +377,41 @@
       "wire": "linked_mods",
       "stage": "POST JSON /creator/wow/share_config/release",
       "condition": "Only selected mod_ids from the live backup are authoritative; other submitted metadata is canonicalized from the selected backup. update_type is wire updateType; it is not an arbitrary version-edit override.",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": true
+      "live_verified": true,
+      "live_scope": "Create nonempty (one item per array), update clear, update restore; linked_mods caller supplied mod_id only and metadata canonicalized from backup"
     },
     "config.create.ignored_unknown_mods": {
       "wire": "ignored_unknown_mods",
       "stage": "POST JSON /creator/wow/share_config/release",
       "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": true
+      "live_verified": true,
+      "live_scope": "Create nonempty (one item per array), update clear, update restore; linked_mods caller supplied mod_id only and metadata canonicalized from backup"
     },
     "config.create.ignored_materials": {
       "wire": "ignored_materials",
       "stage": "POST JSON /creator/wow/share_config/release",
       "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": true
+      "live_verified": true,
+      "live_scope": "Create nonempty (one item per array), update clear, update restore; linked_mods caller supplied mod_id only and metadata canonicalized from backup"
     },
     "config.create.ignored_fronts": {
       "wire": "ignored_fronts",
       "stage": "POST JSON /creator/wow/share_config/release",
       "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": true
+      "live_verified": true,
+      "live_scope": "Create nonempty (one item per array), update clear, update restore; linked_mods caller supplied mod_id only and metadata canonicalized from backup"
     },
     "config.create.roleid": {
       "wire": "roleid",
@@ -533,29 +542,32 @@
     "config.edit.subscribe_plan_level": {
       "wire": "subscribe_plan_level",
       "stage": "POST JSON /creator/wow/share_config/update",
-      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "config.edit.price": {
       "wire": "price",
       "stage": "POST JSON /creator/wow/share_config/update",
-      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "config.edit.time_range": {
       "wire": "time_range",
       "stage": "POST JSON /creator/wow/share_config/update",
-      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "config.edit.co_authors": {
       "wire": "co_authors",
@@ -569,8 +581,8 @@
     "config.edit.references": {
       "wire": "references",
       "stage": "separate relationship POST /creator/content_reference/set",
-      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=3",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=3 Official picker normalizes each selected item type to its fixed sourceType (plugin1/WA2/config3), retaining the exact target id. Search/list display type is a different namespace and must not be copied directly into set. Python write verification always maps observed display types 2/3/4 to wire types 1/2/3 per target, requires exact target IDs and rejects missing/unknown/conflicting target types or source identities; no raw-type fallback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100; current Creator RelatedContentPicker.vue_vue_type_script_setup_true_lang-CAMsWYM6.js F(a), props h=e; Step3PluginForm-CS7_MERc.js source-type1, Step3StringForm-Bv2FLfXb.js source-type2, Step3ShareConfigForm-Cj2x9K4p.js source-type3; live20261031 own target31228 temporary source32720 (deleted)",
       "schema_supported": true,
       "official_client_support": "Creator Center separate association actions",
       "live_verified": false
@@ -597,37 +609,41 @@
       "wire": "linked_mods",
       "stage": "POST JSON /creator/wow/share_config/update",
       "condition": "Only selected mod_ids from the live backup are authoritative; other submitted metadata is canonicalized from the selected backup. update_type is wire updateType; it is not an arbitrary version-edit override.",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Create nonempty (one item per array), update clear, update restore; linked_mods caller supplied mod_id only and metadata canonicalized from backup"
     },
     "config.update.ignored_unknown_mods": {
       "wire": "ignored_unknown_mods",
       "stage": "POST JSON /creator/wow/share_config/update",
       "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Create nonempty (one item per array), update clear, update restore; linked_mods caller supplied mod_id only and metadata canonicalized from backup"
     },
     "config.update.ignored_materials": {
       "wire": "ignored_materials",
       "stage": "POST JSON /creator/wow/share_config/update",
       "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Create nonempty (one item per array), update clear, update restore; linked_mods caller supplied mod_id only and metadata canonicalized from backup"
     },
     "config.update.ignored_fronts": {
       "wire": "ignored_fronts",
       "stage": "POST JSON /creator/wow/share_config/update",
       "condition": "These are exclusion-name arrays, not inclusion arrays. Every name must exist in the selected backup; ignored_fronts is the actual historical wire spelling.",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_config/update_config; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js:1913-1934; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Create nonempty (one item per array), update clear, update restore; linked_mods caller supplied mod_id only and metadata canonicalized from backup"
     },
     "config.update.roleid": {
       "wire": "roleid",
@@ -668,8 +684,8 @@
     "config-reference.set.references": {
       "wire": "references",
       "stage": "separate relationship POST /creator/content_reference/set",
-      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=3",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=3 Official picker normalizes each selected item type to its fixed sourceType (plugin1/WA2/config3), retaining the exact target id. Search/list display type is a different namespace and must not be copied directly into set. Python write verification always maps observed display types 2/3/4 to wire types 1/2/3 per target, requires exact target IDs and rejects missing/unknown/conflicting target types or source identities; no raw-type fallback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100; current Creator RelatedContentPicker.vue_vue_type_script_setup_true_lang-CAMsWYM6.js F(a), props h=e; Step3PluginForm-CS7_MERc.js source-type1, Step3StringForm-Bv2FLfXb.js source-type2, Step3ShareConfigForm-Cj2x9K4p.js source-type3; live20261031 own target31228 temporary source32720 (deleted)",
       "schema_supported": true,
       "official_client_support": "Creator Center separate association actions",
       "live_verified": false
@@ -785,11 +801,12 @@
     "plugin.create.subscribe_plan_level": {
       "wire": "subscribe_plan_level",
       "stage": "POST JSON /creator/wow/mod/create",
-      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "plugin.create.link_to_channel": {
       "wire": "link_to_channel",
@@ -812,11 +829,12 @@
     "plugin.create.references": {
       "wire": "references",
       "stage": "separate relationship POST /creator/content_reference/set",
-      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=1",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=1 Official picker normalizes each selected item type to its fixed sourceType (plugin1/WA2/config3), retaining the exact target id. Search/list display type is a different namespace and must not be copied directly into set. Python write verification always maps observed display types 2/3/4 to wire types 1/2/3 per target, requires exact target IDs and rejects missing/unknown/conflicting target types or source identities; no raw-type fallback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100; current Creator RelatedContentPicker.vue_vue_type_script_setup_true_lang-CAMsWYM6.js F(a), props h=e; Step3PluginForm-CS7_MERc.js source-type1, Step3StringForm-Bv2FLfXb.js source-type2, Step3ShareConfigForm-Cj2x9K4p.js source-type3; live20261031 own target31228 temporary source32720 (deleted)",
       "schema_supported": true,
       "official_client_support": "Creator Center separate association actions",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Own public plugin target, private temporary source, nonempty set/list/clear/delete; no third-party content"
     },
     "plugin.delete.id": {
       "wire": "id",
@@ -956,11 +974,12 @@
     "plugin.edit.subscribe_plan_level": {
       "wire": "subscribe_plan_level",
       "stage": "POST JSON /creator/wow/mod/edit",
-      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_plugin/edit_plugin; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3PluginForm-DlHiNxtf.js:718-781",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "plugin.edit.link_to_channel": {
       "wire": "link_to_channel",
@@ -983,11 +1002,12 @@
     "plugin.edit.references": {
       "wire": "references",
       "stage": "separate relationship POST /creator/content_reference/set",
-      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=1",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=1 Official picker normalizes each selected item type to its fixed sourceType (plugin1/WA2/config3), retaining the exact target id. Search/list display type is a different namespace and must not be copied directly into set. Python write verification always maps observed display types 2/3/4 to wire types 1/2/3 per target, requires exact target IDs and rejects missing/unknown/conflicting target types or source identities; no raw-type fallback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100; current Creator RelatedContentPicker.vue_vue_type_script_setup_true_lang-CAMsWYM6.js F(a), props h=e; Step3PluginForm-CS7_MERc.js source-type1, Step3StringForm-Bv2FLfXb.js source-type2, Step3ShareConfigForm-Cj2x9K4p.js source-type3; live20261031 own target31228 temporary source32720 (deleted)",
       "schema_supported": true,
       "official_client_support": "Creator Center separate association actions",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Own public plugin target, private temporary source, nonempty set/list/clear/delete; no third-party content"
     },
     "plugin.update.mod_id": {
       "wire": "mod_id",
@@ -1091,11 +1111,12 @@
     "plugin-reference.set.references": {
       "wire": "references",
       "stage": "separate relationship POST /creator/content_reference/set",
-      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=1",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=1 Official picker normalizes each selected item type to its fixed sourceType (plugin1/WA2/config3), retaining the exact target id. Search/list display type is a different namespace and must not be copied directly into set. Python write verification always maps observed display types 2/3/4 to wire types 1/2/3 per target, requires exact target IDs and rejects missing/unknown/conflicting target types or source identities; no raw-type fallback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100; current Creator RelatedContentPicker.vue_vue_type_script_setup_true_lang-CAMsWYM6.js F(a), props h=e; Step3PluginForm-CS7_MERc.js source-type1, Step3StringForm-Bv2FLfXb.js source-type2, Step3ShareConfigForm-Cj2x9K4p.js source-type3; live20261031 own target31228 temporary source32720 (deleted)",
       "schema_supported": true,
       "official_client_support": "Creator Center separate association actions",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Own public plugin target, private temporary source, nonempty set/list/clear/delete; no third-party content"
     },
     "wa.create.game_version_id": {
       "wire": "game_version_id",
@@ -1199,29 +1220,32 @@
     "wa.create.subscribe_plan_level": {
       "wire": "subscribe_plan_level",
       "stage": "POST JSON /creator/wow/wa/publish",
-      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "wa.create.price": {
       "wire": "price",
       "stage": "POST JSON /creator/wow/wa/publish",
-      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "wa.create.time_range": {
       "wire": "time_range",
       "stage": "POST JSON /creator/wow/wa/publish",
-      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "wa.create.public": {
       "wire": "share_state",
@@ -1271,8 +1295,8 @@
     "wa.create.references": {
       "wire": "references",
       "stage": "separate relationship POST /creator/content_reference/set",
-      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=2",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=2 Official picker normalizes each selected item type to its fixed sourceType (plugin1/WA2/config3), retaining the exact target id. Search/list display type is a different namespace and must not be copied directly into set. Python write verification always maps observed display types 2/3/4 to wire types 1/2/3 per target, requires exact target IDs and rejects missing/unknown/conflicting target types or source identities; no raw-type fallback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100; current Creator RelatedContentPicker.vue_vue_type_script_setup_true_lang-CAMsWYM6.js F(a), props h=e; Step3PluginForm-CS7_MERc.js source-type1, Step3StringForm-Bv2FLfXb.js source-type2, Step3ShareConfigForm-Cj2x9K4p.js source-type3; live20261031 own target31228 temporary source32720 (deleted)",
       "schema_supported": true,
       "official_client_support": "Creator Center separate association actions",
       "live_verified": false
@@ -1290,10 +1314,11 @@
       "wire": "wa_str_titles",
       "stage": "POST JSON /creator/wow/wa/publish",
       "condition": "Ordered titles follow collection string order; on update omission preserves the current remote titles.",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Two synthetic exported WA strings in collection mode; exact code/title order, reverse update, omitted titles preserved"
     },
     "wa.create.wa_log": {
       "wire": "wa_log",
@@ -1308,10 +1333,11 @@
       "wire": "string_mode",
       "stage": "POST JSON /creator/wow/wa/publish",
       "condition": "single or collection; collection requires ordered titles; this is Python/Creator support, official NCC publish supports single only.",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Two synthetic exported WA strings in collection mode; exact code/title order, reverse update, omitted titles preserved"
     },
     "wa.delete.id": {
       "wire": "id",
@@ -1442,29 +1468,32 @@
     "wa.edit.subscribe_plan_level": {
       "wire": "subscribe_plan_level",
       "stage": "POST JSON /creator/wow/wa/update",
-      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted.",
+      "condition": "Live selectable subscription-plan level; 0=none. No implicit client payment-method label is transmitted. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "wa.edit.price": {
       "wire": "price",
       "stage": "POST JSON /creator/wow/wa/update",
-      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "wa.edit.time_range": {
       "wire": "time_range",
       "stage": "POST JSON /creator/wow/wa/update",
-      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units.",
+      "condition": "Python price is integer fen. price=0 normalizes time_range to empty string. Nonzero values/options are selected through live options endpoints; do not copy NCC yuan units. Live 2026-10-31 private synthetic metadata requests were rejected by backend account/feature entitlement (-4); options discovery is not entitlement approval. No purchase, subscription activation, public publication, or channel push was invoked.",
       "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": false,
+      "live_rejection_evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json"
     },
     "wa.edit.public": {
       "wire": "share_state",
@@ -1514,8 +1543,8 @@
     "wa.edit.references": {
       "wire": "references",
       "stage": "separate relationship POST /creator/content_reference/set",
-      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=2",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=2 Official picker normalizes each selected item type to its fixed sourceType (plugin1/WA2/config3), retaining the exact target id. Search/list display type is a different namespace and must not be copied directly into set. Python write verification always maps observed display types 2/3/4 to wire types 1/2/3 per target, requires exact target IDs and rejects missing/unknown/conflicting target types or source identities; no raw-type fallback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100; current Creator RelatedContentPicker.vue_vue_type_script_setup_true_lang-CAMsWYM6.js F(a), props h=e; Step3PluginForm-CS7_MERc.js source-type1, Step3StringForm-Bv2FLfXb.js source-type2, Step3ShareConfigForm-Cj2x9K4p.js source-type3; live20261031 own target31228 temporary source32720 (deleted)",
       "schema_supported": true,
       "official_client_support": "Creator Center separate association actions",
       "live_verified": false
@@ -1551,10 +1580,11 @@
       "wire": "wa_str_titles",
       "stage": "POST JSON /creator/wow/wa/update_wa_str",
       "condition": "Ordered titles follow collection string order; on update omission preserves the current remote titles.",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:create_wa/edit_wa/update_wa; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3StringForm-Bx7R9KLT.js:875-932; analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
       "schema_supported": true,
       "official_client_support": "Creator Center submitted field",
-      "live_verified": false
+      "live_verified": true,
+      "live_scope": "Two synthetic exported WA strings in collection mode; exact code/title order, reverse update, omitted titles preserved"
     },
     "wa.update.wa_log": {
       "wire": "wa_log",
@@ -1667,8 +1697,8 @@
     "wa-reference.set.references": {
       "wire": "references",
       "stage": "separate relationship POST /creator/content_reference/set",
-      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=2",
-      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100",
+      "condition": "Presence replaces the complete relation; [] clears. Omission preserves. Main write/readback happens before this side effect. items {type,id}; source_type=2 Official picker normalizes each selected item type to its fixed sourceType (plugin1/WA2/config3), retaining the exact target id. Search/list display type is a different namespace and must not be copied directly into set. Python write verification always maps observed display types 2/3/4 to wire types 1/2/3 per target, requires exact target IDs and rejects missing/unknown/conflicting target types or source identities; no raw-type fallback.",
+      "evidence": "fupload/scripts/fupload_cli/newbee.py:_replace_relationships; D:/Code/Fuploader/analyze/legacy-newbee/creator/assets/Step3ShareConfigForm-1CKiEeDd.js submit content_type=4/source_type=3/share_percent ratio/100; current Creator RelatedContentPicker.vue_vue_type_script_setup_true_lang-CAMsWYM6.js F(a), props h=e; Step3PluginForm-CS7_MERc.js source-type1, Step3StringForm-Bv2FLfXb.js source-type2, Step3ShareConfigForm-Cj2x9K4p.js source-type3; live20261031 own target31228 temporary source32720 (deleted)",
       "schema_supported": true,
       "official_client_support": "Creator Center separate association actions",
       "live_verified": false
@@ -1699,7 +1729,6 @@
         "sync",
         "versions",
         "changelog",
-        "game-versions",
         "categories",
         "comments"
       ],
@@ -1996,70 +2025,6 @@
           }
         ],
         "subcommands": [],
-        "help_verified": true,
-        "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
-      },
-      "ncc wow addons game-versions": {
-        "options": [
-          {
-            "flags": "-h, --help",
-            "description": "display help for command"
-          }
-        ],
-        "subcommands": [
-          {
-            "command": "list [options] [page]",
-            "description": "我的插件列表"
-          },
-          {
-            "command": "info <mod_id>",
-            "description": "插件详情：审核/发布状态、编辑回填信息（简介/分类/图片/官网）、最新版本与下载链接"
-          },
-          {
-            "command": "init [options] [dir]",
-            "description": "生成 ncc.json"
-          },
-          {
-            "command": "create [options]",
-            "description": "创建插件（图标/截图传本地图片自动上传；创建后 init 关联目录再 push"
-          },
-          {
-            "command": "edit [options] <mod_id>",
-            "description": "编辑已发布插件的信息（read-modify-write：只改传入项，其余保持当前值；图标/截图传本地图片自动上传）"
-          },
-          {
-            "command": "categories [options]",
-            "description": "插件分类表（创建插件时用 ID 选择分类）"
-          },
-          {
-            "command": "push [options] [dir]",
-            "description": "打包插件目录并上传新版本（核心命令，先 --dry-run 预检）"
-          },
-          {
-            "command": "pack [options] [dir]",
-            "description": "打包插件目录为本地 zip（纯离线：不上传、无需登录）"
-          },
-          {
-            "command": "sync [options] [dir]",
-            "description": "用线上最新版本覆盖本地工程内容（读 ncc.json 关联的插件；须附 --yes 确认）"
-          },
-          {
-            "command": "versions [options] [page]",
-            "description": "版本文件列表（含 file_id，供 changelog 编辑）"
-          },
-          {
-            "command": "changelog [options] <file_id>",
-            "description": "查看/编辑指定版本的更新日志（--set 编辑）"
-          },
-          {
-            "command": "comments",
-            "description": "评论管理：列出收到的评价并回复"
-          },
-          {
-            "command": "help [command]",
-            "description": "display help for command"
-          }
-        ],
         "help_verified": true,
         "evidence": "installed ncc 0.1.29 leaf --help (read-only)"
       },
@@ -2776,7 +2741,7 @@
       "field": "selected_eml",
       "classification": "existing opaque arrays preserved and verified; new nonempty selection schema remains unknown",
       "wire": "selected_eml",
-      "condition": "config get returns existing selected_eml. edit/update deep-copy the existing array to the native selected_eml wire field, including unknown nested keys, and require matching readback. Malformed non-array values stop before mutation. Caller cannot create/change layouts through schema.",
+      "condition": "config get returns existing selected_eml. edit/update deep-copy the existing array to the native selected_eml wire field, including unknown nested keys, and require matching readback. Malformed non-array values stop before mutation. Caller cannot create/change layouts through schema. Current desktop1.1.29 initializes editModeLayouts=[] and submits selected_eml=[]; current Creator Step3ShareConfigForm-Cj2x9K4p.js contains neither selector. A complete valid nonempty synthetic layout object format has not been established, so nonempty live retention is not claimed.",
       "evidence": "newbee.py:_selected_layouts/_config_form/update_config; test_newbee_wire_matrix.py layout preservation/loss/malformed regression"
     },
     {
@@ -2930,6 +2895,65 @@
         "regression": "test_remote_numeric_role_ids_are_exposed_as_config_selector_strings",
         "extra_local_validation_test_backup_deleted_id": 4142416
       }
+    },
+    "reference_picker_namespace_20261031": {
+      "evidence": "analyze/newbee-release-check/reference-fixed-20261031-31552831a388.json",
+      "source_type": 1,
+      "server_display_type": 2,
+      "target_id": 31228,
+      "deleted_synthetic_source_id": 32720,
+      "original_target_complete_metadata_hash_unchanged": true,
+      "not_tested": "Collaborator testing excluded by user; config and WA nonempty relations subsequently verified."
+    },
+    "conditional_acceptance_20261031": {
+      "evidence": "analyze/newbee-release-check/conditions-20261031-66b0ed56d71a.json",
+      "synthetic_only": true,
+      "private_only": true,
+      "deleted_ids": {
+        "plugin": 32721,
+        "file": 681260,
+        "wa": 10071,
+        "config": 62438,
+        "backup": 4142968
+      },
+      "passed": [
+        "schema + execute_write backup.generate/upload/rename",
+        "nonempty known plugin/file metadata reference",
+        "config linked_mods and unknown/material/font ignore arrays each one item: create, clear, restore",
+        "collection two synthetic WA strings and ordered titles: create, reverse update, omitted-title retention",
+        "all created records deleted; original7plugins/0WA/0configs/2backups raw fingerprints unchanged"
+      ],
+      "commercial_rejections": {
+        "plugin/wa subscribe_plan_level1": "-4 当前选定的订阅计划不可用 请到创作者中心查看或申请",
+        "config subscribe_plan_level1; wa/config price100 time_range7d": "-4 付费功能暂未开放，请修改内容设置后提交"
+      },
+      "not_verified": [
+        "successful paid/subscription metadata on an entitled account",
+        "nonempty selected_eml live retention (valid official synthetic object structure unavailable)",
+        "collaborator invitation/acceptance (excluded by user)",
+        "all 186 field-value combinations"
+      ]
+    },
+    "config_reference_eligibility_20261031": {
+      "evidence": "analyze/newbee-release-check/config-eligibility-20261031-026843a65.json",
+      "source_id": 62445,
+      "target_id": 62444,
+      "created_target_review_status": 0,
+      "independent_review_status": 1,
+      "official_search_found_target": true,
+      "wire_source_type": 3,
+      "wire_target_type": 3,
+      "observed_display_type": 4,
+      "set_list_clear_delete_passed": true,
+      "original_hashes_preserved": true,
+      "temporary_logical_records_remaining": 0
+    },
+    "author_subscription_eligibility_20261031": {
+      "endpoint": "/creator/author_subscribe/author_plan_list",
+      "current_account_plan_count": 0,
+      "active_plan_count": 0,
+      "official_ui": "PaymentMethodForm filters author plans by status===1; generic plan dictionary is not account entitlement",
+      "evidence": "analyze/newbee-release-check/remaining-20261031/author-plan-eligibility.json"
     }
   },
   "validation": {
@@ -2942,7 +2966,7 @@
     "config.selected_eml": {
       "wire": "selected_eml",
       "stage": "existing detail -> edit/update -> readback",
-      "condition": "opaque preservation only, no schema mutation key; missing field omitted; malformed non-array rejected before mutation",
+      "condition": "opaque preservation only, no schema mutation key; missing field omitted; malformed non-array rejected before mutation Current desktop1.1.29 initializes editModeLayouts=[] and submits selected_eml=[]; current Creator Step3ShareConfigForm-Cj2x9K4p.js contains neither selector. A complete valid nonempty synthetic layout object format has not been established, so nonempty live retention is not claimed.",
       "evidence": "newbee.py:_selected_layouts/_config_form/update_config; newbee wire matrix regressions",
       "schema_supported": false,
       "official_client_support": "desktop config selected_eml field",

@@ -6,6 +6,12 @@
 
 Creator 证据来自官方 DLL 0.1.6.0 的 IL；主客户端提取包的 package.json 标记 1.2.9。旧 API 汇总中 project delete 的 GET、release detail 的双 ID 路径与 IL 不符，本次采用 IL。Creator 官方为 Bearer 认证，已有 Bearer 前缀不重复添加；主客户端发送存储 token 原样。修复后分别使用现有 Creator 与主客户端登录来源，各读取 Creator 项目列表和主客户端云备份列表，四次读取均被接受。这只记录这两套现有来源的读取结果。
 
+2026-10-31 补核当前安装 Creator/Shared 0.1.9.0：项目状态 1/2/3 对应已通过/待审核/已拒绝，创建可直接返回已通过；不存在已证实的项目私密或草稿控制。官方 CanCreate 拒绝空发布平台，Alpha/Beta 只是版本类型。真机新建空项目未进入公共列表，首个合成 Alpha 版本发布后匿名可见；本轮临时项目及版本均已删除，原项目记录哈希保留。
+
+当前 Creator 下载按钮使用 CdnService.Resolve(release.path)。真机确认旧默认本机 ZIP 名会生成 404 下载地址；同一文件的官方对象路径可下载且字节一致。默认路径现为 modus/wow/addons/{projectId}/files/{fileId}.zip，显式路径保留，上传及路径修改后校验同 fileId 保存的路径、MD5、尺寸和实际 CDN 包；下载不符返回 verification_required，不重放 metadata 或 PUT。版本 changelog 清空也按当前官方 NullMarkerIfWhiteSpace 使用 `<null>`，真机已确认 null/空白清空及非空原文保留。
+
+同 fileId 二进制更新已做冷、热缓存对照：本轮客户端首次访问 CDN 前完成覆盖，新 ZIP 的完整字节、MD5 和尺寸均通过；已有下载缓存的地址八小时后复查仍返回旧包。记录和 PUT 已是新内容时，CDN canonical 地址仍可能继续返回旧 ZIP。原有顺序和官方 PUT 后登记 metadata 的顺序均复现，no-cache 请求未消除旧缓存。没有从当前官方客户端找到可用的作者 CDN 刷新接口；因此保留待核验，不加入 cachebusting query，也不把另建 fileId 的独立版本偷偷作为 update。结构化证据记录期望/实际摘要、尺寸和响应 Age。
+
 配置分享 `content` 是公开富文本存储内容，图片替换成资源键标记；`contentText` 是公开纯文本。真实 detail 响应不返回 contentText；稀疏编辑会按官方 Q2 的 DOM textContent 规则从正文恢复，去除 WA/图片占位及脚本等隐藏节点，HTML 本身原样保留。明确更改正文而未给纯文本时，同步重新计算。WA 导入串由独立的 `codeText` 传输。官方编辑器保存时生成 HTML、存储 content、plainText 三份表示；读取兼容旧 Base64 内容，当前保存链没有再次 Base64 编码。IO 应按资源和字段语义区分公开正文与导入串。
 
 本次已修复多处已有功能问题：Creator 发布文件的 metadata-only `md5` / `zip_size` / `unzip_size` 被丢弃和 `changelog:null` 被静默过滤；主客户端稀疏编辑重置 platform / excludeWtf / synchronizationType；读取 `--page` 没有映射实际页码；项目列表把 CLI envelope 参数带入请求。稀疏编辑现在先读当前 detail，再从允许字段重建完整提交体；创建默认值只用于新建。没有官方 null 清空证据的正文、角色等字段显式拒绝 null；订阅等级的 null 按官方完整表单省略 requiredTierId。

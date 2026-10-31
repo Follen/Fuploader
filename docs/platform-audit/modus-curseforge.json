@@ -64,6 +64,13 @@
       "kind": "official-current-doc",
       "url": "https://docs.curseforge.com/rest-api/",
       "accessed": "2026-10-30"
+    },
+    "creator_current_state": {
+      "kind": "official-binary-il",
+      "path": "analyze/modus-completion/creator-state-019-il.txt",
+      "artifact": "Installed ModUs.Creator.dll / ModUs.Shared.dll 0.1.9.0",
+      "creator_sha256": "2651a4f86af0bd563ed7e8ff699a74a5db84e00664731267821111f38e377d04",
+      "shared_sha256": "985e148d1a1c36efde49c999ebbc8d8c3b5265ea918b4aed5030425695b834a1"
     }
   },
   "platforms": {
@@ -453,12 +460,15 @@
         "plugin.create.path": {
           "wire": "path",
           "stage": "release-create",
-          "condition": "按字段存在发送；省略保留",
+          "condition": "带ZIP时省略或空串默认官方modus/wow/addons/{projectId}/files/{fileId}.zip；仅metadata编辑省略则保留；显式path保留。写后核对同fileId保存路径/MD5/尺寸并从官方CDN下载完整包；路径不可用、内容不符或非官方源需verification_required，不重放写入。",
           "evidence": [
             "creator_api:L16568-L16690",
             "creator_api:L17632-L17725",
             "provider_modus:_release_wire",
-            "provider_modus:publish"
+            "provider_modus:publish",
+            "creator_current_state:ApiService.BuildReleaseUploadPath/CdnService.Resolve/ProjectEditPage.DownloadReleaseAsync",
+            "provider_modus:_verify_release_download",
+            "live_creator_20261031:default-filename-404-canonical-200"
           ],
           "status": "source-confirmed"
         },
@@ -477,12 +487,14 @@
         "plugin.create.changelog": {
           "wire": "changelog",
           "stage": "release-create",
-          "condition": "编辑显式null发送JSON null清空（官方OptionalStringUpdate）；创建空值不表示清旧记录",
+          "condition": "创建说明可选；创建空值不表示清空旧记录，非空正文原样提交。",
           "evidence": [
             "creator_api:L16568-L16690",
             "creator_api:L17632-L17725",
             "provider_modus:_release_wire",
-            "provider_modus:publish"
+            "provider_modus:publish",
+            "creator_current_state:ReleaseFormPageViewModel.UpdateReleaseApiAsync/NullMarkerIfWhiteSpace",
+            "provider_modus:release_metadata"
           ],
           "status": "source-confirmed"
         },
@@ -604,12 +616,15 @@
         "plugin.upload.path": {
           "wire": "path",
           "stage": "release-upload",
-          "condition": "按字段存在发送；省略保留",
+          "condition": "带ZIP时省略或空串默认官方modus/wow/addons/{projectId}/files/{fileId}.zip；仅metadata编辑省略则保留；显式path保留。写后核对同fileId保存路径/MD5/尺寸并从官方CDN下载完整包；路径不可用、内容不符或非官方源需verification_required，不重放写入。",
           "evidence": [
             "creator_api:L16568-L16690",
             "creator_api:L17632-L17725",
             "provider_modus:_release_wire",
-            "provider_modus:publish"
+            "provider_modus:publish",
+            "creator_current_state:ApiService.BuildReleaseUploadPath/CdnService.Resolve/ProjectEditPage.DownloadReleaseAsync",
+            "provider_modus:_verify_release_download",
+            "live_creator_20261031:default-filename-404-canonical-200"
           ],
           "status": "source-confirmed"
         },
@@ -628,12 +643,14 @@
         "plugin.upload.changelog": {
           "wire": "changelog",
           "stage": "release-upload",
-          "condition": "编辑显式null发送JSON null清空（官方OptionalStringUpdate）；创建空值不表示清旧记录",
+          "condition": "创建说明可选；创建空值不表示清空旧记录，非空正文原样提交。",
           "evidence": [
             "creator_api:L16568-L16690",
             "creator_api:L17632-L17725",
             "provider_modus:_release_wire",
-            "provider_modus:publish"
+            "provider_modus:publish",
+            "creator_current_state:ReleaseFormPageViewModel.UpdateReleaseApiAsync/NullMarkerIfWhiteSpace",
+            "provider_modus:release_metadata"
           ],
           "status": "source-confirmed"
         },
@@ -755,12 +772,15 @@
         "plugin.update.path": {
           "wire": "path",
           "stage": "release-update",
-          "condition": "按字段存在发送；省略保留",
+          "condition": "带ZIP时省略或空串默认官方modus/wow/addons/{projectId}/files/{fileId}.zip；仅metadata编辑省略则保留；显式path保留。写后核对同fileId保存路径/MD5/尺寸并从官方CDN下载完整包；路径不可用、内容不符或非官方源需verification_required，不重放写入。",
           "evidence": [
             "creator_api:L16568-L16690",
             "creator_api:L17632-L17725",
             "provider_modus:_release_wire",
-            "provider_modus:publish"
+            "provider_modus:publish",
+            "creator_current_state:ApiService.BuildReleaseUploadPath/CdnService.Resolve/ProjectEditPage.DownloadReleaseAsync",
+            "provider_modus:_verify_release_download",
+            "live_creator_20261031:default-filename-404-canonical-200"
           ],
           "status": "source-confirmed"
         },
@@ -779,12 +799,14 @@
         "plugin.update.changelog": {
           "wire": "changelog",
           "stage": "release-update",
-          "condition": "编辑显式null发送JSON null清空（官方OptionalStringUpdate）；创建空值不表示清旧记录",
+          "condition": "update/edit显式null或空白按官方NullMarkerIfWhiteSpace发送字符串`<null>`清空；省略保留；非空正文原样保留。",
           "evidence": [
             "creator_api:L16568-L16690",
             "creator_api:L17632-L17725",
             "provider_modus:_release_wire",
-            "provider_modus:publish"
+            "provider_modus:publish",
+            "creator_current_state:ReleaseFormPageViewModel.UpdateReleaseApiAsync/NullMarkerIfWhiteSpace",
+            "provider_modus:release_metadata"
           ],
           "status": "source-confirmed"
         },
@@ -906,12 +928,15 @@
         "plugin.edit.path": {
           "wire": "path",
           "stage": "release-edit",
-          "condition": "按字段存在发送；省略保留",
+          "condition": "带ZIP时省略或空串默认官方modus/wow/addons/{projectId}/files/{fileId}.zip；仅metadata编辑省略则保留；显式path保留。写后核对同fileId保存路径/MD5/尺寸并从官方CDN下载完整包；路径不可用、内容不符或非官方源需verification_required，不重放写入。",
           "evidence": [
             "creator_api:L16568-L16690",
             "creator_api:L17632-L17725",
             "provider_modus:_release_wire",
-            "provider_modus:publish"
+            "provider_modus:publish",
+            "creator_current_state:ApiService.BuildReleaseUploadPath/CdnService.Resolve/ProjectEditPage.DownloadReleaseAsync",
+            "provider_modus:_verify_release_download",
+            "live_creator_20261031:default-filename-404-canonical-200"
           ],
           "status": "source-confirmed"
         },
@@ -930,12 +955,14 @@
         "plugin.edit.changelog": {
           "wire": "changelog",
           "stage": "release-edit",
-          "condition": "编辑显式null发送JSON null清空（官方OptionalStringUpdate）；创建空值不表示清旧记录",
+          "condition": "update/edit显式null或空白按官方NullMarkerIfWhiteSpace发送字符串`<null>`清空；省略保留；非空正文原样保留。",
           "evidence": [
             "creator_api:L16568-L16690",
             "creator_api:L17632-L17725",
             "provider_modus:_release_wire",
-            "provider_modus:publish"
+            "provider_modus:publish",
+            "creator_current_state:ReleaseFormPageViewModel.UpdateReleaseApiAsync/NullMarkerIfWhiteSpace",
+            "provider_modus:release_metadata"
           ],
           "status": "source-confirmed"
         },
@@ -3188,7 +3215,7 @@
         {
           "id": "M-METADATA",
           "state": "fixed-local-tests",
-          "finding": "原metadata-only md5/zip_size/unzip_size被publish丢弃、changelog:null被过滤；现透传并对携ZIP显式摘要/尺寸校验，null edit清空。"
+          "finding": "原metadata-only md5/zip_size/unzip_size被丢弃、changelog:null被过滤；现透传并核对携ZIP摘要/尺寸。编辑显式null/空白通过官方`<null>` marker清空，非空正文原样保留，已真机读回。"
         },
         {
           "id": "M-SPARSE",
@@ -3229,6 +3256,21 @@
           "id": "M-SOURCE-VERSIONS",
           "state": "evidence-scope",
           "finding": "所审Creator DLL为0.1.6.0；主客户端提取package.json为1.2.9。旧api-surface.csv将project delete写GET、release detail拼两个ID，均与已读IL矛盾，应以IL为准。"
+        },
+        {
+          "id": "M-RELEASE-DOWNLOAD-PATH",
+          "state": "fixed",
+          "finding": "真机确认原默认archive.name导致Creator下载URL404，而同一signed PUT对象canonical路径200且字节相同。默认path已按projectId/fileId修复；binary发布和显式path修改均加入同ID/MD5/尺寸/实际CDN完整包读回。失败verification_required，写不重试。"
+        },
+        {
+          "id": "M-RELEASE-CDN-CACHE",
+          "state": "platform-propagation-boundary",
+          "finding": "真机冷、热缓存对照：本轮客户端首次访问CDN前完成同fileId覆盖，新ZIP完整字节/MD5/尺寸均验证通过；已有缓存的canonical URL八小时后仍返回旧包。原顺序和官方PUT→metadata顺序均复现热缓存问题；Cache-Control:no-cache及MD5 query未消除旧缓存。保留verification_required并返回期望/实际摘要、尺寸及Age（存在时）；不新增query掩盖原链接，不擅自分配新fileId。plugin.upload新版本是独立已验证能力，不能默认为update替代。"
+        },
+        {
+          "id": "M-CREATOR-STATE-019",
+          "state": "source-and-live-confirmed",
+          "finding": "当前安装Creator/Shared为0.1.9.0。Project status1/2/3分别已通过/待审核/已拒绝；create可直接status1，无私密/草稿setter，空平台数组被官方CanCreate拒绝；null订阅并非私密。空项目公共版本/作者列表不出现，发布合成Alpha版本后匿名可见，Alpha/Beta不代表私密。项目及版本写入已在本轮独立临时资源完整覆盖并清理，原项目未改。"
         }
       ],
       "auth_read_checks": [
@@ -3300,6 +3342,12 @@
           "source": "existing main-client session",
           "remote_writes": false
         }
+      ],
+      "latest_release_audit_on": "2026-10-31",
+      "creator_live_action_evidence": "analyze/modus-completion/live-creator-full-648f7727/result.json",
+      "creator_binary_update_pending_evidence": [
+        "analyze/modus-completion/live-creator-full-dfe20d9b/result.json",
+        "analyze/modus-completion/live-creator-full-2f46f68b/result.json"
       ]
     },
     "curseforge": {
