@@ -226,7 +226,14 @@ class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin, BlackboxWAMixin):
             if (not isinstance(page, list) or any(type(value) is not int or value < 0 for value in totals) or
                     len(set(totals)) > 1):
                 raise FuploadError("version list response is invalid", kind="verification_required", verification_required=True)
-            if totals:
+            # Heybox reports the total on the first page, but can return
+            # total=0 on continuation pages containing the remaining records.
+            # Retain the known total so incomplete/duplicate pages still fail.
+            continuation_placeholder = (
+                offset > 0 and expected_total is not None and expected_total > 0
+                and totals == [0] and result.get("total") == 0
+            )
+            if totals and not continuation_placeholder:
                 if expected_total is not None and expected_total != totals[0]:
                     raise FuploadError("version list changed during pagination", kind="verification_required", verification_required=True)
                 expected_total = totals[0]
