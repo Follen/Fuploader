@@ -228,6 +228,24 @@ class VersionPaginationTests(unittest.TestCase):
                 self.assertEqual(provider._version_rows(7), rows)
                 self.assertEqual(offsets, list(range(0, size, 100)))
 
+    def test_overlapping_pages_require_a_complete_unique_snapshot(self):
+        rows = [{"id": i} for i in range(1, 5)]
+        for snapshot in (rows, rows[:-1], rows[:3] + rows[:1]):
+            requests = []
+            def transport(method, path, body, query):
+                offset, limit = query["offset"], query["limit"]
+                requests.append((offset, limit))
+                page = snapshot if limit == 4 else rows[:2] if offset == 0 else rows[1:3]
+                return {"status": "ok", "result": {"versionList": page, "total": 4 if not offset else 0}}
+            provider = Blackbox({"version_page_size": 2, "version_max_pages": 2}, transport)
+            with self.subTest(snapshot=snapshot):
+                if snapshot == rows:
+                    self.assertEqual(provider._version_rows(7), rows)
+                else:
+                    with self.assertRaises(FuploadError):
+                        provider._version_rows(7)
+                self.assertEqual(requests, [(0, 2), (2, 2), (0, 4)])
+
     def test_zero_placeholder_does_not_hide_incomplete_or_invalid_pages(self):
         for continuation in ([], [{"id": 1}], [{"id": 2}, {"id": 3}, {"id": 4}]):
             with self.subTest(continuation=continuation):

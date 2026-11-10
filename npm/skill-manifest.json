@@ -3,7 +3,7 @@
   "package_name": "@follenfang/fupload",
   "package_version": "1.1.1",
   "skill_version": "1.1.1",
-  "tree_sha256": "3665079bc42b2d0891828d32aa2e2d732eef88bba9b3d3c0570b5d5e487e6ddd",
+  "tree_sha256": "dea56a0710f72b4328f68d2980e98e570e1b1d66380a3fcf078cec0457edcf90",
   "files": [
     {
       "path": "agents/openai.yaml",
@@ -152,8 +152,8 @@
     },
     {
       "path": "scripts/fupload_cli/blackbox.py",
-      "bytes": 30550,
-      "sha256": "7bc37f8cdacadc99e025419f2b88ba4f8bcc357457401152193cdaef9f7ebf59"
+      "bytes": 31645,
+      "sha256": "e4552b657767eda9ae76ab568561cd13b3fb3a0bee240b6236e14c47e80003dd"
     },
     {
       "path": "scripts/fupload_cli/chromium_leveldb.py",
