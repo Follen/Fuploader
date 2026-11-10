@@ -212,7 +212,10 @@ class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin, BlackboxWAMixin):
         if limit < 1 or max_pages < 1:
             raise ValidationError("version pagination limits must be positive")
         rows, seen, offset, expected_total = [], set(), 0, None
-        for _ in range(max_pages):
+        snapshot_total = None
+        for page_number in range(max_pages + 1):
+            if page_number == max_pages and snapshot_total is None:
+                break
             result = self._result(self._request(
                 "GET", "/wow/open_platform/module_version/list/",
                 query={"moduleId":module_id,"offset":offset,"limit":limit},
@@ -226,10 +229,19 @@ class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin, BlackboxWAMixin):
             if (not isinstance(page, list) or any(type(value) is not int or value < 0 for value in totals) or
                     len(set(totals)) > 1):
                 raise FuploadError("version list response is invalid", kind="verification_required", verification_required=True)
-            if totals:
+            # Heybox reports the total on the first page, but can return
+            # total=0 on continuation pages containing the remaining records.
+            # Retain the known total so incomplete/duplicate pages still fail.
+            continuation_placeholder = (
+                offset > 0 and expected_total is not None and expected_total > 0
+                and totals == [0] and result.get("total") == 0
+            )
+            if totals and not continuation_placeholder:
                 if expected_total is not None and expected_total != totals[0]:
                     raise FuploadError("version list changed during pagination", kind="verification_required", verification_required=True)
                 expected_total = totals[0]
+            if snapshot_total is not None and (not totals or totals[0] != snapshot_total or len(page) != snapshot_total):
+                raise FuploadError("version snapshot is incomplete or changed", kind="verification_required", verification_required=True)
             if not page:
                 if expected_total is not None and len(rows) != expected_total:
                     raise FuploadError("version list ended before its reported total", kind="verification_required", verification_required=True)
@@ -237,10 +249,22 @@ class Blackbox(BlackboxConfigMixin, BlackboxBackupMixin, BlackboxWAMixin):
             for item in page:
                 identity = item.get("id") if isinstance(item, Mapping) else None
                 if (isinstance(identity, bool) or not isinstance(identity, (str, int)) or
-                        not str(identity).isascii() or not str(identity).isdigit() or int(identity) <= 0 or int(identity) in seen):
-                    raise FuploadError("version list contains invalid or repeated records", kind="verification_required", verification_required=True)
+                        not str(identity).isascii() or not str(identity).isdigit() or int(identity) <= 0):
+                    raise FuploadError("version list contains an invalid record", kind="verification_required", verification_required=True)
+                if int(identity) in seen:
+                    # Offset pages can overlap and omit a different row. A single
+                    # bounded snapshot must independently account for every ID.
+                    if offset and snapshot_total is None and 0 < (expected_total or 0) <= min(5000, limit * max_pages):
+                        snapshot_total = expected_total
+                        break
+                    raise FuploadError("version list contains repeated records", kind="verification_required", verification_required=True)
                 seen.add(int(identity))
                 rows.append(dict(item))
+            if snapshot_total is not None and offset:
+                rows.clear()
+                seen.clear()
+                offset, limit = 0, snapshot_total
+                continue
             offset += len(page)
             if expected_total is not None:
                 if len(rows) > expected_total:

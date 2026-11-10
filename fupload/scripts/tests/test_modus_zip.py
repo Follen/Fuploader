@@ -122,6 +122,24 @@ class ModusZipParserTests(unittest.TestCase):
         with self.assertRaisesRegex(ValidationError, "unsupported addon TOC Interface"):
             parse_modus_zip(make_zip(("Addon/Addon.toc", "## Interface: 999999\n")))
 
+    def test_historical_flavors_preserve_explicit_retail_and_forever_targets(self) -> None:
+        result = parse_modus_zip(make_zip(
+            ("Postal/Postal.toc", "## Interface: 16001, 120100, 120105"),
+            ("Postal/Postal_Mists.toc", "## Interface: 50502"),
+            ("Postal/Postal_TBC.toc", "## Interface: 20504"),
+            ("Postal/Postal_Wrath.toc", "## Interface: 30403"),
+        ))
+        self.assertEqual(result["unmapped_interface_values"], ["20504", "30403", "50502"])
+        self.assertEqual(set(result["toc_version"].split(",")),
+                         {"16001", "120100", "120105", "20504", "30403", "50502"})
+        targets = [{"gameVersion": "12.1.5", "server": "wow_retail"},
+                   {"gameVersion": "1.60.1", "server": "wow_forever"}]
+        config = [{"key": "wow_builds", "value": json.dumps({
+            "wow_retail": {"versions": ["12.1.5"]},
+            "wow_forever": {"versions": ["1.60.1"]},
+        })}]
+        self.assertEqual(select_game_versions(result["supported_game_versions"], config, targets), targets)
+
     def test_universal_flavors_use_live_choices_and_explicit_product_scope(self) -> None:
         result = parse_modus_zip(make_zip(
             ("Addon/Addon.toc", "## Interface: 11509,16001,20506,30405,38002,40402,50504,120100\n"),

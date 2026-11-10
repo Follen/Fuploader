@@ -48,9 +48,9 @@ INTERFACE_GAME_VERSION_MAP: Mapping[str, Mapping[str, str]] = {
     "50504": {"gameVersion": "5.5.4", "server": "wow_classic"},
 }
 
-# Recognized WoW clients in universal ZIPs which currently have no Creator
-# server mapping. Preserve their Interface codes, without inventing wire keys.
-KNOWN_UNMAPPED_INTERFACES = {"30405"}
+# Historical builds can appear in universal ZIPs without a matching Creator
+# release target. Preserve their Interface codes without selecting a server.
+KNOWN_UNMAPPED_INTERFACES = {"20504", "30403", "30405", "50502"}
 
 _INTERFACE_RE = re.compile(r"^\s*##\s*Interface\s*:\s*(.*?)\s*$", re.IGNORECASE)
 _INTERFACE_VALUE_RE = re.compile(r"^\d+$")

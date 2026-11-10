@@ -219,6 +219,52 @@ class VersionPaginationTests(unittest.TestCase):
             return {"status": "ok", "result": result_for_offset(query["offset"])}
         return Blackbox({"verify_attempts": 1, "delete_settle_seconds": 0}, transport), offsets
 
+    def test_continuation_total_zero_preserves_first_page_total(self):
+        for size in (133, 173, 205):
+            with self.subTest(size=size):
+                rows = [{"id": i} for i in range(1, size + 1)]
+                provider, offsets = self.provider(lambda offset: {
+                    "versionList": rows[offset:offset + 100], "total": size if offset == 0 else 0})
+                self.assertEqual(provider._version_rows(7), rows)
+                self.assertEqual(offsets, list(range(0, size, 100)))
+
+    def test_overlapping_pages_require_a_complete_unique_snapshot(self):
+        rows = [{"id": i} for i in range(1, 5)]
+        for snapshot in (rows, rows[:-1], rows[:3] + rows[:1]):
+            requests = []
+            def transport(method, path, body, query):
+                offset, limit = query["offset"], query["limit"]
+                requests.append((offset, limit))
+                page = snapshot if limit == 4 else rows[:2] if offset == 0 else rows[1:3]
+                return {"status": "ok", "result": {"versionList": page, "total": 4 if not offset else 0}}
+            provider = Blackbox({"version_page_size": 2, "version_max_pages": 2}, transport)
+            with self.subTest(snapshot=snapshot):
+                if snapshot == rows:
+                    self.assertEqual(provider._version_rows(7), rows)
+                else:
+                    with self.assertRaises(FuploadError):
+                        provider._version_rows(7)
+                self.assertEqual(requests, [(0, 2), (2, 2), (0, 4)])
+
+    def test_zero_placeholder_does_not_hide_incomplete_or_invalid_pages(self):
+        for continuation in ([], [{"id": 1}], [{"id": 2}, {"id": 3}, {"id": 4}]):
+            with self.subTest(continuation=continuation):
+                provider, _ = self.provider(lambda offset: {
+                    "versionList": [{"id": 1}] if offset == 0 else continuation,
+                    "total": 3 if offset == 0 else 0})
+                with self.assertRaises(FuploadError) as caught:
+                    provider._version_rows(7)
+                self.assertTrue(caught.exception.verification_required)
+
+    def test_zero_placeholder_does_not_confirm_undeleted_target(self):
+        rows = [{"id": i, "auditState": 2} for i in range(1, 134)]
+        provider, offsets = self.provider(lambda offset: {
+            "versionList": rows[offset:offset + 100], "total": 133 if offset == 0 else 0})
+        with self.assertRaises(FuploadError) as caught:
+            provider.version_delete({"module_id": 7, "version_id": 133})
+        self.assertTrue(caught.exception.verification_required)
+        self.assertEqual(offsets, [0, 100])
+
     def test_short_pages_advance_by_actual_rows_with_and_without_total(self):
         rows = [{"id": i} for i in range(1, 7)]
         for with_total in (True, False):
